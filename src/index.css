@@ -1,0 +1,79 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Admin Dark Mode Styles */
+.admin-dark {
+  --admin-bg-primary: #0f172a;
+  --admin-bg-secondary: #1e293b;
+  --admin-bg-tertiary: #334155;
+  --admin-text-primary: #f1f5f9;
+  --admin-text-secondary: #cbd5e1;
+  --admin-text-muted: #94a3b8;
+  --admin-border: #334155;
+  --admin-hover: #1e293b;
+}
+
+.admin-dark .admin-container {
+  background-color: var(--admin-bg-primary);
+  color: var(--admin-text-primary);
+}
+
+.admin-dark .admin-sidebar {
+  background-color: var(--admin-bg-secondary);
+  border-color: var(--admin-border);
+}
+
+.admin-dark .admin-card {
+  background-color: var(--admin-bg-secondary);
+  border-color: var(--admin-border);
+  color: var(--admin-text-primary);
+}
+
+.admin-dark .admin-input {
+  background-color: var(--admin-bg-tertiary);
+  border-color: var(--admin-border);
+  color: var(--admin-text-primary);
+}
+
+.admin-dark .admin-input::placeholder {
+  color: var(--admin-text-muted);
+}
+
+.admin-dark .admin-text-primary {
+  color: var(--admin-text-primary);
+}
+
+.admin-dark .admin-text-secondary {
+  color: var(--admin-text-secondary);
+}
+
+.admin-dark .admin-text-muted {
+  color: var(--admin-text-muted);
+}
+
+.admin-dark .admin-border {
+  border-color: var(--admin-border);
+}
+
+.admin-dark .admin-hover:hover {
+  background-color: var(--admin-hover);
+}
+
+.admin-dark .admin-table-header {
+  background-color: var(--admin-bg-tertiary);
+}
+
+.admin-dark .admin-table-row:hover {
+  background-color: var(--admin-bg-tertiary);
+}
+
+/* Utility classes */
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
