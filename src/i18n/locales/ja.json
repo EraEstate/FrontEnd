@@ -1,0 +1,1004 @@
+{
+  "common": {
+    "loading": "読み込み中...",
+    "error": "エラー",
+    "success": "成功",
+    "cancel": "キャンセル",
+    "confirm": "確認",
+    "save": "保存",
+    "delete": "削除",
+    "edit": "編集",
+    "add": "追加",
+    "search": "検索",
+    "filter": "フィルター",
+    "sort": "並び替え",
+    "view": "表示",
+    "back": "戻る",
+    "next": "次へ",
+    "previous": "前へ",
+    "close": "閉じる",
+    "open": "開く",
+    "yes": "はい",
+    "no": "いいえ",
+    "submit": "送信",
+    "reset": "リセット",
+    "clear": "クリア",
+    "select": "選択",
+    "selected": "選択済み",
+    "all": "すべて",
+    "none": "なし",
+    "more": "もっと見る",
+    "less": "少なく",
+    "user": "ユーザー",
+    "broker": "ブローカー",
+    "enter": "入力",
+    "spam": "スパム",
+    "email": "メール",
+    "zalo": "Zalo",
+    "notSelected": "未選択",
+    "processing": "処理中",
+    "unknown": "不明",
+    "preview": "プレビュー",
+    "characters": "文字",
+    "billion": "億",
+    "million": "百万",
+    "retry": "再試行",
+    "backToList": "リストに戻る",
+    "tags": "タグ",
+    "relatedArticles": "関連記事",
+    "linkCopied": "リンクをクリップボードにコピーしました！",
+    "importantNote": "重要なお知らせ",
+    "bedrooms": "寝室",
+    "bathrooms": "浴室",
+    "area": "面積",
+    "price": "価格",
+    "province": "省/市",
+    "district": "区/県",
+    "ward": "町/村",
+    "selectProvince": "省/市を選択",
+    "selectDistrict": "区/県を選択",
+    "selectWard": "町/村を選択",
+    "specificAddress": "詳細住所",
+    "continue": "続ける",
+    "loadError": "データの読み込みエラー",
+    "viewAll": "すべて表示",
+    "viewProperties": "物件を見る",
+    "readNews": "ニュースを読む",
+    "goBack": "前のページに戻る",
+    "needHelp": "サポートが必要ですか？",
+    "supportTeam": "サポートチームがいつでもお手伝いします",
+    "call": "電話をかける",
+    "contactHotline": "ホットラインに連絡してサポートを受ける",
+    "office": "オフィス",
+    "visitOffice": "最寄りのオフィスを訪問",
+    "viewAddress": "住所を見る",
+    "searchProperties": "適切な物件を検索",
+    "startSearching": "検索を始める",
+    "popularLinks": "人気リンク",
+    "apartmentHCM": "ホーチミン市のアパート",
+    "houseHanoi": "ハノイの戸建て",
+    "villaDaNang": "ダナンのヴィラ",
+    "landBinhDuong": "ビンズオンの土地",
+    "officeRent": "オフィス賃貸",
+    "marketNews": "市場ニュース",
+    "viewDetails": "詳細を見る",
+    "home": "ホーム",
+    "news": "ニュース",
+    "views": "回閲覧",
+    "author": "著者",
+    "like": "いいね",
+    "share": "共有"
+  },
+  "header": {
+    "home": "ホーム",
+    "properties": "物件",
+    "projects": "プロジェクト",
+    "agencies": "代理店",
+    "agents": "エージェント",
+    "news": "ニュース",
+    "wiki": "不動産Wiki",
+    "about": "会社概要",
+    "contact": "お問い合わせ",
+    "login": "ログイン",
+    "register": "登録",
+    "logout": "ログアウト",
+    "dashboard": "ダッシュボード",
+    "myProperties": "マイ物件",
+    "favorites": "お気に入り",
+    "notifications": "通知",
+    "profile": "プロフィール",
+    "settings": "設定",
+    "explore": "探索",
+    "brokerage": "ブローカー",
+    "companies": "会社",
+    "marketAnalysis": "市場分析",
+    "utilities": "ユーティリティ",
+    "pricing": "価格設定",
+    "appDownload": "アプリダウンロード",
+    "postProperty": "物件投稿",
+    "rent": "賃貸物件"
+  },
+  "footer": {
+    "about": "会社概要",
+    "contact": "お問い合わせ",
+    "privacy": "プライバシーポリシー",
+    "terms": "利用規約",
+    "copyright": "© 2024 Apartment. 全著作権所有。"
+  },
+  "home": {
+    "hero": {
+      "title": "不動産",
+      "subtitle": "全国で数千の信頼できる物件リストを発見",
+      "searchPlaceholder": "場所、物件タイプを検索...",
+      "searchButton": "検索"
+    },
+    "featured": {
+      "title": "注目の物件",
+      "subtitle": "慎重に選ばれたプレミアム物件"
+    },
+    "categories": {
+      "title": "カテゴリー",
+      "apartments": "アパート",
+      "houses": "住宅",
+      "offices": "オフィス",
+      "land": "土地"
+    },
+    "stats": {
+      "properties": "物件",
+      "agents": "エージェント",
+      "companies": "会社",
+      "projects": "プロジェクト"
+    },
+    "tabs": {
+      "sale": "販売物件",
+      "rent": "賃貸物件",
+      "project": "プロジェクト"
+    },
+    "search": {
+      "location": "全国",
+      "placeholder": "検索",
+      "propertyType": "物件タイプ",
+      "priceRange": "価格帯",
+      "area": "面積"
+    },
+    "viewMore": "もっと見る",
+    "sections": {
+      "featuredProperties": "あなたにおすすめの物件",
+      "featuredNews": "注目のニュース",
+      "news": "ニュース",
+      "featuredProjects": "注目の不動産プロジェクト",
+      "propertiesByLocation": "場所別物件",
+      "realEstateNews": "不動産ニュース",
+      "utilitySupport": "ユーティリティサポート",
+      "featuredCompanies": "注目の会社",
+      "mediaCoverage": "Batdongsan.com.vnのメディア報道"
+    },
+    "banner": {
+      "slide1": {
+        "title": "高級アパートVinhomes Central Park",
+        "subtitle": "32億ベトナムドンから - Binh Thanh区、ホーチミン市",
+        "alt": "高級アパート室内"
+      },
+      "slide2": {
+        "title": "隣接ヴィラVinhomes Grand Park",
+        "subtitle": "85億ベトナムドンから - 第9区、ホーチミン市",
+        "alt": "モダンヴィラ外観"
+      },
+      "slide3": {
+        "title": "商業店舗",
+        "subtitle": "128億ベトナムドンから - 第7区、ホーチミン市",
+        "alt": "商業店舗"
+      },
+      "slide4": {
+        "title": "高層アパートハノイ",
+        "subtitle": "28億ベトナムドンから - Cau Giay、ハノイ",
+        "alt": "高層アパートビル"
+      }
+    },
+    "featuredNews": {
+      "hanoi": {
+        "title": "ハノイ不動産",
+        "subtitle": "ハノイ不動産市場の最新ニュース"
+      },
+      "hcm": {
+        "title": "ホーチミン市不動産",
+        "subtitle": "ホーチミン市不動産ニュース更新"
+      },
+      "wiki": {
+        "title": "不動産Wiki",
+        "subtitle": "不動産に関する知識とガイド"
+      }
+    },
+    "projects": {
+      "libera": {
+        "name": "Libera Nha Trang",
+        "location": "Nha Trang, Khánh Hòa"
+      },
+      "lumiere": {
+        "name": "Lumiere SpringBay",
+        "location": "Văn Giang, Hưng Yên"
+      },
+      "jade": {
+        "name": "Jade Square",
+        "location": "第9区、ホーチミン市"
+      },
+      "masteri": {
+        "name": "Masteri Centre Point",
+        "location": "第9区、ホーチミン市"
+      },
+      "verosa": {
+        "name": "Verosa Park Khang Điền",
+        "location": "第9区、ホーチミン市"
+      },
+      "vinhomes": {
+        "name": "Vinhomes Grand Park",
+        "location": "第9区、ホーチミン市"
+      },
+      "status": {
+        "opening": "現在オープン",
+        "comingSoon": "近日公開",
+        "completed": "完了",
+        "selling": "現在販売中"
+      }
+    },
+    "locations": {
+      "hcm": {
+        "name": "ホーチミン市",
+        "listings": "77,810件のリスト"
+      },
+      "hanoi": {
+        "name": "ハノイ",
+        "listings": "58,320件のリスト"
+      },
+      "danang": {
+        "name": "ダナン",
+        "listings": "9,964件のリスト"
+      },
+      "binhduong": {
+        "name": "ビンズオン",
+        "listings": "8,667件のリスト"
+      }
+    },
+    "featuredProjects": {
+      "vinhomesCentral": "Vinhomes Central Park",
+      "vinhomesGrand": "Vinhomes Grand Park",
+      "vinhomesSmart": "Vinhomes Smart City",
+      "vinhomesOcean": "Vinhomes Ocean Park",
+      "vungTau": "Vũng Tàu Pearl",
+      "bcons": "Bcons Green View",
+      "grandeur": "Grandeur Palace",
+      "diamond": "Diamond Island",
+      "haDo": "HaDo Centrosa Garden",
+      "sunAvenue": "The Sun Avenue"
+    },
+    "news": {
+      "article1": {
+        "title": "これを知らないでAgribankを担保にしないで！",
+        "subtitle": "2025年事業用水価格：新しい規制と詳細な価格表の更新"
+      },
+      "article2": {
+        "title": "2025年事業用水価格：新しい規制と詳細な価格表の更新",
+        "subtitle": "両親が亡くなった時の子供への土地分配法：手続きと福利に関する最新ガイド"
+      },
+      "article3": {
+        "title": "両親が亡くなった時の子供への土地分配法：手続きと福利に関する最新ガイド",
+        "subtitle": "Agribank営業時間：月曜日から日曜日までの詳細"
+      },
+      "article4": {
+        "title": "Agribank営業時間：月曜日から日曜日までの詳細",
+        "subtitle": "2025年ホーチミン市社会住宅プロジェクト進捗更新"
+      },
+      "article5": {
+        "title": "2025年ホーチミン市社会住宅プロジェクト進捗更新",
+        "subtitle": "ビンロウはどの星座に適しているか？良い風水のためにビンロウを植える方法"
+      },
+      "article6": {
+        "title": "ビンロウはどの星座に適しているか？良い風水のためにビンロウを植える方法",
+        "subtitle": "ベトナムで一般的な不動産タイプ"
+      }
+    },
+    "utilities": {
+      "ageCalculator": {
+        "title": "家建て年齢を確認",
+        "desc": "家建てに適した年齢を相談"
+      },
+      "constructionCost": {
+        "title": "家建て費用",
+        "desc": "詳細な建設費見積もり"
+      },
+      "interestCalculator": {
+        "title": "金利計算",
+        "desc": "住宅ローン金利の計算"
+      },
+      "fengshui": {
+        "title": "風水相談",
+        "desc": "住宅風水ガイド"
+      }
+    },
+    "companies": {
+      "catTuong": "CAT TUONG不動産グループ",
+      "spHome": "SP HOME不動産貿易サービス有限会社",
+      "kimOanh": "Kim Oanhグループ",
+      "seaholdings": "SEAHOLDINGS不動産株式会社",
+      "gamuda": "Gamuda Landベトナム有限会社",
+      "ttRealty": "TT REALTY投資株式会社"
+    },
+    "media": {
+      "article1": {
+        "title": "地方での土地の売買：4つの重要な注意点",
+        "source": "Tuổi Trẻ"
+      },
+      "article2": {
+        "title": "需要減少にもかかわらず地価は上昇",
+        "source": "Thanh Niên"
+      },
+      "article3": {
+        "title": "地方での不動産購入の解決策",
+        "source": "Dân Trí"
+      },
+      "article4": {
+        "title": "Batdongsan.com.vn親会社収入42%増加",
+        "source": "CafeBiz"
+      },
+      "article5": {
+        "title": "地方での土地取引時のリスク回避経験",
+        "source": "Zing News"
+      },
+      "article6": {
+        "title": "賃貸不動産が不況を脱出",
+        "source": "Pháp Luật Online"
+      }
+    }
+  },
+  "properties": {
+    "title": "物件",
+    "search": {
+      "location": "場所",
+      "type": "タイプ",
+      "price": "価格",
+      "area": "面積",
+      "bedrooms": "寝室",
+      "bathrooms": "浴室",
+      "placeholder": "全国",
+      "button": "検索"
+    },
+    "filters": {
+      "title": "フィルター",
+      "priceRange": "価格帯",
+      "areaRange": "面積範囲",
+      "propertyType": "物件タイプ",
+      "features": "設備",
+      "verified": "検証済み",
+      "clear": "フィルタークリア",
+      "professionalBroker": "プロフェッショナルブローカー"
+    },
+    "details": {
+      "price": "価格",
+      "area": "面積",
+      "bedrooms": "寝室",
+      "bathrooms": "浴室",
+      "floor": "階数",
+      "direction": "向き",
+      "description": "説明",
+      "features": "設備",
+      "location": "場所",
+      "contact": "連絡先",
+      "similar": "類似物件",
+      "owner": "所有者",
+      "posted": "投稿日",
+      "views": "閲覧数",
+      "favorites": "お気に入り"
+    },
+    "actions": {
+      "favorite": "お気に入り",
+      "unfavorite": "お気に入り解除",
+      "contact": "連絡",
+      "viewDetails": "詳細表示",
+      "share": "共有",
+      "saveListing": "このリストを保存",
+      "showPhone": "電話番号を表示"
+    },
+    "status": {
+      "available": "利用可能",
+      "sold": "売却済み",
+      "rented": "賃貸済み",
+      "negotiable": "価格交渉可能"
+    },
+    "loading": "物件を読み込み中...",
+    "error": "データ読み込みエラー",
+    "noResults": "物件が見つかりません",
+    "viewMap": "地図を表示",
+    "pageTitle": "全国で不動産の売買",
+    "propertiesCount": "現在<strong>{{count}}</strong>件の物件を表示しています。",
+    "emailNotifications": "新着リストのメール通知を取得",
+    "sortOptions": {
+      "default": "デフォルト",
+      "newest": "最新",
+      "priceLowToHigh": "価格：安い順",
+      "priceHighToLow": "価格：高い順"
+    },
+    "viewOptions": {
+      "list": "リスト",
+      "map": "地図"
+    },
+    "loadMore": "もっと物件を読み込む",
+    "sidebar": {
+      "byProvince": "都道府県別物件",
+      "provinces": {
+        "hcm": "ホーチミン市",
+        "hanoi": "ハノイ",
+        "danang": "ダナン",
+        "binhduong": "ビンズオン",
+        "khanhhoa": "カンホア"
+      },
+      "popularArticles": "人気記事"
+    },
+    "content": {
+      "mainTitle": "Batdongsan.com.vnで2025年10月の不動産を迅速に売買",
+      "sections": {
+        "marketSegments": "不動産市場セグメントを学ぶ"
+      },
+      "marketSegments": {
+        "description": "不動産市場で人気のある不動産セグメントをいくつか紹介します：",
+        "apartments": "アパート販売",
+        "apartmentsDesc": "これは大都市や地方で人気のある不動産タイプで、住宅需要が通常非常に高いです。",
+        "houses": "個人住宅販売",
+        "housesDesc": "個人住宅または一戸建ては、プライベートで独立した空間を求めるお客様に適しています。",
+        "villas": "ヴィラとタウンハウス販売",
+        "villasDesc": "ヴィラとタウンハウスタイプは現在、住宅購入者と投資家の両方から注目されています。",
+        "land": "プロジェクト土地販売",
+        "landDesc": "プロジェクト土地販売は、利益機会を求める投資家だけでなく、住むための家を購入するお客様にも魅力的です。"
+      },
+      "fastBuying": {
+        "title": "Batdongsan.com.vnで迅速かつ信頼できる不動産売買",
+        "description": "Batdongsan.com.vnは10年以上にわたり工業貿易省から表彰を受けた信頼できるウェブサイトで、不動産分野の主要ウェブサイトの一つとしての専門性と安定性を示しています。"
+      }
+    },
+    "studioFullFurniture": "家具付きスタジオアパート賃貸"
+  },
+  "auth": {
+    "login": {
+      "title": "ログイン",
+      "email": "メールアドレス",
+      "password": "パスワード",
+      "rememberMe": "ログイン状態を保持",
+      "forgotPassword": "パスワードをお忘れですか？",
+      "loginButton": "ログイン",
+      "noAccount": "アカウントをお持ちでないですか？",
+      "registerLink": "今すぐ登録",
+      "orLoginWith": "または以下でログイン",
+      "pleaseLogin": "ログインしてください",
+      "needLoginToView": "このページを表示するにはログインが必要です",
+      "needLoginToPost": "物件を投稿するにはログインが必要です"
+    },
+    "register": {
+      "title": "登録",
+      "fullName": "氏名",
+      "email": "メールアドレス",
+      "password": "パスワード",
+      "confirmPassword": "パスワード確認",
+      "phone": "電話番号",
+      "registerButton": "登録",
+      "haveAccount": "既にアカウントをお持ちですか？",
+      "loginLink": "ログイン",
+      "createAccount": "新しいアカウントを作成",
+      "createAccountButton": "アカウントを作成",
+      "orRegisterWith": "または次の方法で登録",
+      "registerToExperience": "BDSPortalのすべての機能を体験するにはアカウント登録してください",
+      "enterFullName": "フルネームを入力",
+      "enterPhone": "電話番号を入力",
+      "enterPassword": "パスワードを入力",
+      "reEnterPassword": "パスワードを再入力",
+      "passwordMinLength": "パスワードは6文字以上である必要があります",
+      "passwordMatch": "パスワードが一致します",
+      "passwordNotMatch": "パスワードが一致しません"
+    },
+    "loginFooter": {
+      "termsAgreement": "ログインすることで、当社の",
+      "termsOfService": "利用規約",
+      "and": "と",
+      "privacyPolicy": "プライバシーポリシー",
+      "ofUs": "に同意したことになります。",
+      "whyChoose": "なぜBDSPortalを選ぶのか？",
+      "features": {
+        "trustedListings": "数千の信頼できる物件リスト",
+        "transparentInfo": "透明で正確な情報",
+        "support247": "24/7カスタマーサポート",
+        "userFriendly": "ユーザーフレンドリーなインターフェース"
+      }
+    }
+  },
+  "dashboard": {
+    "welcome": "ようこそ",
+    "stats": {
+      "totalProperties": "総物件数",
+      "activeListings": "アクティブリスト",
+      "totalViews": "総閲覧数",
+      "favorites": "お気に入り"
+    },
+    "recentActivity": "最近のアクティビティ",
+    "quickActions": "クイックアクション",
+    "viewRequest": "顧客からの内覧リクエスト",
+    "premiumApartment": "プレミアムアパート",
+    "hoursAgo": "{{count}}時間前",
+    "newViews": "{{count}}回の新しい閲覧",
+    "townhouse": "タウンハウス",
+    "addedToFavorites": "お気に入りに追加された物件",
+    "parkResidence": "アパート",
+    "yourProperties": "あなたの物件",
+    "overview": "概要",
+    "totalProperties": "総物件数",
+    "activeProperties": "アクティブな物件",
+    "totalViews": "総閲覧数",
+    "inquiries": "お問い合わせ",
+    "revenue": "収益",
+    "recentViews": "最近の閲覧",
+    "newInquiries": "新しいお問い合わせ",
+    "topProperties": "トップ物件",
+    "views": "回閲覧"
+  },
+  "language": {
+    "select": "言語を選択",
+    "current": "現在の言語",
+    "vietnamese": "ベトナム語",
+    "english": "英語",
+    "chinese": "中国語",
+    "japanese": "日本語",
+    "korean": "韓国語",
+    "french": "フランス語",
+    "german": "ドイツ語",
+    "spanish": "スペイン語",
+    "italian": "イタリア語",
+    "portuguese": "ポルトガル語",
+    "russian": "ロシア語",
+    "arabic": "アラビア語",
+    "hindi": "ヒンディー語",
+    "thai": "タイ語",
+    "malay": "マレー語",
+    "indonesian": "インドネシア語",
+    "filipino": "フィリピン語",
+    "khmer": "クメール語",
+    "burmese": "ビルマ語"
+  },
+  "settings": {
+    "title": "設定",
+    "account": "アカウント",
+    "password": "パスワード",
+    "changePassword": "パスワードを変更",
+    "currentPassword": "現在のパスワード",
+    "newPassword": "新しいパスワード",
+    "confirmNewPassword": "新しいパスワードを確認",
+    "updateButton": "更新",
+    "updating": "更新中...",
+    "changePasswordButton": "パスワードを変更",
+    "passwordChanged": "パスワードが正常に変更されました！",
+    "passwordNotMatch": "新しいパスワードが一致しません！",
+    "errorChangingPassword": "パスワードの変更中にエラーが発生しました。",
+    "subtitle": "個人情報とアカウント設定を管理",
+    "personalInfo": "個人情報",
+    "preferences": "設定",
+    "notifications": "通知",
+    "updateSuccess": "情報を更新しました！",
+    "updateError": "情報の更新中にエラーが発生しました。",
+    "preferencesUpdated": "設定を更新しました！",
+    "notificationsUpdated": "通知設定を更新しました！",
+    "changeAvatar": "写真を変更",
+    "avatarFormat": "JPG、PNG最大2MB",
+    "saveChanges": "変更を保存",
+    "language": "Ngôn ngữ",
+    "currency": "Đơn vị tiền tệ",
+    "dateFormat": "Định dạng ngày",
+    "timezone": "Múi giờ",
+    "vietnamTimezone": "Việt Nam (GMT+7)",
+    "saveSettings": "Lưu cài đặt",
+    "notificationSettings": "Cài đặt thông báo",
+    "notificationChannels": "Kênh thông báo",
+    "emailNotifications": "Thông báo qua Email",
+    "smsNotifications": "Thông báo qua SMS",
+    "pushNotifications": "Thông báo đẩy",
+    "notificationTypes": "Loại thông báo",
+    "marketingEmails": "Email quảng cáo",
+    "propertyAlerts": "Cảnh báo BDS",
+    "priceUpdates": "Cập nhật giá",
+    "newMessages": "Tin nhắn mới"
+  },
+  "profile": {
+    "title": "プロフィール",
+    "viewProfile": "プロフィールを表示",
+    "editProfile": "プロフィールを編集",
+    "personalInfo": "個人情報",
+    "contactInfo": "連絡先情報",
+    "overview": "概要",
+    "myProperties": "マイ物件",
+    "myFavorites": "保存した物件",
+    "activities": "アクティビティ",
+    "settings": "設定",
+    "propertyTypes": {
+      "apartment": "アパート",
+      "house": "戸建て",
+      "villa": "ヴィラ",
+      "office": "オフィス",
+      "land": "土地",
+      "other": "その他"
+    },
+    "status": {
+      "available": "販売中",
+      "sold": "売却済み",
+      "rented": "賃貸済み",
+      "pending": "保留中"
+    },
+    "avatar": "アバター"
+  },
+  "about": {
+    "title": "会社概要",
+    "mission": "私たちの使命",
+    "vision": "私たちのビジョン",
+    "values": "私たちの価値観",
+    "team": "私たちのチーム",
+    "stats": {
+      "users": "信頼されているユーザー",
+      "properties": "物件リスト",
+      "transactions": "成功した取引",
+      "rating": "顧客評価"
+    },
+    "coreValues": {
+      "trust": "信頼と透明性",
+      "trustDesc": "正確な情報を保証し、すべての関係者に安全で透明な取引を提供します。",
+      "speed": "迅速かつ効率的",
+      "speedDesc": "現代技術を適用してユーザーに最高の体験を提供します。",
+      "dedication": "献身的でプロフェッショナル",
+      "dedicationDesc": "経験豊富な専門家チームが、常に顧客の利益を最優先します。",
+      "innovation": "革新と創造性",
+      "innovationDesc": "継続的に改善し、開発して最適なソリューションを提供します。"
+    },
+    "joinUs": "今すぐ参加",
+    "registerNow": "今すぐ登録",
+    "description": "ベトナムをリードする不動産プラットフォーム、数百万人の夢の家と優れた投資機会を結ぶ。",
+    "yearsActive": "運営年数",
+    "provinces": "省",
+    "support": "サポート",
+    "missionDesc": "不動産情報へのアクセスを民主化し、誰もが簡単に検索、売買、スマートに投資できるようにします。テクノロジーと高品質なサービスを通じて、お客様に真の価値を提供することをお約束します。",
+    "visionDesc": "東南アジアのリーディング不動産プラットフォームとなり、AI、ビッグデータ、ブロックチェーン技術の応用を先導し、透明で効率的、信頼できる不動産エコシステムを創出します。2030年までに1000万人のユーザーへのサービス提供を目指します。",
+    "timeline": "発展の歴史",
+    "testimonials": "お客様の声",
+    "awards": "受賞・認証",
+    "award1Title": "2023年ベトナムスタートアップトップ10",
+    "award1Desc": "ベトナムスタートアップアワード受賞",
+    "award2Title": "ISO 27001認証",
+    "award2Desc": "国際情報セキュリティ標準",
+    "award3Title": "2024年ベストプロップテックプラットフォーム",
+    "award3Desc": "優れた不動産テクノロジー賞",
+    "joinUsDesc": "BDSPortalコミュニティに参加して、最も現代的で効率的な不動産売買・賃貸方法を体験してください。",
+    "learnMore": "詳しく見る"
+  },
+  "contact": {
+    "title": "お問い合わせ",
+    "getInTouch": "お問い合わせください",
+    "sendMessage": "メッセージを送信",
+    "name": "名前",
+    "phone": "電話",
+    "subject": "件名",
+    "message": "メッセージ",
+    "sendButton": "メッセージを送信",
+    "sending": "送信中...",
+    "contactInfo": "連絡先情報",
+    "address": "住所",
+    "email": "メール",
+    "followUs": "フォローしてください",
+    "officeAddress": "オフィス住所",
+    "hotline": "ホットライン",
+    "workingHours": "営業時間",
+    "freeConsultation": "無料相談：1900 1234",
+    "technicalSupport": "Hỗ trợ kỹ thuật",
+    "partnerLine": "Đối tác",
+    "mondayToFriday": "月曜日～金曜日：8:00～18:00",
+    "saturday": "土曜日：8:00～17:00",
+    "sunday": "日曜日：9:00～16:00",
+    "departments": {
+      "title": "Các phòng ban",
+      "customerSupport": "顧客相談",
+      "customerSupportDesc": "不動産検索とコンサルティングサポート",
+      "technical": "Hỗ trợ kỹ thuật",
+      "technicalDesc": "Giải đáp vấn đề website, app",
+      "partnership": "パートナー協力",
+      "partnershipDesc": "ブローカーおよび代理店との提携",
+      "media": "メディア関係",
+      "mediaDesc": "プレスとPR関係",
+      "technicalSupport": "技術サポート",
+      "technicalSupportDesc": "ウェブサイトとアプリの問題解決"
+    },
+    "stats": {
+      "users": "Người dùng",
+      "listings": "Tin đăng",
+      "successfulConsultations": "Tư vấn thành công",
+      "satisfaction": "Khách hàng hài lòng"
+    },
+    "form": {
+      "yourName": "Họ và tên của bạn",
+      "yourEmail": "Email của bạn",
+      "yourPhone": "Số điện thoại của bạn",
+      "selectSubject": "Chọn chủ đề",
+      "subjects": {
+        "generalInquiry": "Câu hỏi chung",
+        "propertyInquiry": "Tư vấn bất động sản",
+        "technicalSupport": "Hỗ trợ kỹ thuật",
+        "partnership": "Hợp tác kinh doanh",
+        "complaint": "Khiếu nại",
+        "other": "Khác"
+      },
+      "yourMessage": "Nội dung tin nhắn",
+      "submitButton": "Gửi tin nhắn",
+      "submitting": "Đang gửi...",
+      "successTitle": "Gửi tin nhắn thành công!",
+      "successMessage": "Cảm ơn bạn đã liên hệ với chúng tôi. Chúng tôi sẽ phản hồi trong thời gian sớm nhất.",
+      "backToHome": "Về trang chủ",
+      "sendNewMessage": "新しいメッセージを送信"
+    },
+    "locations": {
+      "hanoi": "Hà Nội",
+      "hcm": "TP. Hồ Chí Minh",
+      "danang": "Đà Nẵng"
+    },
+    "socialMedia": {
+      "facebook": "Facebook",
+      "youtube": "Youtube",
+      "linkedin": "LinkedIn",
+      "zalo": "Zalo"
+    },
+    "heroDescription": "BDSPortalの専門家チームは24時間年中無休でサポートいたします。今すぐお問い合わせいただき、無料相談をご利用ください！",
+    "floor12": "ABCタワー12階",
+    "street123": "レロイ通り123番地、第1区",
+    "city": "ホーチミン市、ベトナム",
+    "technicalSupportPhone": "技術サポート：028 3456 7890",
+    "partnerPhone": "パートナー：028 3456 7891"
+  },
+  "postProperty": {
+    "apartment": "アパート",
+    "villa": "ヴィラ",
+    "land": "土地",
+    "forRent": "賃貸",
+    "noFurniture": "家具なし",
+    "basicFurniture": "基本家具",
+    "balcony": "バルコニー",
+    "basicInfo": "基本情報",
+    "propertyDetails": "物件詳細",
+    "rentProperty": "賃貸物件",
+    "preview": "プレビュー",
+    "posting": "投稿中...",
+    "postButton": "物件を投稿",
+    "house": "一軒家",
+    "office": "オフィス",
+    "fullFurniture": "家具完備",
+    "parking": "駐車場",
+    "wifi": "Wi-Fi",
+    "security247": "24時間セキュリティ",
+    "garden": "庭園",
+    "elevator": "エレベーター",
+    "airConditioning": "エアコン",
+    "typeAndTransaction": "物件タイプと取引タイプ",
+    "areaPriceAddress": "面積、価格、住所",
+    "descriptionAndFeatures": "説明と設備",
+    "detailsAndAmenities": "詳細とアメニティ",
+    "uploadImages": "画像をアップロード",
+    "previewAndPost": "プレビューして投稿",
+    "reviewAndComplete": "確認して完了",
+    "needLoginToPost": "物件を投稿するにはログインが必要です",
+    "selectPropertyType": "物件タイプを選択",
+    "titleExample": "例：Vinhomes Central Parkの川景色付き高級2BR2BAアパート",
+    "priceExample": "例：5500000000",
+    "areaExample": "例：85",
+    "addressExample": "例：Nguyen Hue通り123番地",
+    "floors": "階数",
+    "yearBuilt": "築年",
+    "detailedDescription": "詳細説明",
+    "descriptionPlaceholder": "物件の詳細説明：場所、デザイン、周辺施設...",
+    "furnishingStatus": "家具の状態",
+    "featuresAndAmenities": "特徴とアメニティ",
+    "imageUploadNote": "最大10枚の画像をアップロードできます。最初の画像がカバー画像になります。",
+    "coverImage": "カバー画像",
+    "uploadImage": "画像をアップロード",
+    "noImages": "まだ画像がアップロードされていません",
+    "selectFromComputer": "コンピューターから選択",
+    "previewPost": "投稿をプレビュー",
+    "moderationNote": "投稿は24時間以内に審査されます",
+    "accuracyNote": "正確な情報と鮮明な画像を確保してください",
+    "guidelinesNote": "BDSPortalの投稿ガイドラインに従ってください",
+    "freePostNote": "無料投稿は30日間表示されます",
+    "subtitle": "無料で投稿、数千人の見込み客にリーチ",
+    "postError": "投稿中にエラーが発生しました。もう一度お試しください。",
+    "rent": "賃貸"
+  },
+  "myProperties": {
+    "processing": "処理中",
+    "all": "すべて",
+    "edit": "編集"
+  },
+  "editProperty": {
+    "detailedDescription": "物件の詳細説明"
+  },
+  "propertyDetail": {
+    "no": "いいえ",
+    "security": "セキュリティ",
+    "balcony": "バルコニー",
+    "forRent": "賃貸",
+    "messagePlaceholder": "メッセージ...",
+    "interestedIn": "物件に興味があります "
+  },
+  "news": {
+    "allNews": "すべてのニュース",
+    "admin": "管理者",
+    "trends": "トレンド",
+    "consulting": "コンサルティング",
+    "newest": "最新",
+    "mostViewed": "最も閲覧",
+    "loadError": "ニュースの読み込みエラー",
+    "notFound": "ニュースが見つかりません",
+    "relatedNews": "関連ニュース",
+    "readMore": "もっと読む",
+    "backToNews": "ニュースページに戻る",
+    "detail": "記事の詳細"
+  },
+  "wiki": {
+    "fengShui": "風水",
+    "unknown": "不明"
+  },
+  "projects": {
+    "vingroup": "Vingroup",
+    "newUrbanArea": "新都市エリア",
+    "apartment": "アパート",
+    "luxuryRiversideComplex": "高級リバーサイド複合施設",
+    "complex": "複合施設",
+    "riverViewClubhouseSpa": "リバービュー、クラブハウス、スパ",
+    "townhouse": "タウンハウス"
+  },
+  "agency": {
+    "realEstateSpecialist": "不動産スペシャリスト"
+  },
+  "agents": {
+    "allAreas": "すべてのエリア",
+    "allSpecialties": "すべての専門分野",
+    "apartment": "アパート",
+    "villa": "ヴィラ",
+    "land": "土地",
+    "mostExperienced": "最も経験豊富",
+    "mostDeals": "最も取引数が多い",
+    "newest": "最新",
+    "enter": "入る",
+    "introduction": "紹介"
+  },
+  "companies": {
+    "vingroup": "Vingroup",
+    "hanoi": "ハノイ",
+    "masterise": "Masterise",
+    "hoChiMinh": "ホーチミン",
+    "novaGroup": "Nova Group",
+    "bienhoa": "ビエンホア"
+  },
+  "inquiry": {
+    "customerInfo": "顧客情報",
+    "propertyInfo": "物件情報",
+    "inquiryContent": "問い合わせ内容",
+    "status": "ステータス",
+    "pending": "保留中",
+    "contacted": "連絡済み",
+    "closed": "クローズ",
+    "viewDetails": "詳細を見る",
+    "sendMessage": "メッセージを送信",
+    "changeStatus": "ステータスを変更",
+    "generalInfo": "一般情報",
+    "areaInfo": "エリア情報"
+  },
+  "marketAnalysis": {
+    "priceRange": "価格帯",
+    "averagePrice": "平均価格",
+    "highestPrice": "最高価格",
+    "lowestPrice": "最低価格",
+    "loadError": "市場分析データを読み込めません",
+    "subtitle": "最新の市場分析、レビュー、不動産トレンドをご覧ください",
+    "searchPlaceholder": "記事を検索...",
+    "marketAnalysis": "市場分析",
+    "trend": "トレンド",
+    "priceAnalysis": "価格分析",
+    "investmentGuide": "投資ガイド",
+    "expertView": "専門家の見解",
+    "noResults": "記事が見つかりません",
+    "noResultsMessage": "検索条件に一致する分析記事はありません。",
+    "loadArticleError": "記事を読み込めません",
+    "loadingArticle": "記事を読み込み中...",
+    "articleNotFound": "記事が見つかりません",
+    "backToAnalysisList": "分析リストに戻る"
+  },
+  "pricing": {
+    "basic": "ベーシック",
+    "premium": "プレミアム"
+  },
+  "notifications": {
+    "newMessage": "新着メッセージ",
+    "justNow": "たった今",
+    "unread": "未読"
+  },
+  "agencies": {
+    "subtitle": "全国の信頼できる不動産会社を探索",
+    "searchPlaceholder": "不動産会社を検索...",
+    "companies": "会社",
+    "noCompanies": "会社が見つかりません"
+  },
+  "favorites": {
+    "title": "お気に入りの物件",
+    "empty": "お気に入りの物件がまだありません",
+    "emptyDescription": "興味のある物件を探して保存してください",
+    "explore": "今すぐ探索",
+    "remove": "お気に入りから削除"
+  },
+  "notFound": {
+    "title": "ページが見つかりません",
+    "description": "お探しのページは存在しないか削除されました",
+    "backHome": "ホームに戻る"
+  },
+  "admin": {
+    "welcome": "Welcome to admin dashboard",
+    "menu": {
+      "main": "Overview",
+      "overview": "Dashboard",
+      "analytics": "Analytics",
+      "inquiries": "Inquiries",
+      "management": "Management",
+      "users": "Users",
+      "properties": "Properties",
+      "agents": "Agents",
+      "agencies": "Agencies",
+      "projects": "Projects",
+      "content": "Content",
+      "news": "News",
+      "marketAnalysis": "Market Analysis",
+      "wiki": "Wiki",
+      "finance": "Finance",
+      "payments": "Payments",
+      "packages": "Packages",
+      "location": "Location",
+      "provinces": "Provinces",
+      "districts": "Districts",
+      "wards": "Wards",
+      "system": "System",
+      "notifications": "Notifications",
+      "settings": "Settings",
+      "security": "Security",
+      "viewUserSite": "View User Site",
+      "logout": "Logout"
+    },
+    "stats": {
+      "totalUsers": "Total Users",
+      "totalProperties": "Total Properties",
+      "totalRevenue": "Total Revenue",
+      "newInquiries": "New Inquiries",
+      "totalAgents": "Total Agents",
+      "activeListings": "Active Listings",
+      "totalViews": "Total Views",
+      "favorites": "Favorites"
+    },
+    "recentActivity": "Recent Activity",
+    "sections": {
+      "overview": "Overview",
+      "analytics": "Analytics",
+      "inquiries": "Inquiries Management",
+      "users": "User Management",
+      "properties": "Property Management",
+      "agents": "Agent Management",
+      "agencies": "Agency Management",
+      "projects": "Project Management",
+      "news": "News Management",
+      "market-analysis": "Market Analysis",
+      "wiki": "Wiki Management",
+      "payments": "Payment Management",
+      "packages": "Package Management",
+      "provinces": "Province Management",
+      "districts": "District Management",
+      "wards": "Ward Management",
+      "notifications": "Notification Management",
+      "settings": "System Settings",
+      "security": "System Security"
+    },
+    "comingSoon": "Feature under development",
+    "backToOverview": "Back to Overview"
+  }
+}
