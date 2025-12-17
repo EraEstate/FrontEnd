@@ -1,0 +1,1004 @@
+{
+  "common": {
+    "loading": "로딩 중...",
+    "error": "오류",
+    "success": "성공",
+    "cancel": "취소",
+    "confirm": "확인",
+    "save": "저장",
+    "delete": "삭제",
+    "edit": "편집",
+    "add": "추가",
+    "search": "검색",
+    "filter": "필터",
+    "sort": "정렬",
+    "view": "보기",
+    "back": "뒤로",
+    "next": "다음",
+    "previous": "이전",
+    "close": "닫기",
+    "open": "열기",
+    "yes": "예",
+    "no": "아니오",
+    "submit": "제출",
+    "reset": "초기화",
+    "clear": "지우기",
+    "select": "선택",
+    "selected": "선택됨",
+    "all": "전체",
+    "none": "없음",
+    "more": "더보기",
+    "less": "적게",
+    "user": "사용자",
+    "broker": "중개인",
+    "enter": "입력",
+    "spam": "스팸",
+    "email": "이메일",
+    "zalo": "Zalo",
+    "notSelected": "선택 안 됨",
+    "processing": "처리 중",
+    "unknown": "알 수 없음",
+    "preview": "미리보기",
+    "characters": "문자",
+    "billion": "억",
+    "million": "백만",
+    "retry": "다시 시도",
+    "backToList": "목록으로 돌아가기",
+    "tags": "태그",
+    "relatedArticles": "관련 기사",
+    "linkCopied": "링크가 클립보드에 복사되었습니다!",
+    "importantNote": "중요 공지",
+    "bedrooms": "침실",
+    "bathrooms": "욕실",
+    "area": "면적",
+    "price": "가격",
+    "province": "성/시",
+    "district": "구/군",
+    "ward": "동/읍",
+    "selectProvince": "성/시 선택",
+    "selectDistrict": "구/군 선택",
+    "selectWard": "동/읍 선택",
+    "specificAddress": "상세 주소",
+    "continue": "계속",
+    "loadError": "데이터 로드 오류",
+    "viewAll": "모두 보기",
+    "viewProperties": "부동산 보기",
+    "readNews": "뉴스 읽기",
+    "goBack": "이전 페이지로 돌아가기",
+    "needHelp": "도움이 필요하신가요?",
+    "supportTeam": "저희 지원팀이 언제든지 도와드립니다",
+    "call": "전화하기",
+    "contactHotline": "즉시 지원을 받으려면 핫라인에 연락하세요",
+    "office": "사무실",
+    "visitOffice": "가까운 사무실 방문",
+    "viewAddress": "주소 보기",
+    "searchProperties": "적합한 부동산 검색",
+    "startSearching": "검색 시작",
+    "popularLinks": "인기 링크",
+    "apartmentHCM": "호치민 아파트",
+    "houseHanoi": "하노이 주택",
+    "villaDaNang": "다낭 빌라",
+    "landBinhDuong": "빈증 토지",
+    "officeRent": "사무실 임대",
+    "marketNews": "시장 뉴스",
+    "viewDetails": "세부 정보 보기",
+    "home": "홈",
+    "news": "뉴스",
+    "views": "회 조회",
+    "author": "저자",
+    "like": "좋아요",
+    "share": "공유"
+  },
+  "header": {
+    "home": "홈",
+    "properties": "부동산",
+    "projects": "프로젝트",
+    "agencies": "중개사무소",
+    "agents": "중개인",
+    "news": "뉴스",
+    "wiki": "부동산 위키",
+    "about": "회사 소개",
+    "contact": "연락처",
+    "login": "로그인",
+    "register": "회원가입",
+    "logout": "로그아웃",
+    "dashboard": "대시보드",
+    "myProperties": "내 부동산",
+    "favorites": "즐겨찾기",
+    "notifications": "알림",
+    "profile": "프로필",
+    "settings": "설정",
+    "explore": "탐색",
+    "brokerage": "중개",
+    "companies": "회사",
+    "marketAnalysis": "시장 분석",
+    "utilities": "유틸리티",
+    "pricing": "가격",
+    "appDownload": "앱 다운로드",
+    "postProperty": "부동산 등록",
+    "rent": "임대 부동산"
+  },
+  "footer": {
+    "about": "회사 소개",
+    "contact": "연락처",
+    "privacy": "개인정보 보호",
+    "terms": "이용 약관",
+    "copyright": "© 2024 Apartment. 모든 권리 보유."
+  },
+  "home": {
+    "hero": {
+      "title": "꿈의 집을 찾으세요",
+      "subtitle": "합리적인 가격으로 수천 개의 고품질 부동산을 만나보세요",
+      "searchPlaceholder": "위치, 부동산 유형 검색...",
+      "searchButton": "검색"
+    },
+    "featured": {
+      "title": "추천 부동산",
+      "subtitle": "엄선된 프리미엄 부동산"
+    },
+    "categories": {
+      "title": "카테고리",
+      "apartments": "아파트",
+      "houses": "주택",
+      "offices": "사무실",
+      "land": "토지"
+    },
+    "stats": {
+      "properties": "부동산",
+      "agents": "중개인",
+      "companies": "회사",
+      "projects": "프로젝트"
+    },
+    "tabs": {
+      "sale": "매매 부동산",
+      "rent": "임대 부동산",
+      "project": "프로젝트"
+    },
+    "search": {
+      "location": "전국",
+      "placeholder": "검색",
+      "propertyType": "부동산 유형",
+      "priceRange": "가격 범위",
+      "area": "면적"
+    },
+    "viewMore": "더보기",
+    "sections": {
+      "featuredProperties": "추천 부동산",
+      "featuredNews": "주요 뉴스",
+      "news": "뉴스",
+      "featuredProjects": "주요 부동산 프로젝트",
+      "propertiesByLocation": "지역별 부동산",
+      "realEstateNews": "부동산 뉴스",
+      "utilitySupport": "유틸리티 지원",
+      "featuredCompanies": "주요 회사",
+      "mediaCoverage": "Batdongsan.com.vn 언론 보도"
+    },
+    "banner": {
+      "slide1": {
+        "title": "럭셔리 아파트 Vinhomes Central Park",
+        "subtitle": "32억 VND부터 - 빈탄 지역, 호치민시",
+        "alt": "럭셔리 아파트 내부"
+      },
+      "slide2": {
+        "title": "인접 빌라 Vinhomes Grand Park",
+        "subtitle": "85억 VND부터 - 9구, 호치민시",
+        "alt": "현대 빌라 외관"
+      },
+      "slide3": {
+        "title": "상업 쇼핑몰",
+        "subtitle": "128억 VND부터 - 7구, 호치민시",
+        "alt": "상업 쇼핑몰"
+      },
+      "slide4": {
+        "title": "하노이 고층 아파트",
+        "subtitle": "28억 VND부터 - Cau Giay, 하노이",
+        "alt": "고층 아파트 건물"
+      }
+    },
+    "featuredNews": {
+      "hanoi": {
+        "title": "하노이 부동산",
+        "subtitle": "하노이 부동산 시장 최신 뉴스"
+      },
+      "hcm": {
+        "title": "호치민시 부동산",
+        "subtitle": "호치민시 부동산 뉴스 업데이트"
+      },
+      "wiki": {
+        "title": "부동산 위키",
+        "subtitle": "부동산에 대한 지식과 가이드"
+      }
+    },
+    "projects": {
+      "libera": {
+        "name": "Libera Nha Trang",
+        "location": "Nha Trang, Khánh Hòa"
+      },
+      "lumiere": {
+        "name": "Lumiere SpringBay",
+        "location": "Văn Giang, Hưng Yên"
+      },
+      "jade": {
+        "name": "Jade Square",
+        "location": "Quận 9, TP.HCM"
+      },
+      "masteri": {
+        "name": "Masteri Centre Point",
+        "location": "Quận 9, TP.HCM"
+      },
+      "verosa": {
+        "name": "Verosa Park Khang Điền",
+        "location": "Quận 9, TP.HCM"
+      },
+      "vinhomes": {
+        "name": "Vinhomes Grand Park",
+        "location": "Quận 9, TP.HCM"
+      },
+      "status": {
+        "opening": "현재 오픈",
+        "comingSoon": "곧 출시",
+        "completed": "완공",
+        "selling": "현재 판매 중"
+      }
+    },
+    "locations": {
+      "hcm": {
+        "name": "호치민시",
+        "listings": "77,810개 목록"
+      },
+      "hanoi": {
+        "name": "하노이",
+        "listings": "58,320개 목록"
+      },
+      "danang": {
+        "name": "다낭",
+        "listings": "9,964개 목록"
+      },
+      "binhduong": {
+        "name": "빈즈엉",
+        "listings": "8,667개 목록"
+      }
+    },
+    "featuredProjects": {
+      "vinhomesCentral": "Vinhomes Central Park",
+      "vinhomesGrand": "Vinhomes Grand Park",
+      "vinhomesSmart": "Vinhomes Smart City",
+      "vinhomesOcean": "Vinhomes Ocean Park",
+      "vungTau": "Vũng Tàu Pearl",
+      "bcons": "Bcons Green View",
+      "grandeur": "Grandeur Palace",
+      "diamond": "Diamond Island",
+      "haDo": "HaDo Centrosa Garden",
+      "sunAvenue": "The Sun Avenue"
+    },
+    "news": {
+      "article1": {
+        "title": "Agribank와 모기지하지 말아야 할 것들!",
+        "subtitle": "사업용수 가격 2025: 새로운 규정 업데이트 및 상세 가격표"
+      },
+      "article2": {
+        "title": "사업용수 가격 2025: 새로운 규정 업데이트 및 상세 가격표",
+        "subtitle": "부모가 돌아가셨을 때 자녀를 위한 토지 분배 법: 절차 및 혜택에 대한 최신 가이드"
+      },
+      "article3": {
+        "title": "부모가 돌아가셨을 때 자녀를 위한 토지 분배 법: 절차 및 혜택에 대한 최신 가이드",
+        "subtitle": "Agribank 영업시간: 월요일부터 일요일까지 세부사항"
+      },
+      "article4": {
+        "title": "Agribank 영업시간: 월요일부터 일요일까지 세부사항",
+        "subtitle": "호치민시 사회주택 프로젝트 진행 상황 업데이트 2025"
+      },
+      "article5": {
+        "title": "호치민시 사회주택 프로젝트 진행 상황 업데이트 2025",
+        "subtitle": "빈랑나무는 어떤 별자리와 궁합인가? 좋은 풍수로 빈랑나무 심는 방법"
+      },
+      "article6": {
+        "title": "빈랑나무는 어떤 별자리와 궁합인가? 좋은 풍수로 빈랑나무 심는 방법",
+        "subtitle": "베트남에서 흔한 부동산 유형"
+      }
+    },
+    "utilities": {
+      "ageCalculator": {
+        "title": "주택 건축 연식 확인",
+        "desc": "주택 건축에 적합한 연식 상담"
+      },
+      "constructionCost": {
+        "title": "주택 건축 비용",
+        "desc": "상세한 건축 비용 견적"
+      },
+      "interestCalculator": {
+        "title": "이자율 계산",
+        "desc": "모기지 이자율 계산"
+      },
+      "fengshui": {
+        "title": "풍수 상담",
+        "desc": "주택 풍수 가이드"
+      }
+    },
+    "companies": {
+      "catTuong": "CAT TUONG 부동산 그룹",
+      "spHome": "SP HOME 부동산 무역 서비스 유한 회사",
+      "kimOanh": "Kim Oanh 그룹",
+      "seaholdings": "SEAHOLDINGS 부동산 주식 회사",
+      "gamuda": "Gamuda Land 베트남 유한 회사",
+      "ttRealty": "TT REALTY 투자 주식 회사"
+    },
+    "media": {
+      "article1": {
+        "title": "지방에서 토지 매매: 4가지 중요한 참고사항",
+        "source": "Tuổi Trẻ"
+      },
+      "article2": {
+        "title": "수요 감소에도 불구하고 토지 가격은 여전히 상승",
+        "source": "Thanh Niên"
+      },
+      "article3": {
+        "title": "지방에서 부동산 구매를 위한 해결책",
+        "source": "Dân Trí"
+      },
+      "article4": {
+        "title": "Batdongsan.com.vn 모회사 수익 42% 증가",
+        "source": "CafeBiz"
+      },
+      "article5": {
+        "title": "지방에서 토지 거래 시 위험 회피 경험",
+        "source": "Zing News"
+      },
+      "article6": {
+        "title": "임대 부동산이 불황을 벗어나다",
+        "source": "Pháp Luật Online"
+      }
+    }
+  },
+  "properties": {
+    "title": "부동산",
+    "search": {
+      "location": "위치",
+      "type": "유형",
+      "price": "가격",
+      "area": "면적",
+      "bedrooms": "침실",
+      "bathrooms": "욕실",
+      "placeholder": "전국",
+      "button": "검색"
+    },
+    "filters": {
+      "priceRange": "가격 범위",
+      "areaRange": "면적 범위",
+      "propertyType": "부동산 유형",
+      "features": "특징",
+      "title": "필터",
+      "verified": "검증됨",
+      "clear": "필터 지우기",
+      "professionalBroker": "전문 중개인"
+    },
+    "details": {
+      "price": "가격",
+      "area": "면적",
+      "bedrooms": "침실",
+      "bathrooms": "욕실",
+      "floor": "층수",
+      "direction": "방향",
+      "description": "설명",
+      "features": "특징",
+      "location": "위치",
+      "contact": "연락처",
+      "similar": "유사 부동산",
+      "owner": "소유자",
+      "posted": "게시일",
+      "views": "조회수",
+      "favorites": "즐겨찾기"
+    },
+    "actions": {
+      "favorite": "즐겨찾기",
+      "unfavorite": "즐겨찾기 해제",
+      "contact": "연락",
+      "viewDetails": "상세보기",
+      "share": "공유",
+      "saveListing": "이 목록 저장",
+      "showPhone": "전화번호 표시"
+    },
+    "status": {
+      "available": "이용 가능",
+      "sold": "판매됨",
+      "rented": "임대됨",
+      "negotiable": "가격 협상 가능"
+    },
+    "loading": "부동산 로딩 중...",
+    "error": "데이터 로딩 오류",
+    "noResults": "부동산을 찾을 수 없습니다",
+    "viewMap": "지도 보기",
+    "pageTitle": "전국적으로 부동산 매매",
+    "propertiesCount": "현재 <strong>{{count}}</strong>개 부동산을 표시하고 있습니다.",
+    "emailNotifications": "새 목록에 대한 이메일 알림 받기",
+    "sortOptions": {
+      "default": "기본",
+      "newest": "최신",
+      "priceLowToHigh": "가격: 낮은 순",
+      "priceHighToLow": "가격: 높은 순"
+    },
+    "viewOptions": {
+      "list": "목록",
+      "map": "지도"
+    },
+    "loadMore": "더 많은 부동산 로드",
+    "sidebar": {
+      "byProvince": "지역별 부동산",
+      "provinces": {
+        "hcm": "호치민시",
+        "hanoi": "하노이",
+        "danang": "다낭",
+        "binhduong": "빈즈엉",
+        "khanhhoa": "칸호아"
+      },
+      "popularArticles": "인기 기사"
+    },
+    "content": {
+      "mainTitle": "Batdongsan.com.vn에서 2025년 10월 부동산 빠르게 매매",
+      "sections": {
+        "marketSegments": "부동산 시장 세그먼트에 대해 알아보기"
+      },
+      "marketSegments": {
+        "description": "부동산 시장에서 인기 있는 부동산 세그먼트를 몇 가지 소개합니다:",
+        "apartments": "아파트 판매",
+        "apartmentsDesc": "이는 대도시와 지방에서 인기 있는 부동산 유형으로, 주택 수요가 일반적으로 매우 높습니다.",
+        "houses": "개별 주택 판매",
+        "housesDesc": "개별 주택 또는 전체 주택은 사적인 독립 공간을 원하는 고객에게 적합합니다.",
+        "villas": "빌라 및 타운하우스 판매",
+        "villasDesc": "빌라 및 타운하우스 유형은 현재 주택 구매자와 투자자 모두에게 관심을 받고 있습니다.",
+        "land": "프로젝트 토지 판매",
+        "landDesc": "프로젝트 토지 판매는 이익 기회를 찾는 투자자뿐만 아니라 거주할 집을 사는 고객에게도 매력적입니다."
+      },
+      "fastBuying": {
+        "title": "Batdongsan.com.vn에서 빠르고 신뢰할 수 있는 부동산 매매",
+        "description": "Batdongsan.com.vn은 10년 이상 산업통상부로부터 상을 받은 신뢰할 수 있는 웹사이트로, 부동산 분야의 선도적인 웹사이트 중 하나의 전문성과 안정성을 보여줍니다."
+      }
+    },
+    "studioFullFurniture": "가구 완비 원룸 아파트 임대"
+  },
+  "auth": {
+    "login": {
+      "title": "로그인",
+      "email": "이메일",
+      "password": "비밀번호",
+      "rememberMe": "로그인 상태 유지",
+      "forgotPassword": "비밀번호를 잊으셨나요?",
+      "loginButton": "로그인",
+      "noAccount": "계정이 없으신가요?",
+      "registerLink": "지금 회원가입",
+      "orLoginWith": "또는 다음으로 로그인",
+      "pleaseLogin": "로그인해주세요",
+      "needLoginToView": "이 페이지를 보려면 로그인이 필요합니다",
+      "needLoginToPost": "부동산을 게시하려면 로그인이 필요합니다"
+    },
+    "register": {
+      "title": "회원가입",
+      "fullName": "이름",
+      "email": "이메일",
+      "password": "비밀번호",
+      "confirmPassword": "비밀번호 확인",
+      "phone": "전화번호",
+      "registerButton": "회원가입",
+      "haveAccount": "이미 계정이 있으신가요?",
+      "loginLink": "로그인",
+      "createAccount": "새 계정 만들기",
+      "createAccountButton": "계정 만들기",
+      "orRegisterWith": "또는 다음으로 가입",
+      "registerToExperience": "BDSPortal의 모든 기능을 경험하려면 계정을 등록하세요",
+      "enterFullName": "이름 입력",
+      "enterPhone": "전화번호 입력",
+      "enterPassword": "비밀번호 입력",
+      "reEnterPassword": "비밀번호 재입력",
+      "passwordMinLength": "비밀번호는 최소 6자 이상이어야 합니다",
+      "passwordMatch": "비밀번호 일치",
+      "passwordNotMatch": "비밀번호 불일치"
+    },
+    "loginFooter": {
+      "termsAgreement": "로그인하면 당사의",
+      "termsOfService": "서비스 약관",
+      "and": "및",
+      "privacyPolicy": "개인정보 보호정책",
+      "ofUs": "에 동의하게 됩니다.",
+      "whyChoose": "BDSPortal을 선택해야 하는 이유는?",
+      "features": {
+        "trustedListings": "수천 개의 신뢰할 수 있는 부동산 목록",
+        "transparentInfo": "투명하고 정확한 정보",
+        "support247": "24/7 고객 지원",
+        "userFriendly": "사용자 친화적 인터페이스"
+      }
+    }
+  },
+  "dashboard": {
+    "welcome": "환영합니다",
+    "stats": {
+      "totalProperties": "총 부동산",
+      "activeListings": "활성 목록",
+      "totalViews": "총 조회수",
+      "favorites": "즐겨찾기"
+    },
+    "recentActivity": "최근 활동",
+    "quickActions": "빠른 작업",
+    "viewRequest": "고객의 방문 요청",
+    "premiumApartment": "프리미엄 아파트",
+    "hoursAgo": "{{count}}시간 전",
+    "newViews": "{{count}}회 새로운 조회",
+    "townhouse": "타운하우스",
+    "addedToFavorites": "즐겨찾기에 추가된 부동산",
+    "parkResidence": "아파트",
+    "yourProperties": "내 부동산",
+    "overview": "개요",
+    "totalProperties": "총 부동산",
+    "activeProperties": "활성 부동산",
+    "totalViews": "총 조회수",
+    "inquiries": "문의",
+    "revenue": "수익",
+    "recentViews": "최근 조회",
+    "newInquiries": "새로운 문의",
+    "topProperties": "인기 부동산",
+    "views": "회 조회"
+  },
+  "language": {
+    "select": "언어 선택",
+    "current": "현재 언어",
+    "vietnamese": "베트남어",
+    "english": "영어",
+    "chinese": "중국어",
+    "japanese": "일본어",
+    "korean": "한국어",
+    "french": "프랑스어",
+    "german": "독일어",
+    "spanish": "스페인어",
+    "italian": "이탈리아어",
+    "portuguese": "포르투갈어",
+    "russian": "러시아어",
+    "arabic": "아랍어",
+    "hindi": "힌디어",
+    "thai": "태국어",
+    "malay": "말레이어",
+    "indonesian": "인도네시아어",
+    "filipino": "필리핀어",
+    "khmer": "크메르어",
+    "burmese": "버마어"
+  },
+  "settings": {
+    "title": "설정",
+    "account": "계정",
+    "password": "비밀번호",
+    "changePassword": "비밀번호 변경",
+    "currentPassword": "현재 비밀번호",
+    "newPassword": "새 비밀번호",
+    "confirmNewPassword": "새 비밀번호 확인",
+    "updateButton": "업데이트",
+    "updating": "업데이트 중...",
+    "changePasswordButton": "비밀번호 변경",
+    "passwordChanged": "비밀번호가 성공적으로 변경되었습니다!",
+    "passwordNotMatch": "새 비밀번호가 일치하지 않습니다!",
+    "errorChangingPassword": "비밀번호 변경 중 오류가 발생했습니다.",
+    "subtitle": "개인 정보 및 계정 환경설정 관리",
+    "personalInfo": "개인 정보",
+    "preferences": "환경설정",
+    "notifications": "알림",
+    "updateSuccess": "정보가 성공적으로 업데이트되었습니다!",
+    "updateError": "정보 업데이트 중 오류가 발생했습니다.",
+    "preferencesUpdated": "환경설정이 성공적으로 업데이트되었습니다!",
+    "notificationsUpdated": "알림 설정이 성공적으로 업데이트되었습니다!",
+    "changeAvatar": "사진 변경",
+    "avatarFormat": "JPG, PNG 최대 2MB",
+    "saveChanges": "변경 사항 저장",
+    "language": "Ngôn ngữ",
+    "currency": "Đơn vị tiền tệ",
+    "dateFormat": "Định dạng ngày",
+    "timezone": "Múi giờ",
+    "vietnamTimezone": "Việt Nam (GMT+7)",
+    "saveSettings": "Lưu cài đặt",
+    "notificationSettings": "Cài đặt thông báo",
+    "notificationChannels": "Kênh thông báo",
+    "emailNotifications": "Thông báo qua Email",
+    "smsNotifications": "Thông báo qua SMS",
+    "pushNotifications": "Thông báo đẩy",
+    "notificationTypes": "Loại thông báo",
+    "marketingEmails": "Email quảng cáo",
+    "propertyAlerts": "Cảnh báo BDS",
+    "priceUpdates": "Cập nhật giá",
+    "newMessages": "Tin nhắn mới"
+  },
+  "profile": {
+    "title": "프로필",
+    "viewProfile": "프로필 보기",
+    "editProfile": "프로필 편집",
+    "personalInfo": "개인 정보",
+    "contactInfo": "연락처 정보",
+    "overview": "개요",
+    "myProperties": "내 매물",
+    "myFavorites": "저장된 매물",
+    "activities": "활동",
+    "settings": "설정",
+    "propertyTypes": {
+      "apartment": "아파트",
+      "house": "주택",
+      "villa": "빌라",
+      "office": "오피스",
+      "land": "토지",
+      "other": "기타"
+    },
+    "status": {
+      "available": "판매 중",
+      "sold": "판매 완료",
+      "rented": "임대 완료",
+      "pending": "보류 중"
+    },
+    "avatar": "아바타"
+  },
+  "about": {
+    "title": "회사 소개",
+    "mission": "우리의 미션",
+    "vision": "우리의 비전",
+    "values": "우리의 가치",
+    "team": "우리 팀",
+    "stats": {
+      "users": "신뢰하는 사용자",
+      "properties": "부동산 목록",
+      "transactions": "성공한 거래",
+      "rating": "고객 평가"
+    },
+    "coreValues": {
+      "trust": "신뢰와 투명성",
+      "trustDesc": "정확한 정보를 보장하고 모든 당사자에게 안전하고 투명한 거래를 제공합니다.",
+      "speed": "빠르고 효율적",
+      "speedDesc": "현대 기술을 적용하여 사용자에게 최고의 경험을 제공합니다.",
+      "dedication": "헌신적이고 전문적",
+      "dedicationDesc": "경험이 풍부한 전문가 팀이 항상 고객의 이익을 최우선으로 합니다.",
+      "innovation": "혁신과 창의성",
+      "innovationDesc": "지속적으로 개선하고 발전하여 최적의 솔루션을 제공합니다."
+    },
+    "joinUs": "지금 가입하세요",
+    "registerNow": "지금 등록",
+    "description": "베트남 최고의 부동산 플랫폼, 수백만 명을 꿈의 집과 훌륭한 투자 기회와 연결합니다.",
+    "yearsActive": "운영 년수",
+    "provinces": "성",
+    "support": "지원",
+    "missionDesc": "부동산 정보에 대한 접근을 민주화하여 모든 사람이 쉽게 검색, 구매, 판매 및 스마트 투자할 수 있도록 돕습니다. 기술과 고품질 서비스를 통해 고객에게 진정한 가치를 제공할 것을 약속합니다.",
+    "visionDesc": "동남아시아 최고의 부동산 플랫폼이 되어 AI, 빅데이터, 블록체인 기술 적용을 선도하여 투명하고 효율적이며 신뢰할 수 있는 부동산 생태계를 만듭니다. 2030년까지 1000만 명의 사용자에게 서비스를 제공하는 것을 목표로 합니다.",
+    "timeline": "발전 여정",
+    "testimonials": "고객 후기",
+    "awards": "수상 및 인증",
+    "award1Title": "2023년 베트남 스타트업 톱 10",
+    "award1Desc": "베트남 스타트업 어워드 수상",
+    "award2Title": "ISO 27001 인증",
+    "award2Desc": "국제 정보 보안 표준",
+    "award3Title": "2024년 최고의 프롭테크 플랫폼",
+    "award3Desc": "우수한 부동산 기술상",
+    "joinUsDesc": "BDSPortal 커뮤니티에 가입하여 가장 현대적이고 효율적인 부동산 매매 및 임대 방법을 경험하세요.",
+    "learnMore": "자세히 알아보기"
+  },
+  "contact": {
+    "title": "문의하기",
+    "getInTouch": "문의하기",
+    "sendMessage": "메시지 보내기",
+    "name": "이름",
+    "phone": "전화",
+    "subject": "제목",
+    "message": "메시지",
+    "sendButton": "메시지 보내기",
+    "sending": "전송 중...",
+    "contactInfo": "연락처 정보",
+    "address": "주소",
+    "email": "이메일",
+    "followUs": "팔로우하기",
+    "officeAddress": "사무실 주소",
+    "hotline": "핫라인",
+    "workingHours": "근무 시간",
+    "freeConsultation": "무료 상담: 1900 1234",
+    "technicalSupport": "Hỗ trợ kỹ thuật",
+    "partnerLine": "Đối tác",
+    "mondayToFriday": "월요일 - 금요일: 오전 8시 - 오후 6시",
+    "saturday": "토요일: 오전 8시 - 오후 5시",
+    "sunday": "일요일: 오전 9시 - 오후 4시",
+    "departments": {
+      "title": "Các phòng ban",
+      "customerSupport": "고객 상담",
+      "customerSupportDesc": "부동산 검색 및 컨설팅 지원",
+      "technical": "Hỗ trợ kỹ thuật",
+      "technicalDesc": "Giải đáp vấn đề website, app",
+      "partnership": "파트너 협력",
+      "partnershipDesc": "중개인 및 대리점 파트너십",
+      "media": "미디어 관계",
+      "mediaDesc": "언론 및 PR 관계",
+      "technicalSupport": "기술 지원",
+      "technicalSupportDesc": "웹사이트 및 앱 문제 해결"
+    },
+    "stats": {
+      "users": "Người dùng",
+      "listings": "Tin đăng",
+      "successfulConsultations": "Tư vấn thành công",
+      "satisfaction": "Khách hàng hài lòng"
+    },
+    "form": {
+      "yourName": "Họ và tên của bạn",
+      "yourEmail": "Email của bạn",
+      "yourPhone": "Số điện thoại của bạn",
+      "selectSubject": "Chọn chủ đề",
+      "subjects": {
+        "generalInquiry": "Câu hỏi chung",
+        "propertyInquiry": "Tư vấn bất động sản",
+        "technicalSupport": "Hỗ trợ kỹ thuật",
+        "partnership": "Hợp tác kinh doanh",
+        "complaint": "Khiếu nại",
+        "other": "Khác"
+      },
+      "yourMessage": "Nội dung tin nhắn",
+      "submitButton": "Gửi tin nhắn",
+      "submitting": "Đang gửi...",
+      "successTitle": "Gửi tin nhắn thành công!",
+      "successMessage": "Cảm ơn bạn đã liên hệ với chúng tôi. Chúng tôi sẽ phản hồi trong thời gian sớm nhất.",
+      "backToHome": "Về trang chủ",
+      "sendNewMessage": "새 메시지 보내기"
+    },
+    "locations": {
+      "hanoi": "Hà Nội",
+      "hcm": "TP. Hồ Chí Minh",
+      "danang": "Đà Nẵng"
+    },
+    "socialMedia": {
+      "facebook": "Facebook",
+      "youtube": "Youtube",
+      "linkedin": "LinkedIn",
+      "zalo": "Zalo"
+    },
+    "heroDescription": "BDSPortal 전문가 팀은 연중무휴 24시간 지원할 준비가 되어 있습니다. 지금 연락하여 무료 상담을 받으세요!",
+    "floor12": "ABC 타워 12층",
+    "street123": "레로이 거리 123번지, 1구",
+    "city": "호치민시, 베트남",
+    "technicalSupportPhone": "기술 지원: 028 3456 7890",
+    "partnerPhone": "파트너: 028 3456 7891"
+  },
+  "postProperty": {
+    "apartment": "아파트",
+    "villa": "빌라",
+    "land": "토지",
+    "forRent": "임대",
+    "noFurniture": "가구 없음",
+    "basicFurniture": "기본 가구",
+    "balcony": "발코니",
+    "basicInfo": "기본 정보",
+    "propertyDetails": "부동산 상세",
+    "rentProperty": "임대 부동산",
+    "preview": "미리보기",
+    "posting": "게시 중...",
+    "postButton": "부동산 게시",
+    "house": "단독 주택",
+    "office": "사무실",
+    "fullFurniture": "가구 완비",
+    "parking": "주차장",
+    "wifi": "와이파이",
+    "security247": "24시간 보안",
+    "garden": "정원",
+    "elevator": "엘리베이터",
+    "airConditioning": "에어컨",
+    "typeAndTransaction": "매물 유형 및 거래 유형",
+    "areaPriceAddress": "면적, 가격, 주소",
+    "descriptionAndFeatures": "설명 및 시설",
+    "detailsAndAmenities": "세부 사항 및 편의 시설",
+    "uploadImages": "이미지 업로드",
+    "previewAndPost": "미리보기 및 게시",
+    "reviewAndComplete": "검토 및 완료",
+    "needLoginToPost": "부동산을 게시하려면 로그인이 필요합니다",
+    "selectPropertyType": "매물 유형 선택",
+    "titleExample": "예: Vinhomes Central Park 강 전망 고급 2BR2BA 아파트",
+    "priceExample": "예: 5500000000",
+    "areaExample": "예: 85",
+    "addressExample": "예: Nguyen Hue 거리 123번지",
+    "floors": "층수",
+    "yearBuilt": "건축 연도",
+    "detailedDescription": "상세 설명",
+    "descriptionPlaceholder": "부동산 상세 설명: 위치, 디자인, 주변 시설...",
+    "furnishingStatus": "가구 상태",
+    "featuresAndAmenities": "특징 및 편의 시설",
+    "imageUploadNote": "최대 10장의 이미지를 업로드할 수 있습니다. 첫 번째 이미지가 커버 이미지가 됩니다.",
+    "coverImage": "커버 이미지",
+    "uploadImage": "이미지 업로드",
+    "noImages": "아직 이미지가 업로드되지 않았습니다",
+    "selectFromComputer": "컴퓨터에서 선택",
+    "previewPost": "게시물 미리보기",
+    "moderationNote": "게시물은 24시간 이내에 검토됩니다",
+    "accuracyNote": "정확한 정보와 선명한 이미지를 확인하세요",
+    "guidelinesNote": "BDSPortal 게시 가이드라인을 준수하세요",
+    "freePostNote": "무료 게시물은 30일간 표시됩니다",
+    "subtitle": "무료 게시, 수천 명의 잠재 고객에게 도달",
+    "postError": "게시 중 오류가 발생했습니다. 다시 시도해주세요.",
+    "rent": "임대"
+  },
+  "myProperties": {
+    "processing": "처리 중",
+    "all": "전체",
+    "edit": "편집"
+  },
+  "editProperty": {
+    "detailedDescription": "부동산 상세 설명"
+  },
+  "propertyDetail": {
+    "no": "아니오",
+    "security": "보안",
+    "balcony": "발코니",
+    "forRent": "임대",
+    "messagePlaceholder": "메시지...",
+    "interestedIn": "부동산에 관심이 있습니다 "
+  },
+  "news": {
+    "allNews": "모든 뉴스",
+    "admin": "관리자",
+    "trends": "트렌드",
+    "consulting": "컨설팅",
+    "newest": "최신",
+    "mostViewed": "최다 조회",
+    "loadError": "뉴스 로드 오류",
+    "notFound": "뉴스를 찾을 수 없습니다",
+    "relatedNews": "관련 뉴스",
+    "readMore": "더 읽기",
+    "backToNews": "뉴스 페이지로 돌아가기",
+    "detail": "기사 세부정보"
+  },
+  "wiki": {
+    "fengShui": "풍수",
+    "unknown": "알 수 없음"
+  },
+  "projects": {
+    "vingroup": "Vingroup",
+    "newUrbanArea": "신도시 지역",
+    "apartment": "아파트",
+    "luxuryRiversideComplex": "고급 강변 복합 단지",
+    "complex": "복합 단지",
+    "riverViewClubhouseSpa": "강 전망, 클럽하우스, 스파",
+    "townhouse": "타운하우스"
+  },
+  "agency": {
+    "realEstateSpecialist": "부동산 전문가"
+  },
+  "agents": {
+    "allAreas": "모든 지역",
+    "allSpecialties": "모든 전문 분야",
+    "apartment": "아파트",
+    "villa": "빌라",
+    "land": "토지",
+    "mostExperienced": "가장 경험이 많은",
+    "mostDeals": "거래가 가장 많은",
+    "newest": "최신",
+    "enter": "입력",
+    "introduction": "소개"
+  },
+  "companies": {
+    "vingroup": "Vingroup",
+    "hanoi": "하노이",
+    "masterise": "Masterise",
+    "hoChiMinh": "호치민",
+    "novaGroup": "Nova Group",
+    "bienhoa": "비엔호아"
+  },
+  "inquiry": {
+    "customerInfo": "고객 정보",
+    "propertyInfo": "부동산 정보",
+    "inquiryContent": "문의 내용",
+    "status": "상태",
+    "pending": "대기 중",
+    "contacted": "연락함",
+    "closed": "종료",
+    "viewDetails": "자세히 보기",
+    "sendMessage": "메시지 보내기",
+    "changeStatus": "상태 변경",
+    "generalInfo": "일반 정보",
+    "areaInfo": "지역 정보"
+  },
+  "marketAnalysis": {
+    "priceRange": "가격 범위",
+    "averagePrice": "평균 가격",
+    "highestPrice": "최고 가격",
+    "lowestPrice": "최저 가격",
+    "loadError": "시장 분석 데이터를 로드할 수 없습니다",
+    "subtitle": "최신 시장 분석, 리뷰 및 부동산 트렌드를 확인하세요",
+    "searchPlaceholder": "기사 검색...",
+    "marketAnalysis": "시장 분석",
+    "trend": "트렌드",
+    "priceAnalysis": "가격 분석",
+    "investmentGuide": "투자 가이드",
+    "expertView": "전문가 견해",
+    "noResults": "기사를 찾을 수 없습니다",
+    "noResultsMessage": "검색 기준과 일치하는 분석 기사가 없습니다.",
+    "loadArticleError": "기사를 로드할 수 없습니다",
+    "loadingArticle": "기사 로딩 중...",
+    "articleNotFound": "기사를 찾을 수 없습니다",
+    "backToAnalysisList": "분석 목록으로 돌아가기"
+  },
+  "pricing": {
+    "basic": "기본",
+    "premium": "프리미엄"
+  },
+  "notifications": {
+    "newMessage": "새 메시지",
+    "justNow": "방금",
+    "unread": "읽지 않음"
+  },
+  "agencies": {
+    "subtitle": "전국의 신뢰할 수 있는 부동산 회사 탐색",
+    "searchPlaceholder": "부동산 회사 검색...",
+    "companies": "회사",
+    "noCompanies": "회사를 찾을 수 없습니다"
+  },
+  "favorites": {
+    "title": "즐겨찾는 부동산",
+    "empty": "아직 즐겨찾는 부동산이 없습니다",
+    "emptyDescription": "관심있는 부동산을 탐색하고 저장하세요",
+    "explore": "지금 탐색",
+    "remove": "즐겨찾기에서 제거"
+  },
+  "notFound": {
+    "title": "페이지를 찾을 수 없습니다",
+    "description": "찾으시는 페이지가 존재하지 않거나 삭제되었습니다",
+    "backHome": "홈으로 돌아가기"
+  },
+  "admin": {
+    "welcome": "Welcome to admin dashboard",
+    "menu": {
+      "main": "Overview",
+      "overview": "Dashboard",
+      "analytics": "Analytics",
+      "inquiries": "Inquiries",
+      "management": "Management",
+      "users": "Users",
+      "properties": "Properties",
+      "agents": "Agents",
+      "agencies": "Agencies",
+      "projects": "Projects",
+      "content": "Content",
+      "news": "News",
+      "marketAnalysis": "Market Analysis",
+      "wiki": "Wiki",
+      "finance": "Finance",
+      "payments": "Payments",
+      "packages": "Packages",
+      "location": "Location",
+      "provinces": "Provinces",
+      "districts": "Districts",
+      "wards": "Wards",
+      "system": "System",
+      "notifications": "Notifications",
+      "settings": "Settings",
+      "security": "Security",
+      "viewUserSite": "View User Site",
+      "logout": "Logout"
+    },
+    "stats": {
+      "totalUsers": "Total Users",
+      "totalProperties": "Total Properties",
+      "totalRevenue": "Total Revenue",
+      "newInquiries": "New Inquiries",
+      "totalAgents": "Total Agents",
+      "activeListings": "Active Listings",
+      "totalViews": "Total Views",
+      "favorites": "Favorites"
+    },
+    "recentActivity": "Recent Activity",
+    "sections": {
+      "overview": "Overview",
+      "analytics": "Analytics",
+      "inquiries": "Inquiries Management",
+      "users": "User Management",
+      "properties": "Property Management",
+      "agents": "Agent Management",
+      "agencies": "Agency Management",
+      "projects": "Project Management",
+      "news": "News Management",
+      "market-analysis": "Market Analysis",
+      "wiki": "Wiki Management",
+      "payments": "Payment Management",
+      "packages": "Package Management",
+      "provinces": "Province Management",
+      "districts": "District Management",
+      "wards": "Ward Management",
+      "notifications": "Notification Management",
+      "settings": "System Settings",
+      "security": "System Security"
+    },
+    "comingSoon": "Feature under development",
+    "backToOverview": "Back to Overview"
+  }
+}
