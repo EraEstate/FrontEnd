@@ -1,0 +1,1004 @@
+{
+  "common": {
+    "loading": "Carregando...",
+    "error": "Erro",
+    "success": "Sucesso",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "save": "Salvar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "add": "Adicionar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "view": "Ver",
+    "back": "Voltar",
+    "next": "Próximo",
+    "previous": "Anterior",
+    "close": "Fechar",
+    "open": "Abrir",
+    "yes": "Sim",
+    "no": "Não",
+    "submit": "Enviar",
+    "reset": "Redefinir",
+    "clear": "Limpar",
+    "select": "Selecionar",
+    "selected": "Selecionado",
+    "all": "Todos",
+    "none": "Nenhum",
+    "more": "Mais",
+    "less": "Menos",
+    "user": "Usuário",
+    "broker": "Corretor",
+    "enter": "Entrar",
+    "spam": "Spam",
+    "email": "E-mail",
+    "zalo": "Zalo",
+    "notSelected": "Não selecionado",
+    "processing": "Processando",
+    "unknown": "Desconhecido",
+    "preview": "Visualizar",
+    "characters": "caracteres",
+    "billion": "bilhão",
+    "million": "milhão",
+    "retry": "Tentar novamente",
+    "backToList": "Voltar para a lista",
+    "tags": "Thẻ",
+    "relatedArticles": "Artigos relacionados",
+    "linkCopied": "Link copiado para a área de transferência!",
+    "importantNote": "Nota importante",
+    "bedrooms": "Quartos",
+    "bathrooms": "Banheiros",
+    "area": "Área",
+    "price": "Preço",
+    "province": "Província/Cidade",
+    "district": "Distrito",
+    "ward": "Bairro",
+    "selectProvince": "Selecionar província/cidade",
+    "selectDistrict": "Selecionar distrito",
+    "selectWard": "Selecionar bairro",
+    "specificAddress": "Endereço específico",
+    "continue": "Continuar",
+    "loadError": "Erro ao carregar dados",
+    "viewAll": "Ver tudo",
+    "viewProperties": "Ver propriedades",
+    "readNews": "Ler notícias",
+    "goBack": "Voltar à página anterior",
+    "needHelp": "Precisa de ajuda?",
+    "supportTeam": "Nossa equipe de suporte está sempre pronta para ajudar",
+    "call": "Ligar",
+    "contactHotline": "Entre em contato com nossa linha direta para suporte imediato",
+    "office": "Escritório",
+    "visitOffice": "Visite o escritório mais próximo",
+    "viewAddress": "Ver endereço",
+    "searchProperties": "Procurar propriedades adequadas",
+    "startSearching": "Começar busca",
+    "popularLinks": "Links populares",
+    "apartmentHCM": "Apartamento Ho Chi Minh",
+    "houseHanoi": "Casa Hanoi",
+    "villaDaNang": "Biệt thự Đà Nẵng",
+    "landBinhDuong": "Terreno Binh Duong",
+    "officeRent": "Escritório para alugar",
+    "marketNews": "Notícias do mercado",
+    "viewDetails": "Ver detalhes",
+    "home": "Início",
+    "news": "Notícias",
+    "views": "visualizações",
+    "author": "Autor",
+    "like": "Curtir",
+    "share": "Compartilhar"
+  },
+  "header": {
+    "home": "Início",
+    "properties": "Propriedades",
+    "projects": "Projetos",
+    "agencies": "Agências",
+    "agents": "Agentes",
+    "news": "Notícias",
+    "wiki": "Wiki Imobiliário",
+    "about": "Sobre nós",
+    "contact": "Contato",
+    "login": "Entrar",
+    "register": "Cadastrar",
+    "logout": "Sair",
+    "dashboard": "Painel",
+    "myProperties": "Minhas propriedades",
+    "favorites": "Favoritos",
+    "notifications": "Notificações",
+    "profile": "Perfil",
+    "settings": "Configurações",
+    "explore": "Explorar",
+    "brokerage": "Corretagem",
+    "companies": "Empresas",
+    "marketAnalysis": "Análise de Mercado",
+    "utilities": "Serviços",
+    "pricing": "Preços",
+    "appDownload": "Baixar App",
+    "postProperty": "Publicar Imóvel",
+    "rent": "Imóveis para Alugar"
+  },
+  "footer": {
+    "about": "Sobre nós",
+    "contact": "Contato",
+    "privacy": "Privacidade",
+    "terms": "Termos",
+    "copyright": "© 2024 Apartment. Todos os direitos reservados."
+  },
+  "home": {
+    "hero": {
+      "title": "Encontre sua casa dos sonhos",
+      "subtitle": "Descubra milhares de propriedades de qualidade a preços acessíveis",
+      "searchPlaceholder": "Buscar local, tipo de propriedade...",
+      "searchButton": "Buscar"
+    },
+    "featured": {
+      "title": "Propriedades em destaque",
+      "subtitle": "Propriedades premium cuidadosamente selecionadas"
+    },
+    "categories": {
+      "title": "Categorias",
+      "apartments": "Apartamentos",
+      "houses": "Casas",
+      "offices": "Escritórios",
+      "land": "Terrenos"
+    },
+    "stats": {
+      "properties": "Propriedades",
+      "agents": "Agentes",
+      "companies": "Empresas",
+      "projects": "Projetos"
+    },
+    "tabs": {
+      "sale": "Imóveis à Venda",
+      "rent": "Imóveis para Alugar",
+      "project": "Projetos"
+    },
+    "search": {
+      "location": "Em todo o país",
+      "placeholder": "Pesquisar",
+      "propertyType": "Tipo de propriedade",
+      "priceRange": "Faixa de preço",
+      "area": "Área"
+    },
+    "viewMore": "Ver mais",
+    "sections": {
+      "featuredProperties": "Propriedades em Destaque",
+      "featuredNews": "Notícias em Destaque",
+      "news": "Notícias",
+      "featuredProjects": "Projetos Imobiliários em Destaque",
+      "propertiesByLocation": "Propriedades por Localização",
+      "realEstateNews": "Notícias Imobiliárias",
+      "utilitySupport": "Suporte de Serviços",
+      "featuredCompanies": "Empresas em Destaque",
+      "mediaCoverage": "Cobertura da Mídia sobre Batdongsan.com.vn"
+    },
+    "banner": {
+      "slide1": {
+        "title": "Apartamentos de luxo Vinhomes Parque Central",
+        "subtitle": "A partir de 3,2 bilhões VND - Distrito Binh Thanh, HCMC",
+        "alt": "Interior de apartamento de luxo"
+      },
+      "slide2": {
+        "title": "Vilas adjacentes Vinhomes Parque Grande",
+        "subtitle": "A partir de 8,5 bilhões VND - Distrito 9, HCMC",
+        "alt": "Exterior de vila moderna"
+      },
+      "slide3": {
+        "title": "Casas comerciais (shophouses)",
+        "subtitle": "A partir de 12,8 bilhões VND - Distrito 7, HCMC",
+        "alt": "Shophouse comercial"
+      },
+      "slide4": {
+        "title": "Apartamentos em edifícios altos em Hanoi",
+        "subtitle": "A partir de 2,8 bilhões VND - Cau Giay, Hanoi",
+        "alt": "Edifício de apartamentos altos"
+      }
+    },
+    "featuredNews": {
+      "hanoi": {
+        "title": "Imóveis em Hanoi",
+        "subtitle": "Últimas notícias sobre o mercado imobiliário de Hanoi"
+      },
+      "hcm": {
+        "title": "Imóveis em HCMC",
+        "subtitle": "Atualizações de notícias do mercado imobiliário de HCMC"
+      },
+      "wiki": {
+        "title": "Wiki Imobiliário",
+        "subtitle": "Conhecimento e guias sobre imóveis"
+      }
+    },
+    "projects": {
+      "libera": {
+        "name": "Libera Nha Trang",
+        "location": "Nha Trang, Khánh Hòa"
+      },
+      "lumiere": {
+        "name": "Lumiere SpringBay",
+        "location": "Văn Giang, Hưng Yên"
+      },
+      "jade": {
+        "name": "Jade Square",
+        "location": "Quận 9, TP.HCM"
+      },
+      "masteri": {
+        "name": "Masteri Centre Point",
+        "location": "Quận 9, TP.HCM"
+      },
+      "verosa": {
+        "name": "Verosa Park Khang Điền",
+        "location": "Quận 9, TP.HCM"
+      },
+      "vinhomes": {
+        "name": "Vinhomes Parque Grande",
+        "location": "Distrito 9, HCMC"
+      },
+      "status": {
+        "opening": "Aberto",
+        "comingSoon": "Em breve",
+        "completed": "Concluído",
+        "selling": "Em venda"
+      }
+    },
+    "locations": {
+      "hcm": {
+        "name": "Cidade de Ho Chi Minh",
+        "listings": "77.810 anúncios"
+      },
+      "hanoi": {
+        "name": "Hà Nội",
+        "listings": "58.320 anúncios"
+      },
+      "danang": {
+        "name": "Đà Nẵng",
+        "listings": "9.964 anúncios"
+      },
+      "binhduong": {
+        "name": "Bình Dương",
+        "listings": "8.667 anúncios"
+      }
+    },
+    "featuredProjects": {
+      "vinhomesCentral": "Vinhomes Parque Central",
+      "vinhomesGrand": "Vinhomes Parque Grande",
+      "vinhomesSmart": "Vinhomes Cidade Inteligente",
+      "vinhomesOcean": "Vinhomes Parque Oceânico",
+      "vungTau": "Vung Tau Pérola",
+      "bcons": "Bcons Vista Verde",
+      "grandeur": "Palácio Grandeur",
+      "diamond": "Ilha Diamante",
+      "haDo": "HaDo Jardim Centrosa",
+      "sunAvenue": "The Sun Avenue"
+    },
+    "news": {
+      "article1": {
+        "title": "Não financie com hipoteca no Agribank sem saber isto!",
+        "subtitle": "Preço da água comercial 2025: Novas regulamentações e lista detalhada de preços"
+      },
+      "article2": {
+        "title": "Preço da água comercial 2025: Novas regulamentações e lista detalhada de preços",
+        "subtitle": "Lei sobre divisão de terras para filhos quando os pais falecem: Guia mais recente sobre procedimentos e benefícios"
+      },
+      "article3": {
+        "title": "Lei sobre divisão de terras para filhos quando os pais falecem: Guia mais recente sobre procedimentos e benefícios",
+        "subtitle": "Horário de funcionamento do Agribank: Detalhes de segunda a domingo"
+      },
+      "article4": {
+        "title": "Horário de funcionamento do Agribank: Detalhes de segunda a domingo",
+        "subtitle": "Atualização sobre o progresso dos projetos de habitação social em HCMC 2025"
+      },
+      "article5": {
+        "title": "Atualização sobre o progresso dos projetos de habitação social em HCMC 2025",
+        "subtitle": "Com qual signo do zodíaco o noz-de-areca é compatível? Como plantar noz-de-areca para bom Feng Shui"
+      },
+      "article6": {
+        "title": "Com qual signo do zodíaco o noz-de-areca é compatível? Como plantar noz-de-areca para bom Feng Shui",
+        "subtitle": "Tipos comuns de imóveis no Vietnã"
+      }
+    },
+    "utilities": {
+      "ageCalculator": {
+        "title": "Verificar idade do prédio",
+        "desc": "Consulte a idade adequada do edifício para construção"
+      },
+      "constructionCost": {
+        "title": "Custo de construção",
+        "desc": "Estimativa detalhada de custos de construção"
+      },
+      "interestCalculator": {
+        "title": "Calcular taxa de juros",
+        "desc": "Calcule as taxas de juros do financiamento"
+      },
+      "fengshui": {
+        "title": "Consulta de Feng Shui",
+        "desc": "Orientação de Feng Shui para a casa"
+      }
+    },
+    "companies": {
+      "catTuong": "Cat Tuong - Corporação Imobiliária",
+      "spHome": "SP Home - Serviços Comerciais Imobiliários",
+      "kimOanh": "Grupo Kim Oanh",
+      "seaholdings": "Seaholdings - Companhia Imobiliária",
+      "gamuda": "Gamuda Land Vietnam",
+      "ttRealty": "TT Realty - Investimentos Imobiliários"
+    },
+    "media": {
+      "article1": {
+        "title": "Comprar e vender terrenos nas províncias: 4 observações importantes",
+        "source": "Tuổi Trẻ"
+      },
+      "article2": {
+        "title": "Apesar da queda na demanda, preços de terrenos ainda aumentam",
+        "source": "Thanh Niên"
+      },
+      "article3": {
+        "title": "Soluções para comprar imóveis nas províncias",
+        "source": "Dân Trí"
+      },
+      "article4": {
+        "title": "Receita da empresa controladora do Batdongsan.com.vn aumentou 42%",
+        "source": "CafeBiz"
+      },
+      "article5": {
+        "title": "Experiência para evitar riscos ao negociar terrenos nas províncias",
+        "source": "Zing Notícias"
+      },
+      "article6": {
+        "title": "O mercado de imóveis para aluguel escapa do período de baixa",
+        "source": "Pháp Luật Online"
+      }
+    }
+  },
+  "properties": {
+    "title": "Propriedades",
+    "search": {
+      "location": "Localização",
+      "type": "Tipo",
+      "price": "Preço",
+      "area": "Área",
+      "bedrooms": "Quartos",
+      "bathrooms": "Banheiros",
+      "placeholder": "Em todo o país",
+      "button": "Pesquisar"
+    },
+    "filters": {
+      "priceRange": "Faixa de preço",
+      "areaRange": "Faixa de área",
+      "propertyType": "Tipo de propriedade",
+      "features": "Características",
+      "title": "Filtros",
+      "verified": "Verificado",
+      "clear": "Limpar filtros",
+      "professionalBroker": "Corretor profissional"
+    },
+    "details": {
+      "price": "Preço",
+      "area": "Área",
+      "bedrooms": "Quartos",
+      "bathrooms": "Banheiros",
+      "floor": "Andar",
+      "direction": "Orientação",
+      "description": "Descrição",
+      "features": "Características",
+      "location": "Localização",
+      "contact": "Contato",
+      "similar": "Propriedades similares",
+      "owner": "Proprietário",
+      "posted": "Publicado em",
+      "views": "Visualizações",
+      "favorites": "Favoritos"
+    },
+    "actions": {
+      "favorite": "Adicionar aos favoritos",
+      "unfavorite": "Remover dos favoritos",
+      "contact": "Entrar em contato",
+      "viewDetails": "Ver detalhes",
+      "share": "Compartilhar",
+      "saveListing": "Salvar este anúncio",
+      "showPhone": "Mostrar número de telefone"
+    },
+    "status": {
+      "available": "Disponível",
+      "sold": "Vendido",
+      "rented": "Alugado",
+      "negotiable": "Preço negociável"
+    },
+    "loading": "Carregando propriedades...",
+    "error": "Erro ao carregar dados",
+    "noResults": "Nenhuma propriedade encontrada",
+    "viewMap": "Ver mapa",
+    "pageTitle": "Comprar e vender imóveis em todo o país",
+    "propertiesCount": "Atualmente exibindo <strong>{{count}}</strong> propriedades.",
+    "emailNotifications": "Receber notificações por e-mail sobre novos anúncios",
+    "sortOptions": {
+      "default": "Padrão",
+      "newest": "Mais recentes",
+      "priceLowToHigh": "Preço: Baixo para Alto",
+      "priceHighToLow": "Preço: Alto para Baixo"
+    },
+    "viewOptions": {
+      "list": "Lista",
+      "map": "Mapa"
+    },
+    "loadMore": "Carregar mais propriedades",
+    "sidebar": {
+      "byProvince": "Propriedades por Província",
+      "provinces": {
+        "hcm": "Cidade de Ho Chi Minh",
+        "hanoi": "Hà Nội",
+        "danang": "Đà Nẵng",
+        "binhduong": "Bình Dương",
+        "khanhhoa": "Khánh Hòa"
+      },
+      "popularArticles": "Artigos populares"
+    },
+    "content": {
+      "mainTitle": "Comprar e vender imóveis rapidamente em Batdongsan.com.vn - Outubro 2025",
+      "sections": {
+        "marketSegments": "Saiba mais sobre os segmentos do mercado imobiliário"
+      },
+      "marketSegments": {
+        "description": "Aqui estão alguns segmentos imobiliários populares no mercado:",
+        "apartments": "Venda de apartamentos",
+        "apartmentsDesc": "Este é um tipo de imóvel popular em grandes cidades e províncias, onde a demanda por moradia costuma ser muito alta.",
+        "houses": "Venda de casas individuais",
+        "housesDesc": "Casas individuais ou casas inteiras são adequadas para clientes que procuram espaço privado e independente.",
+        "villas": "Venda de villas e townhouses",
+        "villasDesc": "Tipos de villas e townhouses são atualmente de interesse tanto para compradores de imóveis quanto para investidores.",
+        "land": "Venda de terrenos para projetos",
+        "landDesc": "A venda de terrenos para projetos atrai não apenas investidores em busca de oportunidades de lucro, mas também clientes que compram casas para morar."
+      },
+      "fastBuying": {
+        "title": "Compra e venda rápida e confiável de imóveis em Batdongsan.com.vn",
+        "description": "O Batdongsan.com.vn é um site confiável reconhecido pelo Ministério da Indústria e Comércio por mais de 10 anos, demonstrando profissionalismo e estabilidade como um dos principais sites no setor imobiliário."
+      }
+    },
+    "studioFullFurniture": "Apartamento estúdio totalmente mobiliado para alugar"
+  },
+  "auth": {
+    "login": {
+      "title": "Entrar",
+      "email": "E-mail",
+      "password": "Senha",
+      "rememberMe": "Lembrar-me",
+      "forgotPassword": "Esqueceu a senha?",
+      "loginButton": "Entrar",
+      "noAccount": "Não tem conta?",
+      "registerLink": "Cadastre-se agora",
+      "orLoginWith": "Ou entrar com",
+      "pleaseLogin": "Por favor, faça login",
+      "needLoginToView": "Você precisa fazer login para visualizar esta página",
+      "needLoginToPost": "Você precisa fazer login para publicar uma propriedade"
+    },
+    "register": {
+      "title": "Cadastrar",
+      "fullName": "Nome completo",
+      "email": "E-mail",
+      "password": "Senha",
+      "confirmPassword": "Confirmar senha",
+      "phone": "Telefone",
+      "registerButton": "Cadastrar",
+      "haveAccount": "Já tem conta?",
+      "loginLink": "Entrar",
+      "createAccount": "Criar nova conta",
+      "createAccountButton": "Criar conta",
+      "orRegisterWith": "Ou registre-se com",
+      "registerToExperience": "Registre-se para experimentar todos os recursos do BDSPortal",
+      "enterFullName": "Digite o nome completo",
+      "enterPhone": "Digite o número de telefone",
+      "enterPassword": "Digite a senha",
+      "reEnterPassword": "Digite a senha novamente",
+      "passwordMinLength": "A senha deve ter pelo menos 6 caracteres",
+      "passwordMatch": "As senhas correspondem",
+      "passwordNotMatch": "As senhas não correspondem"
+    },
+    "loginFooter": {
+      "termsAgreement": "Ao acessar sua conta, você concorda com nossos",
+      "termsOfService": "Termos de serviço",
+      "and": "e nossa",
+      "privacyPolicy": "Política de privacidade",
+      "ofUs": "của chúng tôi.",
+      "whyChoose": "Por que escolher BDSPortal?",
+      "features": {
+        "trustedListings": "Milhares de anúncios imobiliários confiáveis",
+        "transparentInfo": "Informações transparentes e precisas",
+        "support247": "Suporte ao cliente 24/7",
+        "userFriendly": "Interface amigável"
+      }
+    }
+  },
+  "dashboard": {
+    "welcome": "Bem-vindo",
+    "stats": {
+      "totalProperties": "Total de propriedades",
+      "activeListings": "Anúncios ativos",
+      "totalViews": "Total de visualizações",
+      "favorites": "Favoritos"
+    },
+    "recentActivity": "Atividade recente",
+    "quickActions": "Ações rápidas",
+    "viewRequest": "Pedido de visita do cliente",
+    "premiumApartment": "Apartamento premium",
+    "hoursAgo": "Há {{count}} horas",
+    "newViews": "{{count}} novas visualizações",
+    "townhouse": "Casa geminada",
+    "addedToFavorites": "Propriedade adicionada aos favoritos",
+    "parkResidence": "Apartamento",
+    "yourProperties": "Suas propriedades",
+    "overview": "Visão geral",
+    "totalProperties": "Total de propriedades",
+    "activeProperties": "Propriedades ativas",
+    "totalViews": "Total de visualizações",
+    "inquiries": "Consultas",
+    "revenue": "Receita",
+    "recentViews": "Visualizações recentes",
+    "newInquiries": "Novas consultas",
+    "topProperties": "Melhores propriedades",
+    "views": "visualizações"
+  },
+  "language": {
+    "select": "Selecionar idioma",
+    "current": "Idioma atual",
+    "vietnamese": "Vietnamita",
+    "english": "Inglês",
+    "chinese": "Chinês",
+    "japanese": "Japonês",
+    "korean": "Coreano",
+    "french": "Francês",
+    "german": "Alemão",
+    "spanish": "Espanhol",
+    "italian": "Italiano",
+    "portuguese": "Português",
+    "russian": "Russo",
+    "arabic": "Árabe",
+    "hindi": "Tiếng Hindi",
+    "thai": "Tailandês",
+    "malay": "Malaio",
+    "indonesian": "Indonésio",
+    "filipino": "Tiếng Philippines",
+    "khmer": "Tiếng Khmer",
+    "burmese": "Birmanês"
+  },
+  "settings": {
+    "title": "Configurações",
+    "account": "Conta",
+    "password": "Senha",
+    "changePassword": "Alterar senha",
+    "currentPassword": "Senha atual",
+    "newPassword": "Nova senha",
+    "confirmNewPassword": "Confirmar nova senha",
+    "updateButton": "Atualizar",
+    "updating": "Atualizando...",
+    "changePasswordButton": "Alterar senha",
+    "passwordChanged": "Senha alterada com sucesso!",
+    "passwordNotMatch": "A nova senha não corresponde!",
+    "errorChangingPassword": "Erro ao alterar a senha.",
+    "subtitle": "Gerencie suas informações pessoais e preferências de conta",
+    "personalInfo": "Informações pessoais",
+    "preferences": "Preferências",
+    "notifications": "Notificações",
+    "updateSuccess": "Informações atualizadas com sucesso!",
+    "updateError": "Erro ao atualizar informações.",
+    "preferencesUpdated": "Preferências atualizadas com sucesso!",
+    "notificationsUpdated": "Configurações de notificação atualizadas com sucesso!",
+    "changeAvatar": "Alterar foto",
+    "avatarFormat": "JPG, PNG máx. 2MB",
+    "saveChanges": "Salvar alterações",
+    "language": "Ngôn ngữ",
+    "currency": "Đơn vị tiền tệ",
+    "dateFormat": "Định dạng ngày",
+    "timezone": "Múi giờ",
+    "vietnamTimezone": "Việt Nam (GMT+7)",
+    "saveSettings": "Lưu cài đặt",
+    "notificationSettings": "Cài đặt thông báo",
+    "notificationChannels": "Kênh thông báo",
+    "emailNotifications": "Thông báo qua Email",
+    "smsNotifications": "Thông báo qua SMS",
+    "pushNotifications": "Thông báo đẩy",
+    "notificationTypes": "Loại thông báo",
+    "marketingEmails": "Email quảng cáo",
+    "propertyAlerts": "Cảnh báo BDS",
+    "priceUpdates": "Cập nhật giá",
+    "newMessages": "Tin nhắn mới"
+  },
+  "profile": {
+    "title": "Perfil",
+    "viewProfile": "Ver perfil",
+    "editProfile": "Editar perfil",
+    "personalInfo": "Informações pessoais",
+    "contactInfo": "Informações de contato",
+    "overview": "Visão geral",
+    "myProperties": "Minhas propriedades",
+    "myFavorites": "Anúncios salvos",
+    "activities": "Atividades",
+    "settings": "Configurações",
+    "propertyTypes": {
+      "apartment": "Apartamento",
+      "house": "Casa",
+      "villa": "Vila",
+      "office": "Escritório",
+      "land": "Terreno",
+      "other": "Outro"
+    },
+    "status": {
+      "available": "Disponível",
+      "sold": "Vendido",
+      "rented": "Alugado",
+      "pending": "Pendente"
+    },
+    "avatar": "Ảnh đại diện"
+  },
+  "about": {
+    "title": "Sobre nós",
+    "mission": "Nossa missão",
+    "vision": "Nossa visão",
+    "values": "Nossos valores",
+    "team": "Nossa equipe",
+    "stats": {
+      "users": "Usuários confiáveis",
+      "properties": "Anúncios de imóveis",
+      "transactions": "Transações bem-sucedidas",
+      "rating": "Avaliação do cliente"
+    },
+    "coreValues": {
+      "trust": "Confiança e transparência",
+      "trustDesc": "Garantir informações precisas, transações seguras e transparentes para todas as partes.",
+      "speed": "Rápido e eficiente",
+      "speedDesc": "Aplicar tecnologia moderna para oferecer a melhor experiência aos usuários.",
+      "dedication": "Dedicado e profissional",
+      "dedicationDesc": "Equipe de especialistas experientes, sempre colocando os interesses do cliente em primeiro lugar.",
+      "innovation": "Inovação e criatividade",
+      "innovationDesc": "Melhoria e desenvolvimento contínuos para fornecer as melhores soluções."
+    },
+    "joinUs": "Junte-se a nós",
+    "registerNow": "Registre-se agora",
+    "description": "Plataforma imobiliária líder do Vietnã, conectando milhões de pessoas à casa dos seus sonhos e excelentes oportunidades de investimento.",
+    "yearsActive": "Anos de atividade",
+    "provinces": "Províncias",
+    "support": "Suporte",
+    "missionDesc": "Democratizar o acesso à informação imobiliária, ajudar todos a pesquisar, comprar, vender e investir em imóveis de forma inteligente e eficaz. Comprometemo-nos a trazer valor real aos clientes através da tecnologia e serviços de alta qualidade.",
+    "visionDesc": "Tornar-se a plataforma imobiliária líder no Sudeste Asiático, pioneira na aplicação de IA, Big Data e tecnologia Blockchain para criar um ecossistema imobiliário transparente, eficiente e confiável. Até 2030, nosso objetivo é servir 10 milhões de usuários.",
+    "timeline": "Jornada de desenvolvimento",
+    "testimonials": "O que nossos clientes dizem",
+    "awards": "Prêmios e certificações",
+    "award1Title": "Top 10 Startup Vietnam 2023",
+    "award1Desc": "Homenageado pelo Vietnam Startup Awards",
+    "award2Title": "Certificação ISO 27001",
+    "award2Desc": "Padrão internacional de segurança da informação",
+    "award3Title": "Melhor plataforma PropTech 2024",
+    "award3Desc": "Prêmio de excelência em tecnologia imobiliária",
+    "joinUsDesc": "Junte-se à comunidade BDSPortal para experimentar a forma mais moderna e eficiente de comprar, vender e alugar imóveis.",
+    "learnMore": "Saiba mais"
+  },
+  "contact": {
+    "title": "Entre em contato",
+    "getInTouch": "Entre em contato",
+    "sendMessage": "Envie-nos uma mensagem",
+    "name": "Nome",
+    "phone": "Telefone",
+    "subject": "Assunto",
+    "message": "Mensagem",
+    "sendButton": "Enviar mensagem",
+    "sending": "Enviando...",
+    "contactInfo": "Informações de contato",
+    "address": "Endereço",
+    "email": "E-mail",
+    "followUs": "Siga-nos",
+    "officeAddress": "Endereço do escritório",
+    "hotline": "Linha direta",
+    "workingHours": "Horário de trabalho",
+    "freeConsultation": "Consulta gratuita: 1900 1234",
+    "technicalSupport": "Hỗ trợ kỹ thuật",
+    "partnerLine": "Đối tác",
+    "mondayToFriday": "Segunda - Sexta: 8:00 - 18:00",
+    "saturday": "Sábado: 8:00 - 17:00",
+    "sunday": "Domingo: 9:00 - 16:00",
+    "departments": {
+      "title": "Các phòng ban",
+      "customerSupport": "Consultoria ao cliente",
+      "customerSupportDesc": "Suporte de pesquisa e consultoria imobiliária",
+      "technical": "Hỗ trợ kỹ thuật",
+      "technicalDesc": "Giải đáp vấn đề website, app",
+      "partnership": "Cooperação de parceiros",
+      "partnershipDesc": "Parcerias com corretores e agências",
+      "media": "Relações com a mídia",
+      "mediaDesc": "Relações de imprensa e RP",
+      "technicalSupport": "Suporte técnico",
+      "technicalSupportDesc": "Resolução de problemas de site e aplicativo"
+    },
+    "stats": {
+      "users": "Người dùng",
+      "listings": "Tin đăng",
+      "successfulConsultations": "Tư vấn thành công",
+      "satisfaction": "Khách hàng hài lòng"
+    },
+    "form": {
+      "yourName": "Họ và tên của bạn",
+      "yourEmail": "Email của bạn",
+      "yourPhone": "Số điện thoại của bạn",
+      "selectSubject": "Chọn chủ đề",
+      "subjects": {
+        "generalInquiry": "Câu hỏi chung",
+        "propertyInquiry": "Tư vấn bất động sản",
+        "technicalSupport": "Hỗ trợ kỹ thuật",
+        "partnership": "Hợp tác kinh doanh",
+        "complaint": "Khiếu nại",
+        "other": "Khác"
+      },
+      "yourMessage": "Nội dung tin nhắn",
+      "submitButton": "Gửi tin nhắn",
+      "submitting": "Đang gửi...",
+      "successTitle": "Gửi tin nhắn thành công!",
+      "successMessage": "Cảm ơn bạn đã liên hệ với chúng tôi. Chúng tôi sẽ phản hồi trong thời gian sớm nhất.",
+      "backToHome": "Về trang chủ",
+      "sendNewMessage": "Enviar nova mensagem"
+    },
+    "locations": {
+      "hanoi": "Hà Nội",
+      "hcm": "TP. Hồ Chí Minh",
+      "danang": "Đà Nẵng"
+    },
+    "socialMedia": {
+      "facebook": "Facebook",
+      "youtube": "Youtube",
+      "linkedin": "LinkedIn",
+      "zalo": "Zalo"
+    },
+    "heroDescription": "A equipe de especialistas do BDSPortal está sempre pronta para apoiá-lo 24 horas por dia, 7 dias por semana. Entre em contato agora para uma consulta gratuita!",
+    "floor12": "12º andar, Torre ABC",
+    "street123": "123 Rua Le Loi, Distrito 1",
+    "city": "Cidade de Ho Chi Minh, Vietnã",
+    "technicalSupportPhone": "Suporte técnico: 028 3456 7890",
+    "partnerPhone": "Parceiro: 028 3456 7891"
+  },
+  "postProperty": {
+    "apartment": "Apartamento",
+    "villa": "Biệt thự",
+    "land": "Terreno",
+    "forRent": "Para alugar",
+    "noFurniture": "Sem móveis",
+    "basicFurniture": "Móveis básicos",
+    "balcony": "Varanda",
+    "basicInfo": "Informações básicas",
+    "propertyDetails": "Detalhes da propriedade",
+    "rentProperty": "Alugar propriedade",
+    "preview": "Pré-visualização",
+    "posting": "Publicando...",
+    "postButton": "Publicar propriedade",
+    "house": "Casa",
+    "office": "Escritório",
+    "fullFurniture": "Totalmente mobiliado",
+    "parking": "Estacionamento",
+    "wifi": "Wi-Fi",
+    "security247": "Segurança 24/7",
+    "garden": "Jardim",
+    "elevator": "Elevador",
+    "airConditioning": "Ar condicionado",
+    "typeAndTransaction": "Tipo de propriedade e transação",
+    "areaPriceAddress": "Área, preço, endereço",
+    "descriptionAndFeatures": "Descrição e características",
+    "detailsAndAmenities": "Detalhes e comodidades",
+    "uploadImages": "Carregar imagens",
+    "previewAndPost": "Visualizar e publicar",
+    "reviewAndComplete": "Revisar e concluir",
+    "needLoginToPost": "Você precisa fazer login para publicar uma propriedade",
+    "selectPropertyType": "Selecionar tipo de propriedade",
+    "titleExample": "Ex: Apartamento de luxo 2Q2B com vista para o rio no Vinhomes Central Park",
+    "priceExample": "VD: 5500000000",
+    "areaExample": "VD: 85",
+    "addressExample": "Ex: Rua Nguyen Hue 123",
+    "floors": "Andares",
+    "yearBuilt": "Ano de construção",
+    "detailedDescription": "Descrição detalhada",
+    "descriptionPlaceholder": "Descrição detalhada da propriedade: localização, design, comodidades próximas...",
+    "furnishingStatus": "Estado do mobiliário",
+    "featuresAndAmenities": "Características e comodidades",
+    "imageUploadNote": "Carregue até 10 imagens. A primeira imagem será a imagem de capa.",
+    "coverImage": "Imagem de capa",
+    "uploadImage": "Carregar imagem",
+    "noImages": "Nenhuma imagem carregada ainda",
+    "selectFromComputer": "Selecionar do computador",
+    "previewPost": "Visualizar publicação",
+    "moderationNote": "Sua publicação será revisada em 24 horas",
+    "accuracyNote": "Certifique-se de informações precisas e imagens claras",
+    "guidelinesNote": "Cumpra as diretrizes de publicação do BDSPortal",
+    "freePostNote": "Publicações gratuitas serão exibidas por 30 dias",
+    "subtitle": "Publique gratuitamente, alcance milhares de clientes potenciais",
+    "postError": "Ocorreu um erro ao publicar. Por favor, tente novamente.",
+    "rent": "alugar"
+  },
+  "myProperties": {
+    "processing": "Processando",
+    "all": "Todos",
+    "edit": "Editar"
+  },
+  "editProperty": {
+    "detailedDescription": "Descrição detalhada da propriedade"
+  },
+  "propertyDetail": {
+    "no": "Não",
+    "security": "Segurança",
+    "balcony": "Varanda",
+    "forRent": "Para alugar",
+    "messagePlaceholder": "Mensagem...",
+    "interestedIn": "Estou interessado na propriedade "
+  },
+  "news": {
+    "allNews": "Todas as notícias",
+    "admin": "Administrador",
+    "trends": "Tendências",
+    "consulting": "Consultoria",
+    "newest": "Mais recente",
+    "mostViewed": "Mais visualizado",
+    "loadError": "Erro ao carregar notícias",
+    "notFound": "Notícias não encontradas",
+    "relatedNews": "Notícias relacionadas",
+    "readMore": "Ler mais",
+    "backToNews": "Voltar às notícias",
+    "detail": "Detalhes do artigo"
+  },
+  "wiki": {
+    "fengShui": "Phong thủy",
+    "unknown": "Desconhecido"
+  },
+  "projects": {
+    "vingroup": "Vingroup",
+    "newUrbanArea": "Nova área urbana",
+    "apartment": "Apartamento",
+    "luxuryRiversideComplex": "Complexo de luxo à beira-rio",
+    "complex": "Complexo",
+    "riverViewClubhouseSpa": "Vista para o rio, clube, spa",
+    "townhouse": "Casa geminada"
+  },
+  "agency": {
+    "realEstateSpecialist": "Especialista imobiliário"
+  },
+  "agents": {
+    "allAreas": "Todas as áreas",
+    "allSpecialties": "Todas as especialidades",
+    "apartment": "Apartamento",
+    "villa": "Biệt thự",
+    "land": "Terreno",
+    "mostExperienced": "Mais experiente",
+    "mostDeals": "Mais transações",
+    "newest": "Mais recente",
+    "enter": "Entrar",
+    "introduction": "Introdução"
+  },
+  "companies": {
+    "vingroup": "Vingroup",
+    "hanoi": "Hanoi",
+    "masterise": "Masterise",
+    "hoChiMinh": "Ho Chi Minh",
+    "novaGroup": "Nova Group",
+    "bienhoa": "Bienhoa"
+  },
+  "inquiry": {
+    "customerInfo": "Informações do cliente",
+    "propertyInfo": "Informações da propriedade",
+    "inquiryContent": "Conteúdo da consulta",
+    "status": "Trạng thái",
+    "pending": "Pendente",
+    "contacted": "Contatado",
+    "closed": "Fechado",
+    "viewDetails": "Ver detalhes",
+    "sendMessage": "Enviar mensagem",
+    "changeStatus": "Mudar status",
+    "generalInfo": "Informações gerais",
+    "areaInfo": "Informações da área"
+  },
+  "marketAnalysis": {
+    "priceRange": "Faixa de preço",
+    "averagePrice": "Preço médio",
+    "highestPrice": "Preço mais alto",
+    "lowestPrice": "Preço mais baixo",
+    "loadError": "Não foi possível carregar dados de análise de mercado",
+    "subtitle": "Fique atualizado com as últimas análises de mercado, avaliações e tendências imobiliárias",
+    "searchPlaceholder": "Pesquisar artigos...",
+    "marketAnalysis": "Análise de mercado",
+    "trend": "Tendência",
+    "priceAnalysis": "Análise de preços",
+    "investmentGuide": "Guia de investimento",
+    "expertView": "Visão de especialistas",
+    "noResults": "Nenhum artigo encontrado",
+    "noResultsMessage": "Nenhum artigo de análise corresponde aos seus critérios de pesquisa.",
+    "loadArticleError": "Não foi possível carregar o artigo",
+    "loadingArticle": "Carregando artigo...",
+    "articleNotFound": "Artigo não encontrado",
+    "backToAnalysisList": "Voltar para a lista de análises"
+  },
+  "pricing": {
+    "basic": "Básico",
+    "premium": "Cao cấp"
+  },
+  "notifications": {
+    "newMessage": "Nova mensagem",
+    "justNow": "Agora mesmo",
+    "unread": "Não lido"
+  },
+  "agencies": {
+    "subtitle": "Descubra empresas imobiliárias confiáveis em todo o país",
+    "searchPlaceholder": "Procurar empresas imobiliárias...",
+    "companies": "empresas",
+    "noCompanies": "Nenhuma empresa encontrada"
+  },
+  "favorites": {
+    "title": "Propriedades favoritas",
+    "empty": "Você ainda não tem propriedades favoritas",
+    "emptyDescription": "Explore e salve propriedades de seu interesse",
+    "explore": "Explorar agora",
+    "remove": "Remover dos favoritos"
+  },
+  "notFound": {
+    "title": "Página não encontrada",
+    "description": "A página que você está procurando não existe ou foi removida",
+    "backHome": "Voltar ao início"
+  },
+  "admin": {
+    "welcome": "Welcome to admin dashboard",
+    "menu": {
+      "main": "Overview",
+      "overview": "Dashboard",
+      "analytics": "Analytics",
+      "inquiries": "Inquiries",
+      "management": "Management",
+      "users": "Users",
+      "properties": "Properties",
+      "agents": "Agents",
+      "agencies": "Agencies",
+      "projects": "Projects",
+      "content": "Content",
+      "news": "News",
+      "marketAnalysis": "Market Analysis",
+      "wiki": "Wiki",
+      "finance": "Finance",
+      "payments": "Payments",
+      "packages": "Packages",
+      "location": "Location",
+      "provinces": "Provinces",
+      "districts": "Districts",
+      "wards": "Wards",
+      "system": "System",
+      "notifications": "Notifications",
+      "settings": "Settings",
+      "security": "Security",
+      "viewUserSite": "View User Site",
+      "logout": "Logout"
+    },
+    "stats": {
+      "totalUsers": "Total Users",
+      "totalProperties": "Total Properties",
+      "totalRevenue": "Total Revenue",
+      "newInquiries": "New Inquiries",
+      "totalAgents": "Total Agents",
+      "activeListings": "Active Listings",
+      "totalViews": "Total Views",
+      "favorites": "Favorites"
+    },
+    "recentActivity": "Recent Activity",
+    "sections": {
+      "overview": "Overview",
+      "analytics": "Analytics",
+      "inquiries": "Inquiries Management",
+      "users": "User Management",
+      "properties": "Property Management",
+      "agents": "Agent Management",
+      "agencies": "Agency Management",
+      "projects": "Project Management",
+      "news": "News Management",
+      "market-analysis": "Market Analysis",
+      "wiki": "Wiki Management",
+      "payments": "Payment Management",
+      "packages": "Package Management",
+      "provinces": "Province Management",
+      "districts": "District Management",
+      "wards": "Ward Management",
+      "notifications": "Notification Management",
+      "settings": "System Settings",
+      "security": "System Security"
+    },
+    "comingSoon": "Feature under development",
+    "backToOverview": "Back to Overview"
+  }
+}
