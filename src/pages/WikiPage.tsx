@@ -12,7 +12,8 @@ import {
   DollarSign,
   FileText,
   Palette,
-  Wind
+  Wind,
+  Loader2
 } from 'lucide-react';
 import { wikiAPI } from '../api/services';
 import type { WikiArticle } from '../api/types';
@@ -32,6 +33,7 @@ const WikiPage: React.FC = () => {
   const { category } = useParams<{ category?: string }>();
   const [articles, setArticles] = useState<WikiArticle[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>(category || '');
 
@@ -98,6 +100,12 @@ const WikiPage: React.FC = () => {
     const loadArticles = async () => {
       try {
         setLoading(true);
+        setError(null);
+        
+        // Minimum loading time để có cảm giác loading (800ms)
+        const minLoadingTime = 800;
+        const startTime = Date.now();
+        
         let response;
 
         if (selectedCategory) {
@@ -122,24 +130,53 @@ const WikiPage: React.FC = () => {
           response = await wikiAPI.getAll({ page: 0, size: 50 });
         }
 
+        // Handle different response structures
+        // Backend returns Page<WikiArticle> which has a 'content' property
+        // But also handle case where response might be array directly
+        let articlesData: any[] = [];
+        
+        console.log('Wiki API Response:', response); // Debug log
+        
+        if (Array.isArray(response)) {
+          articlesData = response;
+        } else if (response && response.content && Array.isArray(response.content)) {
+          articlesData = response.content;
+        } else if (response && Array.isArray(response)) {
+          articlesData = response;
+        } else {
+          console.warn('Unexpected response structure:', response);
+          articlesData = [];
+        }
+
+        console.log('Extracted articles data:', articlesData); // Debug log
+
         // Transform API response to match our interface
-        const transformedArticles: WikiArticle[] = response.content.map((article: any) => ({
+        const transformedArticles: WikiArticle[] = articlesData.map((article: any) => ({
           id: article.id,
           title: article.title,
           slug: article.slug,
-          summary: article.summary,
+          summary: article.summary || '',
           featuredImageUrl: article.featuredImageUrl,
           category: article.category,
           status: article.status,
-          viewCount: article.viewCount,
+          viewCount: article.viewCount || 0,
           publishedAt: article.publishedAt,
           createdAt: article.createdAt,
           author: article.author
         }));
 
+        console.log('Transformed articles:', transformedArticles); // Debug log
+        
+        // Đảm bảo loading indicator hiển thị ít nhất minLoadingTime
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
+        
+        await new Promise(resolve => setTimeout(resolve, remainingTime));
+        
         setArticles(transformedArticles);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error loading wiki articles:', error);
+        setError(error.response?.data?.message || error.message || 'Không thể tải bài viết wiki');
         // Fallback to empty array if API fails
         setArticles([]);
       } finally {
@@ -150,11 +187,12 @@ const WikiPage: React.FC = () => {
     loadArticles();
   }, [selectedCategory]);
 
+  // Filter articles - only by search term, category filtering is done via API
   const filteredArticles = articles.filter(article => {
+    if (!searchTerm) return true;
     const matchesSearch = article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         article.summary.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = !selectedCategory || article.category.toLowerCase().includes(selectedCategory.toLowerCase());
-    return matchesSearch && matchesCategory;
+                         (article.summary && article.summary.toLowerCase().includes(searchTerm.toLowerCase()));
+    return matchesSearch;
   });
 
   const currentCategory = categories.find(cat => cat.slug === selectedCategory);
@@ -195,24 +233,35 @@ const WikiPage: React.FC = () => {
               <div className="space-y-2">
                 <button
                   onClick={() => setSelectedCategory('')}
-                  className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
+                  disabled={loading}
+                  className={`w-full text-left px-3 py-2 rounded-lg transition-colors flex items-center justify-between ${
                     selectedCategory === '' ? 'bg-red-50 text-red-600' : 'hover:bg-gray-50'
-                  }`}
+                  } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                  Tất cả bài viết
+                  <span>Tất cả bài viết</span>
+                  {loading && selectedCategory === '' && (
+                    <Loader2 className="h-4 w-4 animate-spin text-red-600" />
+                  )}
                 </button>
                 {categories.map((cat) => {
                   const IconComponent = cat.icon;
+                  const isActive = selectedCategory === cat.slug;
                   return (
                     <button
                       key={cat.id}
                       onClick={() => setSelectedCategory(cat.slug)}
-                      className={`w-full text-left px-3 py-2 rounded-lg transition-colors flex items-center space-x-2 ${
-                        selectedCategory === cat.slug ? 'bg-red-50 text-red-600' : 'hover:bg-gray-50'
-                      }`}
+                      disabled={loading}
+                      className={`w-full text-left px-3 py-2 rounded-lg transition-colors flex items-center justify-between ${
+                        isActive ? 'bg-red-50 text-red-600' : 'hover:bg-gray-50'
+                      } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
-                      <IconComponent className={`h-4 w-4 ${cat.color}`} />
-                      <span className="text-sm">{cat.name}</span>
+                      <div className="flex items-center space-x-2">
+                        <IconComponent className={`h-4 w-4 ${cat.color}`} />
+                        <span className="text-sm">{cat.name}</span>
+                      </div>
+                      {loading && isActive && (
+                        <Loader2 className="h-4 w-4 animate-spin text-red-600" />
+                      )}
                     </button>
                   );
                 })}
@@ -236,7 +285,11 @@ const WikiPage: React.FC = () => {
             {/* Articles List */}
             {loading ? (
               <div className="space-y-4">
-                {[...Array(3)].map((_, i) => (
+                <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+                  <Loader2 className="h-12 w-12 text-red-600 animate-spin mx-auto mb-4" />
+                  <p className="text-gray-600">Đang tải bài viết...</p>
+                </div>
+                {[...Array(2)].map((_, i) => (
                   <div key={i} className="bg-white rounded-lg shadow-sm p-6 animate-pulse">
                     <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
                     <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
@@ -244,6 +297,32 @@ const WikiPage: React.FC = () => {
                     <div className="h-3 bg-gray-200 rounded w-2/3"></div>
                   </div>
                 ))}
+              </div>
+            ) : error ? (
+              <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+                <BookOpen className="h-16 w-16 text-red-300 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Lỗi tải dữ liệu</h3>
+                <p className="text-gray-600 mb-4">{error}</p>
+                <button
+                  onClick={() => {
+                    setError(null);
+                    setSelectedCategory(selectedCategory); // Trigger reload
+                  }}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                >
+                  Thử lại
+                </button>
+              </div>
+            ) : filteredArticles.length === 0 && articles.length === 0 ? (
+              <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+                <BookOpen className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Chưa có bài viết nào</h3>
+                <p className="text-gray-600 mb-4">
+                  Hiện tại chưa có bài viết wiki nào được publish. Vui lòng quay lại sau.
+                </p>
+                <p className="text-sm text-gray-500">
+                  (Kiểm tra console để xem chi tiết lỗi nếu có)
+                </p>
               </div>
             ) : (
               <div className="space-y-6">
@@ -293,7 +372,7 @@ const WikiPage: React.FC = () => {
                   </article>
                 ))}
 
-                {filteredArticles.length === 0 && (
+                {filteredArticles.length === 0 && articles.length > 0 && (
                   <div className="bg-white rounded-lg shadow-sm p-12 text-center">
                     <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-lg font-medium text-gray-900 mb-2">Không tìm thấy bài viết</h3>

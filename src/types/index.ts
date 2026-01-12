@@ -6,7 +6,7 @@ export interface User {
   fullName: string;
   phoneNumber: string;
   avatar?: string;
-  role: 'USER' | 'AGENT' | 'ADMIN';
+  role: 'USER' | 'AGENT' | 'EDITOR' | 'ADMIN';
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -281,6 +281,7 @@ export interface RegisterForm {
   confirmPassword: string;
   fullName: string;
   phone: string;
+  otpCode: string;
 }
 
 export interface PropertySearchForm {

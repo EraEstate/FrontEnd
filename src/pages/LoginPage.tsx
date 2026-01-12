@@ -21,9 +21,13 @@ const LoginPage: React.FC = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      // Admin -> luôn vào trang admin dashboard
+      // Redirect based on role
       if (user?.role === 'ADMIN') {
         navigate('/admin', { replace: true });
+      } else if (user?.role === 'AGENT') {
+        navigate('/agent', { replace: true });
+      } else if (user?.role === 'EDITOR') {
+        navigate('/editor', { replace: true });
       } else {
         const from = (location.state as any)?.from?.pathname || '/';
         navigate(from, { replace: true });

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock, User, Phone, AlertCircle, CheckCircle } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, Phone, AlertCircle, CheckCircle, KeyRound } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../store/authStore';
 import type { RegisterForm } from '../types';
@@ -10,23 +10,36 @@ const RegisterPage: React.FC = () => {
   const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showOtpForm, setShowOtpForm] = useState(false);
+  const [sendingOtp, setSendingOtp] = useState(false);
+  const [otpError, setOtpError] = useState<string | null>(null);
   const [formData, setFormData] = useState<RegisterForm>({
     email: '',
     password: '',
     confirmPassword: '',
     fullName: '',
     phone: '',
+    otpCode: '',
   });
 
-  const { register, isLoading, error, isAuthenticated } = useAuthStore();
+  const { register, sendOtp, isLoading, error, isAuthenticated, user } = useAuthStore();
   const navigate = useNavigate();
 
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/', { replace: true });
+      // Redirect based on role
+      if (user?.role === 'ADMIN') {
+        navigate('/admin', { replace: true });
+      } else if (user?.role === 'AGENT') {
+        navigate('/agent', { replace: true });
+      } else if (user?.role === 'EDITOR') {
+        navigate('/editor', { replace: true });
+      } else {
+        navigate('/', { replace: true });
+      }
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,10 +49,35 @@ const RegisterPage: React.FC = () => {
       return;
     }
 
+    // Nếu chưa hiện form OTP, gửi OTP trước
+    if (!showOtpForm) {
+      setSendingOtp(true);
+      setOtpError(null);
+      try {
+        await sendOtp(formData.email);
+        setShowOtpForm(true);
+      } catch (error: any) {
+        setOtpError(error.response?.data?.error || 'Không thể gửi mã OTP');
+      } finally {
+        setSendingOtp(false);
+      }
+      return;
+    }
+
+    // Nếu đã có form OTP, submit đăng ký
+    if (!formData.otpCode || formData.otpCode.length !== 6) {
+      setOtpError('Vui lòng nhập mã OTP 6 chữ số');
+      return;
+    }
+
     try {
       await register(formData);
       // Redirect will be handled by useEffect above
-    } catch (error) {
+    } catch (error: any) {
+      // Nếu lỗi OTP, hiển thị lỗi
+      if (error.response?.data?.error?.includes('OTP')) {
+        setOtpError(error.response.data.error);
+      }
       // Error is handled by the store
     }
   };
@@ -49,6 +87,10 @@ const RegisterPage: React.FC = () => {
       ...formData,
       [e.target.name]: e.target.value,
     });
+    // Clear OTP error when user types
+    if (e.target.name === 'otpCode') {
+      setOtpError(null);
+    }
   };
 
   const passwordsMatch = formData.password === formData.confirmPassword;
@@ -122,7 +164,8 @@ const RegisterPage: React.FC = () => {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+                  disabled={showOtpForm}
+                  className="appearance-none block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm disabled:bg-gray-100"
                   placeholder={t('auth.login.email')}
                 />
                 <Mail className="h-5 w-5 text-gray-400 absolute left-3 top-2" />
@@ -224,13 +267,44 @@ const RegisterPage: React.FC = () => {
               )}
             </div>
 
+            {showOtpForm && (
+              <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-4">
+                <p className="text-sm text-blue-800 mb-3">
+                  Mã OTP đã được gửi đến email <strong>{formData.email}</strong>. Vui lòng kiểm tra email và nhập mã OTP bên dưới.
+                </p>
+                <div>
+                  <label htmlFor="otpCode" className="block text-sm font-medium text-gray-700">
+                    Mã OTP <span className="text-red-500">*</span>
+                  </label>
+                  <div className="mt-1 relative">
+                    <input
+                      id="otpCode"
+                      name="otpCode"
+                      type="text"
+                      required
+                      maxLength={6}
+                      value={formData.otpCode}
+                      onChange={handleChange}
+                      className="appearance-none block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+                      placeholder="Nhập mã OTP 6 chữ số"
+                    />
+                    <KeyRound className="h-5 w-5 text-gray-400 absolute left-3 top-2" />
+                  </div>
+                  {otpError && (
+                    <p className="mt-1 text-sm text-red-600">{otpError}</p>
+                  )}
+                </div>
+              </div>
+            )}
+
             <div className="flex items-center">
               <input
                 id="agree-terms"
                 name="agree-terms"
                 type="checkbox"
                 required
-                className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+                disabled={showOtpForm}
+                className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded disabled:opacity-50"
               />
               <label htmlFor="agree-terms" className="ml-2 block text-sm text-gray-900">
                 {t('auth.loginFooter.termsAgreement')}{' '}
@@ -247,14 +321,21 @@ const RegisterPage: React.FC = () => {
             <div>
               <button
                 type="submit"
-                disabled={isLoading || !passwordsMatch || !isPasswordValid}
+                disabled={isLoading || sendingOtp || !passwordsMatch || !isPasswordValid || (showOtpForm && !formData.otpCode)}
                 className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? (
+                {sendingOtp ? (
+                  <div className="flex items-center">
+                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                    Đang gửi OTP...
+                  </div>
+                ) : isLoading ? (
                   <div className="flex items-center">
                     <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
                     {t('common.loading')}
                   </div>
+                ) : showOtpForm ? (
+                  'Xác nhận đăng ký'
                 ) : (
                   t('auth.register.createAccountButton')
                 )}

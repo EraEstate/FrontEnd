@@ -39,24 +39,43 @@ import DashboardPage from './pages/DashboardPage';
 import PricingPage from './pages/PricingPage';
 import WikiDetailPage from './pages/WikiDetailPage';
 import AdminDashboard from './pages/AdminDashboard';
+import AgentDashboard from './pages/AgentDashboard';
+import EditorDashboard from './pages/EditorDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import PublicProfilePage from './pages/PublicProfilePage';
 
 function AppContent() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
+  const isAgentRoute = location.pathname.startsWith('/agent');
+  const isEditorRoute = location.pathname.startsWith('/editor');
+  const isDashboardRoute = isAdminRoute || isAgentRoute || isEditorRoute;
 
   return (
     <div className="min-h-screen flex flex-col w-full">
-      {/* Conditionally render Header - hide on admin pages */}
-      {!isAdminRoute && <Header />}
+      {/* Conditionally render Header - hide on dashboard pages */}
+      {!isDashboardRoute && <Header />}
       
-      <main className={`flex-1 w-full ${!isAdminRoute ? 'pt-16' : ''}`}>
+      <main className={`flex-1 w-full ${!isDashboardRoute ? 'pt-16' : ''}`}>
         <Routes>
           {/* Admin Routes - Protected and fullscreen */}
           <Route path="/admin" element={
             <ProtectedRoute requireAdmin>
               <AdminDashboard />
+            </ProtectedRoute>
+          } />
+
+          {/* Agent Routes - Protected and fullscreen */}
+          <Route path="/agent" element={
+            <ProtectedRoute requireRole="AGENT">
+              <AgentDashboard />
+            </ProtectedRoute>
+          } />
+
+          {/* Editor Routes - Protected and fullscreen */}
+          <Route path="/editor" element={
+            <ProtectedRoute requireRole="EDITOR">
+              <EditorDashboard />
             </ProtectedRoute>
           } />
 
@@ -101,8 +120,8 @@ function AppContent() {
         </Routes>
       </main>
       
-      {/* Conditionally render Footer - hide on admin pages */}
-      {!isAdminRoute && <Footer />}
+      {/* Conditionally render Footer - hide on dashboard pages */}
+      {!isDashboardRoute && <Footer />}
     </div>
   );
 }

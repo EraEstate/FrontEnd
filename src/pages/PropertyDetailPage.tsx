@@ -55,7 +55,7 @@ const PropertyDetailPage: React.FC = () => {
   // Toggle favorite
   const handleToggleFavorite = async () => {
     if (!id || !isAuthenticated) {
-      alert('Vui lòng đăng nhập để thêm vào danh sách yêu thích');
+      alert(t('propertyDetail.loginToFavorite'));
       return;
     }
     
@@ -70,16 +70,16 @@ const PropertyDetailPage: React.FC = () => {
       
       // Show success message and offer navigation if adding to favorites
       if (!wasFavorited) {
-        const goToFavorites = window.confirm('Đã thêm vào danh sách yêu thích!\n\nBạn có muốn xem danh sách yêu thích không?');
+        const goToFavorites = window.confirm(`${t('propertyDetail.addedToFavorites')}\n\n${t('propertyDetail.viewFavorites')}`);
         if (goToFavorites) {
           navigate('/favorites');
         }
       } else {
-        alert('Đã xóa khỏi danh sách yêu thích');
+        alert(t('propertyDetail.removedFromFavorites'));
       }
     } catch (error: any) {
       console.error('Error toggling favorite:', error);
-      const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi cập nhật danh sách yêu thích';
+      const errorMessage = error.response?.data?.message || t('propertyDetail.favoriteError');
       alert(errorMessage);
     } finally {
       setTogglingFavorite(false);
@@ -117,13 +117,13 @@ const PropertyDetailPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Lỗi tải dữ liệu</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('propertyDetail.loadingError')}</h2>
           <p className="text-gray-600 mb-4">{error}</p>
           <button 
             onClick={refetch}
             className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
           >
-            Thử lại
+            {t('propertyDetail.tryAgain')}
           </button>
         </div>
       </div>
@@ -134,8 +134,8 @@ const PropertyDetailPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Không tìm thấy bất động sản</h2>
-          <p className="text-gray-600">Bất động sản bạn tìm kiếm không tồn tại hoặc đã bị xóa.</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('propertyDetail.notFound')}</h2>
+          <p className="text-gray-600">{t('propertyDetail.notFoundMessage')}</p>
         </div>
       </div>
     );
@@ -154,9 +154,28 @@ const PropertyDetailPage: React.FC = () => {
   
   // Get owner information
   const owner = property.owner || property.user;
-  const ownerName = owner?.fullName || 'Chưa cập nhật';
+  const ownerName = owner?.fullName || t('propertyDetail.notUpdated');
   const ownerPhone = owner?.phone || property.owner?.phone || '';
   const ownerEmail = owner?.email || property.owner?.email || '';
+  
+  // Format phone number for Zalo (remove spaces, dashes, and ensure it starts with 0 or country code)
+  const formatPhoneForZalo = (phone: string): string => {
+    if (!phone) return '';
+    // Remove all non-digit characters
+    let cleaned = phone.replace(/\D/g, '');
+    // If phone doesn't start with 0 or country code, add 0
+    if (cleaned.length === 9) {
+      cleaned = '0' + cleaned;
+    }
+    // If phone starts with +84, replace with 0
+    if (cleaned.startsWith('84')) {
+      cleaned = '0' + cleaned.substring(2);
+    }
+    return cleaned;
+  };
+  
+  const zaloPhone = formatPhoneForZalo(ownerPhone);
+  const zaloLink = zaloPhone ? `https://zalo.me/${zaloPhone}` : '#';
   
   // Check if current user is the property owner
   const isOwner = isAuthenticated && owner && user?.id === owner.id;
@@ -178,11 +197,11 @@ const PropertyDetailPage: React.FC = () => {
     { icon: Bed, label: t('common.bedrooms'), value: property.bedrooms || details?.bedrooms },
     { icon: Bath, label: t('common.bathrooms'), value: property.bathrooms || details?.bathrooms },
     { icon: Building, label: t('postProperty.floors'), value: details?.floors },
-    { icon: Car, label: t('postProperty.parking'), value: details?.parking ? 'Có' : t('propertyDetail.no') },
-    { icon: Shield, label: t('propertyDetail.security'), value: details?.security ? 'Có' : t('propertyDetail.no') },
-    { icon: Zap, label: t('postProperty.airConditioning'), value: details?.airConditioning ? 'Có' : t('propertyDetail.no') },
-    { icon: TreePine, label: t('postProperty.balcony'), value: details?.balcony ? 'Có' : t('propertyDetail.no') },
-    { icon: Home, label: t('postProperty.garden'), value: details?.garden ? 'Có' : t('propertyDetail.no') },
+    { icon: Car, label: t('postProperty.parking'), value: details?.parking ? t('propertyDetail.yes') : t('propertyDetail.no') },
+    { icon: Shield, label: t('propertyDetail.security'), value: details?.security ? t('propertyDetail.yes') : t('propertyDetail.no') },
+    { icon: Zap, label: t('postProperty.airConditioning'), value: details?.airConditioning ? t('propertyDetail.yes') : t('propertyDetail.no') },
+    { icon: TreePine, label: t('postProperty.balcony'), value: details?.balcony ? t('propertyDetail.yes') : t('propertyDetail.no') },
+    { icon: Home, label: t('postProperty.garden'), value: details?.garden ? t('propertyDetail.yes') : t('propertyDetail.no') },
   ].filter(feature => feature.value !== undefined && feature.value !== null);
 
   return (
@@ -235,7 +254,7 @@ const PropertyDetailPage: React.FC = () => {
                       ? 'bg-red-600 text-white' 
                       : 'bg-white bg-opacity-90 text-gray-600 hover:bg-opacity-100'
                   } ${!isAuthenticated ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                  title={isFavorited ? 'Xóa khỏi danh sách yêu thích' : 'Thêm vào danh sách yêu thích'}
+                  title={isFavorited ? t('propertyDetail.removeFromFavorites') : t('propertyDetail.addToFavorites')}
                 >
                   {togglingFavorite ? (
                     <Loader2 className="h-5 w-5 animate-spin" />
@@ -250,7 +269,7 @@ const PropertyDetailPage: React.FC = () => {
             </div>
           ) : (
             <div className="aspect-[16/9] lg:aspect-[21/9] bg-gray-200 flex items-center justify-center">
-              <span className="text-gray-500">Không có hình ảnh</span>
+              <span className="text-gray-500">{t('propertyDetail.noImages')}</span>
             </div>
           )}
 
@@ -307,12 +326,12 @@ const PropertyDetailPage: React.FC = () => {
                   <div className="text-3xl font-bold text-red-600">
                     {formatPrice(Number(property.price))}
                     {(property.listingType || property.transactionType) === 'RENT' && (
-                      <span className="text-lg text-gray-500">/tháng</span>
+                      <span className="text-lg text-gray-500">{t('propertyDetail.perMonth')}</span>
                     )}
                   </div>
                   {property.area && (
                     <div className="text-sm text-gray-500 mt-1">
-                      {Math.round(Number(property.price) / Number(property.area)).toLocaleString()} VNĐ/m²
+                      {Math.round(Number(property.price) / Number(property.area)).toLocaleString()} {t('propertyDetail.vndPerSqm')}
                     </div>
                   )}
                 </div>
@@ -320,7 +339,7 @@ const PropertyDetailPage: React.FC = () => {
 
               <div className="flex items-center text-gray-600 mb-4">
                 <MapPin className="h-5 w-5 mr-2" />
-                <span>{fullAddress || property.address || 'Chưa cập nhật địa chỉ'}</span>
+                <span>{fullAddress || property.address || t('propertyDetail.addressNotUpdated')}</span>
               </div>
 
               <div className="flex items-center space-x-6 text-sm text-gray-600">
@@ -331,12 +350,12 @@ const PropertyDetailPage: React.FC = () => {
                 {property.views !== undefined && (
                   <div className="flex items-center">
                     <Eye className="h-4 w-4 mr-1" />
-                    <span>{property.views?.toLocaleString() || 0} lượt xem</span>
+                    <span>{property.views?.toLocaleString() || 0} {t('propertyDetail.views')}</span>
                   </div>
                 )}
                 <div className="flex items-center">
                   <Calendar className="h-4 w-4 mr-1" />
-                  <span>Đăng {formatDate(property.createdAt)}</span>
+                  <span>{t('propertyDetail.posted')} {formatDate(property.createdAt)}</span>
                 </div>
               </div>
             </div>
@@ -344,7 +363,7 @@ const PropertyDetailPage: React.FC = () => {
             {/* Features */}
             {features.length > 0 && (
               <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Thông tin chi tiết</h2>
+                <h2 className="text-xl font-bold text-gray-900 mb-4">{t('propertyDetail.detailInfo')}</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {features.map((feature, index) => {
                     const Icon = feature.icon;
@@ -362,7 +381,7 @@ const PropertyDetailPage: React.FC = () => {
 
             {/* Description */}
             <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Mô tả</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">{t('propertyDetail.description')}</h2>
               <div className="prose max-w-none text-gray-700">
                 {property.description.split('\n').map((paragraph: string, index: number) => (
                   <p key={index} className="mb-3">{paragraph}</p>
@@ -373,18 +392,18 @@ const PropertyDetailPage: React.FC = () => {
             {/* Additional Features */}
             {details?.additionalFeatures && (
               <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Tiện ích khác</h2>
+                <h2 className="text-xl font-bold text-gray-900 mb-4">{t('propertyDetail.additionalFeatures')}</h2>
                 <p className="text-gray-700">{details.additionalFeatures}</p>
               </div>
             )}
 
             {/* Map */}
             <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Vị trí</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">{t('propertyDetail.location')}</h2>
               <div className="aspect-[16/9] bg-gray-200 rounded-lg flex items-center justify-center">
                 <div className="text-center">
                   <Navigation className="h-12 w-12 text-gray-400 mx-auto mb-2" />
-                  <p className="text-gray-500">Bản đồ sẽ hiển thị tại đây</p>
+                  <p className="text-gray-500">{t('propertyDetail.mapPlaceholder')}</p>
                 </div>
               </div>
             </div>
@@ -433,16 +452,16 @@ const PropertyDetailPage: React.FC = () => {
                     to={`/users/${owner?.id}`}
                     className="inline-block mt-2 text-sm text-red-600 hover:underline"
                   >
-                    Xem hồ sơ →
+                    {t('propertyDetail.viewProfile')}
                   </Link>
                   <div className="flex items-center justify-center mt-2">
                     <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                    <span className="text-sm text-gray-600 ml-1">4.8 (127 đánh giá)</span>
+                    <span className="text-sm text-gray-600 ml-1">{t('propertyDetail.rating')}</span>
                   </div>
                   {property.agent && (
                     <div className="mt-2">
                       <span className="inline-block bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">
-                        Môi giới chứng nhận
+                        {t('propertyDetail.certifiedBroker')}
                       </span>
                     </div>
                   )}
@@ -454,50 +473,63 @@ const PropertyDetailPage: React.FC = () => {
                     className="w-full bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 transition-colors font-medium flex items-center justify-center"
                   >
                     <Phone className="h-5 w-5 mr-2" />
-                    Gọi điện
+                    {t('propertyDetail.call')}
                   </a>
+                  {zaloPhone && (
+                    <a
+                      href={zaloLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full bg-blue-500 text-white py-3 px-4 rounded-lg hover:bg-blue-600 transition-colors font-medium flex items-center justify-center"
+                    >
+                      <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.58 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.64 20.28 9.7 20.28 11.91C20.28 16.31 16.45 20.14 12.05 20.14C10.56 20.14 9.11 19.76 7.85 19.06L7.55 18.91L4.43 19.65L5.17 16.58L5.02 16.28C4.28 14.95 3.89 13.46 3.89 11.91C3.89 7.5 7.72 3.67 12.05 3.67M8.53 7.33C8.37 7.33 8.1 7.39 7.87 7.64C7.65 7.89 7 8.5 7 9.71C7 10.93 7.89 12.1 8 12.27C8.14 12.44 9.76 14.94 12.25 15.87C12.84 16.07 13.3 16.18 13.66 16.26C14.25 16.4 14.79 16.36 15.22 16.28C15.7 16.18 16.68 15.6 16.89 15C17.1 14.38 17.1 13.87 17.04 13.75C16.97 13.64 16.81 13.58 16.56 13.45C16.31 13.33 14.77 12.55 14.44 12.42C14.12 12.29 13.91 12.23 13.7 12.5C13.5 12.74 12.89 13.5 12.69 13.71C12.5 13.92 12.31 13.95 12.06 13.82C11.81 13.69 10.89 13.33 9.76 12.3C8.89 11.5 8.27 10.55 8.08 10.3C7.89 10.05 8.05 9.96 8.22 9.78C8.39 9.61 8.58 9.36 8.72 9.17C8.87 8.97 8.97 8.83 9.13 8.66C9.28 8.5 9.19 8.36 9.08 8.22C8.97 8.08 8.53 7.33 8.53 7.33Z" />
+                      </svg>
+                      {t('propertyDetail.contactZalo')}
+                    </a>
+                  )}
                   <button 
                     onClick={() => setIsChatOpen(true)}
                     className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center justify-center"
                   >
                     <MessageCircle className="h-5 w-5 mr-2" />
-                    Nhắn tin
+                    {t('propertyDetail.sendMessage')}
                   </button>
                   <button
                     onClick={() => setShowContactForm(!showContactForm)}
                     className="w-full border border-red-600 text-red-600 py-3 px-4 rounded-lg hover:bg-red-50 transition-colors font-medium flex items-center justify-center"
                   >
                     <Mail className="h-5 w-5 mr-2" />
-                    Liên hệ
+                    {t('propertyDetail.contact')}
                   </button>
                 </div>
 
                 {/* Contact Form */}
                 {showContactForm && (
                   <div className="border-t pt-6">
-                    <h4 className="font-medium text-gray-900 mb-4">Gửi tin nhắn</h4>
+                    <h4 className="font-medium text-gray-900 mb-4">{t('propertyDetail.sendMessageTitle')}</h4>
                     <form className="space-y-4">
                       <input
                         type="text"
-                        placeholder="Họ và tên"
+                        placeholder={t('propertyDetail.fullName')}
                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       />
                       <input
                         type="tel"
-                        placeholder="Số điện thoại"
+                        placeholder={t('propertyDetail.phoneNumber')}
                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       />
                       <textarea
                         placeholder={t('propertyDetail.messagePlaceholder')}
                         rows={4}
                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
-                        defaultValue={`${t('propertyDetail.interestedIn')}"${property.title}". Xin hãy liên hệ với tôi.`}
+                        defaultValue={`${t('propertyDetail.interestedIn')}"${property.title}". ${t('propertyDetail.contact')}.`}
                       />
                       <button
                         type="submit"
                         className="w-full bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 transition-colors font-medium"
                       >
-                        Gửi tin nhắn
+                        {t('propertyDetail.sendMessageButton')}
                       </button>
                     </form>
                   </div>
@@ -508,15 +540,15 @@ const PropertyDetailPage: React.FC = () => {
                   <div className="grid grid-cols-3 gap-4 text-center">
                     <div>
                       <div className="text-xl font-bold text-gray-900">45</div>
-                      <div className="text-xs text-gray-600">Tin đăng</div>
+                      <div className="text-xs text-gray-600">{t('propertyDetail.listings')}</div>
                     </div>
                     <div>
                       <div className="text-xl font-bold text-gray-900">3.2k</div>
-                      <div className="text-xs text-gray-600">Lượt xem</div>
+                      <div className="text-xs text-gray-600">{t('propertyDetail.views')}</div>
                     </div>
                     <div>
                       <div className="text-xl font-bold text-gray-900">98%</div>
-                      <div className="text-xs text-gray-600">Phản hồi</div>
+                      <div className="text-xs text-gray-600">{t('propertyDetail.responseRate')}</div>
                     </div>
                   </div>
                 </div>
@@ -525,28 +557,28 @@ const PropertyDetailPage: React.FC = () => {
 
             {/* Quick Stats */}
             <div className="bg-white rounded-lg shadow-sm p-6">
-              <h3 className="font-semibold text-gray-900 mb-4">Thống kê nhanh</h3>
+              <h3 className="font-semibold text-gray-900 mb-4">{t('propertyDetail.quickStats')}</h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <TrendingUp className="h-4 w-4 text-green-600 mr-2" />
-                    <span className="text-sm text-gray-600">Giá trung bình khu vực</span>
+                    <span className="text-sm text-gray-600">{t('propertyDetail.avgPriceArea')}</span>
                   </div>
-                  <span className="text-sm font-medium text-gray-900">45 triệu/m²</span>
+                  <span className="text-sm font-medium text-gray-900">45 {t('propertyDetail.millionPerSqm')}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <Award className="h-4 w-4 text-red-600 mr-2" />
-                    <span className="text-sm text-gray-600">Đánh giá khu vực</span>
+                    <span className="text-sm text-gray-600">{t('propertyDetail.areaRating')}</span>
                   </div>
-                  <span className="text-sm font-medium text-gray-900">Tốt</span>
+                  <span className="text-sm font-medium text-gray-900">{t('propertyDetail.good')}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <Clock className="h-4 w-4 text-blue-600 mr-2" />
-                    <span className="text-sm text-gray-600">Thời gian bán trung bình</span>
+                    <span className="text-sm text-gray-600">{t('propertyDetail.avgSellingTime')}</span>
                   </div>
-                  <span className="text-sm font-medium text-gray-900">45 ngày</span>
+                  <span className="text-sm font-medium text-gray-900">45 {t('propertyDetail.days')}</span>
                 </div>
               </div>
             </div>

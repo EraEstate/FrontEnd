@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { projectAPI } from '../api/services';
 import type { Project } from '../api/types';
 import { useTranslation } from 'react-i18next';
+import { useAuthStore } from '../store/authStore';
 
 const ProjectsPage: React.FC = () => {
   const { t } = useTranslation();
+  const { isAuthenticated } = useAuthStore();
+  const navigate = useNavigate();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -16,20 +19,28 @@ const ProjectsPage: React.FC = () => {
     type: '',
     priceRange: ''
   });
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [pendingProjectId, setPendingProjectId] = useState<number | string | null>(null);
 
   useEffect(() => {
     const loadProjects = async () => {
       try {
         setLoading(true);
-        let response;
 
+        // Nếu chưa đăng nhập: không gọi API thật, dùng mock để hiển thị giao diện
+        if (!isAuthenticated) {
+          setProjects(getMockProjects());
+          return;
+        }
+
+        let response;
         if (selectedType) {
           response = await projectAPI.getByType(selectedType);
         } else {
           response = await projectAPI.getAll({ page: 0, size: 50 });
         }
 
-        if (response.content) {
+        if (response?.content) {
           setProjects(response.content);
         }
       } catch (error) {
@@ -42,7 +53,7 @@ const ProjectsPage: React.FC = () => {
     };
 
     loadProjects();
-  }, [selectedType]);
+  }, [selectedType, isAuthenticated]);
 
   const getMockProjects = (): Project[] => [
     {
@@ -164,6 +175,16 @@ const ProjectsPage: React.FC = () => {
                          project.address.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesSearch;
   });
+
+  const handleProjectClick = (projectId: number | string) => {
+    if (!isAuthenticated) {
+      setPendingProjectId(projectId);
+      setShowLoginModal(true);
+      return;
+    }
+
+    navigate(`/projects/${projectId}`);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 pt-20">
@@ -302,10 +323,11 @@ const ProjectsPage: React.FC = () => {
             <div className="p-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {filteredProjects.map((project) => (
-                  <Link
+                  <button
                     key={project.id}
-                    to={`/projects/${project.id}`}
-                    className="group"
+                    type="button"
+                    onClick={() => handleProjectClick(project.id)}
+                    className="group text-left"
                   >
                     <div className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
                       <div className="flex">
@@ -359,13 +381,61 @@ const ProjectsPage: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                  </Link>
+                  </button>
                 ))}
               </div>
             </div>
           )}
         </div>
       </div>
+
+      {/* Login Required Modal */}
+      {showLoginModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div className="px-6 py-4 border-b border-red-100">
+              <h3 className="text-lg font-semibold text-red-600">
+                Vui lòng đăng nhập
+              </h3>
+            </div>
+            <div className="px-6 py-4">
+              <p className="text-gray-700 mb-2">
+                Bạn cần đăng nhập để xem chi tiết dự án.
+              </p>
+              <p className="text-sm text-gray-500">
+                Chọn <span className="font-semibold text-red-600">"Đi tới đăng nhập"</span> để tiếp tục, hoặc <span className="font-semibold text-red-600">"Hủy"</span> để quay lại danh sách dự án.
+              </p>
+            </div>
+            <div className="px-6 py-4 border-t flex justify-end gap-3">
+              <button
+                type="button"
+                className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm"
+                onClick={() => {
+                  setShowLoginModal(false);
+                  setPendingProjectId(null);
+                }}
+              >
+                Hủy
+              </button>
+              <button
+                type="button"
+                className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 text-sm"
+                onClick={() => {
+                  if (pendingProjectId != null) {
+                    navigate('/login', { state: { from: `/projects/${pendingProjectId}` } });
+                  } else {
+                    navigate('/login');
+                  }
+                  setShowLoginModal(false);
+                  setPendingProjectId(null);
+                }}
+              >
+                Đi tới đăng nhập
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -56,15 +56,32 @@ export const authAPI = {
     return response.data;
   },
 
+  // Gửi OTP
+  sendOtp: async (email: string) => {
+    try {
+      const response = await api.post('/auth/send-otp', { email });
+      return response.data;
+    } catch (error: any) {
+      throw error;
+    }
+  },
+
   // Đăng ký
   register: async (userData: {
     email: string;
     password: string;
     fullName: string;
     phone: string;
+    otpCode: string;
   }) => {
     try {
-      const response = await api.post('/auth/register', userData);
+      const response = await api.post('/auth/register', {
+        email: userData.email,
+        password: userData.password,
+        fullName: userData.fullName,
+        phone: userData.phone,
+        otpCode: userData.otpCode,
+      });
       return response.data;
     } catch (error: any) {
       console.warn('Backend not available, using mock register');

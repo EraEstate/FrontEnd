@@ -11,6 +11,7 @@ interface AuthState {
   error: string | null;
   login: (data: LoginForm) => Promise<void>;
   register: (data: RegisterForm) => Promise<void>;
+  sendOtp: (email: string) => Promise<void>;
   logout: () => void;
   clearError: () => void;
   updateUser: (user: User) => void;
@@ -72,7 +73,21 @@ export const useAuthStore = create<AuthState>()(
           });
         } catch (error: any) {
           set({
-            error: error.response?.data?.message || 'Đăng ký thất bại',
+            error: error.response?.data?.error || error.response?.data?.message || 'Đăng ký thất bại',
+            isLoading: false,
+          });
+          throw error;
+        }
+      },
+
+      sendOtp: async (email: string) => {
+        set({ isLoading: true, error: null });
+        try {
+          await authAPI.sendOtp(email);
+          set({ isLoading: false });
+        } catch (error: any) {
+          set({
+            error: error.response?.data?.error || error.response?.data?.message || 'Không thể gửi mã OTP',
             isLoading: false,
           });
           throw error;
