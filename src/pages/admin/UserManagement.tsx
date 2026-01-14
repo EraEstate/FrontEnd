@@ -2,70 +2,295 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
   Search, Filter, Plus, Edit2, Trash2, Eye, 
-  Check, X, Download, Mail, Phone
+  Check, X, Download, Mail, Phone, MoreVertical,
+  UserCheck, UserX, Shield, Loader2
 } from 'lucide-react';
+import { userAPI } from '../../api/user';
 
 interface User {
   id: string;
   fullName?: string;
   email?: string;
   phone?: string;
-  role: string;
+  role: 'USER' | 'AGENT' | 'EDITOR' | 'ADMIN';
   enabled: boolean;
   createdAt?: string;
+  updatedAt?: string;
 }
+
+interface EditUserModalProps {
+  user: User | null;
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: () => void;
+}
+
+// Edit User Modal Component
+const EditUserModal: React.FC<EditUserModalProps> = ({ user, isOpen, onClose, onSave }) => {
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
+    role: 'USER' as User['role'],
+    enabled: true
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        fullName: user.fullName || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        role: user.role,
+        enabled: user.enabled
+      });
+    } else {
+      // Reset form for new user
+      setFormData({
+        fullName: '',
+        email: '',
+        phone: '',
+        role: 'USER',
+        enabled: true
+      });
+    }
+    setError('');
+  }, [user, isOpen]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    setLoading(true);
+    setError('');
+
+    try {
+      if (user) {
+        // Update existing user
+        await userAPI.update(user.id, formData);
+      } else {
+        // Create new user
+        if (!formData.email || !formData.fullName) {
+          setError('Email và Họ tên là bắt buộc');
+          setLoading(false);
+          return;
+        }
+        // Generate a temporary password (user should change it later)
+        const tempPassword = Math.random().toString(36).slice(-8) + 'A1!';
+        await userAPI.create({
+          email: formData.email,
+          password: tempPassword,
+          fullName: formData.fullName,
+          phone: formData.phone,
+          role: formData.role,
+          enabled: formData.enabled
+        });
+      }
+      onSave();
+      onClose();
+    } catch (err: any) {
+      setError(err.response?.data?.message || `Có lỗi xảy ra khi ${user ? 'cập nhật' : 'tạo'} user`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-bold text-gray-900">
+              {user ? 'Chỉnh sửa User' : 'Tạo User Mới'}
+            </h2>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Họ và tên
+              </label>
+              <input
+                type="text"
+                value={formData.fullName}
+                onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email
+              </label>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+                disabled={!!user}
+              />
+              {user && (
+                <p className="mt-1 text-xs text-gray-500">Email không thể thay đổi</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Số điện thoại
+              </label>
+              <input
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Vai trò (Role)
+              </label>
+              <select
+                value={formData.role}
+                onChange={(e) => setFormData({ ...formData, role: e.target.value as User['role'] })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="USER">User</option>
+                <option value="AGENT">Agent</option>
+                <option value="EDITOR">Editor</option>
+                <option value="ADMIN">Admin</option>
+              </select>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="enabled"
+                checked={formData.enabled}
+                onChange={(e) => setFormData({ ...formData, enabled: e.target.checked })}
+                className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+              />
+              <label htmlFor="enabled" className="text-sm font-medium text-gray-700">
+                Kích hoạt tài khoản
+              </label>
+            </div>
+
+            <div className="flex items-center gap-3 pt-4">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Hủy
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Đang {user ? 'lưu' : 'tạo'}...
+                  </>
+                ) : (
+                  user ? 'Lưu thay đổi' : 'Tạo user'
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const UserManagement: React.FC = () => {
   const { t } = useTranslation();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterRole, setFilterRole] = useState<'ALL' | 'USER' | 'BROKER' | 'ADMIN'>('ALL');
+  const [filterRole, setFilterRole] = useState<'ALL' | 'USER' | 'AGENT' | 'EDITOR' | 'ADMIN'>('ALL');
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchUsers();
-  }, [currentPage, filterRole, searchTerm]);
+  }, [currentPage, filterRole]);
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchTerm || filterRole !== 'ALL') {
+        fetchUsers();
+      } else {
+        fetchUsers();
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      // TODO: Replace with actual API call when backend is ready
-      // const response = await userAPI.getAllUsers(currentPage, 20);
-      
-      // Mock data for now
-      const mockUsers: any[] = Array.from({ length: 10 }, (_, i) => ({
-        id: `user-${i}`,
-        fullName: `User ${i + 1}`,
-        email: `user${i + 1}@example.com`,
-        phone: `+84 ${String(Math.random()).slice(2, 11)}`,
-        role: ['ADMIN', 'BROKER', 'USER'][i % 3],
-        enabled: Math.random() > 0.2,
-        createdAt: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString()
-      }));
-      
-      let filteredUsers = mockUsers;
-      
-      // Apply role filter
+      let response;
+
       if (filterRole !== 'ALL') {
-        filteredUsers = filteredUsers.filter((user: any) => user.role === filterRole);
+        response = await userAPI.getByRole(filterRole, currentPage, 20);
+      } else if (searchTerm) {
+        const searchResults = await userAPI.search(searchTerm);
+        // Convert to Page format
+        response = {
+          content: searchResults,
+          totalElements: searchResults.length,
+          totalPages: 1,
+          number: 0,
+          size: 20
+        };
+      } else {
+        response = await userAPI.getAll(currentPage, 20);
       }
-      
-      // Apply search filter
-      if (searchTerm) {
-        filteredUsers = filteredUsers.filter((user: any) => 
+
+      // Filter by search term if needed
+      let filteredContent = response.content || [];
+      if (searchTerm && filterRole === 'ALL') {
+        filteredContent = filteredContent.filter((user: User) =>
           user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           user.fullName?.toLowerCase().includes(searchTerm.toLowerCase())
         );
       }
-      
-      setUsers(filteredUsers as any);
-      setTotalPages(3);
+
+      setUsers(filteredContent);
+      setTotalPages(response.totalPages || 1);
+      setTotalElements(response.totalElements || 0);
     } catch (error) {
       console.error('Failed to fetch users:', error);
+      alert('Không thể tải danh sách users. Vui lòng thử lại.');
     } finally {
       setLoading(false);
     }
@@ -88,37 +313,99 @@ const UserManagement: React.FC = () => {
   };
 
   const handleDeleteUser = async (userId: string) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
+    if (window.confirm('Bạn có chắc chắn muốn xóa user này?')) {
       try {
-        // TODO: await userAPI.delete(userId);
-        console.log('Delete user:', userId);
+        setActionLoading(userId);
+        await userAPI.delete(userId);
+        alert('Xóa user thành công!');
         fetchUsers();
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to delete user:', error);
+        alert(error.response?.data?.message || 'Không thể xóa user. Vui lòng thử lại.');
+      } finally {
+        setActionLoading(null);
       }
     }
   };
 
   const handleBulkDelete = async () => {
-    if (window.confirm(`Delete ${selectedUsers.length} users?`)) {
+    if (window.confirm(`Bạn có chắc chắn muốn xóa ${selectedUsers.length} users?`)) {
       try {
-        // TODO: await Promise.all(selectedUsers.map(id => userAPI.delete(id)));
-        console.log('Delete users:', selectedUsers);
+        setActionLoading('bulk');
+        await Promise.all(selectedUsers.map(id => userAPI.delete(id)));
+        alert(`Đã xóa ${selectedUsers.length} users thành công!`);
         setSelectedUsers([]);
         fetchUsers();
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to delete users:', error);
+        alert('Có lỗi xảy ra khi xóa users. Vui lòng thử lại.');
+      } finally {
+        setActionLoading(null);
       }
     }
+  };
+
+  const handleChangeRole = async (userId: string, newRole: User['role']) => {
+    try {
+      setActionLoading(userId);
+      await userAPI.changeRole(userId, newRole);
+      alert(`Đã đổi role thành công!`);
+      fetchUsers();
+    } catch (error: any) {
+      console.error('Failed to change role:', error);
+      alert(error.response?.data?.message || 'Không thể đổi role. Vui lòng thử lại.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleToggleEnabled = async (userId: string, currentEnabled: boolean) => {
+    try {
+      setActionLoading(userId);
+      if (currentEnabled) {
+        await userAPI.disable(userId);
+        alert('Đã vô hiệu hóa user thành công!');
+      } else {
+        await userAPI.enable(userId);
+        alert('Đã kích hoạt user thành công!');
+      }
+      fetchUsers();
+    } catch (error: any) {
+      console.error('Failed to toggle enabled:', error);
+      alert(error.response?.data?.message || 'Không thể thay đổi trạng thái. Vui lòng thử lại.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleEditUser = (user: User) => {
+    setEditingUser(user);
+    setShowEditModal(true);
+  };
+
+  const handleCreateUser = () => {
+    setEditingUser(null);
+    setShowEditModal(true);
   };
 
   const getRoleBadge = (role: string) => {
     const styles = {
       ADMIN: 'bg-purple-100 text-purple-800 border-purple-200',
-      BROKER: 'bg-blue-100 text-blue-800 border-blue-200',
+      AGENT: 'bg-blue-100 text-blue-800 border-blue-200',
+      EDITOR: 'bg-green-100 text-green-800 border-green-200',
       USER: 'bg-gray-100 text-gray-800 border-gray-200'
     };
     return styles[role as keyof typeof styles] || styles.USER;
+  };
+
+  const getRoleLabel = (role: string) => {
+    const labels: Record<string, string> = {
+      ADMIN: 'Admin',
+      AGENT: 'Agent',
+      EDITOR: 'Editor',
+      USER: 'User'
+    };
+    return labels[role] || role;
   };
 
   return (
@@ -129,9 +416,12 @@ const UserManagement: React.FC = () => {
           <h1 className="text-2xl font-bold text-gray-900">{t('admin.menu.users')}</h1>
           <p className="text-sm text-gray-500 mt-1">{t('admin.userManagement.subtitle')}</p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+        <button 
+          onClick={handleCreateUser}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
           <Plus className="w-4 h-4" />
-          {t('admin.addNew')}
+          Tạo user mới
         </button>
       </div>
 
@@ -158,9 +448,10 @@ const UserManagement: React.FC = () => {
             onChange={(e) => setFilterRole(e.target.value as any)}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
-            <option value="ALL">{t('admin.allRoles')}</option>
-            <option value="USER">{t('common.user')}</option>
-            <option value="BROKER">{t('common.broker')}</option>
+            <option value="ALL">Tất cả roles</option>
+            <option value="USER">User</option>
+            <option value="AGENT">Agent</option>
+            <option value="EDITOR">Editor</option>
             <option value="ADMIN">Admin</option>
           </select>
 
@@ -265,9 +556,96 @@ const UserManagement: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getRoleBadge(user.role)}`}>
-                        {user.role}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getRoleBadge(user.role)}`}>
+                          {getRoleLabel(user.role)}
+                        </span>
+                        <div className="relative">
+                          <button
+                            onClick={() => setOpenDropdownId(openDropdownId === user.id ? null : user.id)}
+                            className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                            disabled={actionLoading === user.id}
+                          >
+                            {actionLoading === user.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <MoreVertical className="w-4 h-4" />
+                            )}
+                          </button>
+                          {openDropdownId === user.id && (
+                            <>
+                              <div 
+                                className="fixed inset-0 z-10" 
+                                onClick={() => setOpenDropdownId(null)}
+                              />
+                              <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-20">
+                            <div className="py-1">
+                              <button
+                                onClick={() => {
+                                  handleChangeRole(user.id, 'USER');
+                                  setOpenDropdownId(null);
+                                }}
+                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                              >
+                                <Shield className="w-4 h-4" />
+                                Đổi thành User
+                              </button>
+                              <button
+                                onClick={() => {
+                                  handleChangeRole(user.id, 'AGENT');
+                                  setOpenDropdownId(null);
+                                }}
+                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                              >
+                                <Shield className="w-4 h-4" />
+                                Đổi thành Agent
+                              </button>
+                              <button
+                                onClick={() => {
+                                  handleChangeRole(user.id, 'EDITOR');
+                                  setOpenDropdownId(null);
+                                }}
+                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                              >
+                                <Shield className="w-4 h-4" />
+                                Đổi thành Editor
+                              </button>
+                              <button
+                                onClick={() => {
+                                  handleChangeRole(user.id, 'ADMIN');
+                                  setOpenDropdownId(null);
+                                }}
+                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                              >
+                                <Shield className="w-4 h-4" />
+                                Đổi thành Admin
+                              </button>
+                              <div className="border-t border-gray-200 my-1"></div>
+                              <button
+                                onClick={() => {
+                                  handleToggleEnabled(user.id, user.enabled);
+                                  setOpenDropdownId(null);
+                                }}
+                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                              >
+                                {user.enabled ? (
+                                  <>
+                                    <UserX className="w-4 h-4" />
+                                    Vô hiệu hóa
+                                  </>
+                                ) : (
+                                  <>
+                                    <UserCheck className="w-4 h-4" />
+                                    Kích hoạt
+                                  </>
+                                )}
+                              </button>
+                            </div>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="space-y-1">
@@ -308,8 +686,9 @@ const UserManagement: React.FC = () => {
                           <Eye className="w-4 h-4" />
                         </button>
                         <button
+                          onClick={() => handleEditUser(user)}
                           className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                          title={t('common.edit')}
+                          title="Chỉnh sửa"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
@@ -333,7 +712,7 @@ const UserManagement: React.FC = () => {
         {totalPages > 1 && (
           <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
             <div className="text-sm text-gray-600">
-              {t('admin.showing')} {users.length} {t('admin.of')} {totalPages * 20} {t('admin.users')}
+              Hiển thị {users.length} / {totalElements} users
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -357,6 +736,19 @@ const UserManagement: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Edit User Modal */}
+      <EditUserModal
+        user={editingUser}
+        isOpen={showEditModal}
+        onClose={() => {
+          setShowEditModal(false);
+          setEditingUser(null);
+        }}
+        onSave={() => {
+          fetchUsers();
+        }}
+      />
     </div>
   );
 };

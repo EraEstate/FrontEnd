@@ -178,12 +178,12 @@ const EditorDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="h-screen bg-gray-50 flex overflow-hidden">
       {/* Sidebar */}
-      <aside className={`bg-white shadow-lg transition-all duration-300 ${
+      <aside className={`bg-white shadow-lg transition-all duration-300 flex flex-col h-full relative ${
         sidebarOpen ? 'w-64' : 'w-20'
       }`}>
-        <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+        <div className="p-4 border-b border-gray-200 flex items-center justify-between flex-shrink-0 z-10 bg-white">
           <div className={`flex items-center ${sidebarOpen ? '' : 'justify-center w-full'}`}>
             <Edit className="w-8 h-8 text-blue-600" />
             {sidebarOpen && (
@@ -198,7 +198,7 @@ const EditorDashboard: React.FC = () => {
           </button>
         </div>
 
-        <nav className="p-4 space-y-2">
+        <nav className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-4 py-4 space-y-2">
           {menuItems.map((item) => (
             <MenuItem
               key={item.id}
@@ -210,19 +210,19 @@ const EditorDashboard: React.FC = () => {
           ))}
         </nav>
 
-        <div className="absolute bottom-0 w-full p-4 border-t border-gray-200">
+        <div className="p-4 border-t border-gray-200 flex-shrink-0 bg-white z-10">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+            className={`w-full flex items-center ${sidebarOpen ? 'justify-start px-4' : 'justify-center px-2'} py-2.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors`}
           >
-            <LogOut className="w-5 h-5 mr-3" />
-            {sidebarOpen && <span>Đăng xuất</span>}
+            <LogOut className={`w-5 h-5 ${sidebarOpen ? 'mr-3' : ''}`} />
+            {sidebarOpen && <span className="text-sm font-medium">Đăng xuất</span>}
           </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto h-full">
         <div className="p-8">
           {renderContent()}
         </div>
