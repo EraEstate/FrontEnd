@@ -195,4 +195,26 @@ export const propertyAPI = {
     const response = await api.get(`/properties/districts/${city}`);
     return response.data;
   },
+
+  // Duyệt tin đăng (STAFF/ADMIN)
+  approveProperty: async (id: string) => {
+    const response = await api.put(`/properties/${id}/approve`);
+    return response.data;
+  },
+
+  // Từ chối tin đăng (STAFF/ADMIN)
+  rejectProperty: async (id: string, reason?: string) => {
+    const response = await api.put(`/properties/${id}/reject`, null, {
+      params: reason ? { reason } : {}
+    });
+    return response.data;
+  },
+
+  // Lấy danh sách tin đăng chờ duyệt (STAFF/ADMIN)
+  getPendingProperties: async (page = 0, size = 20) => {
+    const response = await api.get('/properties/pending', {
+      params: { page, size }
+    });
+    return response.data;
+  },
 };

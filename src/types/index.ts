@@ -6,8 +6,9 @@ export interface User {
   fullName: string;
   phoneNumber: string;
   avatar?: string;
-  role: 'USER' | 'AGENT' | 'EDITOR' | 'ADMIN';
+  role: 'USER' | 'STAFF' | 'ADMIN';
   isActive: boolean;
+  enabled?: boolean; // Tài khoản đã được kích hoạt chưa
   createdAt: string;
   updatedAt: string;
 }
@@ -307,4 +308,43 @@ export interface ContactForm {
   email: string;
   phone: string;
   message: string;
+}
+
+// Bank Account types
+export interface BankAccount {
+  id: string;
+  userId: string;
+  bankName: string;
+  accountNumber: string;
+  accountHolderName: string;
+  branchName?: string;
+  accountType: 'SAVINGS' | 'CHECKING' | 'CURRENT';
+  isPrimary: boolean;
+  isVerified: boolean;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+// Subscription types
+export interface UserSubscription {
+  id: string;
+  userId: string;
+  packageId: string;
+  startDate: string;
+  endDate: string;
+  status: 'ACTIVE' | 'EXPIRED' | 'CANCELLED' | 'SUSPENDED';
+  propertiesUsed: number;
+  autoRenewal: boolean;
+  paymentId?: string;
+  createdAt: string;
+  updatedAt?: string;
+  listingPackage?: {
+    id: string;
+    name: string;
+    price: number;
+    durationDays: number;
+    maxProperties: number | null;
+    maxImagesPerProperty: number;
+  };
 }

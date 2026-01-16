@@ -51,9 +51,17 @@ export const useAuthStore = create<AuthState>()(
           localStorage.setItem('jwt', token);
           console.log('AuthStore - Manual localStorage save completed');
         } catch (error: any) {
-          console.error('AuthStore - Login error:', error);
+          // Backend có thể trả về error hoặc message
+          const errorMessage = error.response?.data?.error || 
+                             error.response?.data?.message || 
+                             error.message || 
+                             'Đăng nhập thất bại';
+          
+          // Chỉ log warning cho auth errors (không phải error)
+          console.warn('AuthStore - Login failed:', errorMessage);
+          
           set({
-            error: error.response?.data?.message || 'Đăng nhập thất bại',
+            error: errorMessage,
             isLoading: false,
           });
           throw error;

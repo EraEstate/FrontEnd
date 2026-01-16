@@ -31,10 +31,8 @@ const RegisterPage: React.FC = () => {
       // Redirect based on role
       if (user?.role === 'ADMIN') {
         navigate('/admin', { replace: true });
-      } else if (user?.role === 'AGENT') {
-        navigate('/agent', { replace: true });
-      } else if (user?.role === 'EDITOR') {
-        navigate('/editor', { replace: true });
+      } else if (user?.role === 'STAFF') {
+        navigate('/staff', { replace: true });
       } else {
         navigate('/', { replace: true });
       }

@@ -94,5 +94,18 @@ export const propertyInquiryAPI = {
   countNewInquiries: async () => {
     const response = await api.get<number>('/property-inquiries/new/count');
     return response.data;
+  },
+
+  // Lấy tất cả inquiries (STAFF/ADMIN)
+  getAll: async (params?: {
+    page?: number;
+    size?: number;
+    sortBy?: string;
+    sortDir?: string;
+    status?: 'NEW' | 'IN_PROGRESS' | 'RESPONDED' | 'CLOSED' | 'SPAM';
+    type?: 'GENERAL_INFO' | 'SCHEDULE_VIEWING' | 'PRICE_NEGOTIATION' | 'FINANCING_INFO' | 'PROPERTY_HISTORY' | 'NEIGHBORHOOD_INFO' | 'OTHER';
+  }) => {
+    const response = await api.get<PageResponse<PropertyInquiry>>('/property-inquiries', { params });
+    return response.data;
   }
 };

@@ -12,7 +12,7 @@ interface User {
   fullName?: string;
   email?: string;
   phone?: string;
-  role: 'USER' | 'AGENT' | 'EDITOR' | 'ADMIN';
+  role: 'USER' | 'STAFF' | 'ADMIN';
   enabled: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -173,8 +173,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ user, isOpen, onClose, on
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="USER">User</option>
-                <option value="AGENT">Agent</option>
-                <option value="EDITOR">Editor</option>
+                <option value="STAFF">Staff</option>
                 <option value="ADMIN">Admin</option>
               </select>
             </div>
@@ -227,7 +226,7 @@ const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterRole, setFilterRole] = useState<'ALL' | 'USER' | 'AGENT' | 'EDITOR' | 'ADMIN'>('ALL');
+  const [filterRole, setFilterRole] = useState<'ALL' | 'USER' | 'STAFF' | 'ADMIN'>('ALL');
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
@@ -391,8 +390,7 @@ const UserManagement: React.FC = () => {
   const getRoleBadge = (role: string) => {
     const styles = {
       ADMIN: 'bg-purple-100 text-purple-800 border-purple-200',
-      AGENT: 'bg-blue-100 text-blue-800 border-blue-200',
-      EDITOR: 'bg-green-100 text-green-800 border-green-200',
+      STAFF: 'bg-blue-100 text-blue-800 border-blue-200',
       USER: 'bg-gray-100 text-gray-800 border-gray-200'
     };
     return styles[role as keyof typeof styles] || styles.USER;
@@ -401,8 +399,7 @@ const UserManagement: React.FC = () => {
   const getRoleLabel = (role: string) => {
     const labels: Record<string, string> = {
       ADMIN: 'Admin',
-      AGENT: 'Agent',
-      EDITOR: 'Editor',
+      STAFF: 'Staff',
       USER: 'User'
     };
     return labels[role] || role;
@@ -450,8 +447,7 @@ const UserManagement: React.FC = () => {
           >
             <option value="ALL">Tất cả roles</option>
             <option value="USER">User</option>
-            <option value="AGENT">Agent</option>
-            <option value="EDITOR">Editor</option>
+            <option value="STAFF">Staff</option>
             <option value="ADMIN">Admin</option>
           </select>
 
@@ -592,23 +588,13 @@ const UserManagement: React.FC = () => {
                               </button>
                               <button
                                 onClick={() => {
-                                  handleChangeRole(user.id, 'AGENT');
+                                  handleChangeRole(user.id, 'STAFF');
                                   setOpenDropdownId(null);
                                 }}
                                 className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
                               >
                                 <Shield className="w-4 h-4" />
-                                Đổi thành Agent
-                              </button>
-                              <button
-                                onClick={() => {
-                                  handleChangeRole(user.id, 'EDITOR');
-                                  setOpenDropdownId(null);
-                                }}
-                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                              >
-                                <Shield className="w-4 h-4" />
-                                Đổi thành Editor
+                                Đổi thành Staff
                               </button>
                               <button
                                 onClick={() => {

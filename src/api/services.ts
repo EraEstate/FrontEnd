@@ -21,6 +21,8 @@ export {
   paymentAPI,
   listingPackageAPI
 } from './misc';
+export { bankAccountAPI } from './bankAccount';
+export { propertyTransactionAPI } from './propertyTransaction';
 
 // Export combined misc API
 export { miscAPI } from './misc';

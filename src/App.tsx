@@ -1,7 +1,10 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { Header } from './components/Header';
 import Footer from './components/Footer';
+import AccountDisabledBanner from './components/AccountDisabledBanner';
 import { useAuthStore } from './store/authStore';
 import HomePage from './components/HomePage';
 import PropertiesPage from './pages/PropertiesPage';
@@ -39,22 +42,23 @@ import DashboardPage from './pages/DashboardPage';
 import PricingPage from './pages/PricingPage';
 import WikiDetailPage from './pages/WikiDetailPage';
 import AdminDashboard from './pages/AdminDashboard';
-import AgentDashboard from './pages/AgentDashboard';
-import EditorDashboard from './pages/EditorDashboard';
+import StaffDashboard from './pages/StaffDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import PublicProfilePage from './pages/PublicProfilePage';
 
 function AppContent() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
-  const isAgentRoute = location.pathname.startsWith('/agent');
-  const isEditorRoute = location.pathname.startsWith('/editor');
-  const isDashboardRoute = isAdminRoute || isAgentRoute || isEditorRoute;
+  const isStaffRoute = location.pathname.startsWith('/staff');
+  const isDashboardRoute = isAdminRoute || isStaffRoute;
 
   return (
     <div className="min-h-screen flex flex-col w-full">
       {/* Conditionally render Header - hide on dashboard pages */}
       {!isDashboardRoute && <Header />}
+      
+      {/* Account Disabled Banner - hiển thị khi tài khoản chưa kích hoạt */}
+      {!isDashboardRoute && <AccountDisabledBanner />}
       
       <main className={`flex-1 w-full ${!isDashboardRoute ? 'pt-16' : ''}`}>
         <Routes>
@@ -65,17 +69,10 @@ function AppContent() {
             </ProtectedRoute>
           } />
 
-          {/* Agent Routes - Protected and fullscreen */}
-          <Route path="/agent" element={
-            <ProtectedRoute requireRole="AGENT">
-              <AgentDashboard />
-            </ProtectedRoute>
-          } />
-
-          {/* Editor Routes - Protected and fullscreen */}
-          <Route path="/editor" element={
-            <ProtectedRoute requireRole="EDITOR">
-              <EditorDashboard />
+          {/* Staff Routes - Protected and fullscreen */}
+          <Route path="/staff" element={
+            <ProtectedRoute requireRole="STAFF">
+              <StaffDashboard />
             </ProtectedRoute>
           } />
 
@@ -122,6 +119,20 @@ function AppContent() {
       
       {/* Conditionally render Footer - hide on dashboard pages */}
       {!isDashboardRoute && <Footer />}
+      
+      {/* Toast Notifications */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </div>
   );
 }

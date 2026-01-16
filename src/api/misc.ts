@@ -249,10 +249,28 @@ export const listingPackageAPI = {
   },
 
   // Purchase package
-  purchase: async (packageId: string, paymentMethod: string) => {
-    const response = await api.post(`/listing-packages/${packageId}/purchase`, {
-      paymentMethod
+  purchase: async (packageId: string, paymentMethod: string, bankAccountId?: string, billingPeriod: string = 'monthly') => {
+    const response = await api.post(`/listing-packages/${packageId}/purchase`, null, {
+      params: {
+        paymentMethod,
+        ...(bankAccountId && { bankAccountId }),
+        billingPeriod
+      }
     });
+    return response.data;
+  },
+
+  // Confirm payment
+  confirmPayment: async (paymentId: string, bankTransactionId: string) => {
+    const response = await api.post(`/listing-packages/payments/${paymentId}/confirm`, null, {
+      params: { bankTransactionId }
+    });
+    return response.data;
+  },
+
+  // Get current subscription
+  getCurrentSubscription: async () => {
+    const response = await api.get('/listing-packages/my-current');
     return response.data;
   },
 

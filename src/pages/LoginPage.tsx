@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, AlertCircle, AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../store/authStore';
 import type { LoginForm } from '../types';
@@ -14,7 +14,7 @@ const LoginPage: React.FC = () => {
     password: '',
   });
 
-  const { login, isLoading, error, isAuthenticated, user } = useAuthStore();
+  const { login, isLoading, error, isAuthenticated, user, clearError } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -24,10 +24,8 @@ const LoginPage: React.FC = () => {
       // Redirect based on role
       if (user?.role === 'ADMIN') {
         navigate('/admin', { replace: true });
-      } else if (user?.role === 'AGENT') {
-        navigate('/agent', { replace: true });
-      } else if (user?.role === 'EDITOR') {
-        navigate('/editor', { replace: true });
+      } else if (user?.role === 'STAFF') {
+        navigate('/staff', { replace: true });
       } else {
         const from = (location.state as any)?.from?.pathname || '/';
         navigate(from, { replace: true });
@@ -43,12 +41,16 @@ const LoginPage: React.FC = () => {
       console.log('LoginPage - Login successful');
       // Redirect will be handled by useEffect above
     } catch (error) {
-      console.error('LoginPage - Login failed:', error);
-      // Error is handled by the store
+      // Error is handled by the store, không cần log ở đây
+      // console.warn('LoginPage - Login failed:', error);
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Clear error khi user thay đổi input
+    if (error) {
+      clearError();
+    }
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -81,14 +83,33 @@ const LoginPage: React.FC = () => {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           {error && (
-            <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
-              <div className="flex">
-                <AlertCircle className="h-5 w-5 text-red-400" />
-                <div className="ml-3">
-                  <p className="text-sm text-red-800">{error}</p>
+            <>
+              {/* Hiển thị banner đặc biệt cho tài khoản chưa kích hoạt */}
+              {(error.includes('vô hiệu hóa') || error.includes('chưa kích hoạt') || error.includes('chưa được kích hoạt')) ? (
+                <div className="mb-6 bg-yellow-50 border-l-4 border-yellow-400 rounded-md p-4">
+                  <div className="flex">
+                    <AlertTriangle className="h-5 w-5 text-yellow-400 flex-shrink-0" />
+                    <div className="ml-3">
+                      <h3 className="text-sm font-medium text-yellow-800 mb-1">
+                        Tài khoản chưa được kích hoạt
+                      </h3>
+                      <p className="text-sm text-yellow-700">
+                        Tài khoản của bạn chưa được kích hoạt. Vui lòng liên hệ quản trị viên để kích hoạt tài khoản.
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              ) : (
+                <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
+                  <div className="flex">
+                    <AlertCircle className="h-5 w-5 text-red-400" />
+                    <div className="ml-3">
+                      <p className="text-sm text-red-800">{error}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
           )}
 
           <form className="space-y-6" onSubmit={handleSubmit}>

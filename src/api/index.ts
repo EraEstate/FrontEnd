@@ -76,11 +76,31 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    console.error('Axios - Response error:', error);
-    if (error.response) {
-      console.error('Axios - Error response status:', error.response.status);
-      console.error('Axios - Error response data:', error.response.data);
+    // Không log 404 cho các endpoint subscription (bình thường khi chưa có subscription)
+    const isSubscription404 = error.response?.status === 404 && 
+      (error.config?.url?.includes('/subscriptions/current') || 
+       error.config?.url?.includes('/listing-packages/my-current'));
+    
+    // Không log error cho 400 từ login/register (chỉ log warning)
+    const isAuth400 = error.response?.status === 400 && 
+      (error.config?.url?.includes('/auth/login') || 
+       error.config?.url?.includes('/auth/register'));
+    
+    if (isSubscription404) {
+      // Chỉ log debug cho 404 subscription (không phải error)
+      console.debug('Axios - No subscription found (404) - this is normal if user has no active subscription');
+    } else if (isAuth400) {
+      // Chỉ log warning cho 400 từ auth (sai password, account disabled, etc.)
+      console.warn('Axios - Auth request failed:', error.response?.data?.error || error.response?.data?.message || 'Authentication failed');
+    } else {
+      // Log error cho các lỗi khác
+      console.error('Axios - Response error:', error);
+      if (error.response) {
+        console.error('Axios - Error response status:', error.response.status);
+        console.error('Axios - Error response data:', error.response.data);
+      }
     }
+    
     if (error.message?.includes('nesting depth') || error.message?.includes('circular')) {
       console.error('Axios - Circular reference detected in response!');
     }

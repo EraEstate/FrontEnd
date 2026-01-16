@@ -11,7 +11,11 @@ import {
   Home,
   BarChart3,
   Grid3x3,
-  List
+  List,
+  ClipboardList,
+  CheckCircle2,
+  Circle,
+  CircleDot
 } from 'lucide-react';
 import { useMyProperties } from '../api/hooks';
 import type { Property } from '../types';
@@ -53,10 +57,10 @@ const MyPropertiesPage = () => {
 
   const getStatusBadge = (status: string) => {
     const badges = {
-      'AVAILABLE': { color: 'bg-emerald-100 text-emerald-700 border-emerald-200', text: '✓ Đang bán', icon: '🟢' },
-      'SOLD': { color: 'bg-gray-100 text-gray-700 border-gray-200', text: '✓ Đã bán', icon: '⚫' },
-      'RENTED': { color: 'bg-blue-100 text-blue-700 border-blue-200', text: '✓ Đã thuê', icon: '🔵' },
-      'PENDING': { color: 'bg-amber-100 text-amber-700 border-amber-200', text: '⏳ Chờ duyệt', icon: '🟡' },
+      'AVAILABLE': { color: 'bg-emerald-100 text-emerald-700 border-emerald-200', text: 'Đang bán', icon: CheckCircle2 },
+      'SOLD': { color: 'bg-gray-100 text-gray-700 border-gray-200', text: 'Đã bán', icon: Circle },
+      'RENTED': { color: 'bg-blue-100 text-blue-700 border-blue-200', text: 'Đã thuê', icon: CircleDot },
+      'PENDING': { color: 'bg-amber-100 text-amber-700 border-amber-200', text: 'Chờ duyệt', icon: TrendingUp },
     };
     return badges[status as keyof typeof badges] || badges.AVAILABLE;
   };
@@ -80,9 +84,12 @@ const MyPropertiesPage = () => {
       <div className="bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">📋 Tin Đăng Của Tôi</h1>
-              <p className="text-gray-600">Quản lý và theo dõi bất động sản của bạn</p>
+            <div className="flex items-center gap-3">
+              <ClipboardList className="h-8 w-8 text-red-600" />
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">Tin Đăng Của Tôi</h1>
+                <p className="text-gray-600">Quản lý và theo dõi bất động sản của bạn</p>
+              </div>
             </div>
             <Link
               to="/post-property"
@@ -120,23 +127,27 @@ const MyPropertiesPage = () => {
           {/* Tabs */}
           <div className="flex flex-wrap gap-2">
             {[
-              { key: 'all', label: 'Tất cả', count: properties.length },
-              { key: 'available', label: '🟢 Đang bán', count: properties.filter((p: Property) => p.status === 'AVAILABLE').length },
-              { key: 'sold', label: '⚫ Đã bán', count: properties.filter((p: Property) => p.status === 'SOLD').length },
-              { key: 'rented', label: '🔵 Đã thuê', count: properties.filter((p: Property) => p.status === 'RENTED').length },
-            ].map(tab => (
-              <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key as any)}
-                className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
-                  activeTab === tab.key
-                    ? 'bg-red-600 text-white shadow-lg scale-105'
-                    : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
-                }`}
-              >
-                {tab.label} <span className="ml-1 opacity-75">({tab.count})</span>
-              </button>
-            ))}
+              { key: 'all', label: 'Tất cả', icon: Home, count: properties.length },
+              { key: 'available', label: 'Đang bán', icon: TrendingUp, count: properties.filter((p: Property) => p.status === 'AVAILABLE').length },
+              { key: 'sold', label: 'Đã bán', icon: BarChart3, count: properties.filter((p: Property) => p.status === 'SOLD').length },
+              { key: 'rented', label: 'Đã thuê', icon: DollarSign, count: properties.filter((p: Property) => p.status === 'RENTED').length },
+            ].map(tab => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key as any)}
+                  className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                    activeTab === tab.key
+                      ? 'bg-red-600 text-white shadow-lg scale-105'
+                      : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  {tab.label} <span className="opacity-75">({tab.count})</span>
+                </button>
+              );
+            })}
           </div>
 
           {/* View Mode Toggle */}
@@ -220,7 +231,8 @@ const MyPropertiesPage = () => {
                     />
                     {/* Status Badge */}
                     <div className="absolute top-4 left-4">
-                      <span className={`px-3 py-1.5 rounded-full text-xs font-bold border ${badge.color}`}>
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border ${badge.color}`}>
+                        {badge.icon && <badge.icon className="h-3 w-3" />}
                         {badge.text}
                       </span>
                     </div>
@@ -319,7 +331,8 @@ const MyPropertiesPage = () => {
                         alt={property.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
-                      <span className={`absolute top-3 left-3 px-3 py-1.5 rounded-full text-xs font-bold border ${badge.color}`}>
+                      <span className={`absolute top-3 left-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border ${badge.color}`}>
+                        {badge.icon && <badge.icon className="h-3 w-3" />}
                         {badge.text}
                       </span>
                     </div>
