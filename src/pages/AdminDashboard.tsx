@@ -8,6 +8,8 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { adminAPI } from '../api/admin';
+import { activityAPI } from '../api/activity';
+import api from '../api/index';
 import { useAuthStore } from '../store/authStore';
 import { AdminThemeProvider, useAdminTheme } from '../contexts/AdminThemeContext';
 import UserManagement from './admin/UserManagement';
@@ -28,20 +30,31 @@ const AdminStatsCard: React.FC<{
   change?: string;
   changeType?: 'up' | 'down';
   color: string;
-}> = ({ icon, title, value, change, changeType, color }) => (
-  <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300">
+  theme?: 'light' | 'dark';
+}> = ({ icon, title, value, change, changeType, color, theme = 'light' }) => (
+  <div className={`rounded-xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 ${
+    theme === 'dark' ? 'bg-slate-800 border border-slate-700' : 'bg-white'
+  }`}>
     <div className="flex items-center justify-between mb-4">
       <div className={`p-3 rounded-lg ${color}`}>
         {icon}
       </div>
       {change && (
-        <span className={`text-sm font-medium ${changeType === 'up' ? 'text-green-600' : 'text-red-600'}`}>
+        <span className={`text-sm font-medium ${
+          changeType === 'up' 
+            ? (theme === 'dark' ? 'text-green-400' : 'text-green-600')
+            : (theme === 'dark' ? 'text-red-400' : 'text-red-600')
+        }`}>
           {change}
         </span>
       )}
     </div>
-    <h3 className="text-gray-600 text-sm font-medium mb-1">{title}</h3>
-    <p className="text-2xl font-bold text-gray-900">{value}</p>
+    <h3 className={`text-sm font-medium mb-1 ${
+      theme === 'dark' ? 'text-slate-400' : 'text-gray-600'
+    }`}>{title}</h3>
+    <p className={`text-2xl font-bold ${
+      theme === 'dark' ? 'text-slate-100' : 'text-gray-900'
+    }`}>{value}</p>
   </div>
 );
 
@@ -53,30 +66,62 @@ const MenuItem: React.FC<{
   onClick: () => void;
   badge?: number;
   theme?: 'light' | 'dark';
-}> = ({ icon, label, active, onClick, badge, theme }) => (
-  <button
-    onClick={onClick}
-    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ${
-      active 
-        ? 'bg-blue-600 text-white shadow-lg' 
-        : theme === 'dark'
-        ? 'text-slate-300 hover:bg-slate-700'
-        : 'text-gray-700 hover:bg-gray-100'
-    }`}
-  >
-    <span className={active ? 'text-white' : theme === 'dark' ? 'text-slate-400 group-hover:text-blue-400' : 'text-gray-500 group-hover:text-blue-600'}>
-      {icon}
-    </span>
-    <span className="flex-1 text-left font-medium">{label}</span>
-    {badge !== undefined && badge > 0 && (
-      <span className={`px-2 py-1 text-xs font-bold rounded-full ${
-        active ? 'bg-white text-blue-600' : 'bg-blue-600 text-white'
-      }`}>
-        {badge}
+  sidebarOpen?: boolean;
+}> = ({ icon, label, active, onClick, badge, theme, sidebarOpen = true }) => (
+  <div className="relative group">
+    <button
+      onClick={onClick}
+      className={`w-full flex items-center rounded-lg transition-all duration-200 ${
+        sidebarOpen ? 'gap-3 px-4 py-3' : 'justify-center p-3'
+      } ${
+        active 
+          ? 'bg-blue-600 text-white shadow-lg' 
+          : theme === 'dark'
+          ? 'text-slate-300 hover:bg-slate-700'
+          : 'text-gray-700 hover:bg-gray-100'
+      }`}
+    >
+      <span className={`relative flex items-center justify-center ${active ? 'text-white' : theme === 'dark' ? 'text-slate-400 group-hover:text-blue-400' : 'text-gray-500 group-hover:text-blue-600'}`}>
+        {icon}
+        {badge !== undefined && badge > 0 && !sidebarOpen && (
+          <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+            {badge > 9 ? '9+' : badge}
+          </span>
+        )}
       </span>
+      {sidebarOpen && (
+        <>
+          <span className="flex-1 text-left font-medium">{label}</span>
+          {badge !== undefined && badge > 0 && (
+            <span className={`px-2 py-1 text-xs font-bold rounded-full ${
+              active ? 'bg-white text-blue-600' : 'bg-blue-600 text-white'
+            }`}>
+              {badge}
+            </span>
+          )}
+          <ChevronRight className={`w-4 h-4 ${active ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
+        </>
+      )}
+    </button>
+    {/* Tooltip khi sidebar co lại */}
+    {!sidebarOpen && (
+      <div className={`absolute left-full ml-2 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap z-50 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${
+        theme === 'dark' 
+          ? 'bg-slate-700 text-slate-100 shadow-xl' 
+          : 'bg-gray-900 text-white shadow-lg'
+      }`} style={{ top: '50%', transform: 'translateY(-50%)' }}>
+        {label}
+        {badge !== undefined && badge > 0 && (
+          <span className="ml-2 px-1.5 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full">
+            {badge}
+          </span>
+        )}
+        <div className={`absolute right-full top-1/2 -translate-y-1/2 w-0 h-0 border-t-4 border-t-transparent border-b-4 border-b-transparent ${
+          theme === 'dark' ? 'border-r-4 border-r-slate-700' : 'border-r-4 border-r-gray-900'
+        }`}></div>
+      </div>
     )}
-    <ChevronRight className={`w-4 h-4 ${active ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
-  </button>
+  </div>
 );
 
 const AdminDashboardContent: React.FC = () => {
@@ -96,6 +141,8 @@ const AdminDashboardContent: React.FC = () => {
     totalViews: 0,
     favorites: 0
   });
+  const [recentActivities, setRecentActivities] = useState<any[]>([]);
+  const [loadingActivities, setLoadingActivities] = useState(true);
 
   useEffect(() => {
     // Fetch real stats from API
@@ -124,6 +171,57 @@ const AdminDashboardContent: React.FC = () => {
         favorites: 8934
       });
     });
+
+    // Fetch recent activities - Get from latest properties
+    setLoadingActivities(true);
+    // Try to get recent properties and convert to activities
+    api.get('/properties', { 
+      params: { 
+        page: 0, 
+        size: 5, 
+        sortBy: 'createdAt', 
+        sortDir: 'desc' 
+      } 
+    })
+      .then(response => {
+        const properties = response.data?.content || response.data || [];
+        const activities = properties.map((prop: any, index: number) => ({
+          id: `property_${prop.id}`,
+          type: 'PROPERTY_POSTED',
+          timestamp: prop.createdAt,
+          title: prop.title || 'Bất động sản',
+          description: prop.owner?.fullName 
+            ? `${prop.owner.fullName} đã tạo tin đăng mới: ${prop.title || 'Bất động sản'}`
+            : `User đã tạo tin đăng mới: ${prop.title || 'Bất động sản'}`,
+          propertyId: prop.id,
+          property: prop,
+          icon: 'plus-circle',
+          color: 'purple'
+        }));
+        setRecentActivities(activities);
+        setLoadingActivities(false);
+      })
+      .catch(error => {
+        console.error('Failed to fetch recent properties for activities:', error);
+        // Try activity API as fallback
+        activityAPI.getUserActivities(0, 5)
+          .then(response => {
+            setRecentActivities(response.content || []);
+            setLoadingActivities(false);
+          })
+          .catch(err => {
+            console.error('Failed to fetch from activity API:', err);
+            // Try admin API
+            adminAPI.getRecentActivity(5).then(data => {
+              setRecentActivities(Array.isArray(data) ? data : []);
+              setLoadingActivities(false);
+            }).catch(e => {
+              console.error('All API calls failed:', e);
+              setRecentActivities([]);
+              setLoadingActivities(false);
+            });
+          });
+      });
   }, []);
 
   const menuSections = [
@@ -198,25 +296,51 @@ const AdminDashboardContent: React.FC = () => {
         theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-200'
       } border-r`}>
         {/* Logo & Toggle */}
-        <div className={`h-16 flex items-center justify-between px-4 admin-border ${
+        <div className={`${sidebarOpen ? 'h-16' : ''} admin-border ${
           theme === 'dark' ? 'border-slate-700' : 'border-gray-200'
         } border-b`}>
-          {sidebarOpen && (
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">
-                <Shield className="w-5 h-5 text-white" />
+          {sidebarOpen ? (
+            <div className="h-16 w-full flex items-center justify-between px-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">
+                  <Shield className="w-5 h-5 text-white" />
+                </div>
+                <span className={`font-bold text-xl ${theme === 'dark' ? 'text-slate-100' : 'text-gray-900'}`}>Admin</span>
               </div>
-              <span className={`font-bold text-xl ${theme === 'dark' ? 'text-slate-100' : 'text-gray-900'}`}>Admin</span>
+              <button 
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className={`p-2 rounded-lg transition-colors ${
+                  theme === 'dark' ? 'hover:bg-slate-700' : 'hover:bg-gray-100'
+                }`}
+                title="Thu gọn"
+              >
+                <X className={`w-5 h-5 ${theme === 'dark' ? 'text-slate-300' : ''}`} />
+              </button>
+            </div>
+          ) : (
+            <div className="py-2 px-2 space-y-1">
+              <button 
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className={`w-full flex items-center justify-center p-3 rounded-lg transition-colors ${
+                  theme === 'dark' ? 'hover:bg-slate-700' : 'hover:bg-gray-100'
+                }`}
+                title="Mở rộng"
+              >
+                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">
+                  <Shield className="w-5 h-5 text-white" />
+                </div>
+              </button>
+              <button 
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className={`w-full flex items-center justify-center p-3 rounded-lg transition-colors ${
+                  theme === 'dark' ? 'hover:bg-slate-700' : 'hover:bg-gray-100'
+                }`}
+                title="Mở rộng"
+              >
+                <Menu className={`w-5 h-5 ${theme === 'dark' ? 'text-slate-300' : 'text-gray-600'}`} />
+              </button>
             </div>
           )}
-          <button 
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className={`p-2 rounded-lg transition-colors ${
-              theme === 'dark' ? 'hover:bg-slate-700' : 'hover:bg-gray-100'
-            }`}
-          >
-            {sidebarOpen ? <X className={`w-5 h-5 ${theme === 'dark' ? 'text-slate-300' : ''}`} /> : <Menu className={`w-5 h-5 ${theme === 'dark' ? 'text-slate-300' : ''}`} />}
-          </button>
         </div>
 
         {/* User Info + Theme Toggle */}
@@ -255,9 +379,9 @@ const AdminDashboardContent: React.FC = () => {
         )}
 
         {/* Menu Sections */}
-        <nav className="flex-1 overflow-y-auto py-4 px-2">
+        <nav className={`flex-1 overflow-y-auto ${sidebarOpen ? 'py-4 px-2' : 'py-2 px-2'}`}>
           {menuSections.map((section) => (
-            <div key={section.title} className="mb-6">
+            <div key={section.title} className={sidebarOpen ? 'mb-6' : 'mb-3'}>
               {sidebarOpen && (
                 <h3 className={`px-4 text-xs font-semibold uppercase tracking-wider mb-2 ${
                   theme === 'dark' ? 'text-slate-400' : 'text-gray-500'
@@ -270,11 +394,12 @@ const AdminDashboardContent: React.FC = () => {
                   <MenuItem
                     key={item.id}
                     icon={item.icon}
-                    label={sidebarOpen ? item.label : ''}
+                    label={item.label}
                     active={activeSection === item.id}
                     onClick={() => setActiveSection(item.id)}
                     badge={item.badge}
                     theme={theme}
+                    sidebarOpen={sidebarOpen}
                   />
                 ))}
               </div>
@@ -283,31 +408,63 @@ const AdminDashboardContent: React.FC = () => {
         </nav>
 
         {/* Bottom Actions */}
-        <div className={`p-4 admin-border space-y-2 ${
+        <div className={`admin-border ${sidebarOpen ? 'p-4 space-y-2' : 'p-2 space-y-1'} ${
           theme === 'dark' ? 'border-slate-700' : 'border-gray-200'
         } border-t`}>
-          <button
-            onClick={goToUserSite}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-              theme === 'dark' 
-                ? 'text-slate-300 hover:bg-slate-700' 
-                : 'text-gray-700 hover:bg-blue-50'
-            }`}
-          >
-            <Home className="w-5 h-5" />
-            {sidebarOpen && <span className="font-medium">{t('admin.menu.viewUserSite')}</span>}
-          </button>
-          <button
-            onClick={handleLogout}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-              theme === 'dark'
-                ? 'text-red-400 hover:bg-red-900/20'
-                : 'text-red-600 hover:bg-red-50'
-            }`}
-          >
-            <LogOut className="w-5 h-5" />
-            {sidebarOpen && <span className="font-medium">{t('admin.menu.logout')}</span>}
-          </button>
+          <div className="relative group">
+            <button
+              onClick={goToUserSite}
+              className={`w-full flex items-center rounded-lg transition-colors ${
+                sidebarOpen ? 'gap-3 px-4 py-3' : 'justify-center p-3'
+              } ${
+                theme === 'dark' 
+                  ? 'text-slate-300 hover:bg-slate-700' 
+                  : 'text-gray-700 hover:bg-blue-50'
+              }`}
+            >
+              <Home className="w-5 h-5" />
+              {sidebarOpen && <span className="font-medium">{t('admin.menu.viewUserSite')}</span>}
+            </button>
+            {!sidebarOpen && (
+              <div className={`absolute left-full ml-2 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap z-50 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${
+                theme === 'dark' 
+                  ? 'bg-slate-700 text-slate-100 shadow-xl' 
+                  : 'bg-gray-900 text-white shadow-lg'
+              }`} style={{ top: '50%', transform: 'translateY(-50%)' }}>
+                {t('admin.menu.viewUserSite')}
+                <div className={`absolute right-full top-1/2 -translate-y-1/2 w-0 h-0 border-t-4 border-t-transparent border-b-4 border-b-transparent ${
+                  theme === 'dark' ? 'border-r-4 border-r-slate-700' : 'border-r-4 border-r-gray-900'
+                }`}></div>
+              </div>
+            )}
+          </div>
+          <div className="relative group">
+            <button
+              onClick={handleLogout}
+              className={`w-full flex items-center rounded-lg transition-colors ${
+                sidebarOpen ? 'gap-3 px-4 py-3' : 'justify-center p-3'
+              } ${
+                theme === 'dark'
+                  ? 'text-red-400 hover:bg-red-900/20'
+                  : 'text-red-600 hover:bg-red-50'
+              }`}
+            >
+              <LogOut className="w-5 h-5" />
+              {sidebarOpen && <span className="font-medium">{t('admin.menu.logout')}</span>}
+            </button>
+            {!sidebarOpen && (
+              <div className={`absolute left-full ml-2 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap z-50 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${
+                theme === 'dark' 
+                  ? 'bg-slate-700 text-slate-100 shadow-xl' 
+                  : 'bg-gray-900 text-white shadow-lg'
+              }`} style={{ top: '50%', transform: 'translateY(-50%)' }}>
+                {t('admin.menu.logout')}
+                <div className={`absolute right-full top-1/2 -translate-y-1/2 w-0 h-0 border-t-4 border-t-transparent border-b-4 border-b-transparent ${
+                  theme === 'dark' ? 'border-r-4 border-r-slate-700' : 'border-r-4 border-r-gray-900'
+                }`}></div>
+              </div>
+            )}
+          </div>
         </div>
       </aside>
 
@@ -359,6 +516,7 @@ const AdminDashboardContent: React.FC = () => {
                   change="+12.5%"
                   changeType="up"
                   color="bg-blue-100"
+                  theme={theme}
                 />
                 <AdminStatsCard
                   icon={<Building className="w-6 h-6 text-green-600" />}
@@ -367,6 +525,7 @@ const AdminDashboardContent: React.FC = () => {
                   change="+8.2%"
                   changeType="up"
                   color="bg-green-100"
+                  theme={theme}
                 />
                 <AdminStatsCard
                   icon={<DollarSign className="w-6 h-6 text-yellow-600" />}
@@ -375,6 +534,7 @@ const AdminDashboardContent: React.FC = () => {
                   change="+15.3%"
                   changeType="up"
                   color="bg-yellow-100"
+                  theme={theme}
                 />
                 <AdminStatsCard
                   icon={<MessageSquare className="w-6 h-6 text-purple-600" />}
@@ -383,6 +543,7 @@ const AdminDashboardContent: React.FC = () => {
                   change="+5"
                   changeType="up"
                   color="bg-purple-100"
+                  theme={theme}
                 />
               </div>
 
@@ -393,46 +554,103 @@ const AdminDashboardContent: React.FC = () => {
                   title={t('admin.stats.totalAgents')}
                   value={stats.totalAgents}
                   color="bg-indigo-100"
+                  theme={theme}
                 />
                 <AdminStatsCard
                   icon={<List className="w-6 h-6 text-orange-600" />}
                   title={t('admin.stats.activeListings')}
                   value={stats.activeListings.toLocaleString()}
                   color="bg-orange-100"
+                  theme={theme}
                 />
                 <AdminStatsCard
                   icon={<Eye className="w-6 h-6 text-pink-600" />}
                   title={t('admin.stats.totalViews')}
                   value={stats.totalViews.toLocaleString()}
                   color="bg-pink-100"
+                  theme={theme}
                 />
                 <AdminStatsCard
                   icon={<Heart className="w-6 h-6 text-red-600" />}
                   title={t('admin.stats.favorites')}
                   value={stats.favorites.toLocaleString()}
                   color="bg-red-100"
+                  theme={theme}
                 />
               </div>
 
               {/* Recent Activity */}
-              <div className="bg-white rounded-xl shadow-md p-6">
-                <h2 className="text-lg font-bold text-gray-900 mb-4">{t('admin.recentActivity')}</h2>
-                <div className="space-y-4">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <div key={i} className="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-lg transition-colors">
-                      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
-                        U{i}
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-900">User {i} created a new property listing</p>
-                        <p className="text-sm text-gray-500">{i} minutes ago</p>
-                      </div>
-                      <button className="px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                        {t('common.view')}
-                      </button>
-                    </div>
-                  ))}
-                </div>
+              <div className={`rounded-xl shadow-md p-6 ${
+                theme === 'dark' ? 'bg-slate-800 border border-slate-700' : 'bg-white'
+              }`}>
+                <h2 className={`text-lg font-bold mb-4 ${
+                  theme === 'dark' ? 'text-slate-100' : 'text-gray-900'
+                }`}>{t('admin.recentActivity')}</h2>
+                {loadingActivities ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                ) : recentActivities.length === 0 ? (
+                  <div className={`text-center py-8 ${theme === 'dark' ? 'text-slate-400' : 'text-gray-500'}`}>
+                    <p>{t('admin.noRecentActivity') || 'Chưa có hoạt động gần đây'}</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {recentActivities.map((activity) => {
+                      const getInitials = (title: string) => {
+                        if (!title) return 'U';
+                        const words = title.split(' ');
+                        if (words.length >= 2) {
+                          return (words[0][0] + words[1][0]).toUpperCase();
+                        }
+                        return title.substring(0, 2).toUpperCase();
+                      };
+
+                      const formatTimeAgo = (timestamp: string) => {
+                        const now = new Date();
+                        const time = new Date(timestamp);
+                        const diffInSeconds = Math.floor((now.getTime() - time.getTime()) / 1000);
+                        
+                        if (diffInSeconds < 60) return `${diffInSeconds} giây trước`;
+                        if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} phút trước`;
+                        if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} giờ trước`;
+                        return `${Math.floor(diffInSeconds / 86400)} ngày trước`;
+                      };
+
+                      return (
+                        <div key={activity.id} className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${
+                          theme === 'dark' 
+                            ? 'hover:bg-slate-700' 
+                            : 'hover:bg-gray-50'
+                        }`}>
+                          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                            {getInitials(activity.title || 'U')}
+                          </div>
+                          <div className="flex-1">
+                            <p className={`font-medium ${
+                              theme === 'dark' ? 'text-slate-100' : 'text-gray-900'
+                            }`}>{activity.description || activity.title}</p>
+                            <p className={`text-sm ${
+                              theme === 'dark' ? 'text-slate-400' : 'text-gray-500'
+                            }`}>{activity.timestamp ? formatTimeAgo(activity.timestamp) : ''}</p>
+                          </div>
+                          {activity.propertyId && (
+                            <button 
+                              onClick={() => navigate(`/properties/${activity.propertyId}`)}
+                              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                                theme === 'dark'
+                                  ? 'text-blue-400 hover:bg-slate-700'
+                                  : 'text-blue-600 hover:bg-blue-50'
+                              }`}
+                            >
+                              {t('common.view')}
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -484,14 +702,24 @@ const AdminDashboardContent: React.FC = () => {
 
           {/* Other Sections - Placeholder */}
           {!['overview', 'analytics', 'users', 'properties', 'agents', 'news', 'payments', 'projects', 'agencies', 'inquiries'].includes(activeSection) && (
-            <div className="bg-white rounded-xl shadow-md p-8 text-center">
-              <div className="w-20 h-20 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <Package className="w-10 h-10 text-gray-400" />
+            <div className={`rounded-xl shadow-md p-8 text-center ${
+              theme === 'dark' ? 'bg-slate-800 border border-slate-700' : 'bg-white'
+            }`}>
+              <div className={`w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center ${
+                theme === 'dark' ? 'bg-slate-700' : 'bg-gray-100'
+              }`}>
+                <Package className={`w-10 h-10 ${
+                  theme === 'dark' ? 'text-slate-400' : 'text-gray-400'
+                }`} />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              <h2 className={`text-2xl font-bold mb-2 ${
+                theme === 'dark' ? 'text-slate-100' : 'text-gray-900'
+              }`}>
                 {t(`admin.sections.${activeSection}`)}
               </h2>
-              <p className="text-gray-600 mb-6">
+              <p className={`mb-6 ${
+                theme === 'dark' ? 'text-slate-400' : 'text-gray-600'
+              }`}>
                 {t('admin.comingSoon')}
               </p>
               <button

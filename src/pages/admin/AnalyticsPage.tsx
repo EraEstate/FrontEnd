@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { adminAPI } from '../../api/admin';
 import type { AdminStats } from '../../api/admin';
+import { useAdminTheme } from '../../contexts/AdminThemeContext';
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
@@ -20,30 +21,40 @@ interface StatCardProps {
   icon: React.ReactNode;
   color: string;
   trend?: 'up' | 'down';
+  theme?: 'light' | 'dark';
 }
 
-const StatCard: React.FC<StatCardProps> = ({ title, value, change, icon, color, trend }) => (
-  <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+const StatCard: React.FC<StatCardProps> = ({ title, value, change, icon, color, trend, theme = 'light' }) => (
+  <div className={`rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow ${
+    theme === 'dark' ? 'bg-slate-800 border border-slate-700' : 'bg-white'
+  }`}>
     <div className="flex items-center justify-between mb-4">
       <div className={`p-3 rounded-lg ${color}`}>
         {icon}
       </div>
       {change !== undefined && (
         <div className={`flex items-center gap-1 text-sm font-semibold ${
-          trend === 'up' ? 'text-green-600' : 'text-red-600'
+          trend === 'up' 
+            ? (theme === 'dark' ? 'text-green-400' : 'text-green-600')
+            : (theme === 'dark' ? 'text-red-400' : 'text-red-600')
         }`}>
           {trend === 'up' ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
           {Math.abs(change)}%
         </div>
       )}
     </div>
-    <h3 className="text-gray-600 text-sm font-medium mb-1">{title}</h3>
-    <p className="text-2xl font-bold text-gray-900">{value}</p>
+    <h3 className={`text-sm font-medium mb-1 ${
+      theme === 'dark' ? 'text-slate-400' : 'text-gray-600'
+    }`}>{title}</h3>
+    <p className={`text-2xl font-bold ${
+      theme === 'dark' ? 'text-slate-100' : 'text-gray-900'
+    }`}>{value}</p>
   </div>
 );
 
 const AnalyticsPage: React.FC = () => {
   const { t } = useTranslation();
+  const { theme } = useAdminTheme();
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [revenueData, setRevenueData] = useState<any[]>([]);
@@ -129,7 +140,7 @@ const AnalyticsPage: React.FC = () => {
       <div className="flex items-center justify-center h-96">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('common.loading')}</p>
+          <p className={theme === 'dark' ? 'text-slate-400' : 'text-gray-600'}>{t('common.loading')}</p>
         </div>
       </div>
     );
@@ -139,8 +150,12 @@ const AnalyticsPage: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">{t('admin.menu.analytics')}</h1>
-        <p className="text-sm text-gray-500 mt-1">Real-time data from backend controllers</p>
+        <h1 className={`text-2xl font-bold ${
+          theme === 'dark' ? 'text-slate-100' : 'text-gray-900'
+        }`}>{t('admin.menu.analytics')}</h1>
+        <p className={`text-sm mt-1 ${
+          theme === 'dark' ? 'text-slate-400' : 'text-gray-500'
+        }`}>Real-time data from backend controllers</p>
       </div>
 
       {/* Key Metrics Grid */}
@@ -152,6 +167,7 @@ const AnalyticsPage: React.FC = () => {
           trend="up"
           icon={<DollarSign className="w-6 h-6 text-green-600" />}
           color="bg-green-100"
+          theme={theme}
         />
         <StatCard
           title="Total Users"
@@ -160,6 +176,7 @@ const AnalyticsPage: React.FC = () => {
           trend="up"
           icon={<Users className="w-6 h-6 text-blue-600" />}
           color="bg-blue-100"
+          theme={theme}
         />
         <StatCard
           title="Active Properties"
@@ -168,6 +185,7 @@ const AnalyticsPage: React.FC = () => {
           trend="up"
           icon={<Building className="w-6 h-6 text-purple-600" />}
           color="bg-purple-100"
+          theme={theme}
         />
         <StatCard
           title="Total Views"
@@ -176,17 +194,26 @@ const AnalyticsPage: React.FC = () => {
           trend="down"
           icon={<Eye className="w-6 h-6 text-orange-600" />}
           color="bg-orange-100"
+          theme={theme}
         />
       </div>
 
       {/* Revenue Chart */}
-      <div className="bg-white rounded-xl shadow-md p-6">
+      <div className={`rounded-xl shadow-md p-6 ${
+        theme === 'dark' ? 'bg-slate-800 border border-slate-700' : 'bg-white'
+      }`}>
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-lg font-bold text-gray-900">Revenue Overview</h2>
-            <p className="text-sm text-gray-500">Last 12 months performance</p>
+            <h2 className={`text-lg font-bold ${
+              theme === 'dark' ? 'text-slate-100' : 'text-gray-900'
+            }`}>Revenue Overview</h2>
+            <p className={`text-sm ${
+              theme === 'dark' ? 'text-slate-400' : 'text-gray-500'
+            }`}>Last 12 months performance</p>
           </div>
-          <div className="flex items-center gap-2 text-green-600">
+          <div className={`flex items-center gap-2 ${
+            theme === 'dark' ? 'text-green-400' : 'text-green-600'
+          }`}>
             <ArrowUp className="w-5 h-5" />
             <span className="font-semibold">+23.5%</span>
           </div>
@@ -220,8 +247,12 @@ const AnalyticsPage: React.FC = () => {
       {/* User Growth & Property Distribution */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* User Growth Chart */}
-        <div className="bg-white rounded-xl shadow-md p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-6">User Growth (30 Days)</h2>
+        <div className={`rounded-xl shadow-md p-6 ${
+          theme === 'dark' ? 'bg-slate-800 border border-slate-700' : 'bg-white'
+        }`}>
+          <h2 className={`text-lg font-bold mb-6 ${
+            theme === 'dark' ? 'text-slate-100' : 'text-gray-900'
+          }`}>User Growth (30 Days)</h2>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={userGrowthData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -238,8 +269,12 @@ const AnalyticsPage: React.FC = () => {
         </div>
 
         {/* Property Distribution Pie Chart */}
-        <div className="bg-white rounded-xl shadow-md p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-6">Property Distribution</h2>
+        <div className={`rounded-xl shadow-md p-6 ${
+          theme === 'dark' ? 'bg-slate-800 border border-slate-700' : 'bg-white'
+        }`}>
+          <h2 className={`text-lg font-bold mb-6 ${
+            theme === 'dark' ? 'text-slate-100' : 'text-gray-900'
+          }`}>Property Distribution</h2>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -265,8 +300,12 @@ const AnalyticsPage: React.FC = () => {
       {/* Inquiry Status & Recent Stats */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Inquiry Status Bar Chart */}
-        <div className="bg-white rounded-xl shadow-md p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-6">Inquiry Status Breakdown</h2>
+        <div className={`rounded-xl shadow-md p-6 ${
+          theme === 'dark' ? 'bg-slate-800 border border-slate-700' : 'bg-white'
+        }`}>
+          <h2 className={`text-lg font-bold mb-6 ${
+            theme === 'dark' ? 'text-slate-100' : 'text-gray-900'
+          }`}>Inquiry Status Breakdown</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={inquiryStatusData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -281,59 +320,95 @@ const AnalyticsPage: React.FC = () => {
         </div>
 
         {/* Quick Stats Grid */}
-        <div className="bg-white rounded-xl shadow-md p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-6">Quick Statistics</h2>
+        <div className={`rounded-xl shadow-md p-6 ${
+          theme === 'dark' ? 'bg-slate-800 border border-slate-700' : 'bg-white'
+        }`}>
+          <h2 className={`text-lg font-bold mb-6 ${
+            theme === 'dark' ? 'text-slate-100' : 'text-gray-900'
+          }`}>Quick Statistics</h2>
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
+            <div className={`flex items-center justify-between p-4 rounded-lg ${
+              theme === 'dark' ? 'bg-slate-700' : 'bg-blue-50'
+            }`}>
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-blue-600 rounded-lg">
                   <Users className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Active Agents</p>
-                  <p className="text-xl font-bold text-gray-900">{stats?.activeAgents || 0}</p>
+                  <p className={`text-sm ${
+                    theme === 'dark' ? 'text-slate-400' : 'text-gray-600'
+                  }`}>Active Agents</p>
+                  <p className={`text-xl font-bold ${
+                    theme === 'dark' ? 'text-slate-100' : 'text-gray-900'
+                  }`}>{stats?.activeAgents || 0}</p>
                 </div>
               </div>
-              <span className="text-sm font-medium text-blue-600">90% Active</span>
+              <span className={`text-sm font-medium ${
+                theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
+              }`}>90% Active</span>
             </div>
 
-            <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg">
+            <div className={`flex items-center justify-between p-4 rounded-lg ${
+              theme === 'dark' ? 'bg-slate-700' : 'bg-green-50'
+            }`}>
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-green-600 rounded-lg">
                   <Building className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Total Projects</p>
-                  <p className="text-xl font-bold text-gray-900">{stats?.totalProjects || 0}</p>
+                  <p className={`text-sm ${
+                    theme === 'dark' ? 'text-slate-400' : 'text-gray-600'
+                  }`}>Total Projects</p>
+                  <p className={`text-xl font-bold ${
+                    theme === 'dark' ? 'text-slate-100' : 'text-gray-900'
+                  }`}>{stats?.totalProjects || 0}</p>
                 </div>
               </div>
-              <span className="text-sm font-medium text-green-600">+12 New</span>
+              <span className={`text-sm font-medium ${
+                theme === 'dark' ? 'text-green-400' : 'text-green-600'
+              }`}>+12 New</span>
             </div>
 
-            <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
+            <div className={`flex items-center justify-between p-4 rounded-lg ${
+              theme === 'dark' ? 'bg-slate-700' : 'bg-purple-50'
+            }`}>
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-purple-600 rounded-lg">
                   <Heart className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Total Favorites</p>
-                  <p className="text-xl font-bold text-gray-900">{stats?.totalFavorites || 0}</p>
+                  <p className={`text-sm ${
+                    theme === 'dark' ? 'text-slate-400' : 'text-gray-600'
+                  }`}>Total Favorites</p>
+                  <p className={`text-xl font-bold ${
+                    theme === 'dark' ? 'text-slate-100' : 'text-gray-900'
+                  }`}>{stats?.totalFavorites || 0}</p>
                 </div>
               </div>
-              <span className="text-sm font-medium text-purple-600">Popular</span>
+              <span className={`text-sm font-medium ${
+                theme === 'dark' ? 'text-purple-400' : 'text-purple-600'
+              }`}>Popular</span>
             </div>
 
-            <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
+            <div className={`flex items-center justify-between p-4 rounded-lg ${
+              theme === 'dark' ? 'bg-slate-700' : 'bg-orange-50'
+            }`}>
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-orange-600 rounded-lg">
                   <MessageSquare className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">New Inquiries</p>
-                  <p className="text-xl font-bold text-gray-900">{stats?.newInquiries || 0}</p>
+                  <p className={`text-sm ${
+                    theme === 'dark' ? 'text-slate-400' : 'text-gray-600'
+                  }`}>New Inquiries</p>
+                  <p className={`text-xl font-bold ${
+                    theme === 'dark' ? 'text-slate-100' : 'text-gray-900'
+                  }`}>{stats?.newInquiries || 0}</p>
                 </div>
               </div>
-              <span className="text-sm font-medium text-orange-600">Needs Response</span>
+              <span className={`text-sm font-medium ${
+                theme === 'dark' ? 'text-orange-400' : 'text-orange-600'
+              }`}>Needs Response</span>
             </div>
           </div>
         </div>

@@ -70,6 +70,75 @@
   background-color: var(--admin-bg-tertiary);
 }
 
+/* Scrollbar Styles for Admin Panel */
+/* Light Mode Scrollbar */
+.admin-container ::-webkit-scrollbar,
+.admin-sidebar ::-webkit-scrollbar,
+.admin-container *::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.admin-container ::-webkit-scrollbar-track,
+.admin-sidebar ::-webkit-scrollbar-track,
+.admin-container *::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.admin-container ::-webkit-scrollbar-thumb,
+.admin-sidebar ::-webkit-scrollbar-thumb,
+.admin-container *::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.admin-container ::-webkit-scrollbar-thumb:hover,
+.admin-sidebar ::-webkit-scrollbar-thumb:hover,
+.admin-container *::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Dark Mode Scrollbar */
+.admin-dark .admin-container ::-webkit-scrollbar-track,
+.admin-dark .admin-sidebar ::-webkit-scrollbar-track,
+.admin-dark .admin-container *::-webkit-scrollbar-track {
+  background: #1e293b;
+  border-radius: 4px;
+}
+
+.admin-dark .admin-container ::-webkit-scrollbar-thumb,
+.admin-dark .admin-sidebar ::-webkit-scrollbar-thumb,
+.admin-dark .admin-container *::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+}
+
+.admin-dark .admin-container ::-webkit-scrollbar-thumb:hover,
+.admin-dark .admin-sidebar ::-webkit-scrollbar-thumb:hover,
+.admin-dark .admin-container *::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* Firefox Scrollbar */
+.admin-container {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.admin-dark .admin-container {
+  scrollbar-color: #475569 #1e293b;
+}
+
+.admin-sidebar {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.admin-dark .admin-sidebar {
+  scrollbar-color: #475569 #1e293b;
+}
+
 /* Utility classes */
 .line-clamp-2 {
   overflow: hidden;
