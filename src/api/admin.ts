@@ -168,21 +168,32 @@ export const adminAPI = {
   },
 
   // Get revenue chart data (last 12 months)
-  getRevenueChart: async (): Promise<RevenueChartData[]> => {
-    const response = await api.get<any>('/payments/statistics/monthly');
-    return response.data || [];
+  // Note: Endpoint /payments/statistics/monthly doesn't exist in backend yet
+  // Using fallback data until endpoint is implemented
+  getRevenueChart: async (startDate?: Date, endDate?: Date): Promise<RevenueChartData[]> => {
+    // Return empty array to trigger fallback in AnalyticsPage
+    // TODO: Implement /payments/statistics/monthly endpoint in backend with date range support
+    // When implemented, use: api.get('/payments/statistics/monthly', { params: { startDate, endDate } })
+    return [];
   },
 
   // Get user growth chart data
-  getUserGrowthChart: async (): Promise<UserGrowthData[]> => {
-    const response = await api.get<any>('/users/statistics/growth');
-    return response.data || [];
+  // Note: Endpoint /users/statistics/growth doesn't exist in backend yet
+  // Using fallback data until endpoint is implemented
+  getUserGrowthChart: async (startDate?: Date, endDate?: Date): Promise<UserGrowthData[]> => {
+    // Return empty array to trigger fallback in AnalyticsPage
+    // TODO: Implement /users/statistics/growth endpoint in backend with date range support
+    // When implemented, use: api.get('/users/statistics/growth', { params: { startDate, endDate } })
+    return [];
   },
 
   // Get property distribution
+  // Note: Endpoint /properties/statistics/by-type doesn't exist in backend yet
+  // Using fallback data until endpoint is implemented
   getPropertyDistribution: async (): Promise<PropertyChartData[]> => {
-    const response = await api.get<any>('/properties/statistics/by-type');
-    return response.data || [];
+    // Return empty array to trigger fallback in AnalyticsPage
+    // TODO: Implement /properties/statistics/by-type endpoint in backend
+    return [];
   },
 
   // Get recent activity

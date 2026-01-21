@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
   Search, Plus, Edit2, Trash2, Eye, Download,
   Building2, MapPin, Phone, Mail, Users, Star
 } from 'lucide-react';
 import { agencyAPI } from '../../api/agency';
+import { agentAPI } from '../../api/agent';
+import { getImageUrl, getImagePlaceholder } from '../../utils/imageUtils';
 
 const AgencyManagement: React.FC = () => {
   const { t } = useTranslation();
@@ -22,7 +24,46 @@ const AgencyManagement: React.FC = () => {
     try {
       setLoading(true);
       const response = await agencyAPI.getAll({ page: currentPage, size: 12 });
-      setAgencies(response.content || []);
+      console.log('Agencies response:', response);
+      
+      const agenciesList = response.content || [];
+      
+      // Map and enrich agency data
+      const agenciesWithStats = await Promise.all(
+        agenciesList.map(async (agency: any) => {
+          // Fetch agents count for this agency
+          let agentsCount = 0;
+          try {
+            const agentsCountResponse = await agentAPI.countByAgency(agency.id);
+            agentsCount = typeof agentsCountResponse === 'number' ? agentsCountResponse : agentsCountResponse?.count || 0;
+          } catch (error) {
+            console.debug(`Could not fetch agents count for agency ${agency.id}:`, error);
+            // Fallback to employeeCount if available
+            agentsCount = agency.employeeCount || 0;
+          }
+
+          // Map backend fields to frontend expected fields
+          return {
+            ...agency,
+            // Map rating fields
+            rating: agency.rating || agency.ratingAverage || 0,
+            totalReviews: agency.totalReviews || agency.ratingCount || 0,
+            // Map stats
+            totalAgents: agentsCount,
+            totalListings: agency.totalListings || agency.totalProperties || 0,
+            totalDeals: agency.totalDeals || 0, // Not available in backend yet
+            // Map contact fields
+            phoneNumber: agency.phoneNumber || agency.phone || 'N/A',
+            // Map verification status
+            isVerified: agency.isVerified || agency.status === 'ACTIVE' || false,
+            // Map other fields
+            logoUrl: agency.logoUrl || agency.logo || null,
+            coverUrl: agency.coverUrl || agency.coverImageUrl || null,
+          };
+        })
+      );
+
+      setAgencies(agenciesWithStats);
       setTotalPages(response.totalPages || 1);
     } catch (error) {
       console.error('Failed to fetch agencies:', error);
@@ -30,6 +71,20 @@ const AgencyManagement: React.FC = () => {
       setLoading(false);
     }
   };
+
+  // Filter agencies by search term
+  const filteredAgencies = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return agencies;
+    }
+    const searchLower = searchTerm.toLowerCase();
+    return agencies.filter((agency) =>
+      agency.name?.toLowerCase().includes(searchLower) ||
+      agency.email?.toLowerCase().includes(searchLower) ||
+      agency.address?.toLowerCase().includes(searchLower) ||
+      agency.phoneNumber?.includes(searchTerm)
+    );
+  }, [agencies, searchTerm]);
 
   const handleDelete = async (id: string) => {
     if (window.confirm('Delete this agency?')) {
@@ -94,28 +149,44 @@ const AgencyManagement: React.FC = () => {
           <div className="col-span-full py-12 text-center text-gray-500">
             {t('common.loading')}
           </div>
-        ) : agencies.length === 0 ? (
+        ) : filteredAgencies.length === 0 ? (
           <div className="col-span-full py-12 text-center text-gray-500">
             No agencies found
           </div>
         ) : (
-          agencies.map((agency) => (
+          filteredAgencies.map((agency) => (
             <div key={agency.id} className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all overflow-hidden group">
               {/* Agency Logo/Banner */}
               <div className="relative h-40 bg-gradient-to-br from-blue-500 to-indigo-600">
-                <img
-                  src={agency.logoUrl || '/default-agency.png'}
-                  alt={agency.name}
-                  className="w-full h-full object-cover"
-                />
+                {agency.coverUrl ? (
+                  <img
+                    src={getImageUrl(agency.coverUrl) || getImagePlaceholder(400, 160)}
+                    alt={agency.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = getImagePlaceholder(400, 160);
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600" />
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                 <div className="absolute bottom-3 left-3 flex items-center gap-2">
                   <div className="w-16 h-16 bg-white rounded-lg shadow-lg flex items-center justify-center overflow-hidden">
-                    <img
-                      src={agency.logoUrl || '/default-agency.png'}
-                      alt={agency.name}
-                      className="w-full h-full object-contain"
-                    />
+                    {agency.logoUrl ? (
+                      <img
+                        src={getImageUrl(agency.logoUrl) || getImagePlaceholder(64, 64)}
+                        alt={agency.name}
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = getImagePlaceholder(64, 64);
+                        }}
+                      />
+                    ) : (
+                      <Building2 className="w-8 h-8 text-gray-400" />
+                    )}
                   </div>
                 </div>
               </div>
@@ -128,7 +199,7 @@ const AgencyManagement: React.FC = () => {
 
                 {/* Rating */}
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="flex">{getRatingStars(agency.rating || 4)}</div>
+                  <div className="flex">{getRatingStars(Math.round(agency.rating || 0))}</div>
                   <span className="text-sm text-gray-600">({agency.totalReviews || 0})</span>
                 </div>
 

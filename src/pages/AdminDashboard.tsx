@@ -4,11 +4,12 @@ import {
   Users, Building, FileText, MessageSquare, TrendingUp, 
   Settings, Bell, DollarSign, Eye, Heart, Package, 
   Home, MapPin, Briefcase, Shield, BarChart3, List,
-  ChevronRight, LogOut, Menu, X, Moon, Sun
+  ChevronRight, LogOut, Menu, X, Moon, Sun, Loader2
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { adminAPI } from '../api/admin';
 import { activityAPI } from '../api/activity';
+import { propertyInquiryAPI } from '../api/propertyInquiry';
 import api from '../api/index';
 import { useAuthStore } from '../store/authStore';
 import { AdminThemeProvider, useAdminTheme } from '../contexts/AdminThemeContext';
@@ -141,8 +142,10 @@ const AdminDashboardContent: React.FC = () => {
     totalViews: 0,
     favorites: 0
   });
+  const [pendingInquiriesCount, setPendingInquiriesCount] = useState(0);
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
   const [loadingActivities, setLoadingActivities] = useState(true);
+  const [sectionLoading, setSectionLoading] = useState(false);
 
   useEffect(() => {
     // Fetch real stats from API
@@ -169,6 +172,25 @@ const AdminDashboardContent: React.FC = () => {
         activeListings: 2156,
         totalViews: 45678,
         favorites: 8934
+      });
+    });
+
+    // Fetch pending inquiries count (NEW + IN_PROGRESS) for badge
+    adminAPI.getInquiryStatusBreakdown().then(breakdown => {
+      const newCount = breakdown.find(s => s.status === 'New')?.count || 0;
+      const inProgressCount = breakdown.find(s => s.status === 'In Progress')?.count || 0;
+      setPendingInquiriesCount(newCount + inProgressCount);
+    }).catch(error => {
+      console.error('Failed to fetch inquiry breakdown:', error);
+      // Fallback: try to get from propertyInquiryAPI directly
+      Promise.all([
+        propertyInquiryAPI.countInquiriesByStatus('NEW'),
+        propertyInquiryAPI.countInquiriesByStatus('IN_PROGRESS')
+      ]).then(([newCount, inProgressCount]) => {
+        setPendingInquiriesCount(newCount + inProgressCount);
+      }).catch(() => {
+        // If all fails, set to 0
+        setPendingInquiriesCount(0);
       });
     });
 
@@ -230,7 +252,7 @@ const AdminDashboardContent: React.FC = () => {
       items: [
         { id: 'overview', icon: <BarChart3 className="w-5 h-5" />, label: t('admin.menu.overview') },
         { id: 'analytics', icon: <TrendingUp className="w-5 h-5" />, label: t('admin.menu.analytics') },
-        { id: 'inquiries', icon: <MessageSquare className="w-5 h-5" />, label: t('admin.menu.inquiries'), badge: stats.newInquiries },
+        { id: 'inquiries', icon: <MessageSquare className="w-5 h-5" />, label: t('admin.menu.inquiries'), badge: pendingInquiriesCount },
       ]
     },
     {
@@ -275,6 +297,17 @@ const AdminDashboardContent: React.FC = () => {
       ]
     }
   ];
+
+  const handleSectionChange = (sectionId: string) => {
+    if (sectionId === activeSection) return; // Không làm gì nếu đã active
+    
+    setSectionLoading(true);
+    // Simulate loading for 1.5-2 seconds
+    setTimeout(() => {
+      setActiveSection(sectionId);
+      setSectionLoading(false);
+    }, 1500);
+  };
 
   const handleLogout = () => {
     resetTheme(); // Reset về light mode khi logout
@@ -396,7 +429,7 @@ const AdminDashboardContent: React.FC = () => {
                     icon={item.icon}
                     label={item.label}
                     active={activeSection === item.id}
-                    onClick={() => setActiveSection(item.id)}
+                    onClick={() => handleSectionChange(item.id)}
                     badge={item.badge}
                     theme={theme}
                     sidebarOpen={sidebarOpen}
@@ -505,6 +538,14 @@ const AdminDashboardContent: React.FC = () => {
 
         {/* Content Area */}
         <div className="p-6">
+          {sectionLoading ? (
+            <div className={`flex flex-col items-center justify-center min-h-[400px] ${theme === 'dark' ? 'text-slate-300' : 'text-gray-600'}`}>
+              <Loader2 className="w-12 h-12 animate-spin mb-4 text-blue-600" />
+              <p className="text-lg font-medium">Đang tải...</p>
+              <p className="text-sm mt-2 opacity-70">Vui lòng đợi trong giây lát</p>
+            </div>
+          ) : (
+            <>
           {activeSection === 'overview' && (
             <div className="space-y-6">
               {/* Stats Grid */}
@@ -729,6 +770,8 @@ const AdminDashboardContent: React.FC = () => {
                 {t('admin.backToOverview')}
               </button>
             </div>
+          )}
+            </>
           )}
         </div>
       </main>

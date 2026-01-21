@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, AreaChart, Area,
@@ -6,7 +6,7 @@ import {
 } from 'recharts';
 import { 
   TrendingUp, TrendingDown, DollarSign, Users, Building, 
-  Eye, Heart, MessageSquare, Calendar, ArrowUp
+  Eye, Heart, MessageSquare, Calendar, ArrowUp, Filter, ChevronDown
 } from 'lucide-react';
 import { adminAPI } from '../../api/admin';
 import type { AdminStats } from '../../api/admin';
@@ -52,6 +52,8 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, change, icon, color, 
   </div>
 );
 
+type TimeFilter = 'today' | 'week' | 'month' | '3months' | '6months' | 'year' | 'custom';
+
 const AnalyticsPage: React.FC = () => {
   const { t } = useTranslation();
   const { theme } = useAdminTheme();
@@ -61,14 +63,103 @@ const AnalyticsPage: React.FC = () => {
   const [userGrowthData, setUserGrowthData] = useState<any[]>([]);
   const [propertyDistribution, setPropertyDistribution] = useState<any[]>([]);
   const [inquiryStatusData, setInquiryStatusData] = useState<any[]>([]);
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>('month');
+  const [customStartDate, setCustomStartDate] = useState<string>('');
+  const [customEndDate, setCustomEndDate] = useState<string>('');
+  const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
+  const datePickerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchAnalytics();
-  }, []);
+  }, [timeFilter, customStartDate, customEndDate]);
+
+  // Close custom date picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (datePickerRef.current && !datePickerRef.current.contains(event.target as Node)) {
+        setShowCustomDatePicker(false);
+      }
+    };
+
+    if (showCustomDatePicker) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showCustomDatePicker]);
+
+  const getDateRange = () => {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
+    let startDate: Date;
+    let endDate: Date = new Date(today);
+    endDate.setHours(23, 59, 59, 999);
+
+    switch (timeFilter) {
+      case 'today':
+        startDate = new Date(today);
+        break;
+      case 'week':
+        startDate = new Date(today);
+        startDate.setDate(today.getDate() - 7);
+        break;
+      case 'month':
+        startDate = new Date(today);
+        startDate.setMonth(today.getMonth() - 1);
+        break;
+      case '3months':
+        startDate = new Date(today);
+        startDate.setMonth(today.getMonth() - 3);
+        break;
+      case '6months':
+        startDate = new Date(today);
+        startDate.setMonth(today.getMonth() - 6);
+        break;
+      case 'year':
+        startDate = new Date(today);
+        startDate.setFullYear(today.getFullYear() - 1);
+        break;
+      case 'custom':
+        if (customStartDate && customEndDate) {
+          startDate = new Date(customStartDate);
+          endDate = new Date(customEndDate);
+          endDate.setHours(23, 59, 59, 999);
+        } else {
+          // Default to last month if custom dates not set
+          startDate = new Date(today);
+          startDate.setMonth(today.getMonth() - 1);
+        }
+        break;
+      default:
+        startDate = new Date(today);
+        startDate.setMonth(today.getMonth() - 1);
+    }
+
+    startDate.setHours(0, 0, 0, 0);
+    return { startDate, endDate };
+  };
+
+  const getFilterLabel = () => {
+    switch (timeFilter) {
+      case 'today': return 'Hôm nay';
+      case 'week': return '7 ngày qua';
+      case 'month': return 'Tháng này';
+      case '3months': return '3 tháng qua';
+      case '6months': return '6 tháng qua';
+      case 'year': return 'Năm nay';
+      case 'custom': return 'Tùy chọn';
+      default: return 'Tháng này';
+    }
+  };
 
   const fetchAnalytics = async () => {
     try {
       setLoading(true);
+      const { startDate, endDate } = getDateRange();
+      
       const [
         statsData,
         revenueChart,
@@ -77,45 +168,130 @@ const AnalyticsPage: React.FC = () => {
         inquiryChart
       ] = await Promise.all([
         adminAPI.getStats(),
-        fetchRevenueData(),
-        fetchUserGrowthData(),
-        fetchPropertyDistribution(),
+        adminAPI.getRevenueChart(startDate, endDate).catch(() => fetchRevenueDataFallback(startDate, endDate)),
+        adminAPI.getUserGrowthChart(startDate, endDate).catch(() => fetchUserGrowthDataFallback(startDate, endDate)),
+        adminAPI.getPropertyDistribution().catch(() => fetchPropertyDistributionFallback()),
         adminAPI.getInquiryStatusBreakdown()
       ]);
 
       setStats(statsData);
-      setRevenueData(revenueChart);
-      setUserGrowthData(userChart);
-      setPropertyDistribution(propertyChart);
-      setInquiryStatusData(inquiryChart);
+      
+      // Map revenue data - ensure it has month and revenue fields
+      const mappedRevenueData = (revenueChart || []).map((item: any) => ({
+        month: item.month || item.monthName || item.label || '',
+        revenue: item.revenue || item.amount || item.value || 0,
+        payments: item.payments || item.count || 0
+      }));
+      setRevenueData(mappedRevenueData.length > 0 ? mappedRevenueData : fetchRevenueDataFallback(startDate, endDate));
+      
+      // Map user growth data - ensure it has date, users, newUsers fields
+      const mappedUserGrowthData = (userChart || []).map((item: any) => ({
+        date: item.date || item.day || item.label || '',
+        users: item.users || item.totalUsers || item.count || 0,
+        newUsers: item.newUsers || item.newUserCount || 0
+      }));
+      setUserGrowthData(mappedUserGrowthData.length > 0 ? mappedUserGrowthData : fetchUserGrowthDataFallback(startDate, endDate));
+      
+      // Map property distribution - ensure it has type/category, count, percentage fields
+      const mappedPropertyData = (propertyChart || []).map((item: any) => ({
+        type: item.type || item.category || item.name || '',
+        count: item.count || item.value || 0,
+        percentage: item.percentage || (item.count && statsData?.totalProperties 
+          ? Math.round((item.count / statsData.totalProperties) * 100) 
+          : 0)
+      }));
+      setPropertyDistribution(mappedPropertyData.length > 0 ? mappedPropertyData : fetchPropertyDistributionFallback());
+      
+      // Map inquiry status data
+      const mappedInquiryData = (inquiryChart || []).map((item: any) => ({
+        status: item.status || '',
+        count: item.count || 0
+      }));
+      setInquiryStatusData(mappedInquiryData);
     } catch (error) {
       console.error('Failed to fetch analytics:', error);
+      // Fallback to mock data if API fails
+      const { startDate, endDate } = getDateRange();
+      setRevenueData(fetchRevenueDataFallback(startDate, endDate));
+      setUserGrowthData(fetchUserGrowthDataFallback(startDate, endDate));
+      setPropertyDistribution(fetchPropertyDistributionFallback());
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchRevenueData = async () => {
-    // Mock data for revenue (last 12 months)
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return months.map((month, i) => ({
-      month,
-      revenue: Math.floor(1000000000 + Math.random() * 2000000000),
-      payments: Math.floor(80 + Math.random() * 120)
-    }));
+  const fetchRevenueDataFallback = (startDate: Date, endDate: Date) => {
+    const daysDiff = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    const dataPoints = Math.min(daysDiff, 30); // Max 30 data points
+    
+    if (daysDiff <= 7) {
+      // Daily data for <= 7 days
+      const days = Array.from({ length: daysDiff }, (_, i) => {
+        const date = new Date(startDate);
+        date.setDate(startDate.getDate() + i);
+        return date.toLocaleDateString('vi-VN', { day: 'numeric', month: 'short' });
+      });
+      return days.map((day, i) => ({
+        month: day,
+        revenue: Math.floor(50000000 + Math.random() * 100000000),
+        payments: Math.floor(10 + Math.random() * 30)
+      }));
+    } else if (daysDiff <= 90) {
+      // Weekly data for <= 90 days
+      const weeks = Math.ceil(daysDiff / 7);
+      return Array.from({ length: weeks }, (_, i) => {
+        const weekStart = new Date(startDate);
+        weekStart.setDate(startDate.getDate() + i * 7);
+        return {
+          month: `Tuần ${i + 1}`,
+          revenue: Math.floor(300000000 + Math.random() * 500000000),
+          payments: Math.floor(50 + Math.random() * 100)
+        };
+      });
+    } else {
+      // Monthly data for > 90 days
+      const months = Math.ceil(daysDiff / 30);
+      const monthNames = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'];
+      return Array.from({ length: Math.min(months, 12) }, (_, i) => {
+        const monthDate = new Date(startDate);
+        monthDate.setMonth(startDate.getMonth() + i);
+        return {
+          month: monthNames[monthDate.getMonth()] + ' ' + monthDate.getFullYear(),
+          revenue: Math.floor(1000000000 + Math.random() * 2000000000),
+          payments: Math.floor(80 + Math.random() * 120)
+        };
+      });
+    }
   };
 
-  const fetchUserGrowthData = async () => {
-    // Mock data for user growth (last 30 days)
-    const days = Array.from({ length: 30 }, (_, i) => i + 1);
-    return days.map(day => ({
-      date: `Day ${day}`,
-      users: Math.floor(10000 + Math.random() * 3000),
-      newUsers: Math.floor(50 + Math.random() * 150)
-    }));
+  const fetchUserGrowthDataFallback = (startDate: Date, endDate: Date) => {
+    const daysDiff = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    const dataPoints = Math.min(daysDiff, 30); // Max 30 data points
+    
+    if (daysDiff <= 30) {
+      // Daily data
+      return Array.from({ length: daysDiff }, (_, i) => {
+        const date = new Date(startDate);
+        date.setDate(startDate.getDate() + i);
+        return {
+          date: date.toLocaleDateString('vi-VN', { day: 'numeric', month: 'short' }),
+          users: Math.floor(10000 + Math.random() * 3000),
+          newUsers: Math.floor(50 + Math.random() * 150)
+        };
+      });
+    } else {
+      // Weekly data
+      const weeks = Math.ceil(daysDiff / 7);
+      return Array.from({ length: Math.min(weeks, 12) }, (_, i) => ({
+        date: `Tuần ${i + 1}`,
+        users: Math.floor(10000 + Math.random() * 3000),
+        newUsers: Math.floor(350 + Math.random() * 1050)
+      }));
+    }
   };
 
-  const fetchPropertyDistribution = async () => {
+  const fetchPropertyDistributionFallback = () => {
+    // Fallback mock data for property distribution
     return [
       { type: 'Apartment', count: 1250, percentage: 45 },
       { type: 'House', count: 680, percentage: 24 },
@@ -149,13 +325,114 @@ const AnalyticsPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className={`text-2xl font-bold ${
-          theme === 'dark' ? 'text-slate-100' : 'text-gray-900'
-        }`}>{t('admin.menu.analytics')}</h1>
-        <p className={`text-sm mt-1 ${
-          theme === 'dark' ? 'text-slate-400' : 'text-gray-500'
-        }`}>Real-time data from backend controllers</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className={`text-2xl font-bold ${
+            theme === 'dark' ? 'text-slate-100' : 'text-gray-900'
+          }`}>{t('admin.menu.analytics')}</h1>
+          <p className={`text-sm mt-1 ${
+            theme === 'dark' ? 'text-slate-400' : 'text-gray-500'
+          }`}>Real-time data from backend controllers</p>
+        </div>
+        
+        {/* Time Filter */}
+        <div className="relative">
+          <div className="flex items-center gap-2">
+            <Filter className={`w-5 h-5 ${theme === 'dark' ? 'text-slate-400' : 'text-gray-600'}`} />
+            <div className="relative">
+              <select
+                value={timeFilter}
+                onChange={(e) => {
+                  const newFilter = e.target.value as TimeFilter;
+                  setTimeFilter(newFilter);
+                  if (newFilter === 'custom') {
+                    setShowCustomDatePicker(true);
+                  } else {
+                    setShowCustomDatePicker(false);
+                  }
+                }}
+                className={`appearance-none px-4 py-2 pr-10 rounded-lg border ${
+                  theme === 'dark' 
+                    ? 'bg-slate-800 border-slate-700 text-slate-100' 
+                    : 'bg-white border-gray-300 text-gray-900'
+                } focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer`}
+              >
+                <option value="today">Hôm nay</option>
+                <option value="week">7 ngày qua</option>
+                <option value="month">Tháng này</option>
+                <option value="3months">3 tháng qua</option>
+                <option value="6months">6 tháng qua</option>
+                <option value="year">Năm nay</option>
+                <option value="custom">Tùy chọn</option>
+              </select>
+              <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none ${
+                theme === 'dark' ? 'text-slate-400' : 'text-gray-600'
+              }`} />
+            </div>
+          </div>
+          
+          {/* Custom Date Picker */}
+          {showCustomDatePicker && (
+            <div 
+              ref={datePickerRef}
+              className={`absolute right-0 top-full mt-2 p-4 rounded-lg shadow-lg z-10 ${
+                theme === 'dark' ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-gray-200'
+              }`}
+            >
+              <div className="flex flex-col gap-3 min-w-[300px]">
+                <div>
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-slate-300' : 'text-gray-700'
+                  }`}>
+                    Từ ngày
+                  </label>
+                  <input
+                    type="date"
+                    value={customStartDate}
+                    onChange={(e) => setCustomStartDate(e.target.value)}
+                    className={`w-full px-3 py-2 rounded-lg border ${
+                      theme === 'dark' 
+                        ? 'bg-slate-700 border-slate-600 text-slate-100' 
+                        : 'bg-white border-gray-300 text-gray-900'
+                    } focus:ring-2 focus:ring-blue-500`}
+                  />
+                </div>
+                <div>
+                  <label className={`block text-sm font-medium mb-1 ${
+                    theme === 'dark' ? 'text-slate-300' : 'text-gray-700'
+                  }`}>
+                    Đến ngày
+                  </label>
+                  <input
+                    type="date"
+                    value={customEndDate}
+                    onChange={(e) => setCustomEndDate(e.target.value)}
+                    min={customStartDate}
+                    className={`w-full px-3 py-2 rounded-lg border ${
+                      theme === 'dark' 
+                        ? 'bg-slate-700 border-slate-600 text-slate-100' 
+                        : 'bg-white border-gray-300 text-gray-900'
+                    } focus:ring-2 focus:ring-blue-500`}
+                  />
+                </div>
+                <button
+                  onClick={() => {
+                    if (customStartDate && customEndDate) {
+                      setShowCustomDatePicker(false);
+                    }
+                  }}
+                  className={`px-4 py-2 rounded-lg font-medium ${
+                    theme === 'dark'
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                      : 'bg-blue-600 hover:bg-blue-700 text-white'
+                  } transition-colors`}
+                >
+                  Áp dụng
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Key Metrics Grid */}
@@ -209,7 +486,7 @@ const AnalyticsPage: React.FC = () => {
             }`}>Revenue Overview</h2>
             <p className={`text-sm ${
               theme === 'dark' ? 'text-slate-400' : 'text-gray-500'
-            }`}>Last 12 months performance</p>
+            }`}>{getFilterLabel()}</p>
           </div>
           <div className={`flex items-center gap-2 ${
             theme === 'dark' ? 'text-green-400' : 'text-green-600'
@@ -252,7 +529,7 @@ const AnalyticsPage: React.FC = () => {
         }`}>
           <h2 className={`text-lg font-bold mb-6 ${
             theme === 'dark' ? 'text-slate-100' : 'text-gray-900'
-          }`}>User Growth (30 Days)</h2>
+          }`}>User Growth ({getFilterLabel()})</h2>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={userGrowthData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />

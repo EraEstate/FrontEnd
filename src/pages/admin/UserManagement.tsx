@@ -3,9 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { 
   Search, Filter, Plus, Edit2, Trash2, Eye, 
   Check, X, Download, Mail, Phone, MoreVertical,
-  UserCheck, UserX, Shield, Loader2
+  UserCheck, UserX, Shield, Loader2, Users, UserCog
 } from 'lucide-react';
 import { userAPI } from '../../api/user';
+import { getImageUrl, getAvatarPlaceholder } from '../../utils/imageUtils';
+import api from '../../api/index';
 
 interface User {
   id: string;
@@ -16,6 +18,11 @@ interface User {
   enabled: boolean;
   createdAt?: string;
   updatedAt?: string;
+  avatar?: string;
+  avatarUrl?: string;
+  profile?: {
+    avatarUrl?: string;
+  };
 }
 
 interface EditUserModalProps {
@@ -44,8 +51,9 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ user, isOpen, onClose, on
         email: user.email || '',
         phone: user.phone || '',
         role: user.role,
-        enabled: user.enabled
+        enabled: user.enabled !== undefined ? user.enabled : true
       });
+      console.log('EditUserModal - User enabled status:', user.enabled);
     } else {
       // Reset form for new user
       setFormData({
@@ -182,13 +190,16 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ user, isOpen, onClose, on
               <input
                 type="checkbox"
                 id="enabled"
-                checked={formData.enabled}
+                checked={formData.enabled || false}
                 onChange={(e) => setFormData({ ...formData, enabled: e.target.checked })}
                 className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
               />
               <label htmlFor="enabled" className="text-sm font-medium text-gray-700">
                 Kích hoạt tài khoản
               </label>
+              {!formData.enabled && (
+                <span className="text-xs text-red-600 ml-2">(Tài khoản chưa được kích hoạt)</span>
+              )}
             </div>
 
             <div className="flex items-center gap-3 pt-4">
@@ -221,12 +232,14 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ user, isOpen, onClose, on
   );
 };
 
+type RoleTab = 'USER' | 'STAFF' | 'ADMIN';
+
 const UserManagement: React.FC = () => {
   const { t } = useTranslation();
+  const [activeTab, setActiveTab] = useState<RoleTab>('USER');
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterRole, setFilterRole] = useState<'ALL' | 'USER' | 'STAFF' | 'ADMIN'>('ALL');
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
@@ -236,55 +249,102 @@ const UserManagement: React.FC = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+  
+  // Stats for each role
+  const [roleStats, setRoleStats] = useState({
+    USER: { total: 0, active: 0, inactive: 0 },
+    STAFF: { total: 0, active: 0, inactive: 0 },
+    ADMIN: { total: 0, active: 0, inactive: 0 }
+  });
 
   useEffect(() => {
     fetchUsers();
-  }, [currentPage, filterRole]);
+    fetchRoleStats();
+  }, [currentPage, activeTab]);
 
   // Debounce search
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (searchTerm || filterRole !== 'ALL') {
-        fetchUsers();
-      } else {
-        fetchUsers();
-      }
+      fetchUsers();
     }, 500);
 
     return () => clearTimeout(timer);
   }, [searchTerm]);
+
+  const fetchRoleStats = async () => {
+    try {
+      const [userUsers, staffUsers, adminUsers] = await Promise.all([
+        userAPI.getByRole('USER', 0, 1000).catch(() => ({ content: [] })),
+        userAPI.getByRole('STAFF', 0, 1000).catch(() => ({ content: [] })),
+        userAPI.getByRole('ADMIN', 0, 1000).catch(() => ({ content: [] }))
+      ]);
+
+      setRoleStats({
+        USER: {
+          total: userUsers.content?.length || 0,
+          active: userUsers.content?.filter((u: User) => u.enabled).length || 0,
+          inactive: userUsers.content?.filter((u: User) => !u.enabled).length || 0
+        },
+        STAFF: {
+          total: staffUsers.content?.length || 0,
+          active: staffUsers.content?.filter((u: User) => u.enabled).length || 0,
+          inactive: staffUsers.content?.filter((u: User) => !u.enabled).length || 0
+        },
+        ADMIN: {
+          total: adminUsers.content?.length || 0,
+          active: adminUsers.content?.filter((u: User) => u.enabled).length || 0,
+          inactive: adminUsers.content?.filter((u: User) => !u.enabled).length || 0
+        }
+      });
+    } catch (error) {
+      console.error('Failed to fetch role stats:', error);
+    }
+  };
 
   const fetchUsers = async () => {
     try {
       setLoading(true);
       let response;
 
-      if (filterRole !== 'ALL') {
-        response = await userAPI.getByRole(filterRole, currentPage, 20);
-      } else if (searchTerm) {
-        const searchResults = await userAPI.search(searchTerm);
-        // Convert to Page format
-        response = {
-          content: searchResults,
-          totalElements: searchResults.length,
-          totalPages: 1,
-          number: 0,
-          size: 20
-        };
-      } else {
-        response = await userAPI.getAll(currentPage, 20);
-      }
+      // Always filter by active tab role
+      response = await userAPI.getByRole(activeTab, currentPage, 20);
 
       // Filter by search term if needed
       let filteredContent = response.content || [];
-      if (searchTerm && filterRole === 'ALL') {
+      if (searchTerm) {
         filteredContent = filteredContent.filter((user: User) =>
           user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.fullName?.toLowerCase().includes(searchTerm.toLowerCase())
+          user.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          user.phone?.toLowerCase().includes(searchTerm.toLowerCase())
         );
       }
 
-      setUsers(filteredContent);
+      // Map and normalize user data to ensure createdAt is available
+      const mappedUsers = filteredContent.map((user: any, index: number) => {
+        // Try multiple possible field names for createdAt
+        // Backend uses snake_case (created_at) but might serialize as camelCase (createdAt)
+        const createdAt = user.createdAt || user.created_at || user.createdDate || user.dateCreated || null;
+        
+        // Log first user to debug
+        if (index === 0) {
+          console.log('Sample user data from API:', {
+            id: user.id,
+            email: user.email,
+            allFields: Object.keys(user),
+            createdAt: createdAt,
+            rawCreatedAt: user.createdAt,
+            rawCreated_at: user.created_at,
+            fullUserObject: user
+          });
+        }
+        
+        return {
+          ...user,
+          createdAt: createdAt
+        };
+      });
+
+      setUsers(mappedUsers);
       setTotalPages(response.totalPages || 1);
       setTotalElements(response.totalElements || 0);
     } catch (error) {
@@ -318,6 +378,7 @@ const UserManagement: React.FC = () => {
         await userAPI.delete(userId);
         alert('Xóa user thành công!');
         fetchUsers();
+        fetchRoleStats();
       } catch (error: any) {
         console.error('Failed to delete user:', error);
         alert(error.response?.data?.message || 'Không thể xóa user. Vui lòng thử lại.');
@@ -335,6 +396,7 @@ const UserManagement: React.FC = () => {
         alert(`Đã xóa ${selectedUsers.length} users thành công!`);
         setSelectedUsers([]);
         fetchUsers();
+        fetchRoleStats();
       } catch (error: any) {
         console.error('Failed to delete users:', error);
         alert('Có lỗi xảy ra khi xóa users. Vui lòng thử lại.');
@@ -350,6 +412,7 @@ const UserManagement: React.FC = () => {
       await userAPI.changeRole(userId, newRole);
       alert(`Đã đổi role thành công!`);
       fetchUsers();
+      fetchRoleStats();
     } catch (error: any) {
       console.error('Failed to change role:', error);
       alert(error.response?.data?.message || 'Không thể đổi role. Vui lòng thử lại.');
@@ -359,19 +422,31 @@ const UserManagement: React.FC = () => {
   };
 
   const handleToggleEnabled = async (userId: string, currentEnabled: boolean) => {
+    const action = currentEnabled ? 'vô hiệu hóa' : 'kích hoạt';
+    if (!window.confirm(`Bạn có chắc chắn muốn ${action} tài khoản này?`)) {
+      return;
+    }
+
     try {
       setActionLoading(userId);
+      let result;
       if (currentEnabled) {
-        await userAPI.disable(userId);
-        alert('Đã vô hiệu hóa user thành công!');
+        result = await userAPI.disable(userId);
+        console.log('User disabled:', result);
       } else {
-        await userAPI.enable(userId);
-        alert('Đã kích hoạt user thành công!');
+        result = await userAPI.enable(userId);
+        console.log('User enabled:', result);
       }
-      fetchUsers();
+      
+      // Refresh data
+      await fetchUsers();
+      await fetchRoleStats();
+      
+      alert(`Đã ${action} user thành công!`);
     } catch (error: any) {
       console.error('Failed to toggle enabled:', error);
-      alert(error.response?.data?.message || 'Không thể thay đổi trạng thái. Vui lòng thử lại.');
+      const errorMessage = error.response?.data?.message || error.message || 'Không thể thay đổi trạng thái. Vui lòng thử lại.';
+      alert(errorMessage);
     } finally {
       setActionLoading(null);
     }
@@ -405,6 +480,61 @@ const UserManagement: React.FC = () => {
     return labels[role] || role;
   };
 
+  // Component để hiển thị avatar với fallback
+  const UserAvatar: React.FC<{ user: User }> = ({ user }) => {
+    const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+      // Nếu đã có avatar trong user object, dùng luôn
+      if (user.avatar || user.avatarUrl || user.profile?.avatarUrl) {
+        setAvatarUrl(user.avatar || user.avatarUrl || user.profile?.avatarUrl || null);
+        setLoading(false);
+        return;
+      }
+
+      // Nếu không có, thử fetch từ public endpoint
+      const fetchAvatar = async () => {
+        try {
+          const response = await api.get(`/users/${user.id}/public`);
+          if (response.data?.avatarUrl) {
+            setAvatarUrl(response.data.avatarUrl);
+          }
+        } catch (error) {
+          // Nếu không có avatar, giữ null
+          console.debug(`No avatar for user ${user.id}`);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchAvatar();
+    }, [user.id, user.avatar, user.avatarUrl, user.profile?.avatarUrl]);
+
+    const imageUrl = avatarUrl ? getImageUrl(avatarUrl) : null;
+
+    return (
+      <div className="relative w-10 h-10 flex-shrink-0">
+        {/* Fallback div - luôn hiển thị */}
+        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+          {user.fullName?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || 'U'}
+        </div>
+        {/* Avatar image - overlay lên trên nếu có */}
+        {!loading && imageUrl && (
+          <img 
+            src={imageUrl} 
+            alt={user.fullName || 'User'} 
+            className="absolute inset-0 w-10 h-10 rounded-full object-cover"
+            onError={(e) => {
+              // Ẩn img nếu lỗi, fallback div sẽ hiển thị
+              e.currentTarget.style.display = 'none';
+            }}
+          />
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -422,43 +552,122 @@ const UserManagement: React.FC = () => {
         </button>
       </div>
 
-      {/* Toolbar */}
-      <div className="bg-white rounded-xl shadow-md p-4">
-        <div className="flex flex-wrap items-center gap-4">
-          {/* Search */}
-          <div className="flex-1 min-w-[300px]">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder={t('admin.searchUsers')}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+      {/* Role Tabs */}
+      <div className="bg-white rounded-xl shadow-md overflow-hidden">
+        <div className="border-b border-gray-200">
+          <nav className="flex -mb-px">
+            <button
+              onClick={() => {
+                setActiveTab('USER');
+                setCurrentPage(0);
+                setSearchTerm('');
+              }}
+              className={`flex-1 px-6 py-4 text-center font-medium border-b-2 transition-colors ${
+                activeTab === 'USER'
+                  ? 'border-blue-600 text-blue-600 bg-blue-50'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <Users className="w-5 h-5" />
+                <span>Người dùng</span>
+                <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
+                  activeTab === 'USER' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
+                }`}>
+                  {roleStats.USER.total}
+                </span>
+              </div>
+            </button>
+            <button
+              onClick={() => {
+                setActiveTab('STAFF');
+                setCurrentPage(0);
+                setSearchTerm('');
+              }}
+              className={`flex-1 px-6 py-4 text-center font-medium border-b-2 transition-colors ${
+                activeTab === 'STAFF'
+                  ? 'border-blue-600 text-blue-600 bg-blue-50'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <UserCog className="w-5 h-5" />
+                <span>Nhân viên</span>
+                <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
+                  activeTab === 'STAFF' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
+                }`}>
+                  {roleStats.STAFF.total}
+                </span>
+              </div>
+            </button>
+            <button
+              onClick={() => {
+                setActiveTab('ADMIN');
+                setCurrentPage(0);
+                setSearchTerm('');
+              }}
+              className={`flex-1 px-6 py-4 text-center font-medium border-b-2 transition-colors ${
+                activeTab === 'ADMIN'
+                  ? 'border-blue-600 text-blue-600 bg-blue-50'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <Shield className="w-5 h-5" />
+                <span>Quản trị viên</span>
+                <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
+                  activeTab === 'ADMIN' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
+                }`}>
+                  {roleStats.ADMIN.total}
+                </span>
+              </div>
+            </button>
+          </nav>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="p-4 bg-gray-50 border-b border-gray-200">
+          <div className="grid grid-cols-3 gap-4">
+            <div className="bg-white rounded-lg p-3 border border-gray-200">
+              <div className="text-sm text-gray-600 mb-1">Tổng số</div>
+              <div className="text-2xl font-bold text-gray-900">{roleStats[activeTab].total}</div>
+            </div>
+            <div className="bg-white rounded-lg p-3 border border-green-200 bg-green-50">
+              <div className="text-sm text-green-700 mb-1">Đang hoạt động</div>
+              <div className="text-2xl font-bold text-green-700">{roleStats[activeTab].active}</div>
+            </div>
+            <div className="bg-white rounded-lg p-3 border border-red-200 bg-red-50">
+              <div className="text-sm text-red-700 mb-1">Đã vô hiệu hóa</div>
+              <div className="text-2xl font-bold text-red-700">{roleStats[activeTab].inactive}</div>
             </div>
           </div>
+        </div>
 
-          {/* Role Filter */}
-          <select
-            value={filterRole}
-            onChange={(e) => setFilterRole(e.target.value as any)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="ALL">Tất cả roles</option>
-            <option value="USER">User</option>
-            <option value="STAFF">Staff</option>
-            <option value="ADMIN">Admin</option>
-          </select>
+        {/* Toolbar */}
+        <div className="p-4 border-b border-gray-200">
+          <div className="flex flex-wrap items-center gap-4">
+            {/* Search */}
+            <div className="flex-1 min-w-[300px]">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder={`Tìm kiếm ${activeTab === 'USER' ? 'người dùng' : activeTab === 'STAFF' ? 'nhân viên' : 'quản trị viên'}...`}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+            </div>
 
-          {/* Filter Button */}
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            <Filter className="w-4 h-4" />
-            {t('common.filter')}
-          </button>
+            {/* Filter Button */}
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <Filter className="w-4 h-4" />
+              {t('common.filter')}
+            </button>
 
           {/* Bulk Actions */}
           {selectedUsers.length > 0 && (
@@ -479,11 +688,12 @@ const UserManagement: React.FC = () => {
             <Download className="w-4 h-4" />
             {t('admin.export')}
           </button>
+          </div>
         </div>
       </div>
 
       {/* Users Table */}
-      <div className="bg-white rounded-xl shadow-md overflow-hidden">
+      <div className="bg-white rounded-xl shadow-md overflow-hidden border-t border-gray-200">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
@@ -508,9 +718,6 @@ const UserManagement: React.FC = () => {
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   {t('admin.status')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  {t('admin.joined')}
-                </th>
                 <th className="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   {t('admin.actions')}
                 </th>
@@ -519,13 +726,13 @@ const UserManagement: React.FC = () => {
             <tbody className="divide-y divide-gray-200">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
                     {t('common.loading')}
                   </td>
                 </tr>
               ) : users.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
                     {t('admin.noUsers')}
                   </td>
                 </tr>
@@ -542,12 +749,10 @@ const UserManagement: React.FC = () => {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
-                          {user.fullName?.charAt(0) || 'U'}
-                        </div>
+                        <UserAvatar user={user} />
                         <div>
-                          <div className="font-medium text-gray-900">{user.fullName}</div>
-                          <div className="text-sm text-gray-500">{user.email}</div>
+                          <div className="font-medium text-gray-900">{user.fullName || 'N/A'}</div>
+                          <div className="text-sm text-gray-500">{user.email || 'N/A'}</div>
                         </div>
                       </div>
                     </td>
@@ -648,20 +853,17 @@ const UserManagement: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      {user.enabled ? (
+                      {user.enabled !== false ? (
                         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                           <Check className="w-3 h-3" />
-                          Active
+                          {t('admin.active')}
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                           <X className="w-3 h-3" />
-                          Inactive
+                          {t('admin.inactive')}
                         </span>
                       )}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-2">
@@ -733,6 +935,7 @@ const UserManagement: React.FC = () => {
         }}
         onSave={() => {
           fetchUsers();
+          fetchRoleStats();
         }}
       />
     </div>

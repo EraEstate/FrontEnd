@@ -5,6 +5,7 @@ import {
   Building2, MapPin, Calendar, Percent, Users
 } from 'lucide-react';
 import { projectAPI } from '../../api/project';
+import { getImageUrl, getImagePlaceholder } from '../../utils/imageUtils';
 
 const ProjectManagement: React.FC = () => {
   const { t } = useTranslation();
@@ -19,14 +20,89 @@ const ProjectManagement: React.FC = () => {
     fetchProjects();
   }, [currentPage, filterStatus]);
 
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchTerm || filterStatus !== 'ALL') {
+        setCurrentPage(0); // Reset to first page when search/filter changes
+        fetchProjects();
+      } else {
+        fetchProjects();
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
   const fetchProjects = async () => {
     try {
       setLoading(true);
-      const response = await projectAPI.getAll({ page: currentPage, size: 12 });
-      setProjects(response.content || []);
-      setTotalPages(response.totalPages || 1);
+      let response;
+
+      if (filterStatus !== 'ALL') {
+        // Fetch by status
+        response = await projectAPI.getByStatus(filterStatus, currentPage, 12);
+      } else if (searchTerm) {
+        // Search projects
+        response = await projectAPI.search(searchTerm, currentPage, 12);
+      } else {
+        // Get all projects
+        response = await projectAPI.getAll({ 
+          page: currentPage, 
+          size: 12,
+          sortBy: 'createdAt',
+          sortDir: 'desc'
+        });
+      }
+
+      console.log('Projects API Response:', response);
+
+      // Handle both Page format and array format
+      let projectsList = [];
+      if (response?.content) {
+        projectsList = response.content;
+      } else if (Array.isArray(response)) {
+        projectsList = response;
+      } else if (response?.data?.content) {
+        projectsList = response.data.content;
+      }
+
+      // Map project data to ensure correct field names
+      projectsList = projectsList.map((project: any) => ({
+        ...project,
+        // Map status fields
+        status: project.status || project.projectStatus || 'ACTIVE',
+        // Map image fields
+        mainImageUrl: project.mainImageUrl || project.featuredImageUrl || project.imageUrl,
+        imageUrls: project.imageUrls || (project.images ? project.images.map((img: any) => img.imageUrl || img.url) : []),
+        // Map location
+        location: project.location || project.address || (project.province ? `${project.district?.name || ''} ${project.province?.name || ''}`.trim() : 'N/A'),
+        // Map price
+        priceFrom: project.priceFrom || project.minPrice || 0,
+        priceTo: project.priceTo || project.maxPrice || 0,
+        // Map other fields
+        completionYear: project.completionYear || project.completedYear || 'TBD',
+        totalUnits: project.totalUnits || project.units || 0,
+        progress: project.progress || project.constructionProgress || 0
+      }));
+
+      // Filter by search term if needed (client-side filtering for status filter)
+      if (searchTerm && filterStatus !== 'ALL') {
+        projectsList = projectsList.filter((project: any) =>
+          project.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          project.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          project.developer?.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      }
+
+      console.log('Processed projects list:', projectsList);
+
+      setProjects(projectsList);
+      setTotalPages(response?.totalPages || response?.data?.totalPages || Math.ceil(projectsList.length / 12) || 1);
     } catch (error) {
       console.error('Failed to fetch projects:', error);
+      setProjects([]);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
@@ -47,10 +123,17 @@ const ProjectManagement: React.FC = () => {
     const badges: Record<string, string> = {
       PLANNING: 'bg-blue-100 text-blue-800',
       ONGOING: 'bg-green-100 text-green-800',
+      ACTIVE: 'bg-green-100 text-green-800',
       COMPLETED: 'bg-purple-100 text-purple-800',
-      PAUSED: 'bg-yellow-100 text-yellow-800'
+      PAUSED: 'bg-yellow-100 text-yellow-800',
+      INACTIVE: 'bg-gray-100 text-gray-800'
     };
     return badges[status] || 'bg-gray-100 text-gray-800';
+  };
+
+  const handleFilterChange = (newStatus: string) => {
+    setFilterStatus(newStatus);
+    setCurrentPage(0); // Reset to first page when filter changes
   };
 
   const formatPrice = (price: number) => {
@@ -92,14 +175,16 @@ const ProjectManagement: React.FC = () => {
 
           <select
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
+            onChange={(e) => handleFilterChange(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           >
             <option value="ALL">All Status</option>
             <option value="PLANNING">Planning</option>
             <option value="ONGOING">Ongoing</option>
+            <option value="ACTIVE">Active</option>
             <option value="COMPLETED">Completed</option>
             <option value="PAUSED">Paused</option>
+            <option value="INACTIVE">Inactive</option>
           </select>
 
           <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
@@ -125,9 +210,13 @@ const ProjectManagement: React.FC = () => {
               {/* Project Image */}
               <div className="relative h-56 bg-gray-200 overflow-hidden">
                 <img
-                  src={project.mainImageUrl || project.imageUrls?.[0] || '/default-project.jpg'}
-                  alt={project.name}
+                  src={getImageUrl(project.mainImageUrl || project.imageUrls?.[0] || project.images?.[0]?.imageUrl) || getImagePlaceholder(400, 224)}
+                  alt={project.name || 'Project'}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = getImagePlaceholder(400, 224);
+                  }}
                 />
                 <div className="absolute top-3 right-3">
                   <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadge(project.status)}`}>

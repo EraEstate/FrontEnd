@@ -5,6 +5,7 @@ import {
   Building, MapPin, DollarSign, Download
 } from 'lucide-react';
 import { propertyAPI } from '../../api/property';
+import { getImageUrl, getImagePlaceholder } from '../../utils/imageUtils';
 
 const PropertyManagement: React.FC = () => {
   const { t } = useTranslation();
@@ -74,6 +75,19 @@ const PropertyManagement: React.FC = () => {
     if (price >= 1000000000) return `${(price / 1000000000).toFixed(1)}B`;
     if (price >= 1000000) return `${(price / 1000000).toFixed(0)}M`;
     return price.toLocaleString();
+  };
+
+  const getPropertyImage = (property: any) => {
+    // Try to get primary image first
+    const primaryImage = property.propertyImages?.find((img: any) => img.isMain || img.isPrimary)?.imageUrl ||
+                         property.propertyImages?.[0]?.imageUrl;
+    
+    // Fallback to mainImageUrl
+    if (!primaryImage) {
+      return property.mainImageUrl || property.mainImage;
+    }
+    
+    return primaryImage;
   };
 
   return (
@@ -196,14 +210,20 @@ const PropertyManagement: React.FC = () => {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <img 
-                          src={property.mainImage || '/placeholder.jpg'} 
-                          alt={property.title}
-                          className="w-16 h-16 rounded-lg object-cover"
-                        />
+                        <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                          <img 
+                            src={getImageUrl(getPropertyImage(property)) || getImagePlaceholder(64, 64)} 
+                            alt={property.title || 'Property'}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = getImagePlaceholder(64, 64);
+                            }}
+                          />
+                        </div>
                         <div>
-                          <div className="font-medium text-gray-900">{property.title}</div>
-                          <div className="text-sm text-gray-500">{property.area} m²</div>
+                          <div className="font-medium text-gray-900">{property.title || 'N/A'}</div>
+                          <div className="text-sm text-gray-500">{property.area ? `${property.area} m²` : 'N/A'}</div>
                         </div>
                       </div>
                     </td>

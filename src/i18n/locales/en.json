@@ -1046,6 +1046,28 @@
       "security": "System Security"
     },
     "comingSoon": "Feature under development",
-    "backToOverview": "Back to Overview"
+    "backToOverview": "Back to Overview",
+    "user": "User",
+    "confirmDelete": "Are you sure you want to delete this user?",
+    "confirmDeleteMultiple": "Delete",
+    "users": "users",
+    "userManagement": {
+      "subtitle": "Manage all users in the system"
+    },
+    "addNew": "Add New",
+    "searchUsers": "Search users...",
+    "allRoles": "All roles",
+    "deleteSelected": "Delete Selected",
+    "export": "Export",
+    "role": "Role",
+    "contact": "Contact",
+    "status": "Status",
+    "joined": "Joined",
+    "actions": "Actions",
+    "noUsers": "No users found",
+    "active": "Active",
+    "inactive": "Inactive",
+    "showing": "Showing",
+    "of": "of"
   }
 }

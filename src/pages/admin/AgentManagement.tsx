@@ -5,6 +5,8 @@ import {
   Briefcase, Star, MapPin, Phone, Mail, Award
 } from 'lucide-react';
 import { agentAPI } from '../../api/agent';
+import { getImageUrl, getAvatarPlaceholder } from '../../utils/imageUtils';
+import api from '../../api/index';
 
 const AgentManagement: React.FC = () => {
   const { t } = useTranslation();
@@ -19,14 +21,129 @@ const AgentManagement: React.FC = () => {
     fetchAgents();
   }, [currentPage, filterSpecialty]);
 
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchTerm) {
+        setCurrentPage(0);
+        fetchAgents();
+      } else {
+        fetchAgents();
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
   const fetchAgents = async () => {
     try {
       setLoading(true);
       const response = await agentAPI.getAll({ page: currentPage, size: 20 });
-      setAgents(response.content || []);
-      setTotalPages(response.totalPages || 1);
+      
+      console.log('Agents API Response:', response);
+
+      // Handle both Page format and List format
+      let agentsList = [];
+      if (response?.content) {
+        // Page format
+        agentsList = response.content;
+      } else if (Array.isArray(response)) {
+        // List format (backend returns List<Agent>)
+        agentsList = response;
+      } else if (response?.data) {
+        // Nested data
+        agentsList = Array.isArray(response.data) ? response.data : (response.data.content || []);
+      }
+
+      // Fetch user info for each agent (since user is @JsonIgnore in backend)
+      const agentsWithUserInfo = await Promise.all(
+        agentsList.map(async (agent: any) => {
+          let userInfo: any = null;
+          
+          // Try to get user info from public endpoint
+          if (agent.userId) {
+            try {
+              const userResponse = await api.get(`/users/${agent.userId}/public`);
+              userInfo = userResponse.data;
+            } catch (error) {
+              console.debug(`Could not fetch user info for agent ${agent.id}:`, error);
+            }
+          }
+
+          // Map agent data to ensure correct field names
+          const mappedAgent = {
+            ...agent,
+            // Map user fields
+            fullName: agent.fullName || userInfo?.fullName || agent.user?.fullName || 'N/A',
+            email: agent.email || userInfo?.email || agent.user?.email || 'N/A',
+            phoneNumber: agent.phoneNumber || agent.phone || userInfo?.phone || agent.user?.phone || 'N/A',
+            avatarUrl: agent.avatarUrl || userInfo?.avatarUrl || agent.user?.avatar || agent.user?.profile?.avatarUrl,
+            // Map location from user profile address
+            city: agent.city || userInfo?.address || agent.user?.userProfile?.address || agent.location?.city || agent.user?.location?.city || 'N/A',
+            location: userInfo?.address || agent.user?.userProfile?.address || agent.location?.address || 'N/A',
+            // Map agent-specific fields
+            specialty: agent.specialty || agent.specialization || 'Real Estate Agent',
+            rating: agent.rating || agent.ratingAverage || agent.averageRating || 0,
+            totalReviews: agent.totalReviews || agent.ratingCount || agent.reviewCount || 0,
+            // Map stats - use direct field names from Agent entity
+            totalListings: agent.totalProperties !== undefined ? agent.totalProperties : (agent.totalListings || agent.propertyCount || 0),
+            totalDeals: agent.totalSales !== undefined ? agent.totalSales : (agent.totalDeals || agent.dealCount || 0),
+            experienceYears: agent.experienceYears || agent.experience || 0,
+            isVerified: agent.isVerified || agent.verified || false
+          };
+          
+          // Debug log for each agent
+          console.log(`Agent ${mappedAgent.id} mapped data:`, {
+            fullName: mappedAgent.fullName,
+            email: mappedAgent.email,
+            phoneNumber: mappedAgent.phoneNumber,
+            location: mappedAgent.location,
+            totalListings: mappedAgent.totalListings,
+            totalDeals: mappedAgent.totalDeals,
+            rating: mappedAgent.rating,
+            totalReviews: mappedAgent.totalReviews,
+            specialty: mappedAgent.specialty,
+            experienceYears: mappedAgent.experienceYears
+          });
+          
+          return mappedAgent;
+        })
+      );
+
+      // Filter by search term
+      let filteredAgents = agentsWithUserInfo;
+      if (searchTerm) {
+        filteredAgents = filteredAgents.filter((agent: any) =>
+          agent.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          agent.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          agent.phoneNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          agent.specialty?.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      }
+
+      // Filter by specialty
+      if (filterSpecialty !== 'ALL') {
+        filteredAgents = filteredAgents.filter((agent: any) =>
+          agent.specialty?.toUpperCase() === filterSpecialty ||
+          agent.specialization?.toUpperCase() === filterSpecialty
+        );
+      }
+
+      // Pagination (client-side if backend returns list)
+      const totalItems = filteredAgents.length;
+      const itemsPerPage = 20;
+      const startIndex = currentPage * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const paginatedAgents = filteredAgents.slice(startIndex, endIndex);
+
+      console.log('Processed agents list:', paginatedAgents);
+
+      setAgents(paginatedAgents);
+      setTotalPages(response?.totalPages || Math.ceil(totalItems / itemsPerPage) || 1);
     } catch (error) {
       console.error('Failed to fetch agents:', error);
+      setAgents([]);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
@@ -117,9 +234,13 @@ const AgentManagement: React.FC = () => {
               {/* Agent Image */}
               <div className="relative h-48 bg-gradient-to-br from-blue-500 to-purple-600">
                 <img
-                  src={agent.avatarUrl || '/default-avatar.png'}
-                  alt={agent.fullName}
+                  src={getImageUrl(agent.avatarUrl) || getAvatarPlaceholder(400, 192)}
+                  alt={agent.fullName || 'Agent'}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = getAvatarPlaceholder(400, 192);
+                  }}
                 />
                 <div className="absolute top-3 right-3 flex gap-2">
                   {agent.isVerified && (
@@ -137,7 +258,7 @@ const AgentManagement: React.FC = () => {
                 
                 {/* Rating */}
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="flex">{getRatingStars(agent.rating || 4)}</div>
+                  <div className="flex">{getRatingStars(Math.round(agent.rating || 0))}</div>
                   <span className="text-sm text-gray-600">({agent.totalReviews || 0})</span>
                 </div>
 
@@ -150,18 +271,18 @@ const AgentManagement: React.FC = () => {
                 {/* Location */}
                 <div className="flex items-center gap-2 mb-2 text-sm text-gray-600">
                   <MapPin className="w-4 h-4" />
-                  {agent.city || 'N/A'}
+                  <span className="line-clamp-1">{agent.location || agent.city || 'N/A'}</span>
                 </div>
 
                 {/* Contact */}
                 <div className="space-y-1 mb-4">
                   <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Phone className="w-4 h-4" />
-                    {agent.phoneNumber || 'N/A'}
+                    <Phone className="w-4 h-4 flex-shrink-0" />
+                    <span className="line-clamp-1">{agent.phoneNumber || 'N/A'}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Mail className="w-4 h-4" />
-                    {agent.email || 'N/A'}
+                    <Mail className="w-4 h-4 flex-shrink-0" />
+                    <span className="line-clamp-1">{agent.email || 'N/A'}</span>
                   </div>
                 </div>
 
