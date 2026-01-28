@@ -37,6 +37,8 @@ import WikiPage from './pages/WikiPage';
 import UtilitiesPage from './pages/UtilitiesPage';
 import NotificationCenter from './pages/NotificationCenter';
 import PaymentHistoryPage from './pages/PaymentHistoryPage';
+import PaymentSuccessPage from './pages/PaymentSuccessPage';
+import PaymentFailedPage from './pages/PaymentFailedPage';
 import InquiryPage from './pages/InquiryPage';
 import DashboardPage from './pages/DashboardPage';
 import PricingPage from './pages/PricingPage';
@@ -109,6 +111,8 @@ function AppContent() {
           {/* <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} /> */}
           <Route path="/notifications" element={<ProtectedRoute><NotificationCenter /></ProtectedRoute>} />
           <Route path="/payments" element={<ProtectedRoute><PaymentHistoryPage /></ProtectedRoute>} />
+          <Route path="/payment/success" element={<PaymentSuccessPage />} />
+          <Route path="/payment/failed" element={<PaymentFailedPage />} />
           <Route path="/inquiries" element={<ProtectedRoute><InquiryPage /></ProtectedRoute>} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/contact" element={<ContactPage />} />

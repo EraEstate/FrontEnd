@@ -100,9 +100,15 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
         setStep('confirm');
         toast.info('Vui lòng chuyển khoản và nhập mã giao dịch');
       } else {
-        // VNPay/MoMo - redirect đến gateway (TODO: implement)
-        toast.info('Đang chuyển hướng đến cổng thanh toán...');
-        // window.location.href = result.paymentUrl;
+        // VNPay/MoMo - redirect đến gateway
+        const paymentUrl = result.paymentUrl || result.payment?.paymentUrl;
+        if (paymentUrl) {
+          toast.info('Đang chuyển hướng đến cổng thanh toán...');
+          // Redirect đến payment gateway
+          window.location.href = paymentUrl;
+        } else {
+          toast.error('Không thể tạo URL thanh toán. Vui lòng thử lại.');
+        }
       }
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Không thể tạo đơn thanh toán');
