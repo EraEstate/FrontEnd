@@ -13,6 +13,7 @@ export { propertyDetailAPI } from './propertyDetail';
 export { propertyInquiryAPI } from './propertyInquiry';
 export { propertyFavoriteAPI } from './propertyFavorite';
 export { chatAPI } from './chat';
+export { aiChatAPI } from './aiChat';
 export { paymentAPI as newPaymentAPI } from './payment';
 export { projectAPI, companyAPI } from './project';
 export { marketAnalysisAPI } from './marketAnalysis';

@@ -33,12 +33,12 @@ const Footer: React.FC = () => {
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center mb-6 group">
               <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center mr-3 group-hover:bg-red-700 transition-colors">
-                <span className="text-white font-bold text-lg">B</span>
+                <span className="text-white font-bold text-lg">E</span>
               </div>
               <div>
                 <div className="text-lg font-bold">
-                  <span className="text-red-600">Batdongsan</span>
-                  <span className="text-gray-800">.com.vn</span>
+                  <span className="text-red-600">Era</span>
+                  <span className="text-gray-800"> Estate</span>
                 </div>
                 <div className="text-xs text-gray-500 -mt-0.5">
                   by PropertyGuru
@@ -114,13 +114,13 @@ const Footer: React.FC = () => {
                 </a>
               </li>
               <li>
-                <a href="mailto:support@batdongsan.com.vn" className="hover:text-red-600 transition-colors inline-flex items-center group">
+                <a href="mailto:support@eraestate.com" className="hover:text-red-600 transition-colors inline-flex items-center group">
                   <Mail className="h-3.5 w-3.5 mr-2 text-gray-400 group-hover:text-red-600" />
                   Hỗ trợ kỹ thuật
                 </a>
               </li>
               <li>
-                <a href="mailto:info@batdongsan.com.vn" className="hover:text-red-600 transition-colors inline-flex items-center group">
+                <a href="mailto:info@eraestate.com" className="hover:text-red-600 transition-colors inline-flex items-center group">
                   <Mail className="h-3.5 w-3.5 mr-2 text-gray-400 group-hover:text-red-600" />
                   Email liên hệ
                 </a>
@@ -192,7 +192,7 @@ const Footer: React.FC = () => {
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             {/* Copyright */}
             <p className="text-sm text-gray-500">
-              © {currentYear} Batdongsan.com.vn. Tất cả quyền được bảo lưu.
+              © {currentYear} Era Estate. Tất cả quyền được bảo lưu.
             </p>
 
             {/* Additional Links */}

@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Header } from './components/Header';
 import Footer from './components/Footer';
 import AccountDisabledBanner from './components/AccountDisabledBanner';
+import AIChatBox from './components/AIChatBox';
 import { useAuthStore } from './store/authStore';
 import HomePage from './components/HomePage';
 import PropertiesPage from './pages/PropertiesPage';
@@ -123,6 +124,9 @@ function AppContent() {
       
       {/* Conditionally render Footer - hide on dashboard pages */}
       {!isDashboardRoute && <Footer />}
+      
+      {/* AI Chat Box - hiển thị trên tất cả các trang ngoài dashboard */}
+      {!isDashboardRoute && <AIChatBox />}
       
       {/* Toast Notifications */}
       <ToastContainer
