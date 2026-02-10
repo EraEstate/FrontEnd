@@ -1000,5 +1000,20 @@
     },
     "comingSoon": "Feature under development",
     "backToOverview": "Back to Overview"
+  },
+  "aiChat": {
+    "title": "Soporte IA Era Estate",
+    "titleShort": "Soporte IA",
+    "active": "En línea",
+    "buttonTitle": "Chatear con soporte IA",
+    "welcomeMessage": "¡Hola! Soy el asistente de IA de Era Estate. Puedo ayudarte a encontrar información sobre bienes raíces, noticias, proyectos y mucho más. ¿En qué puedo ayudarte?",
+    "inputPlaceholder": "Ingresa tu pregunta...",
+    "thinking": "Pensando...",
+    "assistantName": "Asistente IA",
+    "errorMessage": "Lo siento, ocurrió un error al procesar tu pregunta. Por favor, inténtalo de nuevo más tarde.",
+    "disclaimer": "La IA puede responder sobre bienes raíces, noticias e información del sistema",
+    "minimize": "Minimizar",
+    "maximize": "Maximizar",
+    "close": "Cerrar"
   }
 }

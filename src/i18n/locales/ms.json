@@ -1000,5 +1000,20 @@
     },
     "comingSoon": "Feature under development",
     "backToOverview": "Back to Overview"
+  },
+  "aiChat": {
+    "title": "Sokongan AI Era Estate",
+    "titleShort": "Sokongan AI",
+    "active": "Dalam talian",
+    "buttonTitle": "Berbual dengan sokongan AI",
+    "welcomeMessage": "Hello! Saya adalah pembantu AI Era Estate. Saya boleh membantu anda mencari maklumat tentang hartanah, berita, projek dan banyak lagi. Bagaimana saya boleh membantu anda?",
+    "inputPlaceholder": "Masukkan soalan anda...",
+    "thinking": "Berfikir...",
+    "assistantName": "Pembantu AI",
+    "errorMessage": "Maaf, ralat berlaku semasa memproses soalan anda. Sila cuba lagi kemudian.",
+    "disclaimer": "AI boleh menjawab tentang hartanah, berita dan maklumat dalam sistem",
+    "minimize": "Kecilkan",
+    "maximize": "Besarkan",
+    "close": "Tutup"
   }
 }

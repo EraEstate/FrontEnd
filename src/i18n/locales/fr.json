@@ -1000,5 +1000,20 @@
     },
     "comingSoon": "Feature under development",
     "backToOverview": "Back to Overview"
+  },
+  "aiChat": {
+    "title": "Assistance IA Era Estate",
+    "titleShort": "Assistance IA",
+    "active": "En ligne",
+    "buttonTitle": "Discuter avec l'assistance IA",
+    "welcomeMessage": "Bonjour ! Je suis l'assistant IA d'Era Estate. Je peux vous aider à trouver des informations sur l'immobilier, les actualités, les projets et bien plus encore. Comment puis-je vous aider ?",
+    "inputPlaceholder": "Entrez votre question...",
+    "thinking": "Réflexion en cours...",
+    "assistantName": "Assistant IA",
+    "errorMessage": "Désolé, une erreur s'est produite lors du traitement de votre question. Veuillez réessayer plus tard.",
+    "disclaimer": "L'IA peut répondre sur l'immobilier, les actualités et les informations du système",
+    "minimize": "Réduire",
+    "maximize": "Agrandir",
+    "close": "Fermer"
   }
 }

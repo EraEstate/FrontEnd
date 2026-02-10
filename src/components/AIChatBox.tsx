@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Minimize2, Maximize2, Send, Bot, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { aiChatAPI, type AIChatMessage } from '../api/aiChat';
 import { useAuthStore } from '../store/authStore';
 
@@ -15,6 +16,7 @@ const AIChatBox: React.FC<AIChatBoxProps> = ({
   isOpen: externalIsOpen,
   onOpenChange
 }) => {
+  const { t } = useTranslation();
   const { user, isAuthenticated } = useAuthStore();
   const [internalIsOpen, setInternalIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
@@ -72,7 +74,7 @@ const AIChatBox: React.FC<AIChatBoxProps> = ({
       if (messages.length === 0) {
         setMessages([{
           role: 'assistant',
-          content: 'Xin chào! Tôi là trợ lý AI của Era Estate. Tôi có thể giúp bạn tìm kiếm thông tin về bất động sản, tin tức, dự án và nhiều hơn nữa. Bạn cần tôi hỗ trợ gì?',
+          content: t('aiChat.welcomeMessage'),
           timestamp: new Date().toISOString()
         }]);
       }
@@ -97,7 +99,7 @@ const AIChatBox: React.FC<AIChatBoxProps> = ({
     if (messages.length === 0) {
       setMessages([{
         role: 'assistant',
-        content: 'Xin chào! Tôi là trợ lý AI của Era Estate. Tôi có thể giúp bạn tìm kiếm thông tin về bất động sản, tin tức, dự án và nhiều hơn nữa. Bạn cần tôi hỗ trợ gì?',
+        content: t('aiChat.welcomeMessage'),
         timestamp: new Date().toISOString()
       }]);
     }
@@ -216,7 +218,7 @@ const AIChatBox: React.FC<AIChatBoxProps> = ({
       // Add error message
       const errorResponse: AIChatMessage = {
         role: 'assistant',
-        content: 'Xin lỗi, có lỗi xảy ra khi xử lý câu hỏi của bạn. Vui lòng thử lại sau.',
+        content: t('aiChat.errorMessage'),
         timestamp: new Date().toISOString()
       };
       
@@ -248,10 +250,10 @@ const AIChatBox: React.FC<AIChatBoxProps> = ({
           <button
             onClick={() => setIsOpen(true)}
             className="relative bg-gradient-to-r from-red-600 to-red-700 text-white p-4 rounded-full shadow-2xl hover:shadow-3xl hover:scale-110 transition-all duration-300 flex items-center gap-2 group"
-            title="Chat với AI hỗ trợ"
+            title={t('aiChat.buttonTitle')}
           >
             <Bot className="w-6 h-6 group-hover:animate-bounce" />
-            <span className="hidden sm:inline font-medium">AI Hỗ trợ</span>
+            <span className="hidden sm:inline font-medium">{t('aiChat.titleShort')}</span>
           </button>
         </div>
       )}
@@ -271,22 +273,22 @@ const AIChatBox: React.FC<AIChatBoxProps> = ({
               </div>
               {!isMinimized && (
                 <div>
-                  <span className="font-semibold block">AI Hỗ trợ Era Estate</span>
+                  <span className="font-semibold block">{t('aiChat.title')}</span>
                   <span className="text-xs text-red-100 flex items-center gap-1">
                     <span className="w-1.5 h-1.5 bg-green-300 rounded-full animate-pulse"></span>
-                    Đang hoạt động
+                    {t('aiChat.active')}
                   </span>
                 </div>
               )}
               {isMinimized && (
-                <span className="font-semibold">AI Hỗ trợ</span>
+                <span className="font-semibold">{t('aiChat.titleShort')}</span>
               )}
             </div>
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setIsMinimized(!isMinimized)}
                 className="hover:bg-white/20 p-2 rounded-lg transition-colors"
-                title={isMinimized ? 'Mở rộng' : 'Thu nhỏ'}
+                title={isMinimized ? t('aiChat.maximize') : t('aiChat.minimize')}
               >
                 {isMinimized ? (
                   <Maximize2 className="w-4 h-4" />
@@ -300,7 +302,7 @@ const AIChatBox: React.FC<AIChatBoxProps> = ({
                   setIsMinimized(false);
                 }}
                 className="hover:bg-white/20 p-2 rounded-lg transition-colors"
-                title="Đóng"
+                title={t('aiChat.close')}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -328,7 +330,7 @@ const AIChatBox: React.FC<AIChatBoxProps> = ({
                         {!isUser && (
                           <div className="flex items-center gap-2 mb-1">
                             <Bot className="w-4 h-4 text-red-600" />
-                            <span className="text-xs font-semibold text-gray-600">AI Assistant</span>
+                            <span className="text-xs font-semibold text-gray-600">{t('aiChat.assistantName')}</span>
                           </div>
                         )}
                         <div className="text-sm leading-relaxed whitespace-pre-wrap break-words">
@@ -354,7 +356,7 @@ const AIChatBox: React.FC<AIChatBoxProps> = ({
                       <div className="flex items-center gap-2">
                         <Bot className="w-4 h-4 text-red-600" />
                         <Loader2 className="w-4 h-4 text-gray-500 animate-spin" />
-                        <span className="text-sm text-gray-500">Đang suy nghĩ...</span>
+                        <span className="text-sm text-gray-500">{t('aiChat.thinking')}</span>
                       </div>
                     </div>
                   </div>
@@ -371,7 +373,7 @@ const AIChatBox: React.FC<AIChatBoxProps> = ({
                     type="text"
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
-                    placeholder="Nhập câu hỏi của bạn..."
+                    placeholder={t('aiChat.inputPlaceholder')}
                     className="flex-1 border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
                     disabled={isLoading}
                   />
@@ -388,7 +390,7 @@ const AIChatBox: React.FC<AIChatBoxProps> = ({
                   </button>
                 </div>
                 <p className="text-xs text-gray-500 mt-2">
-                  AI có thể trả lời về bất động sản, tin tức và thông tin trên hệ thống
+                  {t('aiChat.disclaimer')}
                 </p>
               </form>
             </>

@@ -30,12 +30,15 @@ import {
 } from 'lucide-react';
 import { useProperty, useFavoriteStatus } from '../api/hooks';
 import { propertyFavoriteAPI } from '../api';
+import { propertyTransactionAPI } from '../api/propertyTransaction';
 import { useTranslation } from 'react-i18next';
 import { getImageUrl, getImagePlaceholder } from '../utils/imageUtils';
 import { useAuthStore } from '../store/authStore';
 import FloatingChatBox from '../components/FloatingChatBox';
 import PropertyChatList from '../components/PropertyChatList';
 import type { Conversation } from '../api/chat';
+import { toast } from 'react-toastify';
+import { REALESTATE_CONTRACT_ADDRESS } from '../config/blockchain';
 
 const PropertyDetailPage: React.FC = () => {
   const { t } = useTranslation();
@@ -47,6 +50,8 @@ const PropertyDetailPage: React.FC = () => {
   const [togglingFavorite, setTogglingFavorite] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
+  const [creatingContract, setCreatingContract] = useState(false);
+  const [showContractModal, setShowContractModal] = useState(false);
   
   // API Hooks
   const { data: property, loading, error, refetch } = useProperty(id || '');
@@ -179,6 +184,7 @@ const PropertyDetailPage: React.FC = () => {
   
   // Check if current user is the property owner
   const isOwner = isAuthenticated && owner && user?.id === owner.id;
+  const isRentListing = (property.listingType || property.transactionType) === 'RENT';
 
   const nextImage = () => {
     if (images.length > 0) {
@@ -203,6 +209,61 @@ const PropertyDetailPage: React.FC = () => {
     { icon: TreePine, label: t('postProperty.balcony'), value: details?.balcony ? t('propertyDetail.yes') : t('propertyDetail.no') },
     { icon: Home, label: t('postProperty.garden'), value: details?.garden ? t('propertyDetail.yes') : t('propertyDetail.no') },
   ].filter(feature => feature.value !== undefined && feature.value !== null);
+
+  const handleOpenContractModal = () => {
+    if (!isAuthenticated || !user) {
+      navigate('/login');
+      return;
+    }
+
+    if (isOwner) {
+      toast.info('Bạn là chủ sở hữu tin đăng này, không thể tự tạo hợp đồng mua cho chính mình.');
+      return;
+    }
+
+    if (!id) {
+      toast.error('Không tìm thấy thông tin bất động sản.');
+      return;
+    }
+
+    if (
+      !REALESTATE_CONTRACT_ADDRESS ||
+      REALESTATE_CONTRACT_ADDRESS === '0x0000000000000000000000000000000000000000'
+    ) {
+      toast.error('Chưa cấu hình địa chỉ smart contract bất động sản. Vui lòng liên hệ quản trị viên.');
+      return;
+    }
+
+    setShowContractModal(true);
+  };
+
+  const handleCreateBlockchainContract = async () => {
+    if (!id || !user) return;
+
+    try {
+      setCreatingContract(true);
+
+      // 1. Tạo giao dịch off-chain trong hệ thống
+      const transaction = await propertyTransactionAPI.create({
+        propertyId: id,
+        buyerId: user.id,
+        paymentMethod: 'CASH',
+      });
+
+      // 2. Đóng modal hiện tại và chuyển sang trang hợp đồng đầy đủ
+      setShowContractModal(false);
+      navigate(`/transactions/${transaction.id}/contract`);
+    } catch (error: any) {
+      console.error('Failed to create transaction from property detail:', error);
+      const msg =
+        error?.message ||
+        error?.response?.data?.error ||
+        'Không thể tạo giao dịch để lập hợp đồng. Vui lòng thử lại.';
+      toast.error(msg);
+    } finally {
+      setCreatingContract(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 pt-20">
@@ -502,6 +563,16 @@ const PropertyDetailPage: React.FC = () => {
                     <Mail className="h-5 w-5 mr-2" />
                     {t('propertyDetail.contact')}
                   </button>
+                  {/* Blockchain contract CTA */}
+                  {!isOwner && (
+                    <button
+                      onClick={handleOpenContractModal}
+                      className="w-full bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 transition-colors font-medium flex items-center justify-center"
+                    >
+                      <Shield className="h-5 w-5 mr-2" />
+                      {isRentListing ? 'Mở hợp đồng thuê (Blockchain)' : 'Mở hợp đồng mua bán (Blockchain)'}
+                    </button>
+                  )}
                 </div>
 
                 {/* Contact Form */}
@@ -599,6 +670,91 @@ const PropertyDetailPage: React.FC = () => {
           }}
           conversationId={selectedConversation?.id}
         />
+      )}
+
+      {/* Blockchain contract preview modal */}
+      {showContractModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-xl max-w-2xl w-full shadow-xl overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">
+                  {isRentListing ? 'Hợp đồng thuê bất động sản (Blockchain)' : 'Hợp đồng mua bán bất động sản (Blockchain)'}
+                </h2>
+                <p className="text-sm text-gray-500 mt-1">
+                  Thông tin hợp đồng sẽ được ghi nhận on-chain sau khi bạn ký bằng MetaMask.
+                </p>
+              </div>
+            </div>
+
+            <div className="px-6 py-5 space-y-4 max-h-[60vh] overflow-y-auto">
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h3 className="font-semibold text-gray-900 mb-2">Thông tin bất động sản</h3>
+                <p className="text-gray-900 font-medium">{property.title}</p>
+                <p className="text-sm text-gray-600 mt-1">{fullAddress || property.address}</p>
+                <p className="text-sm text-gray-700 mt-2">
+                  Giá: <span className="font-semibold text-red-600">{formatPrice(Number(property.price))}</span>
+                  {isRentListing && <span className="text-gray-500"> / tháng</span>}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h3 className="font-semibold text-gray-900 mb-2">Bên A (Người bán/cho thuê)</h3>
+                  <p className="text-sm text-gray-800">{ownerName}</p>
+                  {ownerPhone && <p className="text-sm text-gray-600 mt-1">SĐT: {ownerPhone}</p>}
+                  {ownerEmail && <p className="text-sm text-gray-600">Email: {ownerEmail}</p>}
+                </div>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h3 className="font-semibold text-gray-900 mb-2">Bên B (Người mua/thuê)</h3>
+                  <p className="text-sm text-gray-800">{user?.fullName || user?.email}</p>
+                  {user?.phoneNumber && <p className="text-sm text-gray-600 mt-1">SĐT: {user.phoneNumber}</p>}
+                  <p className="text-sm text-gray-600">Email: {user?.email}</p>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h3 className="font-semibold text-gray-900 mb-2">Điều khoản chính (rút gọn)</h3>
+                <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+                  <li>Hai bên thống nhất giao dịch bất động sản nêu trên với giá đã hiển thị.</li>
+                  <li>Thông tin chi tiết về pháp lý, thanh toán và bàn giao sẽ được hai bên thoả thuận ngoài hệ thống.</li>
+                  <li>Hợp đồng blockchain này chỉ ghi nhận giao dịch trên chuỗi, không thay thế hợp đồng công chứng.</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="px-6 py-4 border-t border-gray-200 flex flex-col md:flex-row md:justify-end gap-3">
+              <button
+                type="button"
+                disabled={creatingContract}
+                onClick={() => {
+                  if (!creatingContract) setShowContractModal(false);
+                }}
+                className="px-4 py-2.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm font-medium disabled:opacity-60"
+              >
+                Đóng
+              </button>
+              <button
+                type="button"
+                onClick={handleCreateBlockchainContract}
+                disabled={creatingContract}
+                className="px-4 py-2.5 rounded-lg bg-red-600 text-white hover:bg-red-700 text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {creatingContract ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Đang ký hợp đồng & gửi lên blockchain...
+                  </>
+                ) : (
+                  <>
+                    <Shield className="h-4 w-4" />
+                    Ký hợp đồng bằng MetaMask
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

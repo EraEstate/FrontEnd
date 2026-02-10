@@ -1000,5 +1000,20 @@
     },
     "comingSoon": "Feature under development",
     "backToOverview": "Back to Overview"
+  },
+  "aiChat": {
+    "title": "AI Support Era Estate",
+    "titleShort": "AI Support",
+    "active": "Online",
+    "buttonTitle": "Makipag-chat sa AI support",
+    "welcomeMessage": "Kamusta! Ako ang AI assistant ng Era Estate. Maaari kitang tulungan na maghanap ng impormasyon tungkol sa real estate, balita, proyekto, at marami pa. Paano kita matutulungan?",
+    "inputPlaceholder": "Ilagay ang iyong tanong...",
+    "thinking": "Nag-iisip...",
+    "assistantName": "AI Assistant",
+    "errorMessage": "Paumanhin, may naganap na error habang pinoproseso ang iyong tanong. Pakisubukan ulit mamaya.",
+    "disclaimer": "Maaaring sagutin ng AI ang tungkol sa real estate, balita, at impormasyon sa system",
+    "minimize": "Maliitin",
+    "maximize": "Palakihin",
+    "close": "Isara"
   }
 }

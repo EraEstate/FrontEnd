@@ -48,6 +48,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import StaffDashboard from './pages/StaffDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import PublicProfilePage from './pages/PublicProfilePage';
+import TransactionContractPage from './pages/TransactionContractPage';
 
 function AppContent() {
   const location = useLocation();
@@ -114,6 +115,7 @@ function AppContent() {
           <Route path="/payments" element={<ProtectedRoute><PaymentHistoryPage /></ProtectedRoute>} />
           <Route path="/payment/success" element={<PaymentSuccessPage />} />
           <Route path="/payment/failed" element={<PaymentFailedPage />} />
+          <Route path="/transactions/:id/contract" element={<ProtectedRoute><TransactionContractPage /></ProtectedRoute>} />
           <Route path="/inquiries" element={<ProtectedRoute><InquiryPage /></ProtectedRoute>} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/contact" element={<ContactPage />} />

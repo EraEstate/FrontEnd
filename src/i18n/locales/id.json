@@ -1000,5 +1000,20 @@
     },
     "comingSoon": "Feature under development",
     "backToOverview": "Back to Overview"
+  },
+  "aiChat": {
+    "title": "Dukungan AI Era Estate",
+    "titleShort": "Dukungan AI",
+    "active": "Online",
+    "buttonTitle": "Chat dengan dukungan AI",
+    "welcomeMessage": "Halo! Saya adalah asisten AI Era Estate. Saya dapat membantu Anda menemukan informasi tentang properti, berita, proyek, dan banyak lagi. Bagaimana saya bisa membantu Anda?",
+    "inputPlaceholder": "Masukkan pertanyaan Anda...",
+    "thinking": "Berpikir...",
+    "assistantName": "Asisten AI",
+    "errorMessage": "Maaf, terjadi kesalahan saat memproses pertanyaan Anda. Silakan coba lagi nanti.",
+    "disclaimer": "AI dapat menjawab tentang properti, berita, dan informasi dalam sistem",
+    "minimize": "Minimalkan",
+    "maximize": "Maksimalkan",
+    "close": "Tutup"
   }
 }

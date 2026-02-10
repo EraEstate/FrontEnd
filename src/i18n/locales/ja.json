@@ -1000,5 +1000,20 @@
     },
     "comingSoon": "Feature under development",
     "backToOverview": "Back to Overview"
+  },
+  "aiChat": {
+    "title": "Era Estate AIサポート",
+    "titleShort": "AIサポート",
+    "active": "オンライン",
+    "buttonTitle": "AIサポートとチャット",
+    "welcomeMessage": "こんにちは！私はEra EstateのAIアシスタントです。不動産、ニュース、プロジェクトなどの情報を検索するお手伝いができます。どのようなサポートが必要ですか？",
+    "inputPlaceholder": "質問を入力してください...",
+    "thinking": "考え中...",
+    "assistantName": "AIアシスタント",
+    "errorMessage": "申し訳ございません。質問の処理中にエラーが発生しました。後でもう一度お試しください。",
+    "disclaimer": "AIは不動産、ニュース、システム情報について回答できます",
+    "minimize": "最小化",
+    "maximize": "最大化",
+    "close": "閉じる"
   }
 }

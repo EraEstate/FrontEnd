@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { DollarSign, CheckCircle, Clock, XCircle, Eye, Loader2, Filter } from 'lucide-react';
+import { DollarSign, CheckCircle, Clock, XCircle, Eye, Loader2, Filter, Link as LinkIcon, FileText } from 'lucide-react';
 import { propertyTransactionAPI, type PropertyTransaction } from '../api/propertyTransaction';
 import { toast } from 'react-toastify';
 import { useAuthStore } from '../store/authStore';
+import { connectMetaMask, sendCreateDealTx } from '../utils/metamask';
+import { REALESTATE_CONTRACT_ADDRESS, BLOCKCHAIN_EXPLORER_URL, BLOCKCHAIN_NETWORK_NAME } from '../config/blockchain';
+import RealEstateEscrowAbi from '../abi/RealEstateEscrow.json';
+import { useNavigate } from 'react-router-dom';
 
 const TransactionHistoryPage: React.FC = () => {
   const { user } = useAuthStore();
+  const navigate = useNavigate();
   const [transactions, setTransactions] = useState<PropertyTransaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
+  const [signingId, setSigningId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchTransactions();
@@ -93,6 +99,109 @@ const TransactionHistoryPage: React.FC = () => {
     return labels[status] || status;
   };
 
+  const getBlockchainStatusBadge = (status?: PropertyTransaction['blockchainStatus']) => {
+    if (!status || status === 'NOT_CREATED') {
+      return {
+        bg: 'bg-gray-100',
+        text: 'text-gray-600',
+        label: 'Chưa có hợp đồng blockchain'
+      };
+    }
+
+    const map: Record<NonNullable<PropertyTransaction['blockchainStatus']>, { bg: string; text: string; label: string }> = {
+      NOT_CREATED: {
+        bg: 'bg-gray-100',
+        text: 'text-gray-600',
+        label: 'Chưa có hợp đồng blockchain'
+      },
+      PENDING_ONCHAIN: {
+        bg: 'bg-yellow-100',
+        text: 'text-yellow-800',
+        label: 'Đang gửi lên blockchain'
+      },
+      ONCHAIN_CONFIRMED: {
+        bg: 'bg-emerald-100',
+        text: 'text-emerald-800',
+        label: 'Đã ghi nhận trên blockchain'
+      },
+      ONCHAIN_FAILED: {
+        bg: 'bg-red-100',
+        text: 'text-red-800',
+        label: 'Ghi nhận blockchain thất bại'
+      },
+      ONCHAIN_CANCELLED: {
+        bg: 'bg-gray-100',
+        text: 'text-gray-700',
+        label: 'Hợp đồng blockchain đã huỷ'
+      }
+    };
+    return map[status];
+  };
+
+  const shortenHash = (hash: string) => {
+    if (!hash) return '';
+    return `${hash.slice(0, 6)}...${hash.slice(-4)}`;
+  };
+
+  const buildExplorerUrl = (txHash: string) => {
+    if (!BLOCKCHAIN_EXPLORER_URL) return '';
+    return `${BLOCKCHAIN_EXPLORER_URL.replace(/\/$/, '')}/tx/${txHash}`;
+  };
+
+  const handleSignOnChain = async (transaction: PropertyTransaction, isRent: boolean) => {
+    try {
+      if (!transaction.totalAmount) {
+        toast.error('Không tìm thấy giá trị giao dịch để tạo hợp đồng blockchain');
+        return;
+      }
+
+      if (!REALESTATE_CONTRACT_ADDRESS || REALESTATE_CONTRACT_ADDRESS === '0x0000000000000000000000000000000000000000') {
+        toast.error('Chưa cấu hình địa chỉ smart contract bất động sản');
+        return;
+      }
+
+      setSigningId(transaction.id);
+
+      const buyerAddress = await connectMetaMask();
+
+      // Demo: tạm thời dùng buyerAddress làm cả seller & buyer để đánh dấu on-chain.
+      // Khi bạn mapping ví on-chain cho owner, hãy thay sellerAddress bằng ví chủ nhà.
+      const sellerAddress = buyerAddress;
+
+      const priceBigInt = BigInt(Math.round(transaction.totalAmount));
+
+      const txHash = await sendCreateDealTx({
+        contractAddress: REALESTATE_CONTRACT_ADDRESS,
+        abi: RealEstateEscrowAbi as any[],
+        sellerAddress,
+        buyerAddress,
+        propertyId: transaction.propertyId,
+        price: priceBigInt,
+        isRent
+      });
+
+      await propertyTransactionAPI.updateBlockchainTx(transaction.id, {
+        txHash,
+        contractAddress: REALESTATE_CONTRACT_ADDRESS,
+        network: BLOCKCHAIN_NETWORK_NAME
+      });
+
+      toast.success('Đã tạo hợp đồng blockchain thành công');
+      await fetchTransactions();
+      // Điều hướng sang trang hợp đồng chi tiết để người dùng xem/in/lưu
+      navigate(`/transactions/${transaction.id}/contract`);
+    } catch (error: any) {
+      console.error('Error signing on-chain deal:', error);
+      const msg =
+        error?.message ||
+        error?.data?.message ||
+        'Không thể tạo hợp đồng blockchain. Vui lòng thử lại.';
+      toast.error(msg);
+    } finally {
+      setSigningId(null);
+    }
+  };
+
   const filteredTransactions = filterStatus === 'ALL' 
     ? transactions 
     : transactions.filter(t => t.status === filterStatus);
@@ -141,6 +250,7 @@ const TransactionHistoryPage: React.FC = () => {
             const statusStyle = getStatusBadge(transaction.status);
             const isBuyer = transaction.buyerId === user?.id;
             const isSeller = transaction.sellerId === user?.id;
+            const blockchainBadge = getBlockchainStatusBadge(transaction.blockchainStatus);
 
             return (
               <div
@@ -233,16 +343,82 @@ const TransactionHistoryPage: React.FC = () => {
                           <> • Hoàn thành: {new Date(transaction.completedAt).toLocaleString('vi-VN')}</>
                         )}
                       </p>
+
+                      {/* Blockchain section */}
+                      <div className="pt-3 border-t border-dashed border-gray-200 mt-2 space-y-2">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className={`px-2 py-1 rounded-full text-[11px] font-medium ${blockchainBadge.bg} ${blockchainBadge.text}`}>
+                              {blockchainBadge.label}
+                            </span>
+                            {transaction.blockchainNetwork && (
+                              <span className="text-[11px] px-2 py-1 rounded-full bg-gray-100 text-gray-600">
+                                {transaction.blockchainNetwork}
+                              </span>
+                            )}
+                          </div>
+                          {transaction.blockchainTxHash && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const url = buildExplorerUrl(transaction.blockchainTxHash!);
+                                if (url) {
+                                  window.open(url, '_blank');
+                                } else {
+                                  navigator.clipboard.writeText(transaction.blockchainTxHash!);
+                                  toast.info('Đã copy transaction hash');
+                                }
+                              }}
+                              className="flex items-center gap-1 text-[11px] text-blue-600 hover:text-blue-700"
+                            >
+                              <LinkIcon className="w-3 h-3" />
+                              <span>{shortenHash(transaction.blockchainTxHash)}</span>
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Nút ký hợp đồng blockchain chỉ cho người mua, khi chưa có txHash và giao dịch chưa bị hủy/thất bại */}
+                        {isBuyer &&
+                          !transaction.blockchainTxHash &&
+                          !['CANCELLED', 'FAILED', 'REFUNDED'].includes(transaction.status) && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleSignOnChain(
+                                  transaction,
+                                  transaction.paymentMethod === 'CASH' ? false : false
+                                )
+                              }
+                              disabled={signingId === transaction.id}
+                              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+                            >
+                              {signingId === transaction.id ? (
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                              ) : (
+                                <CheckCircle className="w-3 h-3" />
+                              )}
+                              <span>Ký hợp đồng blockchain (MetaMask)</span>
+                            </button>
+                          )}
+                      </div>
                     </div>
                   </div>
 
-                  <div className="ml-4">
+                  <div className="ml-4 flex flex-col gap-2">
                     <button
                       onClick={() => window.open(`/properties/${transaction.propertyId}`, '_blank')}
                       className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      title="Xem property"
+                      title="Xem tin bất động sản"
                     >
                       <Eye className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={() => navigate(`/transactions/${transaction.id}/contract`)}
+                      className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors text-xs flex items-center justify-center gap-1"
+                      title="Xem hợp đồng giao dịch"
+                    >
+                      <FileText className="w-4 h-4" />
+                      <span>Hợp đồng</span>
                     </button>
                   </div>
                 </div>

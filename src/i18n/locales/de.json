@@ -1000,5 +1000,20 @@
     },
     "comingSoon": "Feature under development",
     "backToOverview": "Back to Overview"
+  },
+  "aiChat": {
+    "title": "KI-Unterstützung Era Estate",
+    "titleShort": "KI-Unterstützung",
+    "active": "Online",
+    "buttonTitle": "Mit KI-Unterstützung chatten",
+    "welcomeMessage": "Hallo! Ich bin der KI-Assistent von Era Estate. Ich kann Ihnen helfen, Informationen über Immobilien, Nachrichten, Projekte und vieles mehr zu finden. Wie kann ich Ihnen helfen?",
+    "inputPlaceholder": "Geben Sie Ihre Frage ein...",
+    "thinking": "Denke nach...",
+    "assistantName": "KI-Assistent",
+    "errorMessage": "Entschuldigung, beim Verarbeiten Ihrer Frage ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
+    "disclaimer": "KI kann zu Immobilien, Nachrichten und Systeminformationen antworten",
+    "minimize": "Minimieren",
+    "maximize": "Maximieren",
+    "close": "Schließen"
   }
 }

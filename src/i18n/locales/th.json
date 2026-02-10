@@ -1000,5 +1000,20 @@
     },
     "comingSoon": "Feature under development",
     "backToOverview": "Back to Overview"
+  },
+  "aiChat": {
+    "title": "AI รองรับ Era Estate",
+    "titleShort": "AI รองรับ",
+    "active": "ออนไลน์",
+    "buttonTitle": "แชทกับ AI รองรับ",
+    "welcomeMessage": "สวัสดี! ฉันคือผู้ช่วย AI ของ Era Estate ฉันสามารถช่วยคุณค้นหาข้อมูลเกี่ยวกับอสังหาริมทรัพย์ ข่าว โครงการ และอื่นๆ อีกมากมาย มีอะไรให้ช่วยไหมคะ?",
+    "inputPlaceholder": "ใส่คำถามของคุณ...",
+    "thinking": "กำลังคิด...",
+    "assistantName": "ผู้ช่วย AI",
+    "errorMessage": "ขออภัย เกิดข้อผิดพลาดในการประมวลผลคำถามของคุณ กรุณาลองใหม่อีกครั้งในภายหลัง",
+    "disclaimer": "AI สามารถตอบคำถามเกี่ยวกับอสังหาริมทรัพย์ ข่าว และข้อมูลในระบบ",
+    "minimize": "ย่อ",
+    "maximize": "ขยาย",
+    "close": "ปิด"
   }
 }

@@ -1000,5 +1000,20 @@
     },
     "comingSoon": "Feature under development",
     "backToOverview": "Back to Overview"
+  },
+  "aiChat": {
+    "title": "ИИ поддержка Era Estate",
+    "titleShort": "ИИ поддержка",
+    "active": "В сети",
+    "buttonTitle": "Чат с ИИ поддержкой",
+    "welcomeMessage": "Здравствуйте! Я ИИ-ассистент Era Estate. Я могу помочь вам найти информацию о недвижимости, новостях, проектах и многом другом. Чем я могу вам помочь?",
+    "inputPlaceholder": "Введите ваш вопрос...",
+    "thinking": "Думаю...",
+    "assistantName": "ИИ-ассистент",
+    "errorMessage": "Извините, произошла ошибка при обработке вашего вопроса. Пожалуйста, попробуйте позже.",
+    "disclaimer": "ИИ может отвечать о недвижимости, новостях и информации в системе",
+    "minimize": "Свернуть",
+    "maximize": "Развернуть",
+    "close": "Закрыть"
   }
 }

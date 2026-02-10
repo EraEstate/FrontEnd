@@ -21,6 +21,11 @@ export interface PropertyTransaction {
   completedAt?: string;
   createdAt: string;
   updatedAt?: string;
+  // Blockchain fields
+  blockchainContractAddress?: string;
+  blockchainNetwork?: string;
+  blockchainTxHash?: string;
+  blockchainStatus?: 'NOT_CREATED' | 'PENDING_ONCHAIN' | 'ONCHAIN_CONFIRMED' | 'ONCHAIN_FAILED' | 'ONCHAIN_CANCELLED';
   property?: {
     id: string;
     title: string;
@@ -44,6 +49,13 @@ export interface CreateTransactionRequest {
   paymentMethod: 'BANK_TRANSFER' | 'VNPAY' | 'MOMO' | 'ZALOPAY' | 'CASH';
   buyerBankAccountId?: string;
   sellerBankAccountId?: string;
+}
+
+export interface UpdateBlockchainTxRequest {
+  txHash: string;
+  contractAddress?: string;
+  network?: string;
+  status?: PropertyTransaction['blockchainStatus'];
 }
 
 export const propertyTransactionAPI = {
@@ -96,6 +108,12 @@ export const propertyTransactionAPI = {
     const response = await api.put<PropertyTransaction>(`/property-transactions/${id}/cancel`, null, {
       params: reason ? { reason } : {}
     });
+    return response.data;
+  },
+
+  // FE (MetaMask) gửi transaction hash + info blockchain cho giao dịch
+  updateBlockchainTx: async (id: string, data: UpdateBlockchainTxRequest) => {
+    const response = await api.post<PropertyTransaction>(`/property-transactions/${id}/blockchain-tx`, data);
     return response.data;
   },
 };

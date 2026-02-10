@@ -1000,5 +1000,20 @@
     },
     "comingSoon": "Feature under development",
     "backToOverview": "Back to Overview"
+  },
+  "aiChat": {
+    "title": "AI ជំនួយ Era Estate",
+    "titleShort": "AI ជំនួយ",
+    "active": "អនឡាញ",
+    "buttonTitle": "ជជែកជាមួយ AI ជំនួយ",
+    "welcomeMessage": "សួស្តី! ខ្ញុំជា AI assistant របស់ Era Estate។ ខ្ញុំអាចជួយអ្នកស្វែងរកព័ត៌មានអំពីអចលនទ្រព្យ ព័ត៌មាន គម្រោង និងច្រើនទៀត។ តើខ្ញុំអាចជួយអ្នកបានយ៉ាងដូចម្តេច?",
+    "inputPlaceholder": "បញ្ចូលសំណួររបស់អ្នក...",
+    "thinking": "កំពុងគិត...",
+    "assistantName": "AI Assistant",
+    "errorMessage": "សុំទោស មានកំហុសកើតឡើងនៅពេលដោះស្រាយសំណួររបស់អ្នក។ សូមព្យាយាមម្តងទៀតនៅពេលក្រោយ។",
+    "disclaimer": "AI អាចឆ្លើយតបអំពីអចលនទ្រព្យ ព័ត៌មាន និងព័ត៌មានក្នុងប្រព័ន្ធ",
+    "minimize": "បង្រួម",
+    "maximize": "ពង្រីក",
+    "close": "បិទ"
   }
 }

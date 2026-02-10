@@ -1000,5 +1000,20 @@
     },
     "comingSoon": "Feature under development",
     "backToOverview": "Back to Overview"
+  },
+  "aiChat": {
+    "title": "Era Estate AI助手",
+    "titleShort": "AI助手",
+    "active": "在线",
+    "buttonTitle": "与AI助手聊天",
+    "welcomeMessage": "您好！我是Era Estate的AI助手。我可以帮助您查找房地产、新闻、项目等信息。您需要什么帮助？",
+    "inputPlaceholder": "输入您的问题...",
+    "thinking": "正在思考...",
+    "assistantName": "AI助手",
+    "errorMessage": "抱歉，处理您的问题时发生错误。请稍后再试。",
+    "disclaimer": "AI可以回答关于房地产、新闻和系统信息的问题",
+    "minimize": "最小化",
+    "maximize": "最大化",
+    "close": "关闭"
   }
 }

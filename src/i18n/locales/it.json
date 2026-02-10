@@ -1000,5 +1000,20 @@
     },
     "comingSoon": "Feature under development",
     "backToOverview": "Back to Overview"
+  },
+  "aiChat": {
+    "title": "Supporto IA Era Estate",
+    "titleShort": "Supporto IA",
+    "active": "Online",
+    "buttonTitle": "Chatta con supporto IA",
+    "welcomeMessage": "Ciao! Sono l'assistente IA di Era Estate. Posso aiutarti a trovare informazioni su immobili, notizie, progetti e molto altro. Come posso aiutarti?",
+    "inputPlaceholder": "Inserisci la tua domanda...",
+    "thinking": "Pensando...",
+    "assistantName": "Assistente IA",
+    "errorMessage": "Scusa, si è verificato un errore durante l'elaborazione della tua domanda. Riprova più tardi.",
+    "disclaimer": "L'IA può rispondere su immobili, notizie e informazioni del sistema",
+    "minimize": "Riduci",
+    "maximize": "Ingrandisci",
+    "close": "Chiudi"
   }
 }

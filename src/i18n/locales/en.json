@@ -1069,5 +1069,20 @@
     "inactive": "Inactive",
     "showing": "Showing",
     "of": "of"
+  },
+  "aiChat": {
+    "title": "AI Support Era Estate",
+    "titleShort": "AI Support",
+    "active": "Active",
+    "buttonTitle": "Chat with AI support",
+    "welcomeMessage": "Hello! I am Era Estate's AI assistant. I can help you find information about real estate, news, projects, and much more. How can I help you?",
+    "inputPlaceholder": "Enter your question...",
+    "thinking": "Thinking...",
+    "assistantName": "AI Assistant",
+    "errorMessage": "Sorry, an error occurred while processing your question. Please try again later.",
+    "disclaimer": "AI can answer about real estate, news, and information on the system",
+    "minimize": "Minimize",
+    "maximize": "Maximize",
+    "close": "Close"
   }
 }

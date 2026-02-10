@@ -1000,5 +1000,20 @@
     },
     "comingSoon": "Feature under development",
     "backToOverview": "Back to Overview"
+  },
+  "aiChat": {
+    "title": "AI सहायता Era Estate",
+    "titleShort": "AI सहायता",
+    "active": "ऑनलाइन",
+    "buttonTitle": "AI सहायता के साथ चैट करें",
+    "welcomeMessage": "नमस्ते! मैं Era Estate का AI सहायक हूं। मैं आपको रियल एस्टेट, समाचार, परियोजनाओं और बहुत कुछ के बारे में जानकारी खोजने में मदद कर सकता हूं। मैं आपकी कैसे मदद कर सकता हूं?",
+    "inputPlaceholder": "अपना प्रश्न दर्ज करें...",
+    "thinking": "सोच रहा हूं...",
+    "assistantName": "AI सहायक",
+    "errorMessage": "क्षमा करें, आपके प्रश्न को संसाधित करते समय एक त्रुटि हुई। कृपया बाद में पुनः प्रयास करें।",
+    "disclaimer": "AI रियल एस्टेट, समाचार और सिस्टम जानकारी के बारे में उत्तर दे सकता है",
+    "minimize": "छोटा करें",
+    "maximize": "बड़ा करें",
+    "close": "बंद करें"
   }
 }

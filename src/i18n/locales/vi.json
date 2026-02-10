@@ -1069,5 +1069,20 @@
     "inactive": "Không hoạt động",
     "showing": "Hiển thị",
     "of": "trong tổng"
+  },
+  "aiChat": {
+    "title": "AI Hỗ trợ Era Estate",
+    "titleShort": "AI Hỗ trợ",
+    "active": "Đang hoạt động",
+    "buttonTitle": "Chat với AI hỗ trợ",
+    "welcomeMessage": "Xin chào! Tôi là trợ lý AI của Era Estate. Tôi có thể giúp bạn tìm kiếm thông tin về bất động sản, tin tức, dự án và nhiều hơn nữa. Bạn cần tôi hỗ trợ gì?",
+    "inputPlaceholder": "Nhập câu hỏi của bạn...",
+    "thinking": "Đang suy nghĩ...",
+    "assistantName": "AI Assistant",
+    "errorMessage": "Xin lỗi, có lỗi xảy ra khi xử lý câu hỏi của bạn. Vui lòng thử lại sau.",
+    "disclaimer": "AI có thể trả lời về bất động sản, tin tức và thông tin trên hệ thống",
+    "minimize": "Thu nhỏ",
+    "maximize": "Mở rộng",
+    "close": "Đóng"
   }
 }
