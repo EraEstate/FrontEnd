@@ -66,7 +66,7 @@ const ProjectsPage: React.FC = () => {
       address: "Đường Nguyễn Xiển, Phường Long Thạnh Mỹ, Quận 9, TP.HCM",
       area: 271.0,
       projectType: t('projects.newUrbanArea'),
-      projectStatus: "Đang mở bán",
+      projectStatus: t('projects.statusOpening'),
       minPrice: 2500000000,
       maxPrice: 4200000000,
       currency: "VND",
@@ -97,7 +97,7 @@ const ProjectsPage: React.FC = () => {
       address: "Đường Nguyễn Xiển, Phường Long Thạnh Mỹ, Quận 9, TP.HCM",
       area: 2.2,
       projectType: t('postProperty.apartment'),
-      projectStatus: "Đã hoàn thành",
+      projectStatus: t('projects.statusCompleted'),
       minPrice: 1800000000,
       maxPrice: 3500000000,
       currency: "VND",
@@ -128,7 +128,7 @@ const ProjectsPage: React.FC = () => {
       address: "Đường Nguyễn Tất Thành, Quận 4, TP.HCM",
       area: 5.1,
       projectType: t('projects.complex'),
-      projectStatus: "Đang phát triển",
+      projectStatus: t('projects.statusDeveloping'),
       minPrice: 3200000000,
       maxPrice: 6800000000,
       currency: "VND",
@@ -152,12 +152,10 @@ const ProjectsPage: React.FC = () => {
   ];
 
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Đang mở bán': return 'text-green-600 bg-green-100';
-      case 'Đang phát triển': return 'text-yellow-600 bg-yellow-100';
-      case 'Đã hoàn thành': return 'text-blue-600 bg-blue-100';
-      default: return 'text-gray-600 bg-gray-100';
-    }
+    if (status === t('projects.statusOpening')) return 'text-green-600 bg-green-100';
+    if (status === t('projects.statusDeveloping')) return 'text-yellow-600 bg-yellow-100';
+    if (status === t('projects.statusCompleted')) return 'text-blue-600 bg-blue-100';
+    return 'text-gray-600 bg-gray-100';
   };
 
   const formatPrice = (price: number) => {
@@ -191,8 +189,8 @@ const ProjectsPage: React.FC = () => {
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Dự án bất động sản</h1>
-          <p className="text-gray-600">Khám phá các dự án bất động sản nổi bật tại Việt Nam</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('projects.pageTitle')}</h1>
+          <p className="text-gray-600">{t('projects.pageSubtitle')}</p>
         </div>
       </div>
 
@@ -203,7 +201,7 @@ const ProjectsPage: React.FC = () => {
             <div className="flex-1">
               <input
                 type="text"
-                placeholder="Tìm kiếm dự án..."
+                placeholder={t('projects.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -215,25 +213,25 @@ const ProjectsPage: React.FC = () => {
                 onChange={(e) => setSelectedType(e.target.value)}
                 className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
-                <option value="">Tất cả loại</option>
-                <option value={t('projects.newUrbanArea')}>Khu đô thị mới</option>
-                <option value={t('postProperty.apartment')}>Căn hộ chung cư</option>
-                <option value={t('projects.townhouse')}>Biệt thự liền kề</option>
-                <option value="Nhà ở xã hội">Nhà ở xã hội</option>
-                <option value={t('projects.complex')}>Khu phức hợp</option>
+                <option value="">{t('projects.allTypes')}</option>
+                <option value={t('projects.newUrbanArea')}>{t('projects.newUrbanArea')}</option>
+                <option value={t('postProperty.apartment')}>{t('projects.apartment')}</option>
+                <option value={t('projects.townhouse')}>{t('projects.townhouse')}</option>
+                <option value={t('projects.socialHousing')}>{t('projects.socialHousing')}</option>
+                <option value={t('projects.complex')}>{t('projects.complex')}</option>
               </select>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Khu vực</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t('projects.area')}</label>
               <select
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={filters.location}
                 onChange={(e) => setFilters({...filters, location: e.target.value})}
               >
-                <option value="">Chọn khu vực</option>
+                <option value="">{t('projects.selectArea')}</option>
                 <option value="hcm">TP. Hồ Chí Minh</option>
                 <option value="hn">Hà Nội</option>
                 <option value="dn">Đà Nẵng</option>
@@ -241,44 +239,44 @@ const ProjectsPage: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Trạng thái</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t('projects.status')}</label>
               <select
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={filters.status}
                 onChange={(e) => setFilters({...filters, status: e.target.value})}
               >
-                <option value="">Chọn trạng thái</option>
-                <option value="opening">Đang mở bán</option>
-                <option value="coming">Sắp mở bán</option>
-                <option value="completed">Đã bàn giao</option>
+                <option value="">{t('projects.selectStatus')}</option>
+                <option value="opening">{t('projects.statusOpening')}</option>
+                <option value="coming">{t('projects.statusComing')}</option>
+                <option value="completed">{t('projects.statusCompleted')}</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Loại hình</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t('projects.type')}</label>
               <select
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={filters.type}
                 onChange={(e) => setFilters({...filters, type: e.target.value})}
               >
-                <option value="">Chọn loại hình</option>
-                <option value="apartment">Căn hộ chung cư</option>
-                <option value="villa">Biệt thự liền kề</option>
-                <option value="township">Khu đô thị</option>
-                <option value="complex">Khu phức hợp</option>
+                <option value="">{t('projects.selectType')}</option>
+                <option value="apartment">{t('projects.apartment')}</option>
+                <option value="villa">{t('projects.townhouse')}</option>
+                <option value="township">{t('projects.newUrbanArea')}</option>
+                <option value="complex">{t('projects.complex')}</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Mức giá</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t('projects.priceRange')}</label>
               <select
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={filters.priceRange}
                 onChange={(e) => setFilters({...filters, priceRange: e.target.value})}
               >
-                <option value="">Chọn mức giá</option>
-                <option value="under-2">Dưới 2 tỷ</option>
-                <option value="2-5">2 - 5 tỷ</option>
-                <option value="5-10">5 - 10 tỷ</option>
-                <option value="over-10">Trên 10 tỷ</option>
+                <option value="">{t('projects.selectPriceRange')}</option>
+                <option value="under-2">{t('projects.priceUnder2')}</option>
+                <option value="2-5">{t('projects.price2to5')}</option>
+                <option value="5-10">{t('projects.price5to10')}</option>
+                <option value="over-10">{t('projects.priceOver10')}</option>
               </select>
             </div>
           </div>
@@ -288,14 +286,14 @@ const ProjectsPage: React.FC = () => {
         <div className="bg-white rounded-lg shadow-md">
           <div className="p-6 border-b">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold">Có {filteredProjects.length} dự án bất động sản</h2>
+              <h2 className="text-xl font-semibold">{t('projects.resultsCount', { count: filteredProjects.length })}</h2>
               <div className="flex items-center space-x-4">
                 <select className="px-3 py-2 border border-gray-300 rounded-md text-sm">
-                  <option>Sắp xếp theo</option>
-                  <option>Tên A-Z</option>
-                  <option>Giá tăng dần</option>
-                  <option>Giá giảm dần</option>
-                  <option>Mới nhất</option>
+                  <option>{t('projects.sortBy')}</option>
+                  <option>{t('projects.sortNameAZ')}</option>
+                  <option>{t('projects.sortPriceAsc')}</option>
+                  <option>{t('projects.sortPriceDesc')}</option>
+                  <option>{t('projects.sortNewest')}</option>
                 </select>
               </div>
             </div>
@@ -349,7 +347,7 @@ const ProjectsPage: React.FC = () => {
                           </div>
 
                           <p className="text-gray-600 text-sm mb-2">
-                            Chủ đầu tư: <span className="font-medium">{project.developer}</span>
+                            {t('projects.developer')}: <span className="font-medium">{project.developer}</span>
                           </p>
 
                           <div className="flex items-center text-gray-600 text-sm mb-2">
@@ -364,9 +362,9 @@ const ProjectsPage: React.FC = () => {
                           </p>
 
                           <div className="flex justify-between items-center text-sm text-gray-600 mb-3">
-                            <span>Quy mô: {project.area} ha</span>
+                            <span>{t('projects.scale')}: {project.area} ha</span>
                             {project.properties && (
-                              <span>{project.properties.length} căn</span>
+                              <span>{project.properties.length} {t('projects.units')}</span>
                             )}
                           </div>
 
@@ -395,15 +393,15 @@ const ProjectsPage: React.FC = () => {
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
             <div className="px-6 py-4 border-b border-red-100">
               <h3 className="text-lg font-semibold text-red-600">
-                Vui lòng đăng nhập
+                {t('projects.loginRequired')}
               </h3>
             </div>
             <div className="px-6 py-4">
               <p className="text-gray-700 mb-2">
-                Bạn cần đăng nhập để xem chi tiết dự án.
+                {t('projects.loginRequiredMessage')}
               </p>
               <p className="text-sm text-gray-500">
-                Chọn <span className="font-semibold text-red-600">"Đi tới đăng nhập"</span> để tiếp tục, hoặc <span className="font-semibold text-red-600">"Hủy"</span> để quay lại danh sách dự án.
+                {t('projects.loginRequiredDescription')}
               </p>
             </div>
             <div className="px-6 py-4 border-t flex justify-end gap-3">
@@ -415,7 +413,7 @@ const ProjectsPage: React.FC = () => {
                   setPendingProjectId(null);
                 }}
               >
-                Hủy
+                {t('common.cancel')}
               </button>
               <button
                 type="button"
@@ -430,7 +428,7 @@ const ProjectsPage: React.FC = () => {
                   setPendingProjectId(null);
                 }}
               >
-                Đi tới đăng nhập
+                {t('projects.goToLogin')}
               </button>
             </div>
           </div>

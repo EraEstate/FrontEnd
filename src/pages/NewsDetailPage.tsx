@@ -51,6 +51,14 @@ const NewsDetailPage = () => {
     );
   }
 
+  // Chuẩn hoá tên tác giả để hỗ trợ cả dạng string và object (vd: { fullName, email })
+  const authorName =
+    typeof (article as any).author === 'string'
+      ? (article as any).author
+      : (article as any).author?.fullName ||
+        (article as any).author?.name ||
+        '';
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Breadcrumb */}
@@ -118,15 +126,17 @@ const NewsDetailPage = () => {
               <div className="mt-8 pt-6 border-t border-gray-200">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    {article.author && (
+                    {authorName && (
                       <div className="flex items-center space-x-2">
                         <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
                           <span className="text-sm font-medium text-gray-600">
-                            {article.author.charAt(0).toUpperCase()}
+                            {authorName.charAt(0).toUpperCase()}
                           </span>
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-gray-800">{t('common.author')}: {article.author}</p>
+                          <p className="text-sm font-medium text-gray-800">
+                            {t('common.author')}: {authorName}
+                          </p>
                           <p className="text-xs text-gray-600">
                             {new Date(article.createdAt).toLocaleDateString('vi-VN', {
                               year: 'numeric',

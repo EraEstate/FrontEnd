@@ -19,11 +19,13 @@ import { toast } from 'react-toastify';
 import { connectMetaMask, sendCreateDealTx } from '../utils/metamask';
 import { REALESTATE_CONTRACT_ADDRESS, BLOCKCHAIN_EXPLORER_URL, BLOCKCHAIN_NETWORK_NAME } from '../config/blockchain';
 import RealEstateEscrowAbi from '../abi/RealEstateEscrow.json';
+import { useTranslation } from 'react-i18next';
 
 const TransactionContractPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuthStore();
+  const { t } = useTranslation();
 
   const [transaction, setTransaction] = useState<PropertyTransaction | null>(null);
   const [property, setProperty] = useState<any | null>(null);
@@ -47,7 +49,7 @@ const TransactionContractPage: React.FC = () => {
         }
       } catch (error: any) {
         console.error('Failed to load transaction:', error);
-        toast.error('Không tìm thấy thông tin hợp đồng giao dịch.');
+        toast.error(t('transaction.errors.notFound'));
         navigate('/profile');
       } finally {
         setLoading(false);
@@ -59,8 +61,8 @@ const TransactionContractPage: React.FC = () => {
 
   const formatPrice = (price: number | undefined) => {
     if (!price && price !== 0) return '-';
-    if (price >= 1_000_000_000) return `${(price / 1_000_000_000).toFixed(1)} tỷ`;
-    if (price >= 1_000_000) return `${(price / 1_000_000).toFixed(0)} triệu`;
+    if (price >= 1_000_000_000) return `${(price / 1_000_000_000).toFixed(1)} ${t('transaction.contract.priceUnitBillion')}`;
+    if (price >= 1_000_000) return `${(price / 1_000_000).toFixed(0)} ${t('transaction.contract.priceUnitMillion')}`;
     return price.toLocaleString('vi-VN');
   };
 
@@ -78,12 +80,12 @@ const TransactionContractPage: React.FC = () => {
     if (!transaction || !user) return;
 
     if (!REALESTATE_CONTRACT_ADDRESS || REALESTATE_CONTRACT_ADDRESS === '0x0000000000000000000000000000000000000000') {
-      toast.error('Chưa cấu hình địa chỉ smart contract bất động sản.');
+      toast.error(t('transaction.errors.noContract'));
       return;
     }
 
     if (transaction.blockchainTxHash) {
-      toast.info('Hợp đồng blockchain đã được tạo cho giao dịch này.');
+      toast.info(t('transaction.errors.alreadyCreated'));
       return;
     }
 
@@ -96,7 +98,7 @@ const TransactionContractPage: React.FC = () => {
 
       const total = transaction.totalAmount;
       if (!total || Number.isNaN(total)) {
-        toast.error('Không tìm thấy giá trị giao dịch để tạo hợp đồng blockchain.');
+        toast.error(t('transaction.errors.noAmount'));
         return;
       }
 
@@ -119,14 +121,57 @@ const TransactionContractPage: React.FC = () => {
       });
 
       setTransaction(updated);
-      toast.success('Đã ký hợp đồng blockchain thành công.');
+      toast.success(t('transaction.success.signed'));
     } catch (error: any) {
       console.error('Failed to sign on-chain from contract page:', error);
-      const msg =
-        error?.message ||
-        error?.response?.data?.error ||
-        'Không thể ký hợp đồng blockchain. Vui lòng thử lại.';
-      toast.error(msg);
+      
+      // Detect specific error types
+      let errorMessage = t('transaction.errors.signFailed');
+      
+      const errorMsg = error?.message || '';
+      
+      // RPC errors
+      if (error?.code === -32002 || 
+          errorMsg.includes('RPC endpoint') || 
+          errorMsg.includes('too many errors') ||
+          errorMsg.includes('RPC_ENDPOINT_ERROR')) {
+        errorMessage = `${t('transaction.errors.rpcError')}\n${t('transaction.errors.rpcErrorDetails')}`;
+      }
+      // User rejected
+      else if (error?.code === 4001 || 
+               error?.code === 'ACTION_REJECTED' || 
+               errorMsg.includes('USER_REJECTED') ||
+               errorMsg.includes('rejected') || 
+               errorMsg.includes('denied') ||
+               errorMsg.includes('từ chối')) {
+        errorMessage = t('transaction.errors.userRejected');
+      }
+      // Insufficient funds
+      else if (error?.code === -32000 || 
+               errorMsg.includes('INSUFFICIENT_FUNDS') ||
+               errorMsg.includes('insufficient funds') || 
+               errorMsg.includes('insufficient balance') ||
+               errorMsg.includes('Số dư không đủ')) {
+        errorMessage = t('transaction.errors.insufficientFunds');
+      }
+      // Network errors
+      else if (error?.code === 'NETWORK_ERROR' || 
+               errorMsg.includes('network') || 
+               errorMsg.includes('connection') ||
+               errorMsg.includes('ECONNREFUSED')) {
+        errorMessage = t('transaction.errors.networkError');
+      }
+      // Other errors - try to extract meaningful message
+      else if (error?.message) {
+        // Remove error prefixes like "RPC_ENDPOINT_ERROR:" for cleaner display
+        errorMessage = error.message.replace(/^(RPC_ENDPOINT_ERROR|USER_REJECTED|INSUFFICIENT_FUNDS):\s*/i, '');
+      } else if (error?.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      }
+      
+      toast.error(errorMessage, {
+        autoClose: errorMessage.includes('\n') ? 10000 : 5000,
+      });
     } finally {
       setSigning(false);
     }
@@ -140,8 +185,8 @@ const TransactionContractPage: React.FC = () => {
     );
   }
 
-  const isBuyer = user && transaction.buyerId === user.id;
-  const isSeller = user && transaction.sellerId === user.id;
+  const isBuyer = user && String(transaction.buyerId) === String(user.id);
+  const isSeller = user && String(transaction.sellerId) === String(user.id);
   const isParticipant = isBuyer || isSeller;
 
   const isRent = property?.transactionType === 'RENT';
@@ -151,7 +196,7 @@ const TransactionContractPage: React.FC = () => {
     transaction.seller?.fullName ||
     property?.owner?.fullName ||
     property?.user?.fullName ||
-    'Không rõ';
+    t('transaction.review.unknown');
   const sellerEmail =
     transaction.seller?.email ||
     property?.owner?.email ||
@@ -161,20 +206,20 @@ const TransactionContractPage: React.FC = () => {
   const buyerName =
     transaction.buyer?.fullName ||
     (isBuyer ? user?.fullName || user?.email : undefined) ||
-    'Không rõ';
+    t('transaction.review.unknown');
   const buyerEmail =
     transaction.buyer?.email ||
     (isBuyer ? user?.email : undefined) ||
     undefined;
 
   const statusMap: Record<PropertyTransaction['status'], { label: string; color: string; icon: JSX.Element }> = {
-    PENDING: { label: 'Chờ thanh toán', color: 'bg-yellow-100 text-yellow-800', icon: <Clock className="w-4 h-4" /> },
-    PROCESSING: { label: 'Đang xử lý', color: 'bg-blue-100 text-blue-800', icon: <Loader2 className="w-4 h-4 animate-spin" /> },
-    PAID: { label: 'Đã thanh toán', color: 'bg-purple-100 text-purple-800', icon: <DollarSign className="w-4 h-4" /> },
-    COMPLETED: { label: 'Hoàn thành', color: 'bg-green-100 text-green-800', icon: <CheckCircle className="w-4 h-4" /> },
-    FAILED: { label: 'Thất bại', color: 'bg-red-100 text-red-800', icon: <XCircle className="w-4 h-4" /> },
-    CANCELLED: { label: 'Đã huỷ', color: 'bg-gray-100 text-gray-700', icon: <XCircle className="w-4 h-4" /> },
-    REFUNDED: { label: 'Đã hoàn tiền', color: 'bg-orange-100 text-orange-800', icon: <DollarSign className="w-4 h-4" /> },
+    PENDING: { label: t('transaction.status.pending'), color: 'bg-yellow-100 text-yellow-800', icon: <Clock className="w-4 h-4" /> },
+    PROCESSING: { label: t('transaction.status.processing'), color: 'bg-blue-100 text-blue-800', icon: <Loader2 className="w-4 h-4 animate-spin" /> },
+    PAID: { label: t('transaction.status.paid'), color: 'bg-purple-100 text-purple-800', icon: <DollarSign className="w-4 h-4" /> },
+    COMPLETED: { label: t('transaction.status.completed'), color: 'bg-green-100 text-green-800', icon: <CheckCircle className="w-4 h-4" /> },
+    FAILED: { label: t('transaction.status.failed'), color: 'bg-red-100 text-red-800', icon: <XCircle className="w-4 h-4" /> },
+    CANCELLED: { label: t('transaction.status.cancelled'), color: 'bg-gray-100 text-gray-700', icon: <XCircle className="w-4 h-4" /> },
+    REFUNDED: { label: t('transaction.status.refunded'), color: 'bg-orange-100 text-orange-800', icon: <DollarSign className="w-4 h-4" /> },
   };
 
   const blockchainStatus = transaction.blockchainStatus || 'NOT_CREATED';
@@ -182,11 +227,11 @@ const TransactionContractPage: React.FC = () => {
     NonNullable<PropertyTransaction['blockchainStatus']>,
     { label: string; color: string }
   > = {
-    NOT_CREATED: { label: 'Chưa tạo', color: 'bg-gray-100 text-gray-600' },
-    PENDING_ONCHAIN: { label: 'Đang gửi lên chain', color: 'bg-yellow-100 text-yellow-800' },
-    ONCHAIN_CONFIRMED: { label: 'Đã ghi nhận on-chain', color: 'bg-emerald-100 text-emerald-800' },
-    ONCHAIN_FAILED: { label: 'Ghi nhận thất bại', color: 'bg-red-100 text-red-800' },
-    ONCHAIN_CANCELLED: { label: 'Hợp đồng on-chain đã huỷ', color: 'bg-gray-100 text-gray-700' },
+    NOT_CREATED: { label: t('transaction.blockchainStatus.notCreated'), color: 'bg-gray-100 text-gray-600' },
+    PENDING_ONCHAIN: { label: t('transaction.blockchainStatus.pending'), color: 'bg-yellow-100 text-yellow-800' },
+    ONCHAIN_CONFIRMED: { label: t('transaction.blockchainStatus.confirmed'), color: 'bg-emerald-100 text-emerald-800' },
+    ONCHAIN_FAILED: { label: t('transaction.blockchainStatus.failed'), color: 'bg-red-100 text-red-800' },
+    ONCHAIN_CANCELLED: { label: t('transaction.blockchainStatus.cancelled'), color: 'bg-gray-100 text-gray-700' },
   };
 
   const txStatus = statusMap[transaction.status];
@@ -194,6 +239,13 @@ const TransactionContractPage: React.FC = () => {
 
   const contractDate = new Date(transaction.createdAt).toLocaleDateString('vi-VN');
   const isOnChainConfirmed = blockchainStatus === 'ONCHAIN_CONFIRMED';
+  const isPaidOrCompleted = ['PAID', 'COMPLETED'].includes(transaction.status);
+  // Demo mode: cho phép ký on-chain miễn là bạn là 1 trong hai bên và giao dịch chưa bị huỷ/thất bại,
+  // chưa có txHash. Nếu muốn siết lại sau chỉ cần thêm điều kiện status (PAID/COMPLETED) ở đây.
+  const canSignOnChain =
+    isParticipant &&
+    !transaction.blockchainTxHash &&
+    !['CANCELLED', 'FAILED', 'REFUNDED'].includes(transaction.status);
 
   return (
     <div className="min-h-screen bg-gray-50 pt-20">
@@ -203,20 +255,20 @@ const TransactionContractPage: React.FC = () => {
           className="inline-flex items-center text-sm text-gray-600 hover:text-red-600 mb-4"
         >
           <ArrowLeft className="w-4 h-4 mr-1" />
-          Quay lại
+          {t('transaction.back')}
         </button>
 
         {/* Header */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">
-              {isRent ? 'Hợp đồng thuê bất động sản' : 'Hợp đồng mua bán bất động sản'}
+              {isRent ? t('transaction.rentContract') : t('transaction.saleContract')}
             </p>
             <h1 className="text-2xl font-bold text-gray-900">
-              {transaction.property?.title || 'Hợp đồng giao dịch bất động sản'}
+              {transaction.property?.title || t('transaction.title')}
             </h1>
             <p className="text-sm text-gray-500 mt-1">
-              Mã giao dịch: <span className="font-mono">{transaction.id}</span>
+              {t('transaction.transactionId')}: <span className="font-mono">{transaction.id}</span>
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -234,6 +286,15 @@ const TransactionContractPage: React.FC = () => {
                 {chainStatus.label}
               </span>
             )}
+            {isOnChainConfirmed && (
+              <button
+                type="button"
+                onClick={() => navigate('/')}
+                className="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded-md border border-gray-300 text-xs font-medium text-gray-700 hover:bg-gray-50"
+              >
+                <span>{t('transaction.backToHome')}</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -248,21 +309,21 @@ const TransactionContractPage: React.FC = () => {
                 </div>
                 <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                   <Home className="w-5 h-5 text-red-500" />
-                  Thông tin bất động sản
+                  {t('transaction.propertyInfo')}
                 </h2>
               </div>
               <div className="space-y-1 text-sm text-gray-700">
                 <p className="font-medium text-gray-900">
-                  {property?.title || transaction.property?.title || 'Chưa có tiêu đề'}
+                  {property?.title || transaction.property?.title || t('transaction.contract.noTitle')}
                 </p>
                 <p className="text-gray-600">
-                  Giá giao dịch:{' '}
+                  {t('transaction.totalAmount')}:{' '}
                   <span className="font-semibold text-red-600">
                     {formatPrice(transaction.totalAmount)} VND
-                    {isRent && <span className="text-gray-500"> / tháng</span>}
+                    {isRent && <span className="text-gray-500"> / {t('common.month', 'tháng')}</span>}
                   </span>
                 </p>
-                {property?.address && <p className="text-gray-600">Địa chỉ: {property.address}</p>}
+                {property?.address && <p className="text-gray-600">{t('common.address', 'Địa chỉ')}: {property.address}</p>}
               </div>
             </div>
 
@@ -274,29 +335,29 @@ const TransactionContractPage: React.FC = () => {
                 </div>
                 <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                   <User className="w-5 h-5 text-red-500" />
-                  Các bên tham gia
+                  {t('transaction.parties')}
                 </h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div className="bg-gray-50 rounded-lg p-4">
                   <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">
-                    Bên A - Người bán / cho thuê
+                    {t('transaction.seller')}
                   </p>
                   <p className="font-semibold text-gray-900">
                     {sellerName}
-                    {isSeller && <span className="ml-2 text-xs text-green-600">(Bạn)</span>}
+                    {isSeller && <span className="ml-2 text-xs text-green-600">{t('transaction.you')}</span>}
                   </p>
-                  {sellerEmail && <p className="text-gray-600 mt-1">Email: {sellerEmail}</p>}
+                  {sellerEmail && <p className="text-gray-600 mt-1">{t('common.email')}: {sellerEmail}</p>}
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4">
                   <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">
-                    Bên B - Người mua / thuê
+                    {t('transaction.buyer')}
                   </p>
                   <p className="font-semibold text-gray-900">
                     {buyerName}
-                    {isBuyer && <span className="ml-2 text-xs text-green-600">(Bạn)</span>}
+                    {isBuyer && <span className="ml-2 text-xs text-green-600">{t('transaction.you')}</span>}
                   </p>
-                  {buyerEmail && <p className="text-gray-600 mt-1">Email: {buyerEmail}</p>}
+                  {buyerEmail && <p className="text-gray-600 mt-1">{t('common.email')}: {buyerEmail}</p>}
                 </div>
               </div>
             </div>
@@ -309,20 +370,20 @@ const TransactionContractPage: React.FC = () => {
                 </div>
                 <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                   <DollarSign className="w-5 h-5 text-red-500" />
-                  Điều khoản thanh toán
+                  {t('transaction.paymentTerms')}
                 </h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div className="space-y-1">
                   <p className="text-gray-600">
-                    Tổng giá trị giao dịch:{' '}
+                    {t('transaction.totalAmount')}:{' '}
                     <span className="font-semibold text-gray-900">
                       {formatPrice(transaction.totalAmount)} VND
                     </span>
                   </p>
                   {transaction.taxAmount > 0 && (
                     <p className="text-gray-600">
-                      Thuế dự kiến:{' '}
+                      {t('transaction.taxAmount')}:{' '}
                       <span className="font-semibold text-gray-900">
                         {formatPrice(transaction.taxAmount)} VND
                       </span>
@@ -330,7 +391,7 @@ const TransactionContractPage: React.FC = () => {
                   )}
                   {transaction.serviceFee > 0 && (
                     <p className="text-gray-600">
-                      Phí dịch vụ:{' '}
+                      {t('transaction.serviceFee')}:{' '}
                       <span className="font-semibold text-gray-900">
                         {formatPrice(transaction.serviceFee)} VND
                       </span>
@@ -338,7 +399,7 @@ const TransactionContractPage: React.FC = () => {
                   )}
                   {transaction.platformFee > 0 && (
                     <p className="text-gray-600">
-                      Phí nền tảng:{' '}
+                      {t('transaction.platformFee')}:{' '}
                       <span className="font-semibold text-gray-900">
                         {formatPrice(transaction.platformFee)} VND
                       </span>
@@ -347,68 +408,155 @@ const TransactionContractPage: React.FC = () => {
                 </div>
                 <div className="space-y-1">
                   <p className="text-gray-600">
-                    Dự kiến bên bán nhận:{' '}
+                    {t('transaction.sellerAmount')}:{' '}
                     <span className="font-semibold text-red-600">
                       {formatPrice(transaction.sellerAmount)} VND
                     </span>
                   </p>
                   <p className="text-gray-600">
-                    Phương thức thanh toán:{' '}
+                    {t('transaction.paymentMethod')}:{' '}
                     <span className="font-semibold text-gray-900">
                       {transaction.paymentMethod === 'BANK_TRANSFER'
-                        ? 'Chuyển khoản'
+                        ? t('transaction.bankTransfer')
                         : transaction.paymentMethod === 'VNPAY'
-                        ? 'VNPay'
+                        ? t('transaction.vnpay')
                         : transaction.paymentMethod === 'MOMO'
-                        ? 'MoMo'
+                        ? t('transaction.momo')
                         : transaction.paymentMethod === 'ZALOPAY'
-                        ? 'ZaloPay'
-                        : 'Tiền mặt'}
+                        ? t('transaction.zalopay')
+                        : t('transaction.cash')}
                     </span>
                   </p>
                   <p className="text-xs text-gray-500 mt-2">
-                    * Hợp đồng này chỉ mang tính chất ghi nhận giao dịch trong hệ thống và trên blockchain, không thay
-                    thế cho hợp đồng công chứng hoặc văn bản pháp lý chính thức giữa hai bên.
+                    * {t('transaction.disclaimer')}
                   </p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Right column: Blockchain & actions */}
+          {/* Right column: Quy trình & Blockchain actions */}
           <div className="space-y-4">
+            {/* Step overview: toàn bộ quy trình giao dịch + blockchain */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 text-sm text-gray-700">
+              <h2 className="text-lg font-semibold text-gray-900 mb-3">{t('transaction.processTitle')}</h2>
+              <ol className="space-y-3 text-sm">
+                <li className="flex items-start gap-3">
+                  <div className="mt-0.5 h-6 w-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xs font-semibold">
+                    1
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900">{t('transaction.step1')}</p>
+                    <p className="text-gray-600 text-xs mt-0.5">
+                      {t('transaction.step1Desc')}
+                    </p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="mt-0.5 h-6 w-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xs font-semibold">
+                    2
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900">
+                      {t('transaction.step2')}{' '}
+                      {isPaidOrCompleted ? (
+                        <span className="ml-1 inline-flex px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[11px] font-medium">
+                          {t('transaction.step2Completed')}
+                        </span>
+                      ) : (
+                        <span className="ml-1 inline-flex px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 text-[11px] font-medium">
+                          {t('transaction.step2Pending')}
+                        </span>
+                      )}
+                    </p>
+                    <p className="text-gray-600 text-xs mt-0.5">
+                      {t('transaction.step2Desc')}
+                    </p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="mt-0.5 h-6 w-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xs font-semibold">
+                    3
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900">
+                      {t('transaction.step3')}{' '}
+                      {transaction.blockchainTxHash ? (
+                        <span className="ml-1 inline-flex px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[11px] font-medium">
+                          {t('transaction.step3Sent')}
+                        </span>
+                      ) : canSignOnChain ? (
+                        <span className="ml-1 inline-flex px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[11px] font-medium">
+                          {t('transaction.step3Ready')}
+                        </span>
+                      ) : (
+                        <span className="ml-1 inline-flex px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 text-[11px] font-medium">
+                          {t('transaction.step3NotReady')}
+                        </span>
+                      )}
+                    </p>
+                    <p className="text-gray-600 text-xs mt-0.5">
+                      {t('transaction.step3Desc', { network: BLOCKCHAIN_NETWORK_NAME })}
+                    </p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="mt-0.5 h-6 w-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xs font-semibold">
+                    4
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900">
+                      {t('transaction.step4')}{' '}
+                      {isOnChainConfirmed ? (
+                        <span className="ml-1 inline-flex px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[11px] font-medium">
+                          {t('transaction.step4Ready')}
+                        </span>
+                      ) : (
+                        <span className="ml-1 inline-flex px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 text-[11px] font-medium">
+                          {t('transaction.step4Waiting')}
+                        </span>
+                      )}
+                    </p>
+                    <p className="text-gray-600 text-xs mt-0.5">
+                      {t('transaction.step4Desc')}
+                    </p>
+                  </div>
+                </li>
+              </ol>
+            </div>
+
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                   <Shield className="w-5 h-5 text-red-500" />
-                  Trạng thái blockchain
+                  {t('transaction.blockchainStatusTitle')}
                 </h2>
-                {isOnChainConfirmed && (
+              {isOnChainConfirmed && (
                   <button
                     type="button"
                     onClick={() => window.print()}
                     className="hidden lg:inline-flex items-center gap-1 px-3 py-1.5 rounded-md border border-gray-300 text-xs font-medium text-gray-700 hover:bg-gray-50"
                   >
-                    <span>In / Lưu PDF</span>
+                    <span>{t('transaction.printButton')}</span>
                   </button>
                 )}
               </div>
               <div className="space-y-2 text-sm">
                 <p className="text-gray-600">
-                  Mạng:{' '}
+                  {t('transaction.network')}:{' '}
                   <span className="font-semibold text-gray-900">
-                    {transaction.blockchainNetwork || BLOCKCHAIN_NETWORK_NAME || 'Chưa xác định'}
+                    {transaction.blockchainNetwork || BLOCKCHAIN_NETWORK_NAME || t('common.unknown')}
                   </span>
                 </p>
                 <p className="text-gray-600">
-                  Địa chỉ contract:{' '}
+                  {t('transaction.contractAddress')}:{' '}
                   <span className="font-mono text-xs break-all">
-                    {transaction.blockchainContractAddress || REALESTATE_CONTRACT_ADDRESS || 'Chưa thiết lập'}
+                    {transaction.blockchainContractAddress || REALESTATE_CONTRACT_ADDRESS || t('common.notSelected')}
                   </span>
                 </p>
                 {transaction.blockchainTxHash ? (
                   <p className="text-gray-600 flex items-center gap-1">
-                    Tx hash:{' '}
+                    {t('transaction.txHash')}:{' '}
                     <button
                       type="button"
                       onClick={() => {
@@ -417,7 +565,7 @@ const TransactionContractPage: React.FC = () => {
                           window.open(url, '_blank');
                         } else {
                           navigator.clipboard.writeText(transaction.blockchainTxHash!);
-                          toast.info('Đã copy transaction hash');
+                          toast.info(t('transaction.success.hashCopied'));
                         }
                       }}
                       className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700"
@@ -427,11 +575,11 @@ const TransactionContractPage: React.FC = () => {
                     </button>
                   </p>
                 ) : (
-                  <p className="text-gray-500 text-sm">Hợp đồng chưa được ghi nhận trên blockchain.</p>
+                  <p className="text-gray-500 text-sm">{t('transaction.notCreated')}</p>
                 )}
               </div>
 
-              {isParticipant && !transaction.blockchainTxHash && !['CANCELLED', 'FAILED', 'REFUNDED'].includes(transaction.status) && (
+              {canSignOnChain && (
                 <button
                   type="button"
                   onClick={handleSignOnChain}
@@ -441,12 +589,12 @@ const TransactionContractPage: React.FC = () => {
                   {signing ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      Đang ký hợp đồng bằng MetaMask...
+                      {t('transaction.signing')}
                     </>
                   ) : (
                     <>
                       <Shield className="w-4 h-4" />
-                      Ký hợp đồng blockchain bằng MetaMask
+                      {t('transaction.signButton')}
                     </>
                   )}
                 </button>
@@ -454,134 +602,336 @@ const TransactionContractPage: React.FC = () => {
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 text-sm text-gray-600">
-              <h3 className="font-semibold text-gray-900 mb-2">Lưu ý pháp lý</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">{t('transaction.legalNote')}</h3>
               <p>
-                Nền tảng hỗ trợ ghi nhận giao dịch trên blockchain để tăng tính minh bạch. Tuy nhiên, để hoàn tất mua
-                bán/thuê bất động sản, hai bên vẫn cần thực hiện đầy đủ thủ tục pháp lý theo quy định (công chứng, sang
-                tên, hợp đồng thuê, v.v.).
+                {t('transaction.legalNoteText')}
               </p>
             </div>
 
             {/* Printable paper-style contract preview */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 text-sm text-gray-700">
+            <div className="printable-contract bg-white rounded-xl shadow-sm border border-gray-100 p-5 text-sm text-gray-700">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-gray-900">Bản hợp đồng dạng giấy (rút gọn)</h3>
+                <h3 className="font-semibold text-gray-900">{t('transaction.paperContract')}</h3>
                 {isOnChainConfirmed && (
                   <button
                     type="button"
                     onClick={() => window.print()}
                     className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md border border-gray-300 text-xs font-medium text-gray-700 hover:bg-gray-50 lg:hidden"
                   >
-                    <span>In / Lưu PDF</span>
+                    <span>{t('transaction.printButton')}</span>
                   </button>
                 )}
               </div>
               <div className={`border border-gray-200 rounded-lg p-4 bg-white ${!isOnChainConfirmed ? 'opacity-60' : ''}`}>
                 <p className="text-center font-semibold text-gray-900 uppercase mb-1">
-                  CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM
+                  {t('transaction.contract.vietnamHeader')}
                 </p>
-                <p className="text-center text-gray-700 mb-4">Độc lập - Tự do - Hạnh phúc</p>
+                <p className="text-center text-gray-700 mb-4">{t('transaction.contract.vietnamMotto')}</p>
 
-                <p className="text-center font-bold text-gray-900 mb-4 uppercase">
-                  HỢP ĐỒNG {isRent ? 'THUÊ' : 'MUA BÁN'} BẤT ĐỘNG SẢN
+                <p className="text-center font-bold text-gray-900 mb-1 uppercase">
+                  {isRent ? t('transaction.contract.contractTitleRent') : t('transaction.contract.contractTitleSale')}
+                </p>
+                <p className="text-center text-xs text-gray-500 mb-4">
+                  ({t('transaction.contract.contractGenerated', { id: transaction.id })})
                 </p>
 
-                <p className="mb-2">Hôm nay, ngày {contractDate}, tại ERA Estate Platform, chúng tôi gồm có:</p>
+                <p className="mb-2">
+                  {t('transaction.contract.contractIntro', { date: contractDate })}
+                </p>
 
-                <p className="mb-1 font-semibold">Bên A (Bên bán/Cho thuê): {sellerName}</p>
-                {sellerEmail && <p className="mb-2 text-gray-600">Email: {sellerEmail}</p>}
+                <p className="mb-1 font-semibold">{t('transaction.contract.partyA')}: {sellerName}</p>
+                {sellerEmail && <p className="mb-1 text-gray-600 text-sm">{t('common.email')}: {sellerEmail}</p>}
+                <p className="mb-2 text-gray-600 text-xs italic">
+                  ({t('transaction.contract.partyADetail')})
+                </p>
 
-                <p className="mb-1 font-semibold">Bên B (Bên mua/Thuê): {buyerName}</p>
-                {buyerEmail && <p className="mb-4 text-gray-600">Email: {buyerEmail}</p>}
+                <p className="mb-1 font-semibold">{t('transaction.contract.partyB')}: {buyerName}</p>
+                {buyerEmail && <p className="mb-2 text-gray-600 text-sm">{t('common.email')}: {buyerEmail}</p>}
 
-                <p className="mb-2 font-semibold">Điều 1. Thông tin bất động sản</p>
+                <p className="mb-2 font-semibold">{t('transaction.contract.article1')}</p>
                 <p className="mb-1">
-                  1.1. Bất động sản giao dịch: <span className="font-medium">{property?.title || transaction.property?.title}</span>
+                  1.1. {t('transaction.contract.article1_1')}:{' '}
+                  <span className="font-medium">{property?.title || transaction.property?.title}</span>
                 </p>
-                {property?.address && (
-                  <p className="mb-1">1.2. Địa chỉ: {property.address}</p>
-                )}
-                <p className="mb-3">
-                  1.3. Giá trị giao dịch: <span className="font-semibold text-red-600">{formatPrice(transaction.totalAmount)} VND</span>
-                  {isRent && ' (giá thuê dự kiến mỗi tháng)'}
+                {property?.address && <p className="mb-1">1.2. {t('transaction.contract.article1_2')}: {property.address}</p>}
+                <p className="mb-1 text-gray-600 text-xs italic">
+                  ({t('transaction.contract.article1_3Note')})
                 </p>
-
-                <p className="mb-2 font-semibold">Điều 2. Giá trị hợp đồng và phương thức thanh toán</p>
                 <p className="mb-1">
-                  2.1. Giá trị tạm tính của hợp đồng là{' '}
+                  1.3. {t('transaction.contract.article1_3')}:{' '}
                   <span className="font-semibold text-red-600">
                     {formatPrice(transaction.totalAmount)} VND
                   </span>
-                  {isRent && ' (giá thuê dự kiến mỗi tháng)'}.{' '}
-                  Mức giá này có thể được hai bên điều chỉnh, nhưng mọi thay đổi phải được lập thành văn bản.
+                  {isRent && ` (${t('transaction.contract.article1_3RentNote')})`}
+                  .
+                </p>
+                {property?.area && <p className="mb-1">1.4. {t('transaction.contract.article1_4')}: {property.area} m²</p>}
+                <p className="mb-1">1.5. {t('transaction.contract.article1_5')}: {t('transaction.contract.article1_3Note')}</p>
+                <p className="mb-1">1.6. {t('transaction.contract.article1_6')}: {t('transaction.contract.article1_3Note')}</p>
+                <p className="mb-1">1.7. {t('transaction.contract.article1_7')}: {t('transaction.contract.article1_3Note')}</p>
+                <p className="mb-1">1.8. {t('transaction.contract.article1_8')}: {t('transaction.contract.article1_3Note')}</p>
+                <p className="mb-1">1.9. {t('transaction.contract.article1_9')}: {t('transaction.contract.article1_3Note')}</p>
+                <p className="mb-1">1.10. {t('transaction.contract.article1_10')}: {t('transaction.contract.article1_3Note')}</p>
+                <p className="mb-1">1.11. {t('transaction.contract.article1_11')}: {t('transaction.contract.article1_3Note')}</p>
+                <p className="mb-3">1.12. {t('transaction.contract.article1_12')}: {t('transaction.contract.article1_3Note')}</p>
+
+                <p className="mb-2 font-semibold">{t('transaction.contract.article2')}</p>
+                <p className="mb-1">
+                  2.1. {t('transaction.contract.article2_1', { amount: formatPrice(transaction.totalAmount) })}
                 </p>
                 <p className="mb-1">
-                  2.2. Bên B thanh toán cho Bên A theo phương thức:{' '}
+                  2.2. {t('transaction.contract.article2_2')}:{' '}
                   <span className="font-semibold">
                     {transaction.paymentMethod === 'BANK_TRANSFER'
-                      ? 'Chuyển khoản ngân hàng'
+                      ? t('transaction.bankTransfer')
                       : transaction.paymentMethod === 'VNPAY'
-                      ? 'Thanh toán VNPay'
+                      ? t('transaction.vnpay')
                       : transaction.paymentMethod === 'MOMO'
-                      ? 'Thanh toán ví MoMo'
+                      ? t('transaction.momo')
                       : transaction.paymentMethod === 'ZALOPAY'
-                      ? 'Thanh toán ví ZaloPay'
-                      : 'Tiền mặt'}
+                      ? t('transaction.zalopay')
+                      : t('transaction.cash')}
                   </span>
                   .
                 </p>
-                <p className="mb-3">
-                  2.3. Các đợt thanh toán chi tiết, thời điểm bàn giao, nghĩa vụ thuế và phí khác sẽ do hai bên thống
-                  nhất và thể hiện trong phụ lục hợp đồng/biên bản riêng hoặc hợp đồng công chứng.
-                </p>
-
-                <p className="mb-2 font-semibold">Điều 3. Quyền và nghĩa vụ của các bên</p>
                 <p className="mb-1">
-                  3.1. Bên A cam kết thông tin về bất động sản là trung thực, hợp pháp, đủ điều kiện giao dịch theo quy
-                  định pháp luật; phối hợp cung cấp hồ sơ pháp lý, thực hiện thủ tục chuyển nhượng/cho thuê theo quy định.
+                  2.3. {t('transaction.contract.article2_3', { amount: formatPrice(transaction.sellerAmount) })}
                 </p>
                 <p className="mb-1">
-                  3.2. Bên B cam kết đã xem xét kỹ hiện trạng bất động sản, đồng ý mua/thuê theo các thông tin đã được
-                  cung cấp trên nền tảng ERA Estate; thanh toán đúng tiến độ, đủ số tiền theo thoả thuận.
+                  2.4. {t('transaction.contract.article2_4')}
                 </p>
-                <p className="mb-3">
-                  3.3. Hai bên cam kết bảo mật các thông tin giao dịch, trừ trường hợp phải cung cấp theo yêu cầu của cơ
-                  quan nhà nước có thẩm quyền.
-                </p>
+                <p className="mb-1">2.5. {t('transaction.contract.article2_5')}: {t('transaction.contract.article2_4')}</p>
+                <p className="mb-1">2.6. {t('transaction.contract.article2_6')}: {t('transaction.contract.article2_4')}</p>
+                <p className="mb-1">2.7. {t('transaction.contract.article2_7')}</p>
+                <p className="mb-1">2.8. {t('transaction.contract.article2_8')}</p>
+                <p className="mb-1">2.9. {t('transaction.contract.article2_9')}</p>
+                <p className="mb-1">2.10. {t('transaction.contract.article2_10')}</p>
+                <p className="mb-1">2.11. {t('transaction.contract.article2_11')}</p>
+                <p className="mb-3">2.12. {t('transaction.contract.article2_12')}</p>
 
-                <p className="mb-2 font-semibold">Điều 4. Bàn giao bất động sản và xử lý tranh chấp</p>
+                <p className="mb-2 font-semibold">{t('transaction.contract.article3')}</p>
                 <p className="mb-1">
-                  4.1. Thời điểm, địa điểm bàn giao bất động sản, hiện trạng bàn giao và các trang thiết bị đi kèm sẽ
-                  được ghi nhận trong biên bản bàn giao riêng giữa hai bên.
+                  3.1. {t('transaction.contract.article3_1')}
                 </p>
-                <p className="mb-3">
-                  4.2. Mọi tranh chấp phát sinh từ hợp đồng này trước hết được giải quyết bằng thương lượng. Trường hợp
-                  không đạt được thoả thuận, một trong hai bên có quyền khởi kiện tại Toà án có thẩm quyền theo quy định
-                  pháp luật Việt Nam.
+                <p className="mb-1">
+                  3.2. {t('transaction.contract.article3_2')}
                 </p>
+                <p className="mb-1">
+                  3.3. {t('transaction.contract.article3_3')}
+                </p>
+                <p className="mb-1">
+                  3.4. {t('transaction.contract.article3_4')}
+                </p>
+                <p className="mb-1">3.5. {t('transaction.contract.article3_5')}</p>
+                <p className="mb-1">3.6. {t('transaction.contract.article3_6')}</p>
+                <p className="mb-1">3.7. {t('transaction.contract.article3_7')}</p>
+                <p className="mb-1">3.8. {t('transaction.contract.article3_8')}</p>
+                <p className="mb-1">3.9. {t('transaction.contract.article3_9')}</p>
+                <p className="mb-1">3.10. {t('transaction.contract.article3_10')}</p>
+                <p className="mb-1">3.11. {t('transaction.contract.article3_11')}</p>
+                <p className="mb-3">3.12. {t('transaction.contract.article3_12')}</p>
 
-                <p className="mb-2 text-xs text-gray-500">
-                  * Bản hợp đồng này chỉ là bản rút gọn được sinh tự động từ hệ thống để tham khảo và lưu trữ trên
-                  blockchain. Hợp đồng có giá trị pháp lý cuối cùng giữa hai bên là hợp đồng công chứng hoặc văn bản
-                  pháp lý khác được ký trực tiếp ngoài hệ thống.
+                <p className="mb-2 font-semibold">{t('transaction.contract.article4')}</p>
+                <p className="mb-1">
+                  4.1. {t('transaction.contract.article4_1')}
+                </p>
+                <p className="mb-1">
+                  4.2. {t('transaction.contract.article4_2')}
+                </p>
+                <p className="mb-1">4.3. {t('transaction.contract.article4_3')}</p>
+                <p className="mb-1">4.4. {t('transaction.contract.article4_4')}</p>
+                <p className="mb-1">4.5. {t('transaction.contract.article4_5')}</p>
+                <p className="mb-1">4.6. {t('transaction.contract.article4_6')}</p>
+                <p className="mb-1">4.7. {t('transaction.contract.article4_7')}</p>
+                <p className="mb-3">4.8. {t('transaction.contract.article4_8')}</p>
+
+                <p className="mb-2 font-semibold">{t('transaction.contract.article5')}</p>
+                <p className="mb-1">
+                  5.1. {t('transaction.contract.article5_1')}
+                </p>
+                <p className="mb-1">
+                  5.2. {t('transaction.contract.article5_2')}
+                </p>
+                <p className="mb-1">5.3. {t('transaction.contract.article5_3')}</p>
+                <p className="mb-1">5.4. {t('transaction.contract.article5_4')}</p>
+                <p className="mb-1">5.5. {t('transaction.contract.article5_5')}</p>
+                <p className="mb-1">5.6. {t('transaction.contract.article5_6')}</p>
+                <p className="mb-1">5.7. {t('transaction.contract.article5_7')}</p>
+                <p className="mb-1">5.8. {t('transaction.contract.article5_8')}</p>
+                <p className="mb-3">5.9. {t('transaction.contract.article5_9')}</p>
+
+                <p className="mb-2 font-semibold">{t('transaction.contract.article6')}</p>
+                <p className="mb-1">
+                  6.1. {t('transaction.contract.article6_1')}
+                </p>
+                <p className="mb-1">
+                  6.2. {t('transaction.contract.article6_2')}
+                </p>
+                <p className="mb-1">
+                  6.3. {t('transaction.contract.article6_3')}
+                </p>
+                <p className="mb-1">6.4. {t('transaction.contract.article6_4')}</p>
+                <p className="mb-1">6.5. {t('transaction.contract.article6_5')}</p>
+                <p className="mb-1">6.6. {t('transaction.contract.article6_6')}</p>
+                <p className="mb-1">6.7. {t('transaction.contract.article6_7')}</p>
+                <p className="mb-1">6.8. {t('transaction.contract.article6_8')}</p>
+                <p className="mb-3">6.9. {t('transaction.contract.article6_9')}</p>
+
+                <p className="mb-2 font-semibold">{t('transaction.contract.article7')}</p>
+                <p className="mb-1">
+                  7.1. {t('transaction.contract.article7_1')}
+                </p>
+                <p className="mb-1">
+                  7.2. {t('transaction.contract.article7_2')}
+                </p>
+                <p className="mb-1">
+                  7.3. {t('transaction.contract.article7_3')}
+                </p>
+                <p className="mb-1">7.4. {t('transaction.contract.article7_4')}</p>
+                <p className="mb-3">7.5. {t('transaction.contract.article7_5')}</p>
+
+                <p className="mb-2 font-semibold">{t('transaction.contract.article8')}</p>
+                <p className="mb-1">8.1. {t('transaction.contract.article8_1')}</p>
+                <p className="mb-1">8.2. {t('transaction.contract.article8_2')}</p>
+                <p className="mb-3">8.3. {t('transaction.contract.article8_3')}</p>
+
+                <p className="mb-2 font-semibold">{t('transaction.contract.article9')}</p>
+                <p className="mb-1">9.1. {t('transaction.contract.article9_1')}</p>
+                <p className="mb-1">9.2. {t('transaction.contract.article9_2')}</p>
+                <p className="mb-3">9.3. {t('transaction.contract.article9_3')}</p>
+
+                <p className="mb-2 font-semibold">{t('transaction.contract.article10')}</p>
+                <p className="mb-1">10.1. {t('transaction.contract.article10_1')}</p>
+                <p className="mb-1">10.2. {t('transaction.contract.article10_2')}</p>
+                <p className="mb-3">10.3. {t('transaction.contract.article10_3')}</p>
+
+                <p className="mb-2 font-semibold">{t('transaction.contract.article11')}</p>
+                <p className="mb-1">11.1. {t('transaction.contract.article11_1')}</p>
+                <p className="mb-1">11.2. {t('transaction.contract.article11_2')}</p>
+                <p className="mb-3">11.3. {t('transaction.contract.article11_3')}</p>
+
+                <p className="mb-2 font-semibold">{t('transaction.contract.article12')}</p>
+                <p className="mb-1">12.1. {t('transaction.contract.article12_1')}</p>
+                <p className="mb-1">12.2. {t('transaction.contract.article12_2')}</p>
+                <p className="mb-3">12.3. {t('transaction.contract.article12_3')}</p>
+
+                <p className="mb-2 font-semibold">{t('transaction.contract.article13')}</p>
+                <p className="mb-1">13.1. {t('transaction.contract.article13_1')}</p>
+                <p className="mb-1">13.2. {t('transaction.contract.article13_2')}</p>
+                <p className="mb-1">13.3. {t('transaction.contract.article13_3')}</p>
+                <p className="mb-3">13.4. {t('transaction.contract.article13_4')}</p>
+
+                <p className="mb-2 font-semibold">{t('transaction.contract.article14')}</p>
+                <p className="mb-1">14.1. {t('transaction.contract.article14_1')}</p>
+                <p className="mb-1">14.2. {t('transaction.contract.article14_2')}</p>
+                <p className="mb-1">14.3. {t('transaction.contract.article14_3')}</p>
+                <p className="mb-3">14.4. {t('transaction.contract.article14_4')}</p>
+
+                <p className="mb-2 font-semibold">{t('transaction.contract.article15')}</p>
+                <p className="mb-1">15.1. {t('transaction.contract.article15_1')}</p>
+                <p className="mb-1">15.2. {t('transaction.contract.article15_2')}</p>
+                <p className="mb-1">15.3. {t('transaction.contract.article15_3')}</p>
+                <p className="mb-1">15.4. {t('transaction.contract.article15_4')}</p>
+                <p className="mb-3">15.5. {t('transaction.contract.article15_5')}</p>
+
+                <p className="mb-2 font-semibold">{t('transaction.contract.article16')}</p>
+                <p className="mb-1">16.1. {t('transaction.contract.article16_1')}</p>
+                <p className="mb-1">16.2. {t('transaction.contract.article16_2')}</p>
+                <p className="mb-1">16.3. {t('transaction.contract.article16_3')}</p>
+                <p className="mb-1">16.4. {t('transaction.contract.article16_4')}</p>
+                <p className="mb-3">16.5. {t('transaction.contract.article16_5')}</p>
+
+                <p className="mb-2 font-semibold">{t('transaction.contract.article17')}</p>
+                <p className="mb-1">17.1. {t('transaction.contract.article17_1')}</p>
+                <p className="mb-1">17.2. {t('transaction.contract.article17_2')}</p>
+                <p className="mb-1">17.3. {t('transaction.contract.article17_3')}</p>
+                <p className="mb-3">17.4. {t('transaction.contract.article17_4')}</p>
+
+                <p className="mb-2 font-semibold">{t('transaction.contract.article18')}</p>
+                <p className="mb-1">18.1. {t('transaction.contract.article18_1')}</p>
+                <p className="mb-1">18.2. {t('transaction.contract.article18_2')}</p>
+                <p className="mb-1">18.3. {t('transaction.contract.article18_3')}</p>
+                <p className="mb-3">18.4. {t('transaction.contract.article18_4')}</p>
+
+                <p className="mb-2 font-semibold">{t('transaction.contract.article19')}</p>
+                <p className="mb-1">19.1. {t('transaction.contract.article19_1')}</p>
+                <p className="mb-1">19.2. {t('transaction.contract.article19_2')}</p>
+                <p className="mb-1">19.3. {t('transaction.contract.article19_3')}</p>
+                <p className="mb-3">19.4. {t('transaction.contract.article19_4')}</p>
+
+                <p className="mb-2 font-semibold">{t('transaction.contract.article20')}</p>
+                <p className="mb-1">20.1. {t('transaction.contract.article20_1')}</p>
+                <p className="mb-1">20.2. {t('transaction.contract.article20_2')}</p>
+                <p className="mb-1">20.3. {t('transaction.contract.article20_3')}</p>
+                <p className="mb-3">20.4. {t('transaction.contract.article20_4')}</p>
+
+                <p className="mb-2 font-semibold">{t('transaction.contract.article21')}</p>
+                <p className="mb-1">21.1. {t('transaction.contract.article21_1')}</p>
+                <p className="mb-1">21.2. {t('transaction.contract.article21_2')}</p>
+                <p className="mb-3">21.3. {t('transaction.contract.article21_3')}</p>
+
+                <p className="mb-2 font-semibold">{t('transaction.contract.article22')}</p>
+                <p className="mb-1">22.1. {t('transaction.contract.article22_1')}</p>
+                <p className="mb-1">22.2. {t('transaction.contract.article22_2')}</p>
+                <p className="mb-3">22.3. {t('transaction.contract.article22_3')}</p>
+
+                <p className="mb-2 font-semibold">{t('transaction.contract.article23')}</p>
+                <p className="mb-1">23.1. {t('transaction.contract.article23_1')}</p>
+                <p className="mb-1">23.2. {t('transaction.contract.article23_2')}</p>
+                <p className="mb-1">23.3. {t('transaction.contract.article23_3')}</p>
+                <p className="mb-3">23.4. {t('transaction.contract.article23_4')}</p>
+
+                <p className="mb-2 font-semibold">{t('transaction.contract.article24')}</p>
+                <p className="mb-1">24.1. {t('transaction.contract.article24_1')}</p>
+                <p className="mb-1">24.2. {t('transaction.contract.article24_2')}</p>
+                <p className="mb-1">24.3. {t('transaction.contract.article24_3')}</p>
+                <p className="mb-3">24.4. {t('transaction.contract.article24_4')}</p>
+
+                <p className="mb-2 font-semibold">{t('transaction.contract.article25')}</p>
+                <p className="mb-1">25.1. {t('transaction.contract.article25_1')}</p>
+                <p className="mb-1">25.2. {t('transaction.contract.article25_2')}</p>
+                <p className="mb-1">25.3. {t('transaction.contract.article25_3')}</p>
+                <p className="mb-1">25.4. {t('transaction.contract.article25_4')}</p>
+                <p className="mb-3">25.5. {t('transaction.contract.article25_5')}</p>
+
+                {transaction.blockchainTxHash && (
+                  <>
+                    <p className="mb-2 font-semibold text-sm">{t('transaction.contract.blockchainInfo')}</p>
+                    <p className="mb-1 text-xs text-gray-600">
+                      {t('transaction.contract.blockchainInfoDesc')}
+                    </p>
+                    <p className="mb-1 text-xs">
+                      <span className="font-medium">Transaction Hash:</span>{' '}
+                      <span className="font-mono text-gray-700">{transaction.blockchainTxHash}</span>
+                    </p>
+                    {transaction.blockchainNetwork && (
+                      <p className="mb-3 text-xs">
+                        <span className="font-medium">Network:</span>{' '}
+                        <span className="text-gray-700">{transaction.blockchainNetwork}</span>
+                      </p>
+                    )}
+                  </>
+                )}
+
+                <p className="mb-2 text-xs text-gray-500 mt-4">
+                  * {t('transaction.contract.contractFooter')}
                 </p>
                 {!isOnChainConfirmed && (
                   <p className="mb-4 text-xs text-red-500 font-medium">
-                    ** Để in/lưu hợp đồng chính thức, vui lòng ký hợp đồng blockchain bằng MetaMask ở khung bên phải.
-                    Sau khi giao dịch on-chain được xác nhận, nút In/Lưu PDF sẽ được kích hoạt.
+                    ** {t('transaction.contract.contractFooterWarning')}
                   </p>
                 )}
 
                 <div className="grid grid-cols-2 gap-8 mt-6 text-sm">
                   <div className="text-center">
-                    <p className="font-semibold text-gray-900">BÊN A</p>
-                    <p className="text-gray-600 text-xs">(Người bán/Cho thuê)</p>
-                    <p className="mt-10 text-gray-500 text-xs italic">Ký, ghi rõ họ tên</p>
+                    <p className="font-semibold text-gray-900">{t('transaction.contract.partyALabel')}</p>
+                    <p className="text-gray-600 text-xs">({t('transaction.seller').split(' - ')[1]})</p>
+                    <p className="mt-10 text-gray-500 text-xs italic">{t('transaction.contract.partyASign')}</p>
                   </div>
                   <div className="text-center">
-                    <p className="font-semibold text-gray-900">BÊN B</p>
-                    <p className="text-gray-600 text-xs">(Người mua/Thuê)</p>
-                    <p className="mt-10 text-gray-500 text-xs italic">Ký, ghi rõ họ tên</p>
+                    <p className="font-semibold text-gray-900">{t('transaction.contract.partyBLabel')}</p>
+                    <p className="text-gray-600 text-xs">({t('transaction.buyer').split(' - ')[1]})</p>
+                    <p className="mt-10 text-gray-500 text-xs italic">{t('transaction.contract.partyASign')}</p>
                   </div>
                 </div>
               </div>

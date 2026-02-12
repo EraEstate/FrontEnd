@@ -38,11 +38,11 @@ const NewsPage: React.FC = () => {
 
   const categories = [
     { id: 'all', name: t('news.allNews'), count: newsData?.totalElements || 0 },
-    { id: 'MARKET_NEWS', name: 'Thị trường BDS', count: 0 },
-    { id: 'REGULATION', name: 'Chính sách - Pháp luật', count: 0 },
-    { id: 'TIPS', name: 'Đầu tư BDS', count: 0 },
-    { id: 'TREND', name: 'Thiết kế - Trang trí', count: 0 },
-    { id: 'OTHER', name: 'Kinh nghiệm mua bán', count: 0 },
+    { id: 'MARKET_NEWS', name: t('news.categoriesList.marketNews'), count: 0 },
+    { id: 'REGULATION', name: t('news.categoriesList.regulation'), count: 0 },
+    { id: 'TIPS', name: t('news.categoriesList.investment'), count: 0 },
+    { id: 'TREND', name: t('news.categoriesList.design'), count: 0 },
+    { id: 'OTHER', name: t('news.categoriesList.experience'), count: 0 },
   ];
 
   // Handle search
@@ -85,9 +85,9 @@ const NewsPage: React.FC = () => {
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center py-4 text-sm text-gray-600">
-            <Link to="/" className="hover:text-orange-600">Trang chủ</Link>
+            <Link to="/" className="hover:text-orange-600">{t('common.home')}</Link>
             <ChevronRight className="h-4 w-4 mx-2" />
-            <span className="text-gray-900 font-medium">Tin tức bất động sản</span>
+            <span className="text-gray-900 font-medium">{t('news.pageTitle')}</span>
           </div>
         </div>
       </div>
@@ -95,9 +95,9 @@ const NewsPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Tin tức bất động sản</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">{t('news.pageTitle')}</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Cập nhật thông tin thị trường, chính sách và xu hướng bất động sản mới nhất
+            {t('news.pageSubtitle')}
           </p>
         </div>
 
@@ -107,12 +107,12 @@ const NewsPage: React.FC = () => {
             <div className="space-y-6">
               {/* Search */}
               <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="font-semibold text-gray-900 mb-4">Tìm kiếm tin tức</h3>
+                <h3 className="font-semibold text-gray-900 mb-4">{t('news.searchTitle')}</h3>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Nhập từ khóa..."
+                    placeholder={t('news.searchPlaceholder')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
@@ -122,7 +122,7 @@ const NewsPage: React.FC = () => {
 
               {/* Categories */}
               <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="font-semibold text-gray-900 mb-4">Chuyên mục</h3>
+                <h3 className="font-semibold text-gray-900 mb-4">{t('news.categories')}</h3>
                 <div className="space-y-2">
                   {categories.map((category) => (
                     <button
@@ -145,15 +145,15 @@ const NewsPage: React.FC = () => {
               <div className="bg-white rounded-lg shadow-md p-6">
                 <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
                   <TrendingUp className="h-5 w-5 mr-2 text-orange-600" />
-                  Chủ đề nổi bật
+                  {t('news.trendingTopics')}
                 </h3>
                 <div className="space-y-3">
                   {[
-                    'Thị trường Q4/2024',
-                    'Dự án mới TP.HCM',
-                    'Chính sách lãi suất',
-                    'BDS Hà Nội',
-                    'Đầu tư căn hộ'
+                    t('news.trendingTopicsList.marketQ4'),
+                    t('news.trendingTopicsList.newProjectsHCM'),
+                    t('news.trendingTopicsList.interestRate'),
+                    t('news.trendingTopicsList.hanoiRE'),
+                    t('news.trendingTopicsList.apartmentInvestment')
                   ].map((topic, index) => (
                     <button
                       key={index}
@@ -172,9 +172,9 @@ const NewsPage: React.FC = () => {
             {/* Featured Articles */}
             <div className="mb-10">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">Tin nổi bật</h2>
+                <h2 className="text-2xl font-bold text-gray-900">{t('news.featuredNews')}</h2>
                 <div className="flex items-center text-orange-600 hover:text-orange-700 cursor-pointer">
-                  <span className="text-sm font-medium">Xem tất cả</span>
+                  <span className="text-sm font-medium">{t('news.viewAll')}</span>
                   <ArrowRight className="h-4 w-4 ml-1" />
                 </div>
               </div>
@@ -212,7 +212,7 @@ const NewsPage: React.FC = () => {
                             }}
                           />
                           <div className="absolute top-4 left-4 bg-orange-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                            Nổi bật
+                            {t('news.featured')}
                           </div>
                         </div>
                         <div className="p-6">
@@ -288,9 +288,9 @@ const NewsPage: React.FC = () => {
             {/* Regular Articles */}
             <div>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">Tin tức mới nhất</h2>
+                <h2 className="text-2xl font-bold text-gray-900">{t('news.latestNews')}</h2>
                 <div className="flex items-center text-sm text-gray-600">
-                  <span>Tìm thấy {articles.length} bài viết</span>
+                  <span>{t('news.foundArticles', { count: articles.length })}</span>
                 </div>
               </div>
 
@@ -312,17 +312,17 @@ const NewsPage: React.FC = () => {
                 </div>
               ) : error ? (
                 <div className="text-center py-12">
-                  <p className="text-red-600 mb-4">Lỗi tải dữ liệu: {error}</p>
+                  <p className="text-red-600 mb-4">{t('news.errorLoading')}: {error}</p>
                   <button 
                     onClick={refetch}
                     className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
                   >
-                    Thử lại
+                    {t('news.retry')}
                   </button>
                 </div>
               ) : articles.length === 0 ? (
                 <div className="text-center py-12">
-                  <p className="text-gray-500">Không tìm thấy bài viết nào</p>
+                  <p className="text-gray-500">{t('news.noArticlesFound')}</p>
                 </div>
               ) : (
                 <div className="space-y-6">
@@ -365,11 +365,11 @@ const NewsPage: React.FC = () => {
                               <div className="flex items-center space-x-4">
                                 <button className="flex items-center hover:text-red-500 transition-colors">
                                   <Heart className="h-4 w-4 mr-1" />
-                                  <span>Lưu</span>
+                                  <span>{t('news.save')}</span>
                                 </button>
                                 <button className="flex items-center hover:text-blue-500 transition-colors">
                                   <Share2 className="h-4 w-4 mr-1" />
-                                  <span>Chia sẻ</span>
+                                  <span>{t('news.share')}</span>
                                 </button>
                                 <div className="flex items-center">
                                   <Eye className="h-4 w-4 mr-1" />

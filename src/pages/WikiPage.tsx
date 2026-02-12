@@ -40,49 +40,49 @@ const WikiPage: React.FC = () => {
   const categories: WikiCategory[] = [
     {
       id: 'mua-bds',
-      name: 'Mua BĐS',
+      name: t('wiki.categoriesList.buyRE'),
       slug: 'mua-bds',
-      description: 'Hướng dẫn mua bất động sản, kinh nghiệm, thủ tục pháp lý',
+      description: t('wiki.categoriesList.buyREDesc'),
       icon: ShoppingCart,
       color: 'text-blue-600'
     },
     {
       id: 'ban-bds',
-      name: 'Bán BĐS',
+      name: t('wiki.categoriesList.sellRE'),
       slug: 'ban-bds',
-      description: 'Mẹo bán nhà, định giá, marketing bất động sản',
+      description: t('wiki.categoriesList.sellREDesc'),
       icon: Home,
       color: 'text-green-600'
     },
     {
       id: 'thue-bds',
-      name: 'Thuê BĐS',
+      name: t('wiki.categoriesList.rentRE'),
       slug: 'thue-bds',
-      description: 'Hướng dẫn thuê nhà, cho thuê, hợp đồng thuê',
+      description: t('wiki.categoriesList.rentREDesc'),
       icon: FileText,
       color: 'text-purple-600'
     },
     {
       id: 'tai-chinh',
-      name: 'Tài chính BĐS',
+      name: t('wiki.categoriesList.finance'),
       slug: 'tai-chinh',
-      description: 'Vay mua nhà, lãi suất, đầu tư bất động sản',
+      description: t('wiki.categoriesList.financeDesc'),
       icon: DollarSign,
       color: 'text-red-600'
     },
     {
       id: 'quy-hoach-phap-ly',
-      name: 'Quy hoạch - Pháp lý',
+      name: t('wiki.categoriesList.planning'),
       slug: 'quy-hoach-phap-ly',
-      description: 'Quy hoạch đô thị, thủ tục pháp lý, luật đất đai',
+      description: t('wiki.categoriesList.planningDesc'),
       icon: FileText,
       color: 'text-orange-600'
     },
     {
       id: 'noi-ngoai-that',
-      name: 'Nội - Ngoại thất',
+      name: t('wiki.categoriesList.interior'),
       slug: 'noi-ngoai-that',
-      description: 'Thiết kế nhà, nội thất, ngoại thất, phong cách',
+      description: t('wiki.categoriesList.interiorDesc'),
       icon: Palette,
       color: 'text-pink-600'
     },
@@ -90,7 +90,7 @@ const WikiPage: React.FC = () => {
       id: 'phong-thuy',
       name: t('wiki.fengShui'),
       slug: 'phong-thuy',
-      description: 'Phong thủy nhà ở, hướng đất, tuổi hợp mệnh',
+      description: t('wiki.categoriesList.fengShuiDesc'),
       icon: Wind,
       color: 'text-indigo-600'
     }
@@ -176,7 +176,7 @@ const WikiPage: React.FC = () => {
         setArticles(transformedArticles);
       } catch (error: any) {
         console.error('Error loading wiki articles:', error);
-        setError(error.response?.data?.message || error.message || 'Không thể tải bài viết wiki');
+        setError(error.response?.data?.message || error.message || t('wiki.errorLoading'));
         // Fallback to empty array if API fails
         setArticles([]);
       } finally {
@@ -205,9 +205,9 @@ const WikiPage: React.FC = () => {
           <div className="flex items-center space-x-3 mb-4">
             <BookOpen className="h-8 w-8 text-red-600" />
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Wiki BĐS</h1>
+              <h1 className="text-3xl font-bold text-gray-900">{t('wiki.pageTitle')}</h1>
               <p className="text-gray-600 mt-1">
-                Cẩm nang kiến thức bất động sản toàn diện
+                {t('wiki.pageSubtitle')}
               </p>
             </div>
           </div>
@@ -217,7 +217,7 @@ const WikiPage: React.FC = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
             <input
               type="text"
-              placeholder="Tìm kiếm bài viết..."
+              placeholder={t('wiki.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
@@ -229,7 +229,7 @@ const WikiPage: React.FC = () => {
           {/* Sidebar - Categories */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-sm p-6 sticky top-4">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Chuyên mục</h2>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('wiki.categories')}</h2>
               <div className="space-y-2">
                 <button
                   onClick={() => setSelectedCategory('')}
@@ -238,7 +238,7 @@ const WikiPage: React.FC = () => {
                     selectedCategory === '' ? 'bg-red-50 text-red-600' : 'hover:bg-gray-50'
                   } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                  <span>Tất cả bài viết</span>
+                  <span>{t('wiki.allArticles')}</span>
                   {loading && selectedCategory === '' && (
                     <Loader2 className="h-4 w-4 animate-spin text-red-600" />
                   )}
@@ -287,7 +287,7 @@ const WikiPage: React.FC = () => {
               <div className="space-y-4">
                 <div className="bg-white rounded-lg shadow-sm p-12 text-center">
                   <Loader2 className="h-12 w-12 text-red-600 animate-spin mx-auto mb-4" />
-                  <p className="text-gray-600">Đang tải bài viết...</p>
+                  <p className="text-gray-600">{t('wiki.loading')}</p>
                 </div>
                 {[...Array(2)].map((_, i) => (
                   <div key={i} className="bg-white rounded-lg shadow-sm p-6 animate-pulse">
@@ -301,7 +301,7 @@ const WikiPage: React.FC = () => {
             ) : error ? (
               <div className="bg-white rounded-lg shadow-sm p-12 text-center">
                 <BookOpen className="h-16 w-16 text-red-300 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Lỗi tải dữ liệu</h3>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('wiki.errorLoading')}</h3>
                 <p className="text-gray-600 mb-4">{error}</p>
                 <button
                   onClick={() => {
@@ -310,18 +310,18 @@ const WikiPage: React.FC = () => {
                   }}
                   className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                 >
-                  Thử lại
+                  {t('wiki.retry')}
                 </button>
               </div>
             ) : filteredArticles.length === 0 && articles.length === 0 ? (
               <div className="bg-white rounded-lg shadow-sm p-12 text-center">
                 <BookOpen className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Chưa có bài viết nào</h3>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('wiki.noArticles')}</h3>
                 <p className="text-gray-600 mb-4">
-                  Hiện tại chưa có bài viết wiki nào được publish. Vui lòng quay lại sau.
+                  {t('wiki.noArticlesDesc')}
                 </p>
                 <p className="text-sm text-gray-500">
-                  (Kiểm tra console để xem chi tiết lỗi nếu có)
+                  ({t('common.checkConsole', 'Kiểm tra console để xem chi tiết lỗi nếu có')})
                 </p>
               </div>
             ) : (
@@ -352,7 +352,7 @@ const WikiPage: React.FC = () => {
                           </div>
                           <div className="flex items-center space-x-1">
                             <Calendar className="h-4 w-4" />
-                            <span>{article.publishedAt ? new Date(article.publishedAt).toLocaleDateString('vi-VN') : 'N/A'}</span>
+                            <span>{article.publishedAt ? new Date(article.publishedAt).toLocaleDateString('vi-VN') : t('common.notAvailable', 'N/A')}</span>
                           </div>
                           <div className="flex items-center space-x-1">
                             <Eye className="h-4 w-4" />
@@ -364,7 +364,7 @@ const WikiPage: React.FC = () => {
                           to={`/wiki/article/${article.slug}`}
                           className="text-red-600 hover:text-red-700 font-medium flex items-center space-x-1"
                         >
-                          <span>Đọc tiếp</span>
+                          <span>{t('wiki.readMore')}</span>
                           <ChevronRight className="h-4 w-4" />
                         </Link>
                       </div>
@@ -375,9 +375,9 @@ const WikiPage: React.FC = () => {
                 {filteredArticles.length === 0 && articles.length > 0 && (
                   <div className="bg-white rounded-lg shadow-sm p-12 text-center">
                     <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">Không tìm thấy bài viết</h3>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">{t('wiki.noArticlesFound')}</h3>
                     <p className="text-gray-600">
-                      Thử tìm kiếm với từ khóa khác hoặc chọn chuyên mục khác.
+                      {t('wiki.noArticlesFoundDesc')}
                     </p>
                   </div>
                 )}

@@ -106,22 +106,47 @@ export async function sendCreateDealTx(params: CreateDealParams): Promise<string
   // Đảm bảo (tốt nhất có thể) đang ở mạng Hardhat local trước khi gửi tx
   await ensureHardhatNetwork();
 
-  const provider = new BrowserProvider(window.ethereum);
-  const signer = await provider.getSigner();
+  try {
+    const provider = new BrowserProvider(window.ethereum);
+    
+    // Test RPC connection before proceeding
+    try {
+      await provider.getBlockNumber();
+    } catch (rpcError: any) {
+      if (rpcError?.code === -32002 || rpcError?.message?.includes('RPC endpoint') || rpcError?.message?.includes('too many errors')) {
+        throw new Error('RPC_ENDPOINT_ERROR: RPC endpoint đang gặp vấn đề. Vui lòng kiểm tra Hardhat node có đang chạy không (npx hardhat node)');
+      }
+      throw rpcError;
+    }
+    
+    const signer = await provider.getSigner();
 
-  const contract = new Contract(params.contractAddress, params.abi, signer);
+    const contract = new Contract(params.contractAddress, params.abi, signer);
 
-  // Tuỳ smart contract thực tế của bạn, chỉnh lại tên hàm và tham số cho đúng
-  const tx = await contract.createDeal(
-    params.sellerAddress,
-    params.buyerAddress,
-    params.propertyId,
-    params.price,
-    params.isRent
-  );
+    // Tuỳ smart contract thực tế của bạn, chỉnh lại tên hàm và tham số cho đúng
+    const tx = await contract.createDeal(
+      params.sellerAddress,
+      params.buyerAddress,
+      params.propertyId,
+      params.price,
+      params.isRent
+    );
 
-  const receipt = await tx.wait();
-  return receipt.hash ?? tx.hash;
+    const receipt = await tx.wait();
+    return receipt.hash ?? tx.hash;
+  } catch (error: any) {
+    // Re-throw with better error messages
+    if (error?.code === 4001 || error?.code === 'ACTION_REJECTED') {
+      throw new Error('USER_REJECTED: Bạn đã từ chối giao dịch trong MetaMask');
+    }
+    if (error?.message?.includes('insufficient funds') || error?.message?.includes('insufficient balance')) {
+      throw new Error('INSUFFICIENT_FUNDS: Số dư không đủ để thực hiện giao dịch');
+    }
+    if (error?.message?.includes('RPC_ENDPOINT_ERROR')) {
+      throw error; // Re-throw RPC errors as-is
+    }
+    throw error;
+  }
 }
 
 

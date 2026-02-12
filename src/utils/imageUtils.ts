@@ -1,25 +1,47 @@
 /**
  * Helper function to get full image URL
  * Backend returns paths like /uploads/avatars/... or /uploads/properties/...
- * We need to prepend the backend base URL
+ * Also handles Supabase Storage URLs (full URLs)
+ * We need to prepend the backend base URL for relative paths
  */
 export const getImageUrl = (imagePath: string | null | undefined): string | null => {
   if (!imagePath || imagePath.trim() === '') {
     return null;
   }
 
-  // If already a full URL, return as is
-  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-    return imagePath;
+  const trimmedPath = imagePath.trim();
+
+  // If already a full URL (http/https), return as is
+  // This includes Supabase Storage URLs: https://[project].supabase.co/storage/...
+  if (trimmedPath.startsWith('http://') || trimmedPath.startsWith('https://')) {
+    return trimmedPath;
   }
 
   // If starts with /uploads, prepend backend URL
-  if (imagePath.startsWith('/uploads/')) {
-    return `http://localhost:8080${imagePath}`;
+  if (trimmedPath.startsWith('/uploads/')) {
+    // Get backend URL from environment or use default
+    const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+    return `${backendUrl}${trimmedPath}`;
   }
 
-  // Otherwise return as is (might be a relative path)
-  return imagePath;
+  // If it's a data URL (base64), return as is
+  if (trimmedPath.startsWith('data:')) {
+    return trimmedPath;
+  }
+
+  // Check for Supabase Storage URL pattern
+  // Format: https://[project-id].supabase.co/storage/v1/object/public/[bucket]/[path]
+  if (trimmedPath.includes('supabase.co/storage')) {
+    // Supabase Storage URL - return as is (should already be full URL)
+    return trimmedPath;
+  }
+
+  // Otherwise return as is (might be a relative path or invalid)
+  // Log warning in development for unknown formats
+  if (import.meta.env.DEV && trimmedPath && !trimmedPath.startsWith('/')) {
+    console.warn('getImageUrl: Unknown image path format (not http/https, not /uploads/, not data:):', trimmedPath);
+  }
+  return trimmedPath;
 };
 
 /**

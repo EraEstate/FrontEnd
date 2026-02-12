@@ -12,7 +12,7 @@ import {
   Map,
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useFeaturedProperties, useFeaturedNews, useTopAgents, useProvinces } from '../api/hooks';
+import { useFeaturedProperties, useFeaturedNews, useTopAgents, useProvinces, useRecentNews } from '../api/hooks';
 import { useTranslation } from 'react-i18next';
 import MapPicker from './MapPicker';
 
@@ -45,6 +45,11 @@ const HomePage: React.FC = () => {
   const { data: featuredProperties } = useFeaturedProperties(0, 8);
   const { data: featuredNews } = useFeaturedNews(5);
   const { data: topAgents } = useTopAgents(0, 6);
+  const { data: recentNews } = useRecentNews(30, 0, 6);
+
+  // Chuẩn hoá dữ liệu news để tránh lệch kiểu trả về (list hoặc Page)
+  const realEstateNewsArticles: any[] =
+    (recentNews as any)?.content ?? (Array.isArray(recentNews) ? (recentNews as any[]) : []);
 
   const bannerSlides = [
     {
@@ -293,10 +298,10 @@ const HomePage: React.FC = () => {
                   </div>
                   <div className="text-center">
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                      Xem Bản Đồ
+                      {t('home.search.viewMap')}
                     </h3>
                     <p className="text-sm text-gray-600">
-                      Tìm kiếm bất động sản trên bản đồ Việt Nam
+                      {t('home.search.viewMapDesc')}
                     </p>
                   </div>
                 </div>
@@ -315,10 +320,10 @@ const HomePage: React.FC = () => {
                   </div>
                   <div className="text-center">
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                      Tìm Kiếm
+                      {t('home.search.searchTitle')}
                     </h3>
                     <p className="text-sm text-gray-600">
-                      Khám phá hàng ngàn bất động sản
+                      {t('home.search.searchDesc')}
                     </p>
                   </div>
                 </div>
@@ -587,61 +592,85 @@ const HomePage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Numbered News Articles */}
-            {[
-              { 
-                number: '01',
-                title: t('home.news.article1.title'),
-                subtitle: t('home.news.article1.subtitle')
-              },
-              { 
-                number: '02',
-                title: t('home.news.article2.title'),
-                subtitle: t('home.news.article2.subtitle')
-              },
-              { 
-                number: '03',
-                title: t('home.news.article3.title'),
-                subtitle: t('home.news.article3.subtitle')
-              },
-              { 
-                number: '04',
-                title: t('home.news.article4.title'),
-                subtitle: t('home.news.article4.subtitle')
-              },
-              { 
-                number: '05',
-                title: t('home.news.article5.title'),
-                subtitle: t('home.news.article5.subtitle')
-              },
-              { 
-                number: '06',
-                title: t('home.news.article6.title'),
-                subtitle: t('home.news.article6.subtitle')
-              },
-            ].map((article, index) => (
-              <Link
-                key={index}
-                to={`/tin-tuc/${article.title.toLowerCase().replace(/\s+/g, '-')}`}
-                className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 border-l-4 border-red-600"
-              >
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0">
-                    <div className="w-10 h-10 bg-red-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                      {article.number}
+            {/* Numbered News Articles - ưu tiên data thật từ DB, fallback text tĩnh */}
+            {realEstateNewsArticles.length > 0
+              ? realEstateNewsArticles.slice(0, 6).map((article: any, index: number) => (
+                  <Link
+                    key={article.id ?? index}
+                    to={`/news/${article.id}`}
+                    className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 border-l-4 border-red-600"
+                  >
+                    <div className="flex items-start space-x-4">
+                      <div className="flex-shrink-0">
+                        <div className="w-10 h-10 bg-red-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                          {String(index + 1).padStart(2, '0')}
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-gray-900 mb-2 line-clamp-2 text-sm leading-tight">
+                          {article.title}
+                        </h3>
+                        <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
+                          {article.summary || article.description || ''}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-bold text-gray-900 mb-2 line-clamp-2 text-sm leading-tight">
-                      {article.title}
-                    </h3>
-                    <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
-                      {article.subtitle}
-                    </p>
-                  </div>
-                </div>
-              </Link>
-            ))}
+                  </Link>
+                ))
+              : [
+                  {
+                    number: '01',
+                    title: t('home.news.article1.title'),
+                    subtitle: t('home.news.article1.subtitle'),
+                  },
+                  {
+                    number: '02',
+                    title: t('home.news.article2.title'),
+                    subtitle: t('home.news.article2.subtitle'),
+                  },
+                  {
+                    number: '03',
+                    title: t('home.news.article3.title'),
+                    subtitle: t('home.news.article3.subtitle'),
+                  },
+                  {
+                    number: '04',
+                    title: t('home.news.article4.title'),
+                    subtitle: t('home.news.article4.subtitle'),
+                  },
+                  {
+                    number: '05',
+                    title: t('home.news.article5.title'),
+                    subtitle: t('home.news.article5.subtitle'),
+                  },
+                  {
+                    number: '06',
+                    title: t('home.news.article6.title'),
+                    subtitle: t('home.news.article6.subtitle'),
+                  },
+                ].map((article, index) => (
+                  <Link
+                    key={index}
+                    to={`/tin-tuc/${article.title.toLowerCase().replace(/\s+/g, '-')}`}
+                    className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 border-l-4 border-red-600"
+                  >
+                    <div className="flex items-start space-x-4">
+                      <div className="flex-shrink-0">
+                        <div className="w-10 h-10 bg-red-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                          {article.number}
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-gray-900 mb-2 line-clamp-2 text-sm leading-tight">
+                          {article.title}
+                        </h3>
+                        <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
+                          {article.subtitle}
+                        </p>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
           </div>
         </section>
 

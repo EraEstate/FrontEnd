@@ -50,17 +50,17 @@ const Footer: React.FC = () => {
               <div className="flex items-start space-x-2">
                 <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0 text-gray-400" />
                 <div>
-                  <div className="text-gray-900 font-medium mb-1">Văn phòng</div>
-                  <div>Tầng 12, Tòa nhà ABC Tower</div>
-                  <div>123 Đường Lê Lợi, Quận 1</div>
-                  <div>TP. Hồ Chí Minh, Việt Nam</div>
+                  <div className="text-gray-900 font-medium mb-1">{t('footer.office')}</div>
+                  <div>{t('footer.officeAddress.line1')}</div>
+                  <div>{t('footer.officeAddress.line2')}</div>
+                  <div>{t('footer.officeAddress.line3')}</div>
                 </div>
               </div>
               
               <div className="flex items-center space-x-2 pt-2">
                 <Phone className="h-4 w-4 text-gray-400" />
                 <a href="tel:19001234" className="text-gray-900 font-medium hover:text-red-600 transition-colors">
-                  1900 1234
+                  {t('footer.phone')}
                 </a>
               </div>
             </div>
@@ -68,7 +68,7 @@ const Footer: React.FC = () => {
 
           {/* Quick Links */}
           <div>
-            <h3 className="font-semibold text-gray-900 mb-4 text-base">Về chúng tôi</h3>
+            <h3 className="font-semibold text-gray-900 mb-4 text-base">{t('footer.aboutUs')}</h3>
             <ul className="space-y-2.5 text-sm">
               <li>
                 <Link to="/about" className="text-gray-600 hover:text-red-600 transition-colors inline-flex items-center group">
@@ -105,24 +105,24 @@ const Footer: React.FC = () => {
 
           {/* Support */}
           <div>
-            <h3 className="font-semibold text-gray-900 mb-4 text-base">Hỗ trợ</h3>
+            <h3 className="font-semibold text-gray-900 mb-4 text-base">{t('footer.support')}</h3>
             <ul className="space-y-2.5 text-sm text-gray-600">
               <li>
                 <a href="tel:19001234" className="hover:text-red-600 transition-colors inline-flex items-center group">
                   <Phone className="h-3.5 w-3.5 mr-2 text-gray-400 group-hover:text-red-600" />
-                  Tư vấn miễn phí
+                  {t('footer.freeConsultation')}
                 </a>
               </li>
               <li>
                 <a href="mailto:support@eraestate.com" className="hover:text-red-600 transition-colors inline-flex items-center group">
                   <Mail className="h-3.5 w-3.5 mr-2 text-gray-400 group-hover:text-red-600" />
-                  Hỗ trợ kỹ thuật
+                  {t('footer.technicalSupport')}
                 </a>
               </li>
               <li>
                 <a href="mailto:info@eraestate.com" className="hover:text-red-600 transition-colors inline-flex items-center group">
                   <Mail className="h-3.5 w-3.5 mr-2 text-gray-400 group-hover:text-red-600" />
-                  Email liên hệ
+                  {t('footer.contactEmail')}
                 </a>
               </li>
             </ul>
@@ -130,7 +130,7 @@ const Footer: React.FC = () => {
 
           {/* Newsletter & Social */}
           <div>
-            <h3 className="font-semibold text-gray-900 mb-4 text-base">Theo dõi chúng tôi</h3>
+            <h3 className="font-semibold text-gray-900 mb-4 text-base">{t('footer.followUs')}</h3>
             
             {/* Social Media */}
             <div className="flex items-center space-x-3 mb-6">
@@ -165,20 +165,20 @@ const Footer: React.FC = () => {
 
             {/* Newsletter */}
             <div>
-              <p className="text-sm text-gray-600 mb-3">Nhận thông báo qua email</p>
+              <p className="text-sm text-gray-600 mb-3">{t('footer.newsletterTitle')}</p>
               <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Email của bạn"
+                  placeholder={t('footer.emailPlaceholder')}
                   className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   required
                 />
                 <button
                   type="submit"
                   className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center"
-                  aria-label="Đăng ký nhận email"
+                  aria-label={t('footer.subscribeButton')}
                 >
                   <Send className="h-4 w-4" />
                 </button>
@@ -192,21 +192,21 @@ const Footer: React.FC = () => {
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             {/* Copyright */}
             <p className="text-sm text-gray-500">
-              © {currentYear} Era Estate. Tất cả quyền được bảo lưu.
+              © {currentYear} Era Estate. {t('footer.allRightsReserved')}
             </p>
 
             {/* Additional Links */}
             <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
               <Link to="/terms" className="hover:text-red-600 transition-colors">
-                Điều khoản
+                {t('footer.terms')}
               </Link>
               <span className="text-gray-300">•</span>
               <Link to="/privacy" className="hover:text-red-600 transition-colors">
-                Chính sách
+                {t('footer.policy')}
               </Link>
               <span className="text-gray-300">•</span>
               <Link to="/contact" className="hover:text-red-600 transition-colors">
-                Liên hệ
+                {t('footer.contact')}
               </Link>
             </div>
           </div>

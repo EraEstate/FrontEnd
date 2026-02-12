@@ -146,3 +146,26 @@
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
+
+/* Print styles: chỉ in phần hợp đồng có class .printable-contract */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .printable-contract,
+  .printable-contract * {
+    visibility: visible;
+  }
+
+  .printable-contract {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    box-shadow: none !important;
+    border-radius: 0;
+    background: #ffffff;
+  }
+}

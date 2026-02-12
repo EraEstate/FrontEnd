@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import type { Property } from '../types';
 import { useAuthStore } from '../store/authStore';
+import { getImageUrl, getImagePlaceholder } from '../utils/imageUtils';
 
 const PropertiesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -618,30 +619,110 @@ const PropertyListItem: React.FC<{
 
   const formatPrice = (price: number) => {
     if (price >= 1000000000) {
-      return `${(price / 1000000000).toFixed(1)} tỷ`;
+      return `${(price / 1000000000).toFixed(1)} ${t('common.billion')}`;
     } else if (price >= 1000000) {
-      return `${(price / 1000000).toFixed(0)} triệu`;
+      return `${(price / 1000000).toFixed(0)} ${t('common.million')}`;
     }
     return price.toLocaleString();
   };
 
-  // Get primary image or first image - handle both propertyImages (objects) and images (strings or objects)
-  const primaryImage = (property as any).propertyImages?.find((img: any) => img.isPrimary)?.imageUrl || 
-                       (property as any).propertyImages?.[0]?.imageUrl ||
-                       ((property as any).images && Array.isArray((property as any).images) && typeof (property as any).images[0] === 'object' 
-                         ? ((property as any).images.find((img: any) => img.isPrimary)?.imageUrl || (property as any).images[0]?.imageUrl)
-                         : (property as any).images?.[0]) ||
-                       '/api/placeholder/400/300';
+  // Get primary image or first image - handle multiple possible structures
+  // PropertyResponse has: mainImageUrl, propertyImages (array), or images (array)
+  // PropertyImageResponse has: imageUrl, isPrimary (or isMain)
+  let rawImagePath: string | null = null;
+  
+  // Priority 1: Check mainImageUrl (direct field from PropertyResponse)
+  if ((property as any).mainImageUrl) {
+    rawImagePath = (property as any).mainImageUrl;
+  }
+  // Priority 2: Check propertyImages array (serialized name from PropertyResponse)
+  else if ((property as any).propertyImages && Array.isArray((property as any).propertyImages) && (property as any).propertyImages.length > 0) {
+    const images = (property as any).propertyImages;
+    // Find primary image first
+    const primaryImg = images.find((img: any) => img.isPrimary || img.isMain);
+    if (primaryImg && primaryImg.imageUrl) {
+      rawImagePath = primaryImg.imageUrl;
+    } else if (images[0] && images[0].imageUrl) {
+      rawImagePath = images[0].imageUrl;
+    }
+  }
+  // Priority 3: Check images array (internal field name)
+  else if ((property as any).images && Array.isArray((property as any).images)) {
+    if (typeof (property as any).images[0] === 'object') {
+      const images = (property as any).images;
+      const primaryImg = images.find((img: any) => img.isPrimary || img.isMain);
+      if (primaryImg && primaryImg.imageUrl) {
+        rawImagePath = primaryImg.imageUrl;
+      } else if (images[0] && images[0].imageUrl) {
+        rawImagePath = images[0].imageUrl;
+      }
+    } else if (typeof (property as any).images[0] === 'string') {
+      rawImagePath = (property as any).images[0];
+    }
+  }
+  // Priority 4: Check imageUrl alias (from PropertyResponse.getImageUrlAlias)
+  else if ((property as any).imageUrl) {
+    rawImagePath = (property as any).imageUrl;
+  }
+  
+  // Convert to full URL using getImageUrl
+  // This handles both local paths (/uploads/...) and Supabase Storage URLs (https://...)
+  const primaryImage = getImageUrl(rawImagePath) || getImagePlaceholder(400, 300);
+  
+  // Debug log in development - only log when there's an actual image to debug
+  // Don't spam console with warnings for properties without images (this is normal)
+  if (import.meta.env.DEV && rawImagePath) {
+    console.log('📸 Property image loaded:', {
+      propertyId: property.id,
+      propertyTitle: property.title,
+      rawPath: rawImagePath,
+      processedUrl: primaryImage,
+      isSupabase: rawImagePath.includes('supabase.co'),
+      isFullUrl: rawImagePath.startsWith('http://') || rawImagePath.startsWith('https://')
+    });
+    
+    // Warn if using placeholder but have raw path (this indicates a problem)
+    if (primaryImage.includes('data:image/svg+xml') && rawImagePath) {
+      console.warn('⚠️ Image path exists but failed to load. Using placeholder:', rawImagePath);
+    }
+  }
+  // Note: We don't log warnings for properties without images - this is normal
+  // Properties will show placeholder image automatically via getImagePlaceholder()
 
   return (
     <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden border border-gray-200">
       <div className="flex">
         {/* Image Section */}
-        <div className="relative w-80 h-48 flex-shrink-0">
+        <div className="relative w-80 h-48 flex-shrink-0 bg-gray-100">
           <img
             src={primaryImage}
             alt={property.title}
             className="w-full h-full object-cover"
+            loading="lazy"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              const placeholder = getImagePlaceholder(400, 300);
+              // Only log if it's not already the placeholder
+              if (target.src !== placeholder && !target.src.includes('data:image/svg+xml')) {
+                console.error('❌ Failed to load property image:', {
+                  attemptedUrl: target.src,
+                  originalPath: rawImagePath,
+                  propertyId: property.id,
+                  propertyTitle: property.title,
+                  isSupabase: rawImagePath?.includes('supabase.co') || false,
+                  suggestion: rawImagePath?.includes('supabase.co') 
+                    ? 'Check: 1) Bucket is public, 2) CORS configured, 3) URL format correct'
+                    : 'Check: 1) Backend server running, 2) Image file exists, 3) Path correct'
+                });
+                target.src = placeholder;
+              }
+            }}
+            onLoad={() => {
+              // Only log if it's a real image, not placeholder
+              if (import.meta.env.DEV && primaryImage && !primaryImage.includes('data:image/svg+xml')) {
+                console.log('✅ Property image loaded successfully:', primaryImage);
+              }
+            }}
           />
           <div className="absolute top-2 left-2">
             <span className="bg-red-600 text-white px-2 py-1 text-xs font-medium rounded">10</span>

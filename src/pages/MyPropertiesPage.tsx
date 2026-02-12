@@ -57,25 +57,25 @@ const MyPropertiesPage = () => {
 
   const getStatusBadge = (status: string) => {
     const badges = {
-      'AVAILABLE': { color: 'bg-emerald-100 text-emerald-700 border-emerald-200', text: 'Đang bán', icon: CheckCircle2 },
-      'SOLD': { color: 'bg-gray-100 text-gray-700 border-gray-200', text: 'Đã bán', icon: Circle },
-      'RENTED': { color: 'bg-blue-100 text-blue-700 border-blue-200', text: 'Đã thuê', icon: CircleDot },
-      'PENDING': { color: 'bg-amber-100 text-amber-700 border-amber-200', text: 'Chờ duyệt', icon: TrendingUp },
+      'AVAILABLE': { color: 'bg-emerald-100 text-emerald-700 border-emerald-200', text: t('myProperties.selling'), icon: CheckCircle2 },
+      'SOLD': { color: 'bg-gray-100 text-gray-700 border-gray-200', text: t('myProperties.sold'), icon: Circle },
+      'RENTED': { color: 'bg-blue-100 text-blue-700 border-blue-200', text: t('myProperties.rented'), icon: CircleDot },
+      'PENDING': { color: 'bg-amber-100 text-amber-700 border-amber-200', text: t('myProperties.pending'), icon: TrendingUp },
     };
     return badges[status as keyof typeof badges] || badges.AVAILABLE;
   };
 
   const formatPrice = (price: number) => {
-    if (price >= 1000000000) return `${(price / 1000000000).toFixed(1)} tỷ`;
-    if (price >= 1000000) return `${(price / 1000000).toFixed(0)} triệu`;
+    if (price >= 1000000000) return `${(price / 1000000000).toFixed(1)} ${t('common.billion')}`;
+    if (price >= 1000000) return `${(price / 1000000).toFixed(0)} ${t('common.million')}`;
     return price.toLocaleString('vi-VN');
   };
 
   const stats = [
-    { label: 'Tổng tin', value: properties.length, icon: Home, color: 'text-blue-600 bg-blue-50' },
-    { label: 'Đang bán', value: properties.filter((p: Property) => p.status === 'AVAILABLE').length, icon: TrendingUp, color: 'text-green-600 bg-green-50' },
-    { label: 'Đã bán', value: properties.filter((p: Property) => p.status === 'SOLD').length, icon: BarChart3, color: 'text-gray-600 bg-gray-50' },
-    { label: 'Đã thuê', value: properties.filter((p: Property) => p.status === 'RENTED').length, icon: DollarSign, color: 'text-purple-600 bg-purple-50' },
+    { label: t('myProperties.total'), value: properties.length, icon: Home, color: 'text-blue-600 bg-blue-50' },
+    { label: t('myProperties.selling'), value: properties.filter((p: Property) => p.status === 'AVAILABLE').length, icon: TrendingUp, color: 'text-green-600 bg-green-50' },
+    { label: t('myProperties.sold'), value: properties.filter((p: Property) => p.status === 'SOLD').length, icon: BarChart3, color: 'text-gray-600 bg-gray-50' },
+    { label: t('myProperties.rented'), value: properties.filter((p: Property) => p.status === 'RENTED').length, icon: DollarSign, color: 'text-purple-600 bg-purple-50' },
   ];
 
   return (
@@ -87,8 +87,8 @@ const MyPropertiesPage = () => {
             <div className="flex items-center gap-3">
               <ClipboardList className="h-8 w-8 text-red-600" />
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Tin Đăng Của Tôi</h1>
-                <p className="text-gray-600">Quản lý và theo dõi bất động sản của bạn</p>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('myProperties.title')}</h1>
+                <p className="text-gray-600">{t('myProperties.subtitle')}</p>
               </div>
             </div>
             <Link
@@ -96,7 +96,7 @@ const MyPropertiesPage = () => {
               className="mt-4 md:mt-0 inline-flex items-center space-x-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
             >
               <Plus className="h-5 w-5" />
-              <span>Đăng Tin Mới</span>
+              <span>{t('myProperties.newListing')}</span>
             </Link>
           </div>
 
@@ -127,10 +127,10 @@ const MyPropertiesPage = () => {
           {/* Tabs */}
           <div className="flex flex-wrap gap-2">
             {[
-              { key: 'all', label: 'Tất cả', icon: Home, count: properties.length },
-              { key: 'available', label: 'Đang bán', icon: TrendingUp, count: properties.filter((p: Property) => p.status === 'AVAILABLE').length },
-              { key: 'sold', label: 'Đã bán', icon: BarChart3, count: properties.filter((p: Property) => p.status === 'SOLD').length },
-              { key: 'rented', label: 'Đã thuê', icon: DollarSign, count: properties.filter((p: Property) => p.status === 'RENTED').length },
+              { key: 'all', label: t('myProperties.all'), icon: Home, count: properties.length },
+              { key: 'available', label: t('myProperties.selling'), icon: TrendingUp, count: properties.filter((p: Property) => p.status === 'AVAILABLE').length },
+              { key: 'sold', label: t('myProperties.sold'), icon: BarChart3, count: properties.filter((p: Property) => p.status === 'SOLD').length },
+              { key: 'rented', label: t('myProperties.rented'), icon: DollarSign, count: properties.filter((p: Property) => p.status === 'RENTED').length },
             ].map(tab => {
               const Icon = tab.icon;
               return (
@@ -157,7 +157,7 @@ const MyPropertiesPage = () => {
               className={`p-2 rounded-lg transition-all duration-200 ${
                 viewMode === 'grid' ? 'bg-red-600 text-white' : 'text-gray-600 hover:bg-gray-100'
               }`}
-              title="Xem dạng lưới"
+              title={t('myProperties.gridView')}
             >
               <Grid3x3 className="h-5 w-5" />
             </button>
@@ -166,7 +166,7 @@ const MyPropertiesPage = () => {
               className={`p-2 rounded-lg transition-all duration-200 ${
                 viewMode === 'list' ? 'bg-red-600 text-white' : 'text-gray-600 hover:bg-gray-100'
               }`}
-              title="Xem dạng danh sách"
+              title={t('myProperties.listView')}
             >
               <List className="h-5 w-5" />
             </button>
@@ -193,12 +193,12 @@ const MyPropertiesPage = () => {
               <Home className="h-12 w-12 text-gray-400" />
             </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-3">
-              {activeTab === 'all' ? 'Chưa có tin đăng' : `Không có tin ${getStatusBadge(activeTab.toUpperCase()).text.toLowerCase()}`}
+              {activeTab === 'all' ? t('myProperties.noListings') : t('myProperties.noListingsByStatus', { status: getStatusBadge(activeTab.toUpperCase()).text.toLowerCase() })}
             </h3>
             <p className="text-gray-600 mb-8 max-w-md mx-auto">
               {activeTab === 'all' 
-                ? 'Bắt đầu đăng tin bất động sản đầu tiên của bạn và tiếp cận hàng ngàn khách hàng tiềm năng.'
-                : `Hiện không có tin nào ở trạng thái này.`
+                ? t('myProperties.emptyDescription')
+                : t('myProperties.noListingsInStatus')
               }
             </p>
             {activeTab === 'all' && (
@@ -207,7 +207,7 @@ const MyPropertiesPage = () => {
                 className="inline-flex items-center space-x-2 px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 text-white font-bold rounded-xl hover:shadow-xl transition-all duration-200"
               >
                 <Plus className="h-5 w-5" />
-                <span>Đăng Tin Ngay</span>
+                <span>{t('myProperties.postNow')}</span>
               </Link>
             )}
           </div>
@@ -241,13 +241,13 @@ const MyPropertiesPage = () => {
                       <Link
                         to={`/edit-property/${property.id}`}
                         className="p-2.5 bg-white/95 backdrop-blur-sm rounded-xl hover:bg-white shadow-lg transition-all hover:scale-110"
-                        title="Chỉnh sửa"
+                        title={t('myProperties.edit')}
                       >
                         <Edit3 className="h-4 w-4 text-blue-600" />
                       </Link>
                       <button 
                         className="p-2.5 bg-white/95 backdrop-blur-sm rounded-xl hover:bg-white shadow-lg transition-all hover:scale-110"
-                        title="Xóa"
+                        title={t('myProperties.delete')}
                       >
                         <Trash2 className="h-4 w-4 text-red-600" />
                       </button>
@@ -273,13 +273,13 @@ const MyPropertiesPage = () => {
                     {/* Price & Area */}
                     <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-100">
                       <div>
-                        <p className="text-xs text-gray-500 mb-1">Giá</p>
+                        <p className="text-xs text-gray-500 mb-1">{t('myProperties.price')}</p>
                         <p className="text-xl font-bold text-red-600">
                           {formatPrice(property.price)}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-xs text-gray-500 mb-1">Diện tích</p>
+                        <p className="text-xs text-gray-500 mb-1">{t('myProperties.area')}</p>
                         <p className="text-lg font-semibold text-gray-900">
                           {property.area} m²
                         </p>
@@ -310,11 +310,11 @@ const MyPropertiesPage = () => {
                         to={`/property/${property.id}`}
                         className="flex-1 bg-red-600 text-white text-center py-2.5 px-4 rounded-xl hover:bg-red-700 transition-colors text-sm font-semibold shadow-sm"
                       >
-                        Xem Chi Tiết
+                        {t('myProperties.viewDetails')}
                       </Link>
                       <button 
                         className="px-4 py-2.5 border-2 border-gray-200 text-gray-700 rounded-xl hover:border-red-600 hover:text-red-600 transition-all text-sm font-semibold"
-                        title="Thống kê"
+                        title={t('myProperties.statistics')}
                       >
                         <BarChart3 className="h-4 w-4" />
                       </button>
@@ -352,13 +352,13 @@ const MyPropertiesPage = () => {
                           <Link
                             to={`/edit-property/${property.id}`}
                             className="p-2.5 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors"
-                            title="Chỉnh sửa"
+                            title={t('myProperties.edit')}
                           >
                             <Edit3 className="h-4 w-4" />
                           </Link>
                           <button 
                             className="p-2.5 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors"
-                            title="Xóa"
+                            title={t('myProperties.delete')}
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -367,11 +367,11 @@ const MyPropertiesPage = () => {
                       
                       <div className="flex items-center gap-6 mb-4">
                         <div>
-                          <p className="text-xs text-gray-500">Giá</p>
+                          <p className="text-xs text-gray-500">{t('myProperties.price')}</p>
                           <p className="text-2xl font-bold text-red-600">{formatPrice(property.price)}</p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-500">Diện tích</p>
+                          <p className="text-xs text-gray-500">{t('myProperties.area')}</p>
                           <p className="text-lg font-semibold text-gray-900">{property.area} m²</p>
                         </div>
                         <div className="flex items-center space-x-4 text-sm text-gray-600">
@@ -387,11 +387,11 @@ const MyPropertiesPage = () => {
                           className="inline-flex items-center space-x-2 bg-red-600 text-white px-6 py-2.5 rounded-xl hover:bg-red-700 transition-colors text-sm font-semibold"
                         >
                           <Eye className="h-4 w-4" />
-                          <span>Xem Chi Tiết</span>
+                          <span>{t('myProperties.viewDetails')}</span>
                         </Link>
                         <button className="inline-flex items-center space-x-2 px-5 py-2.5 border-2 border-gray-200 text-gray-700 rounded-xl hover:border-red-600 hover:text-red-600 transition-all text-sm font-semibold">
                           <BarChart3 className="h-4 w-4" />
-                          <span>Thống Kê</span>
+                          <span>{t('myProperties.statistics')}</span>
                         </button>
                       </div>
                     </div>

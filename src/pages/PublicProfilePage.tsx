@@ -319,7 +319,7 @@ const PublicProfilePage: React.FC = () => {
                             property.listingType === 'SALE' ? 'bg-green-600' : 'bg-blue-600'
                           }`}
                         >
-                          {property.listingType === 'SALE' ? 'Bán' : 'Cho thuê'}
+                          {property.listingType === 'SALE' ? t('common.sell') : t('postProperty.forRent')}
                         </span>
                       </div>
                     </div>

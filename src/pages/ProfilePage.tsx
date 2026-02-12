@@ -84,10 +84,10 @@ const ProfilePage: React.FC = () => {
     { id: 'overview', label: t('profile.overview'), icon: User },
     { id: 'properties', label: t('profile.myProperties'), icon: Building2 },
     { id: 'favorites', label: t('profile.myFavorites'), icon: Heart },
-    { id: 'subscription', label: 'Gói dịch vụ', icon: Package },
+    { id: 'subscription', label: t('profile.subscription'), icon: Package },
     { id: 'activities', label: t('profile.activities'), icon: TrendingUp },
-    { id: 'bank-accounts', label: 'Tài khoản ngân hàng', icon: CreditCard },
-    { id: 'transactions', label: 'Lịch sử giao dịch', icon: DollarSign },
+    { id: 'bank-accounts', label: t('profile.bankAccounts'), icon: CreditCard },
+    { id: 'transactions', label: t('profile.transactionHistory'), icon: DollarSign },
     { id: 'settings', label: t('profile.settings'), icon: Shield },
   ];
 
@@ -95,10 +95,10 @@ const ProfilePage: React.FC = () => {
 
   const formatPrice = (price: number) => {
     if (price >= 1000000000) {
-      return `${(price / 1000000000).toFixed(1)} tỷ`;
+      return `${(price / 1000000000).toFixed(1)} ${t('common.billion')}`;
     }
     if (price >= 1000000) {
-      return `${(price / 1000000).toFixed(0)} triệu`;
+      return `${(price / 1000000).toFixed(0)} ${t('common.million')}`;
     }
     return price.toLocaleString('vi-VN');
   };
@@ -170,19 +170,19 @@ const ProfilePage: React.FC = () => {
               </button>
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">{userProfile?.fullName || 'Người dùng'}</h2>
+              <h2 className="text-2xl font-bold text-gray-900">{userProfile?.fullName || t('profile.user')}</h2>
               <div className="flex items-center text-gray-600 mt-1">
                 <Award className="w-4 h-4 mr-1" />
-                <span>Thành viên từ {new Date(userProfile?.createdAt || Date.now()).getFullYear()}</span>
+                <span>{t('profile.memberSince')} {new Date(userProfile?.createdAt || Date.now()).getFullYear()}</span>
               </div>
               <div className="flex items-center space-x-4 mt-2 text-sm text-gray-600">
                 <div className="flex items-center">
                   <Building2 className="w-4 h-4 mr-1" />
-                  <span>{myProperties.length} tin đăng</span>
+                  <span>{myProperties.length} {t('profile.listings')}</span>
                 </div>
                 <div className="flex items-center">
                   <Heart className="w-4 h-4 mr-1" />
-                  <span>{favorites.length} tin đã lưu</span>
+                  <span>{favorites.length} {t('profile.savedListings')}</span>
                 </div>
               </div>
             </div>
@@ -192,13 +192,13 @@ const ProfilePage: React.FC = () => {
             className="flex items-center px-4 py-2 text-red-600 border border-red-600 rounded-lg hover:bg-red-50"
           >
             <Edit3 className="w-4 h-4 mr-2" />
-            Chỉnh sửa
+            {t('profile.edit')}
           </button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h3 className="font-semibold text-gray-900 mb-3">Thông tin liên hệ</h3>
+            <h3 className="font-semibold text-gray-900 mb-3">{t('profile.contactInfo')}</h3>
             <div className="space-y-2">
               <div className="flex items-center text-gray-600">
                 <Mail className="w-4 h-4 mr-3" />
@@ -206,33 +206,33 @@ const ProfilePage: React.FC = () => {
               </div>
               <div className="flex items-center text-gray-600">
                 <Phone className="w-4 h-4 mr-3" />
-                <span>{userProfile?.phoneNumber || userProfile?.phone || 'Chưa cập nhật'}</span>
+                <span>{userProfile?.phoneNumber || userProfile?.phone || t('profile.notUpdated')}</span>
               </div>
               <div className="flex items-center text-gray-600">
                 <MapPin className="w-4 h-4 mr-3" />
-                <span>{userProfile?.address || 'Chưa cập nhật'}</span>
+                <span>{userProfile?.address || t('profile.notUpdated')}</span>
               </div>
             </div>
           </div>
 
           <div>
-            <h3 className="font-semibold text-gray-900 mb-3">Thống kê hoạt động</h3>
+            <h3 className="font-semibold text-gray-900 mb-3">{t('profile.activityStatistics')}</h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-gray-50 rounded-lg p-3 text-center">
                 <div className="text-2xl font-bold text-red-600">{myProperties.length}</div>
-                <div className="text-sm text-gray-600">Tin đăng</div>
+                <div className="text-sm text-gray-600">{t('myProperties.total')}</div>
               </div>
               <div className="bg-gray-50 rounded-lg p-3 text-center">
                 <div className="text-2xl font-bold text-blue-600">{favorites.length}</div>
-                <div className="text-sm text-gray-600">Tin đã lưu</div>
+                <div className="text-sm text-gray-600">{t('profile.savedListings')}</div>
               </div>
               <div className="bg-gray-50 rounded-lg p-3 text-center">
                 <div className="text-2xl font-bold text-green-600">156</div>
-                <div className="text-sm text-gray-600">Lượt xem</div>
+                <div className="text-sm text-gray-600">{t('profile.views')}</div>
               </div>
               <div className="bg-gray-50 rounded-lg p-3 text-center">
                 <div className="text-2xl font-bold text-purple-600">12</div>
-                <div className="text-sm text-gray-600">Liên hệ</div>
+                <div className="text-sm text-gray-600">{t('profile.contacts')}</div>
               </div>
             </div>
           </div>
@@ -241,27 +241,27 @@ const ProfilePage: React.FC = () => {
 
       {/* Recent Activity */}
       <div className="bg-white rounded-lg shadow-sm p-6">
-        <h3 className="text-xl font-bold text-gray-900 mb-4">Hoạt động gần đây</h3>
+        <h3 className="text-xl font-bold text-gray-900 mb-4">{t('profile.recentActivity')}</h3>
         <div className="space-y-4">
           <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
             <div className="flex-1">
-              <p className="text-gray-900">Bạn đã đăng tin "Căn hộ cao cấp Vinhomes Central Park"</p>
-              <p className="text-sm text-gray-500">2 ngày trước</p>
+              <p className="text-gray-900">{t('profile.postedListing', { title: 'Căn hộ cao cấp Vinhomes Central Park' })}</p>
+              <p className="text-sm text-gray-500">{t('profile.daysAgo', { count: 2 })}</p>
             </div>
           </div>
           <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
             <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
             <div className="flex-1">
-              <p className="text-gray-900">Bạn đã lưu tin "Nhà phố hiện đại Thủ Đức"</p>
-              <p className="text-sm text-gray-500">3 ngày trước</p>
+              <p className="text-gray-900">{t('profile.savedListing', { title: 'Nhà phố hiện đại Thủ Đức' })}</p>
+              <p className="text-sm text-gray-500">{t('profile.daysAgo', { count: 3 })}</p>
             </div>
           </div>
           <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
             <div className="w-2 h-2 bg-red-500 rounded-full"></div>
             <div className="flex-1">
-              <p className="text-gray-900">Có 5 người đã xem tin đăng của bạn</p>
-              <p className="text-sm text-gray-500">1 tuần trước</p>
+              <p className="text-gray-900">{t('profile.viewedYourListing', { count: 5 })}</p>
+              <p className="text-sm text-gray-500">{t('profile.weeksAgo', { count: 1 })}</p>
             </div>
           </div>
         </div>
@@ -273,25 +273,25 @@ const ProfilePage: React.FC = () => {
   const PropertiesTab = () => (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h3 className="text-xl font-bold text-gray-900">Tin đăng của tôi ({myProperties.length})</h3>
+        <h3 className="text-xl font-bold text-gray-900">{t('profile.myProperties')} ({myProperties.length})</h3>
         <Link
           to="/post-property"
           className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
         >
-          Đăng tin mới
+          {t('profile.newListing')}
         </Link>
       </div>
 
       {myProperties.length === 0 ? (
         <div className="text-center py-12">
           <Building2 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Chưa có tin đăng nào</h3>
-          <p className="text-gray-600 mb-4">Hãy đăng tin đầu tiên để bắt đầu bán/cho thuê bất động sản</p>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('profile.noListings')}</h3>
+          <p className="text-gray-600 mb-4">{t('profile.noListingsDesc')}</p>
           <Link
             to="/post-property"
             className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700"
           >
-            Đăng tin ngay
+            {t('profile.postNow')}
           </Link>
         </div>
       ) : (
@@ -331,7 +331,7 @@ const ProfilePage: React.FC = () => {
                       </Link>
                     </h4>
                     <div className="text-2xl font-bold text-red-600 mb-2">
-                      {formatPrice(property.price)} VND
+                      {formatPrice(property.price)}
                     </div>
                     <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
                       <span>{property.area} m²</span>
@@ -352,29 +352,29 @@ const ProfilePage: React.FC = () => {
                     {property.viewCount !== undefined && (
                       <div className="flex items-center">
                         <Eye className="w-4 h-4 mr-1" />
-                        <span>{property.viewCount || 0} lượt xem</span>
+                        <span>{t('profile.viewsCount', { count: property.viewCount || 0 })}</span>
                       </div>
                     )}
                     <span className="text-sm text-gray-500">
-                      Đăng {new Date(property.createdAt).toLocaleDateString('vi-VN')}
+                      {t('profile.postedOn', { date: new Date(property.createdAt).toLocaleDateString('vi-VN') })}
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Link
                       to={`/properties/${property.id}`}
                       className="flex items-center px-4 py-2 text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors border border-blue-200"
-                      title="Xem chi tiết"
+                      title={t('profile.viewDetails')}
                     >
                       <Eye className="w-4 h-4 mr-2" />
-                      Xem chi tiết
+                      {t('profile.viewDetails')}
                     </Link>
                     <Link
                       to={`/edit-property/${property.id}`}
                       className="flex items-center px-4 py-2 text-sm text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors"
-                      title="Chỉnh sửa"
+                      title={t('profile.edit')}
                     >
                       <Edit3 className="w-4 h-4 mr-2" />
-                      Chỉnh sửa
+                      {t('profile.edit')}
                     </Link>
                   </div>
                 </div>
@@ -388,18 +388,18 @@ const ProfilePage: React.FC = () => {
 
   const FavoritesTab = () => (
     <div className="space-y-6">
-      <h3 className="text-xl font-bold text-gray-900">Tin đã lưu ({favorites.length})</h3>
+      <h3 className="text-xl font-bold text-gray-900">{t('profile.myFavorites')} ({favorites.length})</h3>
 
       {favorites.length === 0 ? (
         <div className="text-center py-12">
           <Heart className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Chưa có tin đã lưu</h3>
-          <p className="text-gray-600 mb-4">Lưu những tin đăng yêu thích để xem lại sau</p>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('profile.noSavedListings')}</h3>
+          <p className="text-gray-600 mb-4">{t('profile.noSavedListingsDesc')}</p>
           <Link
             to="/properties"
             className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700"
           >
-            Khám phá tin đăng
+            {t('profile.exploreListings')}
           </Link>
         </div>
       ) : (
@@ -412,7 +412,7 @@ const ProfilePage: React.FC = () => {
                     {favorite.property?.title}
                   </h4>
                   <div className="text-2xl font-bold text-red-600 mb-2">
-                    {favorite.property && formatPrice(favorite.property.price)} VND
+                    {favorite.property && formatPrice(favorite.property.price)}
                   </div>
                   <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
                     <span>{favorite.property?.area} m²</span>
@@ -438,7 +438,7 @@ const ProfilePage: React.FC = () => {
               </div>
               <div className="pt-4 border-t">
                 <span className="text-sm text-gray-500">
-                  Lưu ngày {new Date(favorite.createdAt).toLocaleDateString('vi-VN')}
+                  {t('profile.savedOn', { date: new Date(favorite.createdAt).toLocaleDateString('vi-VN') })}
                 </span>
               </div>
             </div>
@@ -495,15 +495,15 @@ const ProfilePage: React.FC = () => {
     };
 
     const handleCancelSubscription = async (id: string) => {
-      if (!window.confirm('Bạn có chắc chắn muốn hủy gói dịch vụ này?')) {
+      if (!window.confirm(t('profile.confirmCancel'))) {
         return;
       }
       try {
         await subscriptionAPI.cancel(id);
-        toast.success('Đã hủy gói dịch vụ thành công');
+        toast.success(t('profile.cancelSuccess'));
         loadSubscriptionData();
       } catch (error: any) {
-        toast.error(error.response?.data?.error || 'Không thể hủy gói dịch vụ');
+        toast.error(error.response?.data?.error || t('profile.cancelError'));
       }
     };
 
@@ -527,7 +527,7 @@ const ProfilePage: React.FC = () => {
       return (
         <div className="bg-white rounded-lg shadow-sm p-8 text-center">
           <div className="animate-spin h-8 w-8 border-4 border-red-600 border-t-transparent rounded-full mx-auto"></div>
-          <p className="mt-4 text-gray-600">Đang tải thông tin gói dịch vụ...</p>
+          <p className="mt-4 text-gray-600">{t('profile.loadingSubscription')}</p>
         </div>
       );
     }
@@ -538,7 +538,7 @@ const ProfilePage: React.FC = () => {
         <div className="bg-white rounded-lg shadow-sm p-6">
           <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
             <Package className="h-5 w-5 text-red-600" />
-            Gói dịch vụ hiện tại
+            {t('profile.currentSubscription')}
           </h3>
 
           {currentSubscription ? (
@@ -546,12 +546,12 @@ const ProfilePage: React.FC = () => {
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <h4 className="text-lg font-semibold text-gray-900 mb-1">
-                    {currentSubscription.listingPackage?.name || 'Gói dịch vụ'}
+                    {currentSubscription.listingPackage?.name || t('profile.subscriptionPackage')}
                   </h4>
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Calendar className="h-4 w-4" />
                     <span>
-                      Từ {formatDate(currentSubscription.startDate)} đến {formatDate(currentSubscription.endDate)}
+                      {t('profile.fromTo', { start: formatDate(currentSubscription.startDate), end: formatDate(currentSubscription.endDate) })}
                     </span>
                   </div>
                 </div>
@@ -565,23 +565,23 @@ const ProfilePage: React.FC = () => {
                   {currentSubscription.status === 'ACTIVE' && <CheckCircle2 className="h-3 w-3 inline mr-1" />}
                   {currentSubscription.status === 'EXPIRED' && <XCircle className="h-3 w-3 inline mr-1" />}
                   {currentSubscription.status === 'CANCELLED' && <XCircle className="h-3 w-3 inline mr-1" />}
-                  {currentSubscription.status === 'ACTIVE' ? 'Đang hoạt động' :
-                   currentSubscription.status === 'EXPIRED' ? 'Đã hết hạn' :
-                   currentSubscription.status === 'CANCELLED' ? 'Đã hủy' : currentSubscription.status}
+                  {currentSubscription.status === 'ACTIVE' ? t('profile.active') :
+                   currentSubscription.status === 'EXPIRED' ? t('profile.expired') :
+                   currentSubscription.status === 'CANCELLED' ? t('profile.cancelled') : currentSubscription.status}
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Thời hạn còn lại</p>
+                  <p className="text-sm text-gray-600 mb-1">{t('profile.daysRemaining')}</p>
                   <p className="text-lg font-semibold text-gray-900">
-                    {getDaysRemaining(currentSubscription.endDate)} ngày
+                    {t('profile.days', { count: getDaysRemaining(currentSubscription.endDate) })}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Đã sử dụng</p>
+                  <p className="text-sm text-gray-600 mb-1">{t('profile.used')}</p>
                   <p className="text-lg font-semibold text-gray-900">
-                    {currentSubscription.propertiesUsed} / {currentSubscription.listingPackage?.maxProperties || '∞'} tin đăng
+                    {t('profile.of', { used: currentSubscription.propertiesUsed, max: currentSubscription.listingPackage?.maxProperties || '∞' })}
                   </p>
                 </div>
               </div>
@@ -591,7 +591,7 @@ const ProfilePage: React.FC = () => {
                   onClick={() => handleCancelSubscription(currentSubscription.id)}
                   className="w-full px-4 py-2 border border-red-600 text-red-600 rounded-lg hover:bg-red-50 transition-colors font-medium"
                 >
-                  Hủy gói dịch vụ
+                  {t('profile.cancelSubscription')}
                 </button>
               )}
 
@@ -600,20 +600,20 @@ const ProfilePage: React.FC = () => {
                   to="/pricing"
                   className="block w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-center"
                 >
-                  Gia hạn hoặc mua gói mới
+                  {t('profile.renewOrBuy')}
                 </Link>
               )}
             </div>
           ) : (
             <div className="border border-gray-200 rounded-lg p-8 text-center">
               <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">Bạn chưa có gói dịch vụ</h4>
-              <p className="text-gray-600 mb-4">Mua gói dịch vụ để đăng tin bất động sản</p>
+              <h4 className="text-lg font-semibold text-gray-900 mb-2">{t('profile.noSubscription')}</h4>
+              <p className="text-gray-600 mb-4">{t('profile.noSubscriptionDesc')}</p>
               <Link
                 to="/pricing"
                 className="inline-block px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
               >
-                Xem các gói dịch vụ
+                {t('profile.viewPackages')}
               </Link>
             </div>
           )}
@@ -621,7 +621,7 @@ const ProfilePage: React.FC = () => {
 
         {/* Subscription History */}
         <div className="bg-white rounded-lg shadow-sm p-6">
-          <h3 className="text-xl font-bold text-gray-900 mb-4">Lịch sử gói dịch vụ</h3>
+          <h3 className="text-xl font-bold text-gray-900 mb-4">{t('profile.subscriptionHistory')}</h3>
           {subscriptionHistory?.content && subscriptionHistory.content.length > 0 ? (
             <div className="space-y-4">
               {subscriptionHistory.content.map((sub: UserSubscription) => (
@@ -629,7 +629,7 @@ const ProfilePage: React.FC = () => {
                   <div className="flex items-start justify-between mb-2">
                     <div>
                       <h4 className="font-semibold text-gray-900">
-                        {sub.listingPackage?.name || 'Gói dịch vụ'}
+                        {sub.listingPackage?.name || t('profile.subscriptionPackage')}
                       </h4>
                       <p className="text-sm text-gray-600">
                         {formatDate(sub.startDate)} - {formatDate(sub.endDate)}
@@ -640,19 +640,19 @@ const ProfilePage: React.FC = () => {
                       sub.status === 'EXPIRED' ? 'bg-gray-100 text-gray-700' :
                       'bg-red-100 text-red-700'
                     }`}>
-                      {sub.status === 'ACTIVE' ? 'Hoạt động' :
-                       sub.status === 'EXPIRED' ? 'Hết hạn' :
-                       sub.status === 'CANCELLED' ? 'Đã hủy' : sub.status}
+                      {sub.status === 'ACTIVE' ? t('profile.active') :
+                       sub.status === 'EXPIRED' ? t('profile.expired') :
+                       sub.status === 'CANCELLED' ? t('profile.cancelled') : sub.status}
                     </span>
                   </div>
                   <div className="text-sm text-gray-600">
-                    Đã sử dụng: {sub.propertiesUsed} / {sub.listingPackage?.maxProperties || '∞'} tin đăng
+                    {t('profile.used')}: {t('profile.of', { used: sub.propertiesUsed, max: sub.listingPackage?.maxProperties || '∞' })}
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-gray-600 text-center py-8">Chưa có lịch sử gói dịch vụ</p>
+            <p className="text-gray-600 text-center py-8">{t('profile.noSubscriptionHistory')}</p>
           )}
         </div>
       </div>
@@ -663,13 +663,13 @@ const ProfilePage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Vui lòng đăng nhập</h2>
-          <p className="text-gray-600 mb-6">Bạn cần đăng nhập để xem trang cá nhân</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('profile.pleaseLogin')}</h2>
+          <p className="text-gray-600 mb-6">{t('profile.loginRequired')}</p>
           <Link
             to="/login"
             className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700"
           >
-            Đăng nhập ngay
+            {t('profile.loginNow')}
           </Link>
         </div>
       </div>
