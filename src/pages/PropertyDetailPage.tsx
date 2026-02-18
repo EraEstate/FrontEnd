@@ -16,6 +16,7 @@ import {
   Bath,
   Car,
   Shield,
+  CreditCard,
   Zap,
   TreePine,
   Building,
@@ -225,32 +226,25 @@ const PropertyDetailPage: React.FC = () => {
       toast.error('Không tìm thấy thông tin bất động sản.');
       return;
     }
-
-    if (
-      !REALESTATE_CONTRACT_ADDRESS ||
-      REALESTATE_CONTRACT_ADDRESS === '0x0000000000000000000000000000000000000000'
-    ) {
-      toast.error('Chưa cấu hình địa chỉ smart contract bất động sản. Vui lòng liên hệ quản trị viên.');
-      return;
-    }
-
     setShowContractModal(true);
   };
 
-  const handleCreateBlockchainContract = async () => {
+  const handleCreateTransaction = async (paymentMethod: 'VNPAY' | 'CASH') => {
     if (!id || !user) return;
-
+    if (paymentMethod === 'CASH' && (
+      !REALESTATE_CONTRACT_ADDRESS ||
+      REALESTATE_CONTRACT_ADDRESS === '0x0000000000000000000000000000000000000000'
+    )) {
+      toast.error('Chưa cấu hình địa chỉ smart contract. Chọn "Thanh toán VNPay" hoặc liên hệ quản trị viên.');
+      return;
+    }
     try {
       setCreatingContract(true);
-
-      // 1. Tạo giao dịch off-chain trong hệ thống
       const transaction = await propertyTransactionAPI.create({
         propertyId: id,
-        buyerId: user.id,
-        paymentMethod: 'CASH',
+        buyerId: String(user.id),
+        paymentMethod,
       });
-
-      // 2. Đóng modal hiện tại và chuyển sang trang hợp đồng đầy đủ
       setShowContractModal(false);
       navigate(`/transactions/${transaction.id}/contract`);
     } catch (error: any) {
@@ -258,7 +252,7 @@ const PropertyDetailPage: React.FC = () => {
       const msg =
         error?.message ||
         error?.response?.data?.error ||
-        'Không thể tạo giao dịch để lập hợp đồng. Vui lòng thử lại.';
+        'Không thể tạo giao dịch. Vui lòng thử lại.';
       toast.error(msg);
     } finally {
       setCreatingContract(false);
@@ -563,14 +557,14 @@ const PropertyDetailPage: React.FC = () => {
                     <Mail className="h-5 w-5 mr-2" />
                     {t('propertyDetail.contact')}
                   </button>
-                  {/* Blockchain contract CTA */}
+                  {/* Mở hợp đồng: VNPay hoặc Blockchain */}
                   {!isOwner && (
                     <button
                       onClick={handleOpenContractModal}
                       className="w-full bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 transition-colors font-medium flex items-center justify-center"
                     >
                       <Shield className="h-5 w-5 mr-2" />
-                      {isRentListing ? 'Mở hợp đồng thuê (Blockchain)' : 'Mở hợp đồng mua bán (Blockchain)'}
+                      {isRentListing ? 'Mở hợp đồng thuê' : 'Mở hợp đồng mua bán'}
                     </button>
                   )}
                 </div>
@@ -679,10 +673,10 @@ const PropertyDetailPage: React.FC = () => {
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-bold text-gray-900">
-                  {isRentListing ? 'Hợp đồng thuê bất động sản (Blockchain)' : 'Hợp đồng mua bán bất động sản (Blockchain)'}
+                  {isRentListing ? 'Hợp đồng thuê bất động sản' : 'Hợp đồng mua bán bất động sản'}
                 </h2>
                 <p className="text-sm text-gray-500 mt-1">
-                  Thông tin hợp đồng sẽ được ghi nhận on-chain sau khi bạn ký bằng MetaMask.
+                  Chọn phương thức: thanh toán VNPay hoặc ký hợp đồng trên blockchain (MetaMask).
                 </p>
               </div>
             </div>
@@ -723,7 +717,35 @@ const PropertyDetailPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="px-6 py-4 border-t border-gray-200 flex flex-col md:flex-row md:justify-end gap-3">
+            <div className="px-6 py-4 border-t border-gray-200 flex flex-col gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleCreateTransaction('VNPAY')}
+                  disabled={creatingContract}
+                  className="flex-1 px-4 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {creatingContract ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <CreditCard className="h-4 w-4" />
+                  )}
+                  Thanh toán bằng VNPay
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleCreateTransaction('CASH')}
+                  disabled={creatingContract}
+                  className="flex-1 px-4 py-3 rounded-lg bg-red-600 text-white hover:bg-red-700 text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {creatingContract ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Shield className="h-4 w-4" />
+                  )}
+                  Ký hợp đồng Blockchain (MetaMask)
+                </button>
+              </div>
               <button
                 type="button"
                 disabled={creatingContract}
@@ -733,24 +755,6 @@ const PropertyDetailPage: React.FC = () => {
                 className="px-4 py-2.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm font-medium disabled:opacity-60"
               >
                 Đóng
-              </button>
-              <button
-                type="button"
-                onClick={handleCreateBlockchainContract}
-                disabled={creatingContract}
-                className="px-4 py-2.5 rounded-lg bg-red-600 text-white hover:bg-red-700 text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {creatingContract ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Đang ký hợp đồng & gửi lên blockchain...
-                  </>
-                ) : (
-                  <>
-                    <Shield className="h-4 w-4" />
-                    Ký hợp đồng bằng MetaMask
-                  </>
-                )}
               </button>
             </div>
           </div>

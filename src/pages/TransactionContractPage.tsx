@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   ArrowLeft,
   Shield,
@@ -11,6 +11,7 @@ import {
   XCircle,
   Loader2,
   Link as LinkIcon,
+  CreditCard,
 } from 'lucide-react';
 import { propertyTransactionAPI, type PropertyTransaction } from '../api/propertyTransaction';
 import { propertyAPI } from '../api/property';
@@ -18,12 +19,14 @@ import { useAuthStore } from '../store/authStore';
 import { toast } from 'react-toastify';
 import { connectMetaMask, sendCreateDealTx } from '../utils/metamask';
 import { REALESTATE_CONTRACT_ADDRESS, BLOCKCHAIN_EXPLORER_URL, BLOCKCHAIN_NETWORK_NAME } from '../config/blockchain';
+import { createVnpayPaymentUrl } from '../config/vnpay';
 import RealEstateEscrowAbi from '../abi/RealEstateEscrow.json';
 import { useTranslation } from 'react-i18next';
 
 const TransactionContractPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuthStore();
   const { t } = useTranslation();
 
@@ -31,33 +34,58 @@ const TransactionContractPage: React.FC = () => {
   const [property, setProperty] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [signing, setSigning] = useState(false);
+  const [payingVnpay, setPayingVnpay] = useState(false);
+
+  const fetchTransaction = async () => {
+    if (!id) return;
+    try {
+      setLoading(true);
+      const tx = await propertyTransactionAPI.getById(id);
+      setTransaction(tx);
+      if (tx.propertyId) {
+        try {
+          const prop = await propertyAPI.getById(tx.propertyId);
+          setProperty(prop);
+        } catch (e) {
+          console.error('Failed to load property for contract page:', e);
+        }
+      }
+    } catch (error: any) {
+      console.error('Failed to load transaction:', error);
+      toast.error(t('transaction.errors.notFound'));
+      navigate('/profile');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!id) return;
-      try {
-        setLoading(true);
-        const tx = await propertyTransactionAPI.getById(id);
-        setTransaction(tx);
-        if (tx.propertyId) {
-          try {
-            const prop = await propertyAPI.getById(tx.propertyId);
-            setProperty(prop);
-          } catch (e) {
-            console.error('Failed to load property for contract page:', e);
-          }
-        }
-      } catch (error: any) {
-        console.error('Failed to load transaction:', error);
-        toast.error(t('transaction.errors.notFound'));
-        navigate('/profile');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
+    fetchTransaction();
   }, [id, navigate]);
+
+  // Xử lý return từ VNPay: ?payment=vnpay&vnp_ResponseCode=00&vnp_TxnRef=...&vnp_TransactionNo=...
+  useEffect(() => {
+    const payment = searchParams.get('payment');
+    const vnpResponseCode = searchParams.get('vnp_ResponseCode');
+    const vnpTxnRef = searchParams.get('vnp_TxnRef');
+    const vnpTransactionNo = searchParams.get('vnp_TransactionNo');
+    if (payment !== 'vnpay' || !vnpTxnRef || !id) return;
+    if (vnpResponseCode === '00') {
+      (async () => {
+        try {
+          await propertyTransactionAPI.confirmPayment(vnpTxnRef, vnpTransactionNo || vnpTxnRef);
+          toast.success(t('transaction.success.vnpayPaid'));
+          setSearchParams({}, { replace: true });
+          await fetchTransaction();
+        } catch (e: any) {
+          toast.error(e?.response?.data?.error || t('transaction.errors.signFailed'));
+        }
+      })();
+    } else {
+      toast.error(t('transaction.errors.vnpayFailed'));
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams]);
 
   const formatPrice = (price: number | undefined) => {
     if (!price && price !== 0) return '-';
@@ -177,6 +205,28 @@ const TransactionContractPage: React.FC = () => {
     }
   };
 
+  const handlePayWithVnpay = async () => {
+    if (!transaction || !id) return;
+    const total = transaction.totalAmount;
+    if (!total || Number.isNaN(total)) {
+      toast.error(t('transaction.errors.noAmount'));
+      return;
+    }
+    try {
+      setPayingVnpay(true);
+      const returnUrl = `${window.location.origin}/transactions/${id}/blockchain?payment=vnpay`;
+      const paymentUrl = await createVnpayPaymentUrl({
+        transactionId: id,
+        amount: total,
+        returnUrl,
+      });
+      window.location.href = paymentUrl;
+    } catch (e: any) {
+      toast.error(e?.message || t('transaction.errors.vnpayCreateFailed'));
+      setPayingVnpay(false);
+    }
+  };
+
   if (loading || !transaction) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -240,11 +290,20 @@ const TransactionContractPage: React.FC = () => {
   const contractDate = new Date(transaction.createdAt).toLocaleDateString('vi-VN');
   const isOnChainConfirmed = blockchainStatus === 'ONCHAIN_CONFIRMED';
   const isPaidOrCompleted = ['PAID', 'COMPLETED'].includes(transaction.status);
+  const isVnpayPaid = transaction.paymentMethod === 'VNPAY' && isPaidOrCompleted;
+  const isContractReady = isOnChainConfirmed || isVnpayPaid;
   // Demo mode: cho phép ký on-chain miễn là bạn là 1 trong hai bên và giao dịch chưa bị huỷ/thất bại,
   // chưa có txHash. Nếu muốn siết lại sau chỉ cần thêm điều kiện status (PAID/COMPLETED) ở đây.
   const canSignOnChain =
     isParticipant &&
     !transaction.blockchainTxHash &&
+    !['CANCELLED', 'FAILED', 'REFUNDED'].includes(transaction.status) &&
+    !isVnpayPaid; // Đã thanh toán VNPay thì không hiện nút ký MetaMask
+
+  const canPayVnpay =
+    isParticipant &&
+    transaction.paymentMethod === 'VNPAY' &&
+    transaction.status === 'PENDING' &&
     !['CANCELLED', 'FAILED', 'REFUNDED'].includes(transaction.status);
 
   return (
@@ -286,7 +345,7 @@ const TransactionContractPage: React.FC = () => {
                 {chainStatus.label}
               </span>
             )}
-            {isOnChainConfirmed && (
+            {isContractReady && (
               <button
                 type="button"
                 onClick={() => navigate('/')}
@@ -297,6 +356,50 @@ const TransactionContractPage: React.FC = () => {
             )}
           </div>
         </div>
+
+        {/* VNPay: Các bước đã hoàn thành + thông báo hợp đồng có hiệu lực */}
+        {isVnpayPaid && (
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100 p-6 mb-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                <CreditCard className="w-6 h-6 text-blue-600" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">{t('transaction.vnpaySuccessTitle')}</h2>
+                <p className="text-sm text-gray-600">{t('transaction.vnpaySuccessSubtitle')}</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="flex items-center gap-3 rounded-lg bg-white/80 p-3 border border-blue-100">
+                <div className="h-8 w-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-bold">1</div>
+                <div>
+                  <p className="font-semibold text-gray-900 text-sm">{t('transaction.vnpayStep1')}</p>
+                  <p className="text-xs text-gray-600">{t('transaction.vnpayStep1Desc')}</p>
+                </div>
+                <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0 ml-auto" />
+              </div>
+              <div className="flex items-center gap-3 rounded-lg bg-white/80 p-3 border border-blue-100">
+                <div className="h-8 w-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-bold">2</div>
+                <div>
+                  <p className="font-semibold text-gray-900 text-sm">{t('transaction.vnpayStep2')}</p>
+                  <p className="text-xs text-gray-600">{t('transaction.vnpayStep2Desc')}</p>
+                </div>
+                <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0 ml-auto" />
+              </div>
+              <div className="flex items-center gap-3 rounded-lg bg-white/80 p-3 border border-blue-100">
+                <div className="h-8 w-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-bold">3</div>
+                <div>
+                  <p className="font-semibold text-gray-900 text-sm">{t('transaction.vnpayStep3')}</p>
+                  <p className="text-xs text-gray-600">{t('transaction.vnpayStep3Desc')}</p>
+                </div>
+                <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0 ml-auto" />
+              </div>
+            </div>
+            <p className="mt-4 text-sm text-gray-700 bg-white/60 rounded-lg px-4 py-2 border border-blue-100">
+              {t('transaction.vnpayContractReady')}
+            </p>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main contract content */}
@@ -437,101 +540,127 @@ const TransactionContractPage: React.FC = () => {
 
           {/* Right column: Quy trình & Blockchain actions */}
           <div className="space-y-4">
-            {/* Step overview: toàn bộ quy trình giao dịch + blockchain */}
+            {/* Step overview: VNPay flow (3 bước) hoặc Blockchain flow (4 bước) */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 text-sm text-gray-700">
-              <h2 className="text-lg font-semibold text-gray-900 mb-3">{t('transaction.processTitle')}</h2>
-              <ol className="space-y-3 text-sm">
-                <li className="flex items-start gap-3">
-                  <div className="mt-0.5 h-6 w-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xs font-semibold">
-                    1
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900">{t('transaction.step1')}</p>
-                    <p className="text-gray-600 text-xs mt-0.5">
-                      {t('transaction.step1Desc')}
-                    </p>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3">
-                  <div className="mt-0.5 h-6 w-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xs font-semibold">
-                    2
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900">
-                      {t('transaction.step2')}{' '}
-                      {isPaidOrCompleted ? (
-                        <span className="ml-1 inline-flex px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[11px] font-medium">
-                          {t('transaction.step2Completed')}
-                        </span>
-                      ) : (
-                        <span className="ml-1 inline-flex px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 text-[11px] font-medium">
-                          {t('transaction.step2Pending')}
-                        </span>
-                      )}
-                    </p>
-                    <p className="text-gray-600 text-xs mt-0.5">
-                      {t('transaction.step2Desc')}
-                    </p>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3">
-                  <div className="mt-0.5 h-6 w-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xs font-semibold">
-                    3
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900">
-                      {t('transaction.step3')}{' '}
-                      {transaction.blockchainTxHash ? (
-                        <span className="ml-1 inline-flex px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[11px] font-medium">
-                          {t('transaction.step3Sent')}
-                        </span>
-                      ) : canSignOnChain ? (
-                        <span className="ml-1 inline-flex px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[11px] font-medium">
-                          {t('transaction.step3Ready')}
-                        </span>
-                      ) : (
-                        <span className="ml-1 inline-flex px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 text-[11px] font-medium">
-                          {t('transaction.step3NotReady')}
-                        </span>
-                      )}
-                    </p>
-                    <p className="text-gray-600 text-xs mt-0.5">
-                      {t('transaction.step3Desc', { network: BLOCKCHAIN_NETWORK_NAME })}
-                    </p>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3">
-                  <div className="mt-0.5 h-6 w-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xs font-semibold">
-                    4
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900">
-                      {t('transaction.step4')}{' '}
-                      {isOnChainConfirmed ? (
-                        <span className="ml-1 inline-flex px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[11px] font-medium">
-                          {t('transaction.step4Ready')}
-                        </span>
-                      ) : (
-                        <span className="ml-1 inline-flex px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 text-[11px] font-medium">
-                          {t('transaction.step4Waiting')}
-                        </span>
-                      )}
-                    </p>
-                    <p className="text-gray-600 text-xs mt-0.5">
-                      {t('transaction.step4Desc')}
-                    </p>
-                  </div>
-                </li>
-              </ol>
+              <h2 className="text-lg font-semibold text-gray-900 mb-3">
+                {isVnpayPaid ? t('transaction.vnpayProcessTitle') : t('transaction.processTitle')}
+              </h2>
+              {isVnpayPaid ? (
+                <ol className="space-y-3 text-sm">
+                  <li className="flex items-start gap-3">
+                    <div className="mt-0.5 h-6 w-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-semibold">1</div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-gray-900">{t('transaction.vnpayStep1')}</p>
+                      <p className="text-gray-600 text-xs mt-0.5">{t('transaction.vnpayStep1Desc')}</p>
+                    </div>
+                    <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="mt-0.5 h-6 w-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-semibold">2</div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-gray-900">{t('transaction.vnpayStep2')}</p>
+                      <p className="text-gray-600 text-xs mt-0.5">{t('transaction.vnpayStep2Desc')}</p>
+                    </div>
+                    <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="mt-0.5 h-6 w-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-semibold">3</div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-gray-900">{t('transaction.vnpayStep3')}</p>
+                      <p className="text-gray-600 text-xs mt-0.5">{t('transaction.vnpayStep3Desc')}</p>
+                    </div>
+                    <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />
+                  </li>
+                </ol>
+              ) : (
+                <ol className="space-y-3 text-sm">
+                  <li className="flex items-start gap-3">
+                    <div className="mt-0.5 h-6 w-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xs font-semibold">1</div>
+                    <div>
+                      <p className="font-semibold text-gray-900">{t('transaction.step1')}</p>
+                      <p className="text-gray-600 text-xs mt-0.5">{t('transaction.step1Desc')}</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="mt-0.5 h-6 w-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xs font-semibold">2</div>
+                    <div>
+                      <p className="font-semibold text-gray-900">
+                        {t('transaction.step2')}{' '}
+                        {isPaidOrCompleted ? (
+                          <span className="ml-1 inline-flex px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[11px] font-medium">
+                            {t('transaction.step2Completed')}
+                          </span>
+                        ) : (
+                          <span className="ml-1 inline-flex px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 text-[11px] font-medium">
+                            {t('transaction.step2Pending')}
+                          </span>
+                        )}
+                      </p>
+                      <p className="text-gray-600 text-xs mt-0.5">{t('transaction.step2Desc')}</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="mt-0.5 h-6 w-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xs font-semibold">3</div>
+                    <div>
+                      <p className="font-semibold text-gray-900">
+                        {t('transaction.step3')}{' '}
+                        {transaction.blockchainTxHash ? (
+                          <span className="ml-1 inline-flex px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[11px] font-medium">
+                            {t('transaction.step3Sent')}
+                          </span>
+                        ) : canSignOnChain ? (
+                          <span className="ml-1 inline-flex px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[11px] font-medium">
+                            {t('transaction.step3Ready')}
+                          </span>
+                        ) : (
+                          <span className="ml-1 inline-flex px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 text-[11px] font-medium">
+                            {t('transaction.step3NotReady')}
+                          </span>
+                        )}
+                      </p>
+                      <p className="text-gray-600 text-xs mt-0.5">
+                        {t('transaction.step3Desc', { network: BLOCKCHAIN_NETWORK_NAME })}
+                      </p>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="mt-0.5 h-6 w-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xs font-semibold">4</div>
+                    <div>
+                      <p className="font-semibold text-gray-900">
+                        {t('transaction.step4')}{' '}
+                        {isContractReady ? (
+                          <span className="ml-1 inline-flex px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[11px] font-medium">
+                            {t('transaction.step4Ready')}
+                          </span>
+                        ) : (
+                          <span className="ml-1 inline-flex px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 text-[11px] font-medium">
+                            {t('transaction.step4Waiting')}
+                          </span>
+                        )}
+                      </p>
+                      <p className="text-gray-600 text-xs mt-0.5">{t('transaction.step4Desc')}</p>
+                    </div>
+                  </li>
+                </ol>
+              )}
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                  <Shield className="w-5 h-5 text-red-500" />
-                  {t('transaction.blockchainStatusTitle')}
+                  {isVnpayPaid ? (
+                    <>
+                      <CreditCard className="w-5 h-5 text-blue-500" />
+                      {t('transaction.vnpayStatusTitle')}
+                    </>
+                  ) : (
+                    <>
+                      <Shield className="w-5 h-5 text-red-500" />
+                      {t('transaction.blockchainStatusTitle')}
+                    </>
+                  )}
                 </h2>
-              {isOnChainConfirmed && (
+              {isContractReady && (
                   <button
                     type="button"
                     onClick={() => window.print()}
@@ -541,50 +670,86 @@ const TransactionContractPage: React.FC = () => {
                   </button>
                 )}
               </div>
-              <div className="space-y-2 text-sm">
-                <p className="text-gray-600">
-                  {t('transaction.network')}:{' '}
-                  <span className="font-semibold text-gray-900">
-                    {transaction.blockchainNetwork || BLOCKCHAIN_NETWORK_NAME || t('common.unknown')}
-                  </span>
-                </p>
-                <p className="text-gray-600">
-                  {t('transaction.contractAddress')}:{' '}
-                  <span className="font-mono text-xs break-all">
-                    {transaction.blockchainContractAddress || REALESTATE_CONTRACT_ADDRESS || t('common.notSelected')}
-                  </span>
-                </p>
-                {transaction.blockchainTxHash ? (
-                  <p className="text-gray-600 flex items-center gap-1">
-                    {t('transaction.txHash')}:{' '}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const url = buildExplorerUrl(transaction.blockchainTxHash!);
-                        if (url) {
-                          window.open(url, '_blank');
-                        } else {
-                          navigator.clipboard.writeText(transaction.blockchainTxHash!);
-                          toast.info(t('transaction.success.hashCopied'));
-                        }
-                      }}
-                      className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700"
-                    >
-                      <LinkIcon className="w-3 h-3" />
-                      <span className="font-mono text-xs">{shortenHash(transaction.blockchainTxHash)}</span>
-                    </button>
+              {isVnpayPaid ? (
+                <div className="space-y-2 text-sm">
+                  <p className="text-gray-600">
+                    {t('transaction.vnpayPaidAt')}:{' '}
+                    <span className="font-semibold text-emerald-700">{t('transaction.status.paid')}</span>
                   </p>
-                ) : (
-                  <p className="text-gray-500 text-sm">{t('transaction.notCreated')}</p>
-                )}
-              </div>
+                  {transaction.bankTransactionId && (
+                    <p className="text-gray-600">
+                      {t('transaction.vnpayTransactionId')}:{' '}
+                      <span className="font-mono text-xs">{transaction.bankTransactionId}</span>
+                    </p>
+                  )}
+                  <p className="text-xs text-gray-500 mt-2">{t('transaction.vnpayContractNote')}</p>
+                </div>
+              ) : (
+                <div className="space-y-2 text-sm">
+                  <p className="text-gray-600">
+                    {t('transaction.network')}:{' '}
+                    <span className="font-semibold text-gray-900">
+                      {transaction.blockchainNetwork || BLOCKCHAIN_NETWORK_NAME || t('common.unknown')}
+                    </span>
+                  </p>
+                  <p className="text-gray-600">
+                    {t('transaction.contractAddress')}:{' '}
+                    <span className="font-mono text-xs break-all">
+                      {transaction.blockchainContractAddress || REALESTATE_CONTRACT_ADDRESS || t('common.notSelected')}
+                    </span>
+                  </p>
+                  {transaction.blockchainTxHash ? (
+                    <p className="text-gray-600 flex items-center gap-1">
+                      {t('transaction.txHash')}:{' '}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const url = buildExplorerUrl(transaction.blockchainTxHash!);
+                          if (url) {
+                            window.open(url, '_blank');
+                          } else {
+                            navigator.clipboard.writeText(transaction.blockchainTxHash!);
+                            toast.info(t('transaction.success.hashCopied'));
+                          }
+                        }}
+                        className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700"
+                      >
+                        <LinkIcon className="w-3 h-3" />
+                        <span className="font-mono text-xs">{shortenHash(transaction.blockchainTxHash)}</span>
+                      </button>
+                    </p>
+                  ) : (
+                    <p className="text-gray-500 text-sm">{t('transaction.notCreated')}</p>
+                  )}
+                </div>
+              )}
 
+              {canPayVnpay && (
+                <button
+                  type="button"
+                  onClick={handlePayWithVnpay}
+                  disabled={payingVnpay}
+                  className="mt-4 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 text-sm font-medium disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {payingVnpay ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      {t('transaction.vnpayRedirecting')}
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="w-4 h-4" />
+                      {t('transaction.payWithVnpay')}
+                    </>
+                  )}
+                </button>
+              )}
               {canSignOnChain && (
                 <button
                   type="button"
                   onClick={handleSignOnChain}
                   disabled={signing}
-                  className="mt-4 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-red-600 text-white hover:bg-red-700 text-sm font-medium disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="mt-3 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-red-600 text-white hover:bg-red-700 text-sm font-medium disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {signing ? (
                     <>
@@ -611,8 +776,10 @@ const TransactionContractPage: React.FC = () => {
             {/* Printable paper-style contract preview */}
             <div className="printable-contract bg-white rounded-xl shadow-sm border border-gray-100 p-5 text-sm text-gray-700">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-gray-900">{t('transaction.paperContract')}</h3>
-                {isOnChainConfirmed && (
+                <h3 className="font-semibold text-gray-900">
+                  {isVnpayPaid ? t('transaction.vnpayPaperContract') : t('transaction.paperContract')}
+                </h3>
+                {isContractReady && (
                   <button
                     type="button"
                     onClick={() => window.print()}
@@ -622,7 +789,7 @@ const TransactionContractPage: React.FC = () => {
                   </button>
                 )}
               </div>
-              <div className={`border border-gray-200 rounded-lg p-4 bg-white ${!isOnChainConfirmed ? 'opacity-60' : ''}`}>
+              <div className={`border border-gray-200 rounded-lg p-4 bg-white ${!isContractReady ? 'opacity-60' : ''}`}>
                 <p className="text-center font-semibold text-gray-900 uppercase mb-1">
                   {t('transaction.contract.vietnamHeader')}
                 </p>
@@ -916,7 +1083,7 @@ const TransactionContractPage: React.FC = () => {
                 <p className="mb-2 text-xs text-gray-500 mt-4">
                   * {t('transaction.contract.contractFooter')}
                 </p>
-                {!isOnChainConfirmed && (
+                {!isContractReady && (
                   <p className="mb-4 text-xs text-red-500 font-medium">
                     ** {t('transaction.contract.contractFooterWarning')}
                   </p>
