@@ -29,7 +29,8 @@ export interface PropertyTransaction {
   property?: {
     id: string;
     title: string;
-    price: number;
+    listingType?: string;
+    thumbnailUrl?: string;
   };
   buyer?: {
     id: string;

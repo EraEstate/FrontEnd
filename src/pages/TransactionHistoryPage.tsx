@@ -1,12 +1,84 @@
 import React, { useState, useEffect } from 'react';
-import { DollarSign, CheckCircle, Clock, XCircle, Eye, Loader2, Filter, Link as LinkIcon, FileText } from 'lucide-react';
+import {
+  DollarSign,
+  CheckCircle,
+  Clock,
+  XCircle,
+  Eye,
+  Loader2,
+  FileText,
+  Home,
+  ChevronDown,
+  ChevronUp,
+  ExternalLink,
+} from 'lucide-react';
 import { propertyTransactionAPI, type PropertyTransaction } from '../api/propertyTransaction';
 import { toast } from 'react-toastify';
 import { useAuthStore } from '../store/authStore';
 import { connectMetaMask, sendCreateDealTx } from '../utils/metamask';
-import { REALESTATE_CONTRACT_ADDRESS, BLOCKCHAIN_EXPLORER_URL, BLOCKCHAIN_NETWORK_NAME } from '../config/blockchain';
+import {
+  REALESTATE_CONTRACT_ADDRESS,
+  BLOCKCHAIN_EXPLORER_URL,
+  BLOCKCHAIN_NETWORK_NAME,
+} from '../config/blockchain';
 import RealEstateEscrowAbi from '../abi/RealEstateEscrow.json';
 import { useNavigate } from 'react-router-dom';
+
+const STATUS_CONFIG: Record<
+  string,
+  { bg: string; text: string; label: string; icon: React.ReactNode }
+> = {
+  PENDING: {
+    bg: 'bg-amber-50',
+    text: 'text-amber-700',
+    label: 'Chờ thanh toán',
+    icon: <Clock className="w-3.5 h-3.5" />,
+  },
+  PROCESSING: {
+    bg: 'bg-sky-50',
+    text: 'text-sky-700',
+    label: 'Đang xử lý',
+    icon: <Loader2 className="w-3.5 h-3.5 animate-spin" />,
+  },
+  PAID: {
+    bg: 'bg-violet-50',
+    text: 'text-violet-700',
+    label: 'Đã thanh toán',
+    icon: <CheckCircle className="w-3.5 h-3.5" />,
+  },
+  COMPLETED: {
+    bg: 'bg-emerald-50',
+    text: 'text-emerald-700',
+    label: 'Hoàn thành',
+    icon: <CheckCircle className="w-3.5 h-3.5" />,
+  },
+  FAILED: {
+    bg: 'bg-red-50',
+    text: 'text-red-700',
+    label: 'Thất bại',
+    icon: <XCircle className="w-3.5 h-3.5" />,
+  },
+  CANCELLED: {
+    bg: 'bg-gray-100',
+    text: 'text-gray-600',
+    label: 'Đã hủy',
+    icon: <XCircle className="w-3.5 h-3.5" />,
+  },
+  REFUNDED: {
+    bg: 'bg-orange-50',
+    text: 'text-orange-700',
+    label: 'Đã hoàn tiền',
+    icon: <DollarSign className="w-3.5 h-3.5" />,
+  },
+};
+
+const PAYMENT_METHOD_LABEL: Record<string, string> = {
+  BANK_TRANSFER: 'Chuyển khoản',
+  VNPAY: 'VNPay',
+  MOMO: 'MoMo',
+  ZALOPAY: 'ZaloPay',
+  CASH: 'Tiền mặt',
+};
 
 const TransactionHistoryPage: React.FC = () => {
   const { user } = useAuthStore();
@@ -17,6 +89,7 @@ const TransactionHistoryPage: React.FC = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
   const [signingId, setSigningId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchTransactions();
@@ -25,10 +98,7 @@ const TransactionHistoryPage: React.FC = () => {
   const fetchTransactions = async () => {
     try {
       setLoading(true);
-      const response = await propertyTransactionAPI.getMyTransactions(
-        currentPage,
-        20
-      );
+      const response = await propertyTransactionAPI.getMyTransactions(currentPage, 20);
       setTransactions(response.content || []);
       setTotalPages(response.totalPages || 1);
     } catch (error: any) {
@@ -45,131 +115,23 @@ const TransactionHistoryPage: React.FC = () => {
     return price.toLocaleString('vi-VN');
   };
 
-  const getStatusBadge = (status: string) => {
-    const styles: Record<string, { bg: string; text: string; icon: React.ReactNode }> = {
-      PENDING: {
-        bg: 'bg-yellow-100',
-        text: 'text-yellow-800',
-        icon: <Clock className="w-4 h-4" />
-      },
-      PROCESSING: {
-        bg: 'bg-blue-100',
-        text: 'text-blue-800',
-        icon: <Loader2 className="w-4 h-4 animate-spin" />
-      },
-      PAID: {
-        bg: 'bg-purple-100',
-        text: 'text-purple-800',
-        icon: <DollarSign className="w-4 h-4" />
-      },
-      COMPLETED: {
-        bg: 'bg-green-100',
-        text: 'text-green-800',
-        icon: <CheckCircle className="w-4 h-4" />
-      },
-      FAILED: {
-        bg: 'bg-red-100',
-        text: 'text-red-800',
-        icon: <XCircle className="w-4 h-4" />
-      },
-      CANCELLED: {
-        bg: 'bg-gray-100',
-        text: 'text-gray-800',
-        icon: <XCircle className="w-4 h-4" />
-      },
-      REFUNDED: {
-        bg: 'bg-orange-100',
-        text: 'text-orange-800',
-        icon: <DollarSign className="w-4 h-4" />
-      }
-    };
-    return styles[status] || styles.PENDING;
-  };
-
-  const getStatusLabel = (status: string) => {
-    const labels: Record<string, string> = {
-      PENDING: 'Chờ thanh toán',
-      PROCESSING: 'Đang xử lý',
-      PAID: 'Đã thanh toán',
-      COMPLETED: 'Hoàn thành',
-      FAILED: 'Thất bại',
-      CANCELLED: 'Đã hủy',
-      REFUNDED: 'Đã hoàn tiền'
-    };
-    return labels[status] || status;
-  };
-
-  const getBlockchainStatusBadge = (status?: PropertyTransaction['blockchainStatus']) => {
-    if (!status || status === 'NOT_CREATED') {
-      return {
-        bg: 'bg-gray-100',
-        text: 'text-gray-600',
-        label: 'Chưa có hợp đồng blockchain'
-      };
-    }
-
-    const map: Record<NonNullable<PropertyTransaction['blockchainStatus']>, { bg: string; text: string; label: string }> = {
-      NOT_CREATED: {
-        bg: 'bg-gray-100',
-        text: 'text-gray-600',
-        label: 'Chưa có hợp đồng blockchain'
-      },
-      PENDING_ONCHAIN: {
-        bg: 'bg-yellow-100',
-        text: 'text-yellow-800',
-        label: 'Đang gửi lên blockchain'
-      },
-      ONCHAIN_CONFIRMED: {
-        bg: 'bg-emerald-100',
-        text: 'text-emerald-800',
-        label: 'Đã ghi nhận trên blockchain'
-      },
-      ONCHAIN_FAILED: {
-        bg: 'bg-red-100',
-        text: 'text-red-800',
-        label: 'Ghi nhận blockchain thất bại'
-      },
-      ONCHAIN_CANCELLED: {
-        bg: 'bg-gray-100',
-        text: 'text-gray-700',
-        label: 'Hợp đồng blockchain đã huỷ'
-      }
-    };
-    return map[status];
-  };
-
-  const shortenHash = (hash: string) => {
-    if (!hash) return '';
-    return `${hash.slice(0, 6)}...${hash.slice(-4)}`;
-  };
-
-  const buildExplorerUrl = (txHash: string) => {
-    if (!BLOCKCHAIN_EXPLORER_URL) return '';
-    return `${BLOCKCHAIN_EXPLORER_URL.replace(/\/$/, '')}/tx/${txHash}`;
-  };
-
   const handleSignOnChain = async (transaction: PropertyTransaction, isRent: boolean) => {
     try {
       if (!transaction.totalAmount) {
         toast.error('Không tìm thấy giá trị giao dịch để tạo hợp đồng blockchain');
         return;
       }
-
-      if (!REALESTATE_CONTRACT_ADDRESS || REALESTATE_CONTRACT_ADDRESS === '0x0000000000000000000000000000000000000000') {
+      if (
+        !REALESTATE_CONTRACT_ADDRESS ||
+        REALESTATE_CONTRACT_ADDRESS === '0x0000000000000000000000000000000000000000'
+      ) {
         toast.error('Chưa cấu hình địa chỉ smart contract bất động sản');
         return;
       }
-
       setSigningId(transaction.id);
-
       const buyerAddress = await connectMetaMask();
-
-      // Demo: tạm thời dùng buyerAddress làm cả seller & buyer để đánh dấu on-chain.
-      // Khi bạn mapping ví on-chain cho owner, hãy thay sellerAddress bằng ví chủ nhà.
       const sellerAddress = buyerAddress;
-
       const priceBigInt = BigInt(Math.round(transaction.totalAmount));
-
       const txHash = await sendCreateDealTx({
         contractAddress: REALESTATE_CONTRACT_ADDRESS,
         abi: RealEstateEscrowAbi as any[],
@@ -177,18 +139,15 @@ const TransactionHistoryPage: React.FC = () => {
         buyerAddress,
         propertyId: transaction.propertyId,
         price: priceBigInt,
-        isRent
+        isRent,
       });
-
       await propertyTransactionAPI.updateBlockchainTx(transaction.id, {
         txHash,
         contractAddress: REALESTATE_CONTRACT_ADDRESS,
-        network: BLOCKCHAIN_NETWORK_NAME
+        network: BLOCKCHAIN_NETWORK_NAME,
       });
-
       toast.success('Đã tạo hợp đồng blockchain thành công');
       await fetchTransactions();
-      // Điều hướng sang trang hợp đồng chi tiết để người dùng xem/in/lưu
       navigate(`/transactions/${transaction.id}/contract`);
     } catch (error: any) {
       console.error('Error signing on-chain deal:', error);
@@ -202,249 +161,273 @@ const TransactionHistoryPage: React.FC = () => {
     }
   };
 
-  const filteredTransactions = filterStatus === 'ALL' 
-    ? transactions 
-    : transactions.filter(t => t.status === filterStatus);
+  const filteredTransactions =
+    filterStatus === 'ALL'
+      ? transactions
+      : transactions.filter((t) => t.status === filterStatus);
 
   if (loading && transactions.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64 bg-white rounded-lg">
-        <Loader2 className="w-8 h-8 animate-spin text-red-600" />
+      <div className="flex items-center justify-center min-h-[320px] bg-white rounded-xl border border-gray-100">
+        <Loader2 className="w-8 h-8 animate-spin text-red-500" />
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg p-6 space-y-6">
-      <div className="border-b border-gray-200 pb-4">
-        <h1 className="text-2xl font-bold text-gray-900">Lịch Sử Giao Dịch</h1>
-        <p className="text-sm text-gray-500 mt-1">Xem lịch sử mua bán bất động sản của bạn</p>
+    <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+      {/* Header */}
+      <div className="px-6 py-5 border-b border-gray-100">
+        <h1 className="text-xl font-semibold text-gray-900">Lịch sử giao dịch</h1>
+        <p className="text-sm text-gray-500 mt-0.5">
+          Xem và quản lý các giao dịch mua bán, cho thuê BĐS của bạn
+        </p>
       </div>
 
       {/* Filter */}
-      <div className="flex items-center gap-3 pb-4 border-b border-gray-200">
-        <Filter className="w-4 h-4 text-gray-500" />
+      <div className="px-6 py-3 flex items-center justify-between gap-4 border-b border-gray-100 bg-gray-50/50">
+        <span className="text-sm text-gray-600">Trạng thái</span>
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-colors text-sm"
+          className="text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white text-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none min-w-[160px]"
         >
           <option value="ALL">Tất cả</option>
-          <option value="PENDING">Chờ thanh toán</option>
-          <option value="PROCESSING">Đang xử lý</option>
-          <option value="PAID">Đã thanh toán</option>
-          <option value="COMPLETED">Hoàn thành</option>
-          <option value="FAILED">Thất bại</option>
-          <option value="CANCELLED">Đã hủy</option>
+          {Object.entries(STATUS_CONFIG).map(([value, { label }]) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
         </select>
       </div>
 
-      {filteredTransactions.length === 0 ? (
-        <div className="bg-gray-50 rounded-lg p-12 text-center border border-gray-200">
-          <DollarSign className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-          <p className="text-gray-600 text-sm">Chưa có giao dịch nào</p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {filteredTransactions.map((transaction) => {
-            const statusStyle = getStatusBadge(transaction.status);
-            const isBuyer = transaction.buyerId === user?.id;
-            const isSeller = transaction.sellerId === user?.id;
-            const blockchainBadge = getBlockchainStatusBadge(transaction.blockchainStatus);
+      {/* List */}
+      <div className="divide-y divide-gray-100">
+        {filteredTransactions.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 px-6">
+            <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+              <FileText className="w-7 h-7 text-gray-400" />
+            </div>
+            <p className="text-gray-600 font-medium">Chưa có giao dịch nào</p>
+            <p className="text-sm text-gray-500 mt-1">Các giao dịch của bạn sẽ hiển thị tại đây</p>
+          </div>
+        ) : (
+          filteredTransactions.map((tx) => {
+            const statusCfg = STATUS_CONFIG[tx.status] || STATUS_CONFIG.PENDING;
+            const isBuyer = tx.buyerId === user?.id;
+            const isSeller = tx.sellerId === user?.id;
+            const isRent = tx.property?.listingType === 'RENT';
+            const showBlockchainBtn =
+              isBuyer &&
+              !tx.blockchainTxHash &&
+              !['CANCELLED', 'FAILED', 'REFUNDED'].includes(tx.status);
+            const isExpanded = expandedId === tx.id;
 
             return (
               <div
-                key={transaction.id}
-                className="bg-white border border-gray-200 rounded-lg p-5 hover:border-red-300 transition-colors"
+                key={tx.id}
+                className="px-6 py-4 hover:bg-gray-50/50 transition-colors"
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-4">
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        {transaction.property?.title || 'Bất động sản'}
-                      </h3>
-                      <span className={`px-2.5 py-1 text-xs font-medium rounded flex items-center gap-1 ${statusStyle.bg} ${statusStyle.text}`}>
-                        {statusStyle.icon}
-                        {getStatusLabel(transaction.status)}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                      <div>
-                        <p className="text-xs text-gray-500 mb-1">Tổng tiền</p>
-                        <p className="text-base font-semibold text-gray-900">
-                          {formatPrice(transaction.totalAmount)}
-                        </p>
-                      </div>
-                      {isSeller && (
-                        <>
-                          <div>
-                            <p className="text-xs text-gray-500 mb-1">Thuế</p>
-                            <p className="text-sm text-gray-700">
-                              -{formatPrice(transaction.taxAmount)}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-gray-500 mb-1">Phí dịch vụ</p>
-                            <p className="text-sm text-gray-700">
-                              -{formatPrice(transaction.serviceFee)}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-gray-500 mb-1">Phí nền tảng</p>
-                            <p className="text-sm text-gray-700">
-                              -{formatPrice(transaction.platformFee)}
-                            </p>
-                          </div>
-                        </>
-                      )}
-                    </div>
-
-                    {isSeller && (
-                      <div className="bg-red-50 border-l-4 border-red-500 p-3 rounded mb-4">
-                        <p className="text-xs text-gray-600 mb-1">Số tiền bạn nhận được</p>
-                        <p className="text-lg font-bold text-red-600">
-                          {formatPrice(transaction.sellerAmount)}
-                        </p>
+                <div className="flex gap-4">
+                  {/* Thumbnail */}
+                  <a
+                    href={`/properties/${tx.propertyId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-shrink-0 w-20 h-20 rounded-lg bg-gray-100 overflow-hidden border border-gray-100"
+                  >
+                    {tx.property?.thumbnailUrl ? (
+                      <img
+                        src={tx.property.thumbnailUrl}
+                        alt=""
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-400">
+                        <Home className="w-8 h-8" />
                       </div>
                     )}
+                  </a>
 
-                    <div className="text-sm text-gray-600 space-y-1.5 pt-3 border-t border-gray-100">
-                      <p>
-                        <span className="text-gray-500">Phương thức:</span>{' '}
-                        <span className="font-medium">{
-                          transaction.paymentMethod === 'BANK_TRANSFER' ? 'Chuyển khoản' :
-                          transaction.paymentMethod === 'VNPAY' ? 'VNPay' :
-                          transaction.paymentMethod === 'MOMO' ? 'MoMo' :
-                          transaction.paymentMethod === 'ZALOPAY' ? 'ZaloPay' : 'Tiền mặt'
-                        }</span>
-                      </p>
-                      {isBuyer && transaction.seller && (
-                        <p>
-                          <span className="text-gray-500">Người bán:</span>{' '}
-                          <span className="font-medium">{transaction.seller.fullName}</span>
-                        </p>
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                      <a
+                        href={`/properties/${tx.propertyId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-medium text-gray-900 hover:text-red-600 truncate max-w-[280px]"
+                      >
+                        {tx.property?.title || 'Bất động sản'}
+                      </a>
+                      <span
+                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${statusCfg.bg} ${statusCfg.text}`}
+                      >
+                        {statusCfg.icon}
+                        {statusCfg.label}
+                      </span>
+                      {tx.property?.listingType && (
+                        <span
+                          className={
+                            isRent
+                              ? 'px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700'
+                              : 'px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700'
+                          }
+                        >
+                          {isRent ? 'Cho thuê' : 'Mua bán'}
+                        </span>
                       )}
-                      {isSeller && transaction.buyer && (
-                        <p>
-                          <span className="text-gray-500">Người mua:</span>{' '}
-                          <span className="font-medium">{transaction.buyer.fullName}</span>
-                        </p>
-                      )}
-                      {transaction.bankTransactionId && (
-                        <p>
-                          <span className="text-gray-500">Mã giao dịch:</span>{' '}
-                          <span className="font-medium">{transaction.bankTransactionId}</span>
-                        </p>
-                      )}
-                      <p className="text-xs text-gray-400 pt-2">
-                        {new Date(transaction.createdAt).toLocaleString('vi-VN')}
-                        {transaction.completedAt && (
-                          <> • Hoàn thành: {new Date(transaction.completedAt).toLocaleString('vi-VN')}</>
-                        )}
-                      </p>
-
-                      {/* Blockchain section */}
-                      <div className="pt-3 border-t border-dashed border-gray-200 mt-2 space-y-2">
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-2">
-                            <span className={`px-2 py-1 rounded-full text-[11px] font-medium ${blockchainBadge.bg} ${blockchainBadge.text}`}>
-                              {blockchainBadge.label}
-                            </span>
-                            {transaction.blockchainNetwork && (
-                              <span className="text-[11px] px-2 py-1 rounded-full bg-gray-100 text-gray-600">
-                                {transaction.blockchainNetwork}
-                              </span>
-                            )}
-                          </div>
-                          {transaction.blockchainTxHash && (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const url = buildExplorerUrl(transaction.blockchainTxHash!);
-                                if (url) {
-                                  window.open(url, '_blank');
-                                } else {
-                                  navigator.clipboard.writeText(transaction.blockchainTxHash!);
-                                  toast.info('Đã copy transaction hash');
-                                }
-                              }}
-                              className="flex items-center gap-1 text-[11px] text-blue-600 hover:text-blue-700"
-                            >
-                              <LinkIcon className="w-3 h-3" />
-                              <span>{shortenHash(transaction.blockchainTxHash)}</span>
-                            </button>
-                          )}
-                        </div>
-
-                        {/* Nút ký hợp đồng blockchain chỉ cho người mua, khi chưa có txHash và giao dịch chưa bị hủy/thất bại */}
-                        {isBuyer &&
-                          !transaction.blockchainTxHash &&
-                          !['CANCELLED', 'FAILED', 'REFUNDED'].includes(transaction.status) && (
-                            <button
-                              type="button"
-                              onClick={() =>
-                                handleSignOnChain(
-                                  transaction,
-                                  transaction.paymentMethod === 'CASH' ? false : false
-                                )
-                              }
-                              disabled={signingId === transaction.id}
-                              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
-                            >
-                              {signingId === transaction.id ? (
-                                <Loader2 className="w-3 h-3 animate-spin" />
-                              ) : (
-                                <CheckCircle className="w-3 h-3" />
-                              )}
-                              <span>Ký hợp đồng blockchain (MetaMask)</span>
-                            </button>
-                          )}
-                      </div>
                     </div>
+                    <p className="text-lg font-semibold text-gray-900 mt-0.5">
+                      {formatPrice(Number(tx.totalAmount))}
+                      {isRent && (
+                        <span className="text-sm font-normal text-gray-500">/tháng</span>
+                      )}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {PAYMENT_METHOD_LABEL[tx.paymentMethod] || tx.paymentMethod}
+                      {tx.bankTransactionId && ` · ${tx.bankTransactionId}`}
+                      {' · '}
+                      {new Date(tx.createdAt).toLocaleDateString('vi-VN')}
+                    </p>
+
+                    {/* Blockchain: one line, optional sign button */}
+                    {showBlockchainBtn && (
+                      <div className="mt-2 flex items-center gap-2">
+                        <span className="text-xs text-gray-500">Chưa ký blockchain</span>
+                        <button
+                          type="button"
+                          onClick={() => handleSignOnChain(tx, isRent)}
+                          disabled={signingId === tx.id}
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-60"
+                        >
+                          {signingId === tx.id ? (
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                          ) : (
+                            <ExternalLink className="w-3 h-3" />
+                          )}
+                          Ký MetaMask
+                        </button>
+                      </div>
+                    )}
+                    {tx.blockchainTxHash && (
+                      <a
+                        href={
+                          BLOCKCHAIN_EXPLORER_URL
+                            ? `${BLOCKCHAIN_EXPLORER_URL.replace(/\/$/, '')}/tx/${tx.blockchainTxHash}`
+                            : '#'
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline mt-1"
+                      >
+                        Đã ghi blockchain
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    )}
                   </div>
 
-                  <div className="ml-4 flex flex-col gap-2">
+                  {/* Actions */}
+                  <div className="flex flex-col gap-2 flex-shrink-0">
                     <button
-                      onClick={() => window.open(`/properties/${transaction.propertyId}`, '_blank')}
-                      className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      title="Xem tin bất động sản"
-                    >
-                      <Eye className="w-5 h-5" />
-                    </button>
-                    <button
-                      onClick={() => navigate(`/transactions/${transaction.id}/contract`)}
-                      className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors text-xs flex items-center justify-center gap-1"
-                      title="Xem hợp đồng giao dịch"
+                      onClick={() => navigate(`/transactions/${tx.id}/contract`)}
+                      className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition-colors"
                     >
                       <FileText className="w-4 h-4" />
-                      <span>Hợp đồng</span>
+                      Xem hợp đồng
                     </button>
+                    <a
+                      href={`/properties/${tx.propertyId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-gray-200 text-gray-700 text-sm hover:bg-gray-50 transition-colors"
+                    >
+                      <Eye className="w-4 h-4" />
+                      Xem BĐS
+                    </a>
                   </div>
+                </div>
+
+                {/* Expand: chi tiết (seller: thuế/phí/số tiền nhận; buyer: người bán) */}
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  <button
+                    type="button"
+                    onClick={() => setExpandedId(isExpanded ? null : tx.id)}
+                    className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900"
+                  >
+                    {isExpanded ? (
+                      <ChevronUp className="w-4 h-4" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4" />
+                    )}
+                    {isExpanded ? 'Thu gọn' : 'Chi tiết giao dịch'}
+                  </button>
+                  {isExpanded && (
+                      <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+                        {isSeller && (
+                          <>
+                            <div>
+                              <p className="text-gray-500">Thuế</p>
+                              <p className="font-medium text-gray-700">
+                                -{formatPrice(Number(tx.taxAmount || 0))}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-gray-500">Phí dịch vụ</p>
+                              <p className="font-medium text-gray-700">
+                                -{formatPrice(Number(tx.serviceFee || 0))}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-gray-500">Phí nền tảng</p>
+                              <p className="font-medium text-gray-700">
+                                -{formatPrice(Number(tx.platformFee || 0))}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-gray-500">Bạn nhận</p>
+                              <p className="font-semibold text-red-600">
+                                {formatPrice(Number(tx.sellerAmount))}
+                              </p>
+                            </div>
+                          </>
+                        )}
+                        {isBuyer && tx.seller && (
+                          <p className="text-gray-600">
+                            Người bán: <span className="font-medium">{tx.seller.fullName}</span>
+                          </p>
+                        )}
+                        {isSeller && tx.buyer && (
+                          <p className="text-gray-600">
+                            Người mua: <span className="font-medium">{tx.buyer.fullName}</span>
+                          </p>
+                        )}
+                      </div>
+                    )}
                 </div>
               </div>
             );
-          })}
-        </div>
-      )}
+          })
+        )}
+      </div>
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 pt-4 border-t border-gray-200">
+        <div className="px-6 py-4 flex items-center justify-center gap-2 border-t border-gray-100 bg-gray-50/30">
           <button
-            onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
+            onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
             disabled={currentPage === 0}
-            className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 hover:text-red-600 transition-colors text-sm font-medium"
+            className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white"
           >
             Trước
           </button>
-          <span className="px-4 py-2 text-sm text-gray-600">
+          <span className="text-sm text-gray-600">
             Trang {currentPage + 1} / {totalPages}
           </span>
           <button
-            onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))}
+            onClick={() => setCurrentPage((p) => Math.min(totalPages - 1, p + 1))}
             disabled={currentPage >= totalPages - 1}
-            className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 hover:text-red-600 transition-colors text-sm font-medium"
+            className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white"
           >
             Sau
           </button>
@@ -455,4 +438,3 @@ const TransactionHistoryPage: React.FC = () => {
 };
 
 export default TransactionHistoryPage;
-
