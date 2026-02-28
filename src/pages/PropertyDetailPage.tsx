@@ -494,7 +494,7 @@ const PropertyDetailPage: React.FC = () => {
                       )}
                     </div>
                     <h3 className="text-lg font-semibold text-gray-900 group-hover:text-red-600 transition-colors">
-                      {ownerName}
+                      {ownerName || ''}
                     </h3>
                   </Link>
                   {ownerPhone && (

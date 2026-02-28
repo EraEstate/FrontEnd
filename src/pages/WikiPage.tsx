@@ -152,16 +152,20 @@ const WikiPage: React.FC = () => {
 
         // Transform API response to match our interface
         const transformedArticles: WikiArticle[] = articlesData.map((article: any) => ({
-          id: article.id,
+          id: String(article.id),
           title: article.title,
           slug: article.slug,
           summary: article.summary || '',
+          content: article.content || '',
           featuredImageUrl: article.featuredImageUrl,
           category: article.category,
           status: article.status,
           viewCount: article.viewCount || 0,
+          isFeatured: article.isFeatured ?? false,
           publishedAt: article.publishedAt,
           createdAt: article.createdAt,
+          updatedAt: article.updatedAt,
+          authorId: article.authorId || '',
           author: article.author
         }));
 

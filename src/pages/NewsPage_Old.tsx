@@ -183,7 +183,11 @@ const NewsPage: React.FC = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <User className="w-4 h-4 mr-2 text-gray-400" />
-            <span className="text-sm text-gray-600">{article.author || 'BDSPortal'}</span>
+            <span className="text-sm text-gray-600">
+              {typeof article.author === 'string'
+                ? article.author
+                : article.author?.fullName || 'BDSPortal'}
+            </span>
           </div>
           <span className="text-xs text-gray-500">
             {getReadingTime(article.content)}
