@@ -214,8 +214,8 @@ const TransactionHistoryPage: React.FC = () => {
         ) : (
           filteredTransactions.map((tx) => {
             const statusCfg = STATUS_CONFIG[tx.status] || STATUS_CONFIG.PENDING;
-            const isBuyer = tx.buyerId === user?.id;
-            const isSeller = tx.sellerId === user?.id;
+            const isBuyer = String(tx.buyerId) === String(user?.id);
+            const isSeller = String(tx.sellerId) === String(user?.id);
             const isRent = tx.property?.listingType === 'RENT';
             const showBlockchainBtn =
               isBuyer &&

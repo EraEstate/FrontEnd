@@ -160,7 +160,7 @@ const PropertyDetailPage: React.FC = () => {
   
   // Get owner information
   const owner = property.owner || property.user;
-  const ownerName = owner?.fullName || t('propertyDetail.notUpdated');
+  const ownerName: string = (owner?.fullName ?? t('propertyDetail.notUpdated') ?? '') as string;
   const ownerPhone = owner?.phone || property.owner?.phone || '';
   const ownerEmail = owner?.email || property.owner?.email || '';
   

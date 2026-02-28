@@ -151,7 +151,7 @@ const WikiPage: React.FC = () => {
         console.log('Extracted articles data:', articlesData); // Debug log
 
         // Transform API response to match our interface
-        const transformedArticles: WikiArticle[] = articlesData.map((article: any) => ({
+        const transformedArticles = articlesData.map((article: any) => ({
           id: String(article.id),
           title: article.title,
           slug: article.slug,
@@ -177,7 +177,7 @@ const WikiPage: React.FC = () => {
         
         await new Promise(resolve => setTimeout(resolve, remainingTime));
         
-        setArticles(transformedArticles);
+        setArticles(transformedArticles as WikiArticle[]);
       } catch (error: any) {
         console.error('Error loading wiki articles:', error);
         setError(error.response?.data?.message || error.message || t('wiki.errorLoading'));
