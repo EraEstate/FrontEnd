@@ -52,7 +52,7 @@ export const propertyAPI = {
   },
 
   // Chi tiết bất động sản
-  getById: async (id: string) => {
+  getById: async (id: string | number) => {
     const response = await api.get(`/properties/${id}`);
     return response.data;
   },

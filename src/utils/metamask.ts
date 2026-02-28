@@ -16,7 +16,6 @@ export interface CreateDealParams {
   isRent: boolean;
 }
 
-const HARDHAT_CHAIN_ID_DEC = 31337;
 const HARDHAT_CHAIN_ID_HEX = '0x7a69'; // 31337 in hex
 const HARDHAT_RPC_URL = 'http://127.0.0.1:8545';
 const HARDHAT_NAME = 'Hardhat Local';

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MessageSquare, CheckCircle, XCircle, Eye, Loader2, Filter } from 'lucide-react';
+import { MessageSquare, Eye, Loader2, Filter } from 'lucide-react';
 import { propertyInquiryAPI } from '../../api/propertyInquiry';
 import { toast } from 'react-toastify';
 
@@ -18,11 +18,11 @@ const InquiryManagementPage: React.FC = () => {
   const fetchInquiries = async () => {
     try {
       setLoading(true);
-      const response = await propertyInquiryAPI.getAll(
-        currentPage,
-        20,
-        filterStatus !== 'ALL' ? filterStatus : undefined
-      );
+      const response = await propertyInquiryAPI.getAll({
+        page: currentPage,
+        size: 20,
+        status: filterStatus !== 'ALL' ? (filterStatus as any) : undefined,
+      });
       setInquiries(response.content || []);
       setTotalPages(response.totalPages || 1);
     } catch (error: any) {

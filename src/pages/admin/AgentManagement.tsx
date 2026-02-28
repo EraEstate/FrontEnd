@@ -234,12 +234,12 @@ const AgentManagement: React.FC = () => {
               {/* Agent Image */}
               <div className="relative h-48 bg-gradient-to-br from-blue-500 to-purple-600">
                 <img
-                  src={getImageUrl(agent.avatarUrl) || getAvatarPlaceholder(400, 192)}
+                  src={getImageUrl(agent.avatarUrl) || getAvatarPlaceholder(400)}
                   alt={agent.fullName || 'Agent'}
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
-                    target.src = getAvatarPlaceholder(400, 192);
+                    target.src = getAvatarPlaceholder(400);
                   }}
                 />
                 <div className="absolute top-3 right-3 flex gap-2">

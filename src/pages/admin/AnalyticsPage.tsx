@@ -222,7 +222,6 @@ const AnalyticsPage: React.FC = () => {
 
   const fetchRevenueDataFallback = (startDate: Date, endDate: Date) => {
     const daysDiff = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-    const dataPoints = Math.min(daysDiff, 30); // Max 30 data points
     
     if (daysDiff <= 7) {
       // Daily data for <= 7 days
@@ -266,7 +265,6 @@ const AnalyticsPage: React.FC = () => {
 
   const fetchUserGrowthDataFallback = (startDate: Date, endDate: Date) => {
     const daysDiff = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-    const dataPoints = Math.min(daysDiff, 30); // Max 30 data points
     
     if (daysDiff <= 30) {
       // Daily data
@@ -565,7 +563,7 @@ const AnalyticsPage: React.FC = () => {
                 dataKey="count"
               >
                 {propertyDistribution.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell key={entry.type || `cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
               <Tooltip />

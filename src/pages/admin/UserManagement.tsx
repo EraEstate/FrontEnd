@@ -6,7 +6,7 @@ import {
   UserCheck, UserX, Shield, Loader2, Users, UserCog
 } from 'lucide-react';
 import { userAPI } from '../../api/user';
-import { getImageUrl, getAvatarPlaceholder } from '../../utils/imageUtils';
+import { getImageUrl } from '../../utils/imageUtils';
 import api from '../../api/index';
 
 interface User {

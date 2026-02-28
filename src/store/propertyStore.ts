@@ -45,7 +45,12 @@ export const usePropertyStore = create<PropertyState>((set, get) => ({
   searchProperties: async (params: PropertySearchForm) => {
     set({ isLoading: true, error: null });
     try {
-      const response: PaginatedResponse<Property> = await propertyAPI.getAll(params);
+      const response: PaginatedResponse<Property> = await propertyAPI.getAll({
+        ...params,
+        provinceId: params.provinceId !== undefined ? String(params.provinceId) : undefined,
+        districtId: params.districtId !== undefined ? String(params.districtId) : undefined,
+        wardId: params.wardId !== undefined ? String(params.wardId) : undefined,
+      });
       set({
         properties: response.content,
         pagination: {
