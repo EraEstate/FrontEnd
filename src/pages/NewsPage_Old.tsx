@@ -3,12 +3,11 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, User, Eye, MessageSquare, Search, Grid, List } from 'lucide-react';
 import { api } from '../api';
-import type { News } from '../types';
 import { useTranslation } from 'react-i18next';
 
 const NewsPage: React.FC = () => {
   const { t } = useTranslation();
-  const [news, setNews] = useState<News[]>([]);
+  const [news, setNews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -145,7 +144,7 @@ const NewsPage: React.FC = () => {
     return `${minutes} phút đọc`;
   };
 
-  const NewsCard: React.FC<{ article: News; isGrid: boolean }> = ({ article, isGrid }) => (
+  const NewsCard: React.FC<{ article: any; isGrid: boolean }> = ({ article, isGrid }) => (
     <div className={`bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow ${
       isGrid ? '' : 'flex'
     }`}>
@@ -198,7 +197,7 @@ const NewsPage: React.FC = () => {
     </div>
   );
 
-  const FeaturedNews: React.FC<{ article: News }> = ({ article }) => (
+  const FeaturedNews: React.FC<{ article: any }> = ({ article }) => (
     <div className="relative bg-white rounded-lg shadow-lg overflow-hidden">
       <div className="h-80">
         <img
