@@ -153,7 +153,7 @@ const BankAccountManagementPage: React.FC = () => {
                       </span>
                     )}
                     {account.isVerified && (
-                      <CheckCircle className="w-4 h-4 text-green-500" title="Đã xác thực" />
+                      <CheckCircle className="w-4 h-4 text-green-500" />
                     )}
                   </div>
                   <div className="space-y-1.5 text-sm">
