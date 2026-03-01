@@ -484,7 +484,7 @@ const PropertyDetailPage: React.FC = () => {
                       </div>
                       {owner?.avatar && (
                         <img
-                          src={getImageUrl(owner.avatar)}
+                          src={getImageUrl(owner.avatar) ?? undefined}
                           alt={ownerName ?? undefined}
                           className="absolute inset-0 w-20 h-20 rounded-full object-cover"
                           onError={(e) => {
