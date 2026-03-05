@@ -4,9 +4,9 @@
  * Also handles Supabase Storage URLs (full URLs)
  * We need to prepend the backend base URL for relative paths
  */
-export const getImageUrl = (imagePath: string | null | undefined): string | null => {
+export const getImageUrl = (imagePath: string | null | undefined): string | undefined => {
   if (!imagePath || imagePath.trim() === '') {
-    return null;
+    return undefined;
   }
 
   const trimmedPath = imagePath.trim();
