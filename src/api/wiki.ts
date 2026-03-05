@@ -2,9 +2,13 @@ import axios from 'axios';
 import api from './index';
 import type { WikiCategory, WikiArticleCreateRequest, WikiArticleUpdateRequest } from './types';
 
+// Determine API base URL from environment (Vercel/Vite) or fall back to local dev
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080/api';
+
 // Create a public API instance for endpoints that don't require authentication
 const publicApi = axios.create({
-  baseURL: 'http://localhost:8080/api',
+  baseURL: API_BASE_URL,
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
