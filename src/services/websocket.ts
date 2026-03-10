@@ -37,7 +37,11 @@ export const connectWebSocket = (
 
   console.log('WebSocket connecting with token:', token ? 'exists' : 'null');
 
-  const socket = new SockJS('http://localhost:8080/ws');
+  // Determine WebSocket base URL from environment (Vercel/Vite) or fall back to local dev
+  const WS_BASE_URL =
+    import.meta.env.VITE_WS_BASE_URL ?? 'http://localhost:8080/ws';
+
+  const socket = new SockJS(WS_BASE_URL);
   stompClient = new Client({
     webSocketFactory: () => socket as any,
     connectHeaders: token ? { token: token } : {},
