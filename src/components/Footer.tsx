@@ -89,15 +89,27 @@ const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/terms" className="text-gray-600 hover:text-red-600 transition-colors inline-flex items-center group">
+                <Link to="/legal?tab=terms" className="text-gray-600 hover:text-red-600 transition-colors inline-flex items-center group">
                   <ChevronRight className="h-3 w-3 mr-1 opacity-0 group-hover:opacity-100 transition-opacity" />
                   {t('footer.terms')}
                 </Link>
               </li>
               <li>
-                <Link to="/privacy" className="text-gray-600 hover:text-red-600 transition-colors inline-flex items-center group">
+                <Link to="/legal?tab=terms" className="text-gray-600 hover:text-red-600 transition-colors inline-flex items-center group">
                   <ChevronRight className="h-3 w-3 mr-1 opacity-0 group-hover:opacity-100 transition-opacity" />
                   {t('footer.privacy')}
+                </Link>
+              </li>
+              <li>
+                <Link to="/legal" className="text-gray-600 hover:text-red-600 transition-colors inline-flex items-center group">
+                  <ChevronRight className="h-3 w-3 mr-1 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  Trung tâm pháp lý
+                </Link>
+              </li>
+              <li>
+                <Link to="/security" className="text-gray-600 hover:text-red-600 transition-colors inline-flex items-center group">
+                  <ChevronRight className="h-3 w-3 mr-1 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  Trung tâm bảo mật
                 </Link>
               </li>
             </ul>
@@ -197,16 +209,24 @@ const Footer: React.FC = () => {
 
             {/* Additional Links */}
             <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
-              <Link to="/terms" className="hover:text-red-600 transition-colors">
+              <Link to="/legal?tab=terms" className="hover:text-red-600 transition-colors">
                 {t('footer.terms')}
               </Link>
               <span className="text-gray-300">•</span>
-              <Link to="/privacy" className="hover:text-red-600 transition-colors">
+              <Link to="/legal?tab=terms" className="hover:text-red-600 transition-colors">
                 {t('footer.policy')}
               </Link>
               <span className="text-gray-300">•</span>
               <Link to="/contact" className="hover:text-red-600 transition-colors">
                 {t('footer.contact')}
+              </Link>
+              <span className="text-gray-300">•</span>
+              <Link to="/legal" className="hover:text-red-600 transition-colors">
+                Trung tâm pháp lý
+              </Link>
+              <span className="text-gray-300">•</span>
+              <Link to="/security" className="hover:text-red-600 transition-colors">
+                Trung tâm bảo mật
               </Link>
             </div>
           </div>

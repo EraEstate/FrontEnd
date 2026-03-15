@@ -5,6 +5,7 @@ import { propertyTransactionAPI, type PropertyTransaction } from '../api/propert
 import { propertyAPI } from '../api/property';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
+import { TransactionStepper } from '../components/TransactionStepper';
 
 const TransactionOverviewPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -77,6 +78,10 @@ const TransactionOverviewPage: React.FC = () => {
             {t('transaction.overview.createdDate')}: <span className="font-medium">{contractDate}</span> · {t('transaction.transactionId')}:{' '}
             <span className="font-mono">{transaction.id}</span>
           </p>
+
+          <div className="mt-4">
+            <TransactionStepper current={1} />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">

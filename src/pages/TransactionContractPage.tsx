@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
 import {
   ArrowLeft,
   Shield,
@@ -12,6 +12,7 @@ import {
   Loader2,
   Link as LinkIcon,
   CreditCard,
+  Info,
 } from 'lucide-react';
 import { propertyTransactionAPI, type PropertyTransaction } from '../api/propertyTransaction';
 import { propertyAPI } from '../api/property';
@@ -22,6 +23,7 @@ import { REALESTATE_CONTRACT_ADDRESS, BLOCKCHAIN_EXPLORER_URL, BLOCKCHAIN_NETWOR
 import { createVnpayPaymentUrl } from '../config/vnpay';
 import RealEstateEscrowAbi from '../abi/RealEstateEscrow.json';
 import { useTranslation } from 'react-i18next';
+import { TransactionStepper } from '../components/TransactionStepper';
 
 const TransactionContractPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -35,6 +37,10 @@ const TransactionContractPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [signing, setSigning] = useState(false);
   const [payingVnpay, setPayingVnpay] = useState(false);
+  const [showSignConfirm, setShowSignConfirm] = useState(false);
+  const [signConsent, setSignConsent] = useState(false);
+  const [privacyMaskContact, setPrivacyMaskContact] = useState(false);
+  const [privacyHideRealName, setPrivacyHideRealName] = useState(false);
 
   const fetchTransaction = async () => {
     if (!id) return;
@@ -329,6 +335,9 @@ const TransactionContractPage: React.FC = () => {
             <p className="text-sm text-gray-500 mt-1">
               {t('transaction.transactionId')}: <span className="font-mono">{transaction.id}</span>
             </p>
+            <div className="mt-3">
+              <TransactionStepper current={3} />
+            </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <span
@@ -540,6 +549,35 @@ const TransactionContractPage: React.FC = () => {
 
           {/* Right column: Quy trình & Blockchain actions */}
           <div className="space-y-4">
+            {/* Badge phân biệt VNPay / Blockchain */}
+            <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200 p-4 text-xs text-gray-700 flex items-start gap-2">
+              <Info className="w-4 h-4 text-red-500 mt-0.5" />
+              <div>
+                {isVnpayPaid ? (
+                  <>
+                    <p className="font-semibold text-gray-900 mb-1">
+                      Hợp đồng đã hiệu lực theo thanh toán VNPay
+                    </p>
+                    <p>
+                      Thanh toán VNPay thành công là căn cứ chính trong hệ thống. Ký Blockchain là
+                      <span className="font-semibold"> tuỳ chọn</span> nếu bạn muốn thêm lớp ghi nhận
+                      on-chain.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-semibold text-gray-900 mb-1">
+                      Ký hợp đồng Blockchain bằng MetaMask
+                    </p>
+                    <p>
+                      Giao dịch trên Blockchain giúp minh bạch hơn, nhưng{' '}
+                      <span className="font-semibold">vẫn cần</span> hợp đồng công chứng và thủ tục
+                      sang tên ngoài đời thực.
+                    </p>
+                  </>
+                )}
+              </div>
+            </div>
             {/* Step overview: VNPay flow (3 bước) hoặc Blockchain flow (4 bước) */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 text-sm text-gray-700">
               <h2 className="text-lg font-semibold text-gray-900 mb-3">
@@ -645,6 +683,39 @@ const TransactionContractPage: React.FC = () => {
               )}
             </div>
 
+            {/* Nhật ký giao dịch (audit trail đơn giản) */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 text-sm text-gray-700">
+              <h2 className="text-lg font-semibold text-gray-900 mb-3">Nhật ký giao dịch</h2>
+              <ol className="relative border-l border-gray-200 ml-2 space-y-3 text-xs">
+                <li className="ml-4">
+                  <div className="absolute -left-1.5 mt-1 w-3 h-3 rounded-full bg-red-500 border border-white" />
+                  <p className="font-semibold text-gray-900">Tạo giao dịch trên hệ thống</p>
+                  <p className="text-gray-600">
+                    ERA Estate ghi nhận thông tin bất động sản, giá trị giao dịch và các khoản phí dự kiến.
+                  </p>
+                </li>
+                {isVnpayPaid && (
+                  <li className="ml-4">
+                    <div className="absolute -left-1.5 mt-1 w-3 h-3 rounded-full bg-blue-500 border border-white" />
+                    <p className="font-semibold text-gray-900">Thanh toán VNPay thành công</p>
+                    <p className="text-gray-600">
+                      Cổng VNPay xác nhận thanh toán, hệ thống cập nhật trạng thái giao dịch là Đã thanh toán.
+                    </p>
+                  </li>
+                )}
+                {transaction.blockchainTxHash && (
+                  <li className="ml-4">
+                    <div className="absolute -left-1.5 mt-1 w-3 h-3 rounded-full bg-emerald-500 border border-white" />
+                    <p className="font-semibold text-gray-900">Ghi nhận hợp đồng trên Blockchain</p>
+                    <p className="text-gray-600">
+                      Một giao dịch on-chain với Tx Hash {shortenHash(transaction.blockchainTxHash)} đã được gửi lên{' '}
+                      {transaction.blockchainNetwork || BLOCKCHAIN_NETWORK_NAME}.
+                    </p>
+                  </li>
+                )}
+              </ol>
+            </div>
+
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
@@ -686,6 +757,14 @@ const TransactionContractPage: React.FC = () => {
                 </div>
               ) : (
                 <div className="space-y-2 text-sm">
+                  <div className="flex items-start gap-2 text-xs text-gray-600 border border-blue-100 bg-blue-50 rounded-lg p-2">
+                    <Info className="w-4 h-4 text-blue-500 mt-0.5" />
+                    <p>
+                      <span className="font-semibold">Blockchain</span> là sổ cái phân tán ghi lại giao dịch.
+                      Ký bằng <span className="font-semibold">MetaMask</span> sẽ tạo một giao dịch on-chain (Tx Hash)
+                      có thể tra cứu trên trình khám phá mạng (explorer).
+                    </p>
+                  </div>
                   <p className="text-gray-600">
                     {t('transaction.network')}:{' '}
                     <span className="font-semibold text-gray-900">
@@ -713,6 +792,7 @@ const TransactionContractPage: React.FC = () => {
                           }
                         }}
                         className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700"
+                        title="Tx Hash là mã giao dịch trên blockchain, dùng để tra cứu chi tiết giao dịch."
                       >
                         <LinkIcon className="w-3 h-3" />
                         <span className="font-mono text-xs">{shortenHash(transaction.blockchainTxHash)}</span>
@@ -745,12 +825,20 @@ const TransactionContractPage: React.FC = () => {
                 </button>
               )}
               {canSignOnChain && (
-                <button
-                  type="button"
-                  onClick={handleSignOnChain}
-                  disabled={signing}
-                  className="mt-3 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-red-600 text-white hover:bg-red-700 text-sm font-medium disabled:opacity-60 disabled:cursor-not-allowed"
-                >
+                <div className="mt-3 space-y-2">
+                  <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1.5" title="Không ký nếu bạn đang dùng máy công cộng hoặc mạng không tin tưởng.">
+                    ⚠️ Không ký nếu bạn đang dùng máy công cộng / không tin tưởng network.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSignConsent(false);
+                      setShowSignConfirm(true);
+                    }}
+                    disabled={signing}
+                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-red-600 text-white hover:bg-red-700 text-sm font-medium disabled:opacity-60 disabled:cursor-not-allowed"
+                    title="Không ký nếu bạn đang dùng máy công cộng hoặc mạng không tin tưởng."
+                  >
                   {signing ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
@@ -763,6 +851,7 @@ const TransactionContractPage: React.FC = () => {
                     </>
                   )}
                 </button>
+                </div>
               )}
             </div>
 
@@ -771,6 +860,62 @@ const TransactionContractPage: React.FC = () => {
               <p>
                 {t('transaction.legalNoteText')}
               </p>
+              <p className="mt-2 text-xs">
+                Tìm hiểu thêm tại{' '}
+                <Link to="/legal" className="text-red-600 hover:underline font-medium">Trung tâm pháp lý</Link>
+                {' '}và{' '}
+                <Link to="/security" className="text-red-600 hover:underline font-medium">Trung tâm bảo mật</Link>.
+              </p>
+            </div>
+
+            {/* Chuẩn bị pháp lý */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 text-sm text-gray-700">
+              <h3 className="font-semibold text-gray-900 mb-2">Chuẩn bị pháp lý trước khi ký</h3>
+              <p className="text-xs text-gray-500 mb-3">
+                Danh sách bên dưới chỉ mang tính gợi ý. Bạn nên làm việc thêm với luật sư/văn phòng công chứng nếu giao dịch có giá trị lớn.
+              </p>
+              <ul className="space-y-2">
+                <li className="flex items-start gap-2">
+                  <input type="checkbox" className="mt-1 h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-500" />
+                  <span>Đã xem bản scan sổ đỏ/sổ hồng và các giấy tờ pháp lý liên quan.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <input type="checkbox" className="mt-1 h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-500" />
+                  <span>Đã xác minh chủ sở hữu (CMND/CCCD, đối chiếu thông tin trên sổ).</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <input type="checkbox" className="mt-1 h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-500" />
+                  <span>Đã thống nhất thời điểm bàn giao, bên chịu thuế/phí, chi phí công chứng, phí dịch vụ.</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Quyền riêng tư & hiển thị thông tin */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 text-sm text-gray-700">
+              <h3 className="font-semibold text-gray-900 mb-2">Quyền riêng tư & hiển thị thông tin</h3>
+              <p className="text-xs text-gray-500 mb-3">
+                Tùy chọn dưới đây chỉ áp dụng cho giao diện và bản in (demo). Hệ thống có thể mở rộng lưu lựa chọn của bạn sau này.
+              </p>
+              <ul className="space-y-2">
+                <li className="flex items-start gap-2">
+                  <input
+                    type="checkbox"
+                    className="mt-1 h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-500"
+                    checked={privacyMaskContact}
+                    onChange={(e) => setPrivacyMaskContact(e.target.checked)}
+                  />
+                  <span>Không hiển thị email/phone đầy đủ trong hợp đồng in ra (chỉ ẩn bớt).</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <input
+                    type="checkbox"
+                    className="mt-1 h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-500"
+                    checked={privacyHideRealName}
+                    onChange={(e) => setPrivacyHideRealName(e.target.checked)}
+                  />
+                  <span>Ẩn tên thật trên lịch sử công khai, chỉ hiển thị mã giao dịch.</span>
+                </li>
+              </ul>
             </div>
 
             {/* Printable paper-style contract preview */}
@@ -802,18 +947,30 @@ const TransactionContractPage: React.FC = () => {
                   ({t('transaction.contract.contractGenerated', { id: transaction.id })})
                 </p>
 
+                <p className="mb-2 text-xs text-gray-500 italic" title="Thông tin này có thể xuất hiện trong bản in, không nên dùng email/phone công việc nếu cần bảo mật cao.">
+                  Lưu ý: Email và số điện thoại bên dưới có thể xuất hiện trong bản in. Nếu cần bảo mật cao, hãy dùng thông tin liên hệ riêng tư.
+                </p>
+
                 <p className="mb-2">
                   {t('transaction.contract.contractIntro', { date: contractDate })}
                 </p>
 
                 <p className="mb-1 font-semibold">{t('transaction.contract.partyA')}: {sellerName}</p>
-                {sellerEmail && <p className="mb-1 text-gray-600 text-sm">{t('common.email')}: {sellerEmail}</p>}
+                {sellerEmail && (
+                  <p className="mb-1 text-gray-600 text-sm" title="Thông tin này có thể xuất hiện trong bản in. Không nên dùng email/phone công việc nếu cần bảo mật cao.">
+                    {t('common.email')}: {privacyMaskContact ? `${sellerEmail.slice(0, 3)}***@${sellerEmail.split('@')[1] || ''}` : sellerEmail}
+                  </p>
+                )}
                 <p className="mb-2 text-gray-600 text-xs italic">
                   ({t('transaction.contract.partyADetail')})
                 </p>
 
                 <p className="mb-1 font-semibold">{t('transaction.contract.partyB')}: {buyerName}</p>
-                {buyerEmail && <p className="mb-2 text-gray-600 text-sm">{t('common.email')}: {buyerEmail}</p>}
+                {buyerEmail && (
+                  <p className="mb-2 text-gray-600 text-sm" title="Thông tin này có thể xuất hiện trong bản in. Không nên dùng email/phone công việc nếu cần bảo mật cao.">
+                    {t('common.email')}: {privacyMaskContact ? `${buyerEmail.slice(0, 3)}***@${buyerEmail.split('@')[1] || ''}` : buyerEmail}
+                  </p>
+                )}
 
                 <p className="mb-2 font-semibold">{t('transaction.contract.article1')}</p>
                 <p className="mb-1">
@@ -1061,6 +1218,11 @@ const TransactionContractPage: React.FC = () => {
                 <p className="mb-1">25.4. {t('transaction.contract.article25_4')}</p>
                 <p className="mb-3">25.5. {t('transaction.contract.article25_5')}</p>
 
+                <p className="mb-2 font-semibold">Điều 26. Bảo mật & dữ liệu cá nhân</p>
+                <p className="mb-1">26.1. Các bên cam kết không được chia sẻ dữ liệu hợp đồng (nội dung, giá trị, thông tin các bên) cho bên thứ ba, trừ khi pháp luật yêu cầu hoặc cơ quan nhà nước có thẩm quyền yêu cầu.</p>
+                <p className="mb-1">26.2. Dữ liệu lưu trên ERA Estate và trên blockchain chủ yếu ở dạng mã hóa hoặc ẩn bớt thông tin định danh; không lưu đầy đủ CMND/CCCD, số sổ đỏ, số tài khoản ngân hàng trên giao diện công khai hay bản in mặc định.</p>
+                <p className="mb-3">26.3. Mỗi bên tự chịu trách nhiệm bảo mật tài khoản ERA Estate, ví MetaMask, email, mã OTP và thiết bị sử dụng. ERA Estate không lưu mật khẩu hay seed phrase của người dùng.</p>
+
                 {transaction.blockchainTxHash && (
                   <>
                     <p className="mb-2 font-semibold text-sm">{t('transaction.contract.blockchainInfo')}</p>
@@ -1106,6 +1268,90 @@ const TransactionContractPage: React.FC = () => {
           </div>
         </div>
       </div>
+      {/* Modal xác nhận trước khi ký MetaMask */}
+      {showSignConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 px-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full overflow-hidden">
+            <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
+              <Shield className="w-5 h-5 text-red-500" />
+              <div>
+                <h2 className="text-sm font-semibold text-gray-900">Xác nhận ký hợp đồng trên Blockchain</h2>
+                <p className="text-xs text-gray-500">
+                  MetaMask sẽ mở cửa sổ mới để bạn xác nhận giao dịch on-chain.
+                </p>
+              </div>
+            </div>
+            <div className="px-5 py-4 space-y-3 text-xs text-gray-700">
+              <div className="rounded-lg bg-gray-50 border border-gray-200 p-3">
+                <p className="font-semibold text-gray-900 mb-1">Tóm tắt giao dịch</p>
+                <p>
+                  <span className="text-gray-600">Bất động sản:</span>{' '}
+                  <span className="font-medium">
+                    {property?.title || transaction.property?.title || t('transaction.contract.noTitle')}
+                  </span>
+                </p>
+                <p>
+                  <span className="text-gray-600">Giá trị:</span>{' '}
+                  <span className="font-semibold text-red-600">
+                    {formatPrice(transaction.totalAmount)} VND
+                  </span>
+                </p>
+                <p>
+                  <span className="text-gray-600">Mạng Blockchain:</span>{' '}
+                  <span className="font-medium">
+                    {transaction.blockchainNetwork || BLOCKCHAIN_NETWORK_NAME || t('common.unknown')}
+                  </span>
+                </p>
+              </div>
+              <div className="flex items-start gap-2">
+                <input
+                  type="checkbox"
+                  className="mt-0.5 h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-500"
+                  checked={signConsent}
+                  onChange={(e) => setSignConsent(e.target.checked)}
+                />
+                <p>
+                  Tôi hiểu rằng ký trên Blockchain chỉ là bước ghi nhận giao dịch trên mạng{' '}
+                  <span className="font-semibold">{transaction.blockchainNetwork || BLOCKCHAIN_NETWORK_NAME}</span>,{' '}
+                  <span className="font-semibold">không thay thế</span> cho hợp đồng công chứng và thủ tục sang tên theo quy định pháp luật.
+                </p>
+              </div>
+            </div>
+            <div className="px-5 py-3 border-t border-gray-100 flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => !signing && setShowSignConfirm(false)}
+                className="px-4 py-2 rounded-lg border border-gray-300 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                disabled={signing}
+              >
+                Hủy
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!signConsent || signing) return;
+                  await handleSignOnChain();
+                  setShowSignConfirm(false);
+                }}
+                disabled={!signConsent || signing}
+                className="px-4 py-2 rounded-lg bg-red-600 text-white text-xs font-medium hover:bg-red-700 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {signing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    {t('transaction.signing')}
+                  </>
+                ) : (
+                  <>
+                    <Shield className="w-4 h-4" />
+                    Xác nhận & mở MetaMask
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

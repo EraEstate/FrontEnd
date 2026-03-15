@@ -437,6 +437,13 @@ export const Header: React.FC = () => {
                       >
                         {t('header.myProperties')}
                       </Link>
+                      <Link
+                        to="/security"
+                        className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                        onClick={() => setIsUserMenuOpen(false)}
+                      >
+                        Trung tâm bảo mật
+                      </Link>
                       <div className="border-t border-gray-100 my-1"></div>
                       <button
                         onClick={handleLogout}

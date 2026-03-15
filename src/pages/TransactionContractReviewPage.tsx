@@ -5,6 +5,7 @@ import { propertyTransactionAPI, type PropertyTransaction } from '../api/propert
 import { propertyAPI } from '../api/property';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
+import { TransactionStepper } from '../components/TransactionStepper';
 
 const TransactionContractReviewPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -86,6 +87,10 @@ const TransactionContractReviewPage: React.FC = () => {
             {t('transaction.review.contractDate')}: <span className="font-medium">{contractDate}</span> · {t('transaction.transactionId')}:{' '}
             <span className="font-mono">{transaction.id}</span>
           </p>
+
+          <div className="mt-4">
+            <TransactionStepper current={2} />
+          </div>
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 text-sm text-gray-700 mb-4">
@@ -161,17 +166,26 @@ const TransactionContractReviewPage: React.FC = () => {
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-          <label className="flex items-start gap-2 text-sm text-gray-700">
-            <input
-              type="checkbox"
-              className="mt-1 h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-500"
-              checked={agreed}
-              onChange={(e) => setAgreed(e.target.checked)}
-            />
-            <span>
-              {t('transaction.review.agreeCheckbox')}
-            </span>
-          </label>
+          <div className="space-y-3">
+            <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
+              <p className="font-semibold mb-1">Lưu ý pháp lý quan trọng</p>
+              <ul className="list-disc list-inside space-y-1">
+                <li>Hợp đồng trên hệ thống và trên blockchain <span className="font-semibold">không thay thế</span> cho hợp đồng công chứng ngoài đời.</li>
+                <li>Bạn cần tự kiểm tra pháp lý BĐS (sổ đỏ/sổ hồng, quy hoạch, thế chấp, tranh chấp) trước khi thanh toán và ký kết chính thức.</li>
+              </ul>
+            </div>
+            <label className="flex items-start gap-2 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                className="mt-1 h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-500"
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+              />
+              <span>
+                {t('transaction.review.agreeCheckbox')}
+              </span>
+            </label>
+          </div>
 
           <button
             type="button"

@@ -51,6 +51,8 @@ import PublicProfilePage from './pages/PublicProfilePage';
 import TransactionContractPage from './pages/TransactionContractPage';
 import TransactionOverviewPage from './pages/TransactionOverviewPage';
 import TransactionContractReviewPage from './pages/TransactionContractReviewPage';
+import LegalCenterPage from './pages/LegalCenterPage';
+import SecurityCenterPage from './pages/SecurityCenterPage';
 
 function AppContent() {
   const location = useLocation();
@@ -122,6 +124,8 @@ function AppContent() {
           <Route path="/transactions/:id/blockchain" element={<ProtectedRoute><TransactionContractPage /></ProtectedRoute>} />
           <Route path="/inquiries" element={<ProtectedRoute><InquiryPage /></ProtectedRoute>} />
           <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/legal" element={<LegalCenterPage />} />
+          <Route path="/security" element={<SecurityCenterPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="*" element={<NotFoundPage />} />
