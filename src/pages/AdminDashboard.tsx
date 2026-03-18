@@ -22,6 +22,7 @@ import PaymentManagement from './admin/PaymentManagement';
 import ProjectManagement from './admin/ProjectManagement';
 import AgencyManagement from './admin/AgencyManagement';
 import InquiryManagement from './admin/InquiryManagement';
+import MarketAnalysisManagement from './admin/MarketAnalysisManagement';
 
 // Admin Stats Cards Component
 const AdminStatsCard: React.FC<{
@@ -721,6 +722,10 @@ const AdminDashboardContent: React.FC = () => {
             <NewsManagement />
           )}
 
+          {activeSection === 'market-analysis' && (
+            <MarketAnalysisManagement />
+          )}
+
           {/* Payment Management Section */}
           {activeSection === 'payments' && (
             <PaymentManagement />
@@ -742,7 +747,7 @@ const AdminDashboardContent: React.FC = () => {
           )}
 
           {/* Other Sections - Placeholder */}
-          {!['overview', 'analytics', 'users', 'properties', 'agents', 'news', 'payments', 'projects', 'agencies', 'inquiries'].includes(activeSection) && (
+          {!['overview', 'analytics', 'users', 'properties', 'agents', 'news', 'market-analysis', 'payments', 'projects', 'agencies', 'inquiries'].includes(activeSection) && (
             <div className={`rounded-xl shadow-md p-8 text-center ${
               theme === 'dark' ? 'bg-slate-800 border border-slate-700' : 'bg-white'
             }`}>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, CheckCircle, XCircle, CreditCard, Loader2 } from 'lucide-react';
+import { Plus, Edit2, Trash2, CheckCircle, XCircle, CreditCard, Loader2, ShieldCheck } from 'lucide-react';
 import { bankAccountAPI, type CreateBankAccountRequest } from '../api/bankAccount';
 import type { BankAccount } from '../types';
 import { toast } from 'react-toastify';
@@ -50,6 +50,20 @@ const BankAccountManagementPage: React.FC = () => {
       fetchAccounts();
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Có lỗi xảy ra');
+    }
+  };
+
+  const handleRequestVerify = async (id: string) => {
+    try {
+      await bankAccountAPI.verify(id);
+      toast.success('Tài khoản đã được đánh dấu xác minh (hoặc yêu cầu đã gửi).');
+      fetchAccounts();
+    } catch (error: any) {
+      if (error.response?.status === 403) {
+        toast.error('Chỉ quản trị viên mới xác minh được. Liên hệ hỗ trợ nếu bạn cần gấp.');
+      } else {
+        toast.error(error.response?.data?.message || 'Không xác minh được tài khoản.');
+      }
     }
   };
 
@@ -178,6 +192,16 @@ const BankAccountManagementPage: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-1 ml-4">
+                  {!account.isVerified && (
+                    <button
+                      type="button"
+                      onClick={() => handleRequestVerify(account.id)}
+                      className="p-2 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                      title="Yêu cầu xác minh (admin)"
+                    >
+                      <ShieldCheck className="w-4 h-4" />
+                    </button>
+                  )}
                   <button
                     onClick={() => handleEdit(account)}
                     className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"

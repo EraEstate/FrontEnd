@@ -24,8 +24,12 @@ export const paymentAPI = {
     return response.data;
   },
 
-  // Lấy thanh toán theo trạng thái
-  getPaymentsByStatus: async (status: 'PENDING' | 'SUCCESS' | 'FAILED' | 'CANCELLED', page = 0, size = 10) => {
+  // Lấy thanh toán theo trạng thái (khớp Payment.PaymentStatus trên BE)
+  getPaymentsByStatus: async (
+    status: 'PENDING' | 'COMPLETED' | 'FAILED' | 'CANCELLED' | 'REFUNDED',
+    page = 0,
+    size = 10
+  ) => {
     const response = await api.get<PageResponse<Payment>>(`/payments/status/${status}`, {
       params: { page, size }
     });
@@ -50,7 +54,13 @@ export const paymentAPI = {
 
   // Thống kê tổng doanh thu
   getTotalRevenue: async () => {
-    const response = await api.get<number>('/payments/revenue/total');
+    const response = await api.get<number | string>('/payments/revenue/total');
     return response.data;
-  }
+  },
+
+  /** Tổng số giao dịch thanh toán */
+  countPayments: async () => {
+    const response = await api.get<number>('/payments/count');
+    return response.data;
+  },
 };

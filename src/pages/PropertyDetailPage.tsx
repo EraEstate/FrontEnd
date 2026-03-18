@@ -28,9 +28,12 @@ import {
   Navigation,
   Clock,
   Loader2,
+  Flag,
+  X,
 } from 'lucide-react';
 import { useProperty, useFavoriteStatus } from '../api/hooks';
 import { propertyFavoriteAPI } from '../api';
+import { propertyAPI } from '../api/property';
 import { propertyTransactionAPI } from '../api/propertyTransaction';
 import { useTranslation } from 'react-i18next';
 import { getImageUrl, getImagePlaceholder } from '../utils/imageUtils';
@@ -53,6 +56,10 @@ const PropertyDetailPage: React.FC = () => {
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [creatingContract, setCreatingContract] = useState(false);
   const [showContractModal, setShowContractModal] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState('INACCURATE');
+  const [reportDescription, setReportDescription] = useState('');
+  const [reportSubmitting, setReportSubmitting] = useState(false);
   
   // API Hooks
   const { data: property, loading, error, refetch } = useProperty(id || '');
@@ -317,9 +324,27 @@ const PropertyDetailPage: React.FC = () => {
                     <Heart className={`h-5 w-5 ${isFavorited ? 'fill-current' : ''}`} />
                   )}
                 </button>
-                <button className="p-3 bg-white bg-opacity-90 text-gray-600 rounded-full hover:bg-opacity-100 transition-colors">
+                <button
+                  type="button"
+                  onClick={() => {
+                    void navigator.clipboard?.writeText(window.location.href);
+                    toast.info('Đã sao chép liên kết tin đăng.');
+                  }}
+                  className="p-3 bg-white bg-opacity-90 text-gray-600 rounded-full hover:bg-opacity-100 transition-colors"
+                  title="Chia sẻ / sao chép link"
+                >
                   <Share2 className="h-5 w-5" />
                 </button>
+                {!isOwner && (
+                  <button
+                    type="button"
+                    onClick={() => setShowReportModal(true)}
+                    className="p-3 bg-white bg-opacity-90 text-gray-600 rounded-full hover:bg-red-50 hover:text-red-600 transition-colors"
+                    title="Báo cáo tin vi phạm"
+                  >
+                    <Flag className="h-5 w-5" />
+                  </button>
+                )}
               </div>
             </div>
           ) : (
@@ -667,6 +692,78 @@ const PropertyDetailPage: React.FC = () => {
       )}
 
       {/* Blockchain contract preview modal */}
+      {showReportModal && id && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 relative">
+            <button
+              type="button"
+              onClick={() => setShowReportModal(false)}
+              className="absolute top-3 right-3 p-2 rounded-lg text-gray-500 hover:bg-gray-100"
+              aria-label="Đóng"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <h2 className="text-lg font-bold text-gray-900 pr-8">Báo cáo tin đăng</h2>
+            <p className="text-sm text-gray-600 mt-1 mb-4">
+              Thông tin của bạn giúp chúng tôi duy trì nội dung uy tín. Báo cáo được xử lý nội bộ.
+            </p>
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-700">Lý do</label>
+              <select
+                value={reportReason}
+                onChange={(e) => setReportReason(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500"
+              >
+                <option value="INACCURATE">Thông tin sai lệch / giả mạo</option>
+                <option value="SPAM">Spam / lừa đảo</option>
+                <option value="DUPLICATE">Trùng tin</option>
+                <option value="OFFENSIVE">Nội dung không phù hợp</option>
+                <option value="OTHER">Khác</option>
+              </select>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Mô tả thêm (tuỳ chọn)</label>
+                <textarea
+                  value={reportDescription}
+                  onChange={(e) => setReportDescription(e.target.value)}
+                  rows={3}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                  placeholder="Ghi chú ngắn giúp bộ phận kiểm duyệt xử lý nhanh hơn"
+                />
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                type="button"
+                onClick={() => setShowReportModal(false)}
+                className="flex-1 py-2.5 rounded-lg border border-gray-300 text-gray-700 text-sm font-medium hover:bg-gray-50"
+              >
+                Huỷ
+              </button>
+              <button
+                type="button"
+                disabled={reportSubmitting}
+                onClick={async () => {
+                  setReportSubmitting(true);
+                  try {
+                    await propertyAPI.report(id, reportReason, reportDescription.trim() || undefined);
+                    toast.success('Đã gửi báo cáo. Cảm ơn bạn.');
+                    setShowReportModal(false);
+                    setReportDescription('');
+                  } catch (e: any) {
+                    toast.error(e.response?.data?.message || 'Không gửi được báo cáo.');
+                  } finally {
+                    setReportSubmitting(false);
+                  }
+                }}
+                className="flex-1 py-2.5 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700 disabled:opacity-50"
+              >
+                {reportSubmitting ? 'Đang gửi…' : 'Gửi báo cáo'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showContractModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
           <div className="bg-white rounded-xl max-w-2xl w-full shadow-xl overflow-hidden">

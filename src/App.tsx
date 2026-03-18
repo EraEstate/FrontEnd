@@ -53,6 +53,10 @@ import TransactionOverviewPage from './pages/TransactionOverviewPage';
 import TransactionContractReviewPage from './pages/TransactionContractReviewPage';
 import LegalCenterPage from './pages/LegalCenterPage';
 import SecurityCenterPage from './pages/SecurityCenterPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
+import VerifyEmailPage from './pages/VerifyEmailPage';
+import NotificationSettingsPage from './pages/NotificationSettingsPage';
 
 function AppContent() {
   const location = useLocation();
@@ -108,6 +112,9 @@ function AppContent() {
           <Route path="/agencies/:id" element={<AgencyDetailPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
           <Route path="/favorites" element={<ProtectedRoute><FavoritesPage /></ProtectedRoute>} />
@@ -116,6 +123,7 @@ function AppContent() {
           <Route path="/edit-property/:id" element={<ProtectedRoute><EditPropertyPage /></ProtectedRoute>} />
           {/* <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} /> */}
           <Route path="/notifications" element={<ProtectedRoute><NotificationCenter /></ProtectedRoute>} />
+          <Route path="/notifications/settings" element={<ProtectedRoute><NotificationSettingsPage /></ProtectedRoute>} />
           <Route path="/payments" element={<ProtectedRoute><PaymentHistoryPage /></ProtectedRoute>} />
           <Route path="/payment/success" element={<PaymentSuccessPage />} />
           <Route path="/payment/failed" element={<PaymentFailedPage />} />

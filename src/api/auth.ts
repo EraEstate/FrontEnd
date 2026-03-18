@@ -155,9 +155,9 @@ export const authAPI = {
     return response.data;
   },
 
-  // Reset mật khẩu
-  resetPassword: async (token: string, newPassword: string) => {
-    const response = await api.post('/auth/reset-password', { token, newPassword });
+  // Reset mật khẩu (BE AuthController dùng key `resetToken`)
+  resetPassword: async (resetToken: string, newPassword: string) => {
+    const response = await api.post('/auth/reset-password', { resetToken, newPassword });
     return response.data;
   },
 

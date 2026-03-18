@@ -149,7 +149,7 @@ const NotificationCenter: React.FC = () => {
                 </button>
               )}
               <Link
-                to="/settings"
+                to="/notifications/settings"
                 className="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
               >
                 <Settings className="w-4 h-4 mr-2" />

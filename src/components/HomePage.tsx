@@ -15,6 +15,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useFeaturedProperties, useFeaturedNews, useTopAgents, useProvinces, useRecentNews } from '../api/hooks';
 import { useTranslation } from 'react-i18next';
 import MapPicker from './MapPicker';
+import { propertyViewAPI } from '../api/propertyView';
+import { propertyAPI } from '../api/property';
+import { getImageUrl, getImagePlaceholder } from '../utils/imageUtils';
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -46,6 +49,41 @@ const HomePage: React.FC = () => {
   const { data: featuredNews } = useFeaturedNews(5);
   const { data: topAgents } = useTopAgents(0, 6);
   const { data: recentNews } = useRecentNews(30, 0, 6);
+
+  const [mostViewed, setMostViewed] = useState<any[]>([]);
+  const [mostViewedLoading, setMostViewedLoading] = useState(true);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const page = await propertyViewAPI.getMostViewedProperties(undefined, 0, 8);
+        const rows: unknown[] = (page as any)?.content ?? [];
+        const enriched = await Promise.all(
+          rows.slice(0, 8).map(async (row: unknown) => {
+            const r = row as unknown[];
+            const pid = Array.isArray(r) ? r[0] : (row as any)?.propertyId;
+            const viewCount = Array.isArray(r) ? r[1] : (row as any)?.viewCount;
+            if (!pid) return null;
+            try {
+              const prop = await propertyAPI.getById(String(pid));
+              return { ...prop, weekViews: viewCount };
+            } catch {
+              return null;
+            }
+          })
+        );
+        if (alive) setMostViewed(enriched.filter(Boolean) as any[]);
+      } catch {
+        if (alive) setMostViewed([]);
+      } finally {
+        if (alive) setMostViewedLoading(false);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   // Chuẩn hoá dữ liệu news để tránh lệch kiểu trả về (list hoặc Page)
   const realEstateNewsArticles: any[] =
@@ -359,12 +397,12 @@ const HomePage: React.FC = () => {
             {(featuredProperties?.content || []).slice(0, 4).map((property: any) => (
               <Link
                 key={property.id}
-                to={`/property/${property.id}`}
+                to={`/properties/${property.id}`}
                 className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow"
               >
                 <div 
                   className="h-48 bg-cover bg-center bg-no-repeat"
-                  style={{ backgroundImage: `url(${property.imageUrl || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'})` }}
+                  style={{ backgroundImage: `url(${getImageUrl(property.mainImageUrl || property.imageUrl) || getImagePlaceholder(400, 300)})` }}
                 >
                   <div className="h-full bg-black bg-opacity-20 hover:bg-opacity-30 transition-all duration-200" />
                 </div>
@@ -384,6 +422,71 @@ const HomePage: React.FC = () => {
             ))}
           </div>
         </section>
+
+        {/* Xem nhiều trong 7 ngày — dữ liệu từ API lượt xem */}
+        {(mostViewedLoading || mostViewed.length > 0) && (
+          <section className="mb-12">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="w-8 h-8 text-red-600" />
+                <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">Bất động sản xem nhiều</h2>
+              </div>
+              <Link
+                to="/properties"
+                className="text-red-600 hover:text-red-700 font-bold flex items-center transition-all duration-200 hover:scale-105"
+              >
+                {t('home.viewMore')} <ChevronRight className="h-4 w-4 ml-1" />
+              </Link>
+            </div>
+            {mostViewedLoading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="h-56 bg-gray-200 rounded-lg animate-pulse" />
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {mostViewed.map((property: any) => (
+                  <Link
+                    key={property.id}
+                    to={`/properties/${property.id}`}
+                    className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow border border-gray-100"
+                  >
+                    <div
+                      className="h-48 bg-cover bg-center bg-no-repeat relative"
+                      style={{
+                        backgroundImage: `url(${getImageUrl(property.mainImageUrl || property.propertyImages?.[0]?.imageUrl) || getImagePlaceholder(400, 300)})`,
+                      }}
+                    >
+                      {property.weekViews != null && (
+                        <span className="absolute top-2 right-2 bg-black/65 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                          <Eye className="w-3 h-3" />
+                          {Number(property.weekViews).toLocaleString('vi-VN')}
+                        </span>
+                      )}
+                      <div className="h-full bg-black bg-opacity-10 hover:bg-opacity-20 transition-all duration-200" />
+                    </div>
+                    <div className="p-4">
+                      <h3 className="font-semibold text-gray-900 mb-2 text-sm line-clamp-2">{property.title}</h3>
+                      <div className="flex items-center justify-between text-sm mb-2">
+                        <span className="text-red-600 font-bold">
+                          {property.price >= 1000000000
+                            ? `${(property.price / 1000000000).toFixed(1)} tỷ`
+                            : property.price >= 1000000
+                              ? `${(property.price / 1000000).toFixed(0)} triệu`
+                              : property.price?.toLocaleString('vi-VN')}{' '}
+                          VND
+                        </span>
+                        <span className="text-gray-600">{property.area}m²</span>
+                      </div>
+                      <p className="text-xs text-gray-500 truncate">{property.address}</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
 
         {/* Tin nổi bật Section */}
         <section className="mb-12">

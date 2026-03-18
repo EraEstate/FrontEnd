@@ -1,12 +1,21 @@
 import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAgent, useAgentProperties } from '../api/hooks';
 import { useTranslation } from 'react-i18next';
+import { agentAPI } from '../api/agent';
+import { useAuthStore } from '../store/authStore';
+import { toast } from 'react-toastify';
+import { Star, Loader2 } from 'lucide-react';
 
 const AgentDetailPage = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const { isAuthenticated } = useAuthStore();
   const [activeTab, setActiveTab] = useState<'about' | 'properties' | 'reviews'>('about');
+  const [ratingScore, setRatingScore] = useState(5);
+  const [reviewText, setReviewText] = useState('');
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   // API Hooks
   const { data: agent, loading } = useAgent(id || '');
@@ -314,13 +323,71 @@ const AgentDetailPage = () => {
           <h2 className="text-2xl font-semibold text-gray-800 mb-6">
             Đánh giá từ khách hàng ({agent.reviewCount})
           </h2>
-          
-          <div className="text-center py-12">
-            <svg className="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 8h10m0 0V6a2 2 0 00-2-2H9a2 2 0 00-2 2v2m10 0v10a2 2 0 01-2 2H9a2 2 0 01-2-2V8m0 0V6a2 2 0 012-2h2a2 2 0 012 2v2" />
-            </svg>
-            <p className="text-gray-500">Tính năng đánh giá đang được phát triển</p>
+
+          <div className="max-w-lg border border-gray-200 rounded-xl p-5 mb-8 bg-gray-50/50">
+            <h3 className="text-sm font-semibold text-gray-900 mb-3">Bạn đã làm việc với môi giới này?</h3>
+            {!isAuthenticated ? (
+              <p className="text-sm text-gray-600">
+                <button type="button" onClick={() => navigate('/login')} className="text-red-600 font-medium hover:underline">
+                  Đăng nhập
+                </button>{' '}
+                để gửi đánh giá.
+              </p>
+            ) : (
+              <form
+                className="space-y-3"
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  if (!id) return;
+                  setSubmittingReview(true);
+                  try {
+                    await agentAPI.rate(id, ratingScore, reviewText.trim() || undefined);
+                    toast.success('Cảm ơn bạn đã đánh giá.');
+                    setReviewText('');
+                  } catch (err: any) {
+                    toast.error(err.response?.data?.message || err.response?.data?.error || 'Không gửi được đánh giá.');
+                  } finally {
+                    setSubmittingReview(false);
+                  }
+                }}
+              >
+                <div className="flex items-center gap-1">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => setRatingScore(s)}
+                      className="p-0.5 rounded hover:bg-white"
+                    >
+                      <Star
+                        className={`w-7 h-7 ${s <= ratingScore ? 'fill-amber-400 text-amber-400' : 'text-gray-300'}`}
+                      />
+                    </button>
+                  ))}
+                  <span className="text-sm text-gray-600 ml-2">{ratingScore}/5</span>
+                </div>
+                <textarea
+                  value={reviewText}
+                  onChange={(e) => setReviewText(e.target.value)}
+                  rows={3}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                  placeholder="Chia sẻ trải nghiệm của bạn (tuỳ chọn)"
+                />
+                <button
+                  type="submit"
+                  disabled={submittingReview}
+                  className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 disabled:opacity-50 inline-flex items-center gap-2"
+                >
+                  {submittingReview ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                  Gửi đánh giá
+                </button>
+              </form>
+            )}
           </div>
+
+          <p className="text-sm text-gray-500 text-center py-6">
+            Danh sách đánh giá chi tiết sẽ hiển thị khi backend trả về danh sách review đầy đủ.
+          </p>
         </div>
       )}
     </div>

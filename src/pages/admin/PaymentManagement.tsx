@@ -14,15 +14,61 @@ const PaymentManagement: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState('ALL');
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [stats, setStats] = useState({
+    revenue: 0,
+    completed: 0,
+    pending: 0,
+    failed: 0,
+    totalCount: 0,
+  });
+  const [statsLoading, setStatsLoading] = useState(true);
 
   useEffect(() => {
     fetchPayments();
   }, [currentPage, filterStatus]);
 
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const [revenueRaw, completed, pending, failed, totalCount] = await Promise.all([
+          paymentAPI.getTotalRevenue().catch(() => 0),
+          paymentAPI.getPaymentsByStatus('COMPLETED', 0, 1).then((p: any) => p.totalElements ?? 0).catch(() => 0),
+          paymentAPI.getPaymentsByStatus('PENDING', 0, 1).then((p: any) => p.totalElements ?? 0).catch(() => 0),
+          paymentAPI.getPaymentsByStatus('FAILED', 0, 1).then((p: any) => p.totalElements ?? 0).catch(() => 0),
+          paymentAPI.countPayments().catch(() => 0),
+        ]);
+        if (!alive) return;
+        const revenueNum = typeof revenueRaw === 'string' ? parseFloat(revenueRaw) : Number(revenueRaw);
+        setStats({
+          revenue: Number.isFinite(revenueNum) ? revenueNum : 0,
+          completed: Number(completed) || 0,
+          pending: Number(pending) || 0,
+          failed: Number(failed) || 0,
+          totalCount: Number(totalCount) || 0,
+        });
+      } catch {
+        if (alive) setStats({ revenue: 0, completed: 0, pending: 0, failed: 0, totalCount: 0 });
+      } finally {
+        if (alive) setStatsLoading(false);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
+
   const fetchPayments = async () => {
     try {
       setLoading(true);
-      const response = await paymentAPI.getAllPayments(currentPage, 20);
+      const response =
+        filterStatus === 'ALL'
+          ? await paymentAPI.getAllPayments(currentPage, 20)
+          : await paymentAPI.getPaymentsByStatus(
+              filterStatus as 'PENDING' | 'COMPLETED' | 'FAILED' | 'CANCELLED' | 'REFUNDED',
+              currentPage,
+              20
+            );
       setPayments(response.content || []);
       setTotalPages(response.totalPages || 1);
     } catch (error) {
@@ -37,17 +83,16 @@ const PaymentManagement: React.FC = () => {
       COMPLETED: { bg: 'bg-green-100', text: 'text-green-800', icon: CheckCircle },
       PENDING: { bg: 'bg-yellow-100', text: 'text-yellow-800', icon: Clock },
       FAILED: { bg: 'bg-red-100', text: 'text-red-800', icon: XCircle },
-      REFUNDED: { bg: 'bg-blue-100', text: 'text-blue-800', icon: DollarSign }
+      REFUNDED: { bg: 'bg-blue-100', text: 'text-blue-800', icon: DollarSign },
+      CANCELLED: { bg: 'bg-gray-100', text: 'text-gray-800', icon: XCircle },
     };
     return badges[status] || badges.PENDING;
   };
 
-  const formatCurrency = (amount: number) => {
-    if (amount >= 1000000000) return `${(amount / 1000000000).toFixed(1)}B`;
-    if (amount >= 1000000) return `${(amount / 1000000).toFixed(1)}M`;
-    if (amount >= 1000) return `${(amount / 1000).toFixed(1)}K`;
-    return amount.toString();
-  };
+  const formatVnd = (amount: number) =>
+    new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(
+      amount || 0
+    );
 
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString('en-US', { 
@@ -73,42 +118,44 @@ const PaymentManagement: React.FC = () => {
         </button>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats Cards — từ API */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg">
           <div className="flex items-center justify-between mb-4">
             <DollarSign className="w-8 h-8 opacity-80" />
-            <span className="text-xs opacity-80">This Month</span>
+            <span className="text-xs opacity-80">Doanh thu</span>
           </div>
-          <div className="text-3xl font-bold mb-1">${formatCurrency(5420000)}</div>
-          <div className="text-sm opacity-80">Total Revenue</div>
+          <div className="text-2xl sm:text-3xl font-bold mb-1 break-words">
+            {statsLoading ? '…' : formatVnd(stats.revenue)}
+          </div>
+          <div className="text-sm opacity-80">Tổng (payments/revenue/total)</div>
         </div>
 
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-lg">
           <div className="flex items-center justify-between mb-4">
             <CheckCircle className="w-8 h-8 opacity-80" />
-            <span className="text-xs opacity-80">Completed</span>
+            <span className="text-xs opacity-80">Hoàn thành</span>
           </div>
-          <div className="text-3xl font-bold mb-1">1,234</div>
-          <div className="text-sm opacity-80">Transactions</div>
+          <div className="text-3xl font-bold mb-1">{statsLoading ? '…' : stats.completed}</div>
+          <div className="text-sm opacity-80">Giao dịch COMPLETED</div>
         </div>
 
         <div className="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl p-6 text-white shadow-lg">
           <div className="flex items-center justify-between mb-4">
             <Clock className="w-8 h-8 opacity-80" />
-            <span className="text-xs opacity-80">Pending</span>
+            <span className="text-xs opacity-80">Đang xử lý</span>
           </div>
-          <div className="text-3xl font-bold mb-1">45</div>
-          <div className="text-sm opacity-80">Awaiting</div>
+          <div className="text-3xl font-bold mb-1">{statsLoading ? '…' : stats.pending}</div>
+          <div className="text-sm opacity-80">Giao dịch PENDING</div>
         </div>
 
         <div className="bg-gradient-to-br from-red-500 to-red-600 rounded-xl p-6 text-white shadow-lg">
           <div className="flex items-center justify-between mb-4">
             <XCircle className="w-8 h-8 opacity-80" />
-            <span className="text-xs opacity-80">Failed</span>
+            <span className="text-xs opacity-80">Thất bại</span>
           </div>
-          <div className="text-3xl font-bold mb-1">12</div>
-          <div className="text-sm opacity-80">Transactions</div>
+          <div className="text-3xl font-bold mb-1">{statsLoading ? '…' : stats.failed}</div>
+          <div className="text-sm opacity-80">Tổng ghi nhận: {statsLoading ? '…' : stats.totalCount}</div>
         </div>
       </div>
 
@@ -130,7 +177,10 @@ const PaymentManagement: React.FC = () => {
 
           <select
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
+            onChange={(e) => {
+              setFilterStatus(e.target.value);
+              setCurrentPage(0);
+            }}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           >
             <option value="ALL">All Status</option>
@@ -196,7 +246,7 @@ const PaymentManagement: React.FC = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="font-bold text-gray-900">${formatCurrency(payment.amount)}</div>
+                        <div className="font-bold text-gray-900">{formatVnd(Number(payment.amount))}</div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
