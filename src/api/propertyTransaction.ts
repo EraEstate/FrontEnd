@@ -18,6 +18,8 @@ export interface PropertyTransaction {
   buyerBankAccountId?: string;
   sellerBankAccountId?: string;
   notes?: string;
+  /** Ngày kết thúc thuê (giao dịch cho thuê) */
+  leaseEndDate?: string;
   completedAt?: string;
   createdAt: string;
   updatedAt?: string;
@@ -98,9 +100,11 @@ export const propertyTransactionAPI = {
     return response.data;
   },
 
-  // Hoàn thành giao dịch (STAFF/ADMIN)
-  complete: async (id: string) => {
-    const response = await api.put<PropertyTransaction>(`/property-transactions/${id}/complete`);
+  // Hoàn thành giao dịch (STAFF/ADMIN). Với tin cho thuê nên truyền leaseEndDate (YYYY-MM-DD).
+  complete: async (id: string, leaseEndDate?: string) => {
+    const response = await api.put<PropertyTransaction>(`/property-transactions/${id}/complete`, null, {
+      params: leaseEndDate ? { leaseEndDate } : {},
+    });
     return response.data;
   },
 

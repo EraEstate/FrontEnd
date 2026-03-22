@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Shield, Scale, FileText, HelpCircle } from 'lucide-react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 
 type TabKey = 'blockchain' | 'terms' | 'faq';
 
@@ -84,6 +84,14 @@ const LegalCenterPage: React.FC = () => {
                   <li>Giá trị giao dịch tại thời điểm ký trên chuỗi.</li>
                   <li>Thời điểm giao dịch được ghi nhận trên blockchain.</li>
                 </ul>
+                <p className="pt-1">
+                  <Link
+                    to="/help/wallet"
+                    className="inline-flex items-center text-sm font-medium text-red-600 hover:underline"
+                  >
+                    Hướng dẫn cài MetaMask, chọn mạng và chuẩn bị phí gas →
+                  </Link>
+                </p>
                 <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-xs md:text-sm">
                   <p className="font-semibold text-amber-800 mb-1">
                     Lưu ý quan trọng về giá trị pháp lý:

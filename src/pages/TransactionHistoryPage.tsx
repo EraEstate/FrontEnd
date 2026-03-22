@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   DollarSign,
   CheckCircle,
@@ -22,7 +22,8 @@ import {
   BLOCKCHAIN_NETWORK_NAME,
 } from '../config/blockchain';
 import RealEstateEscrowAbi from '../abi/RealEstateEscrow.json';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const STATUS_CONFIG: Record<
   string,
@@ -80,14 +81,23 @@ const PAYMENT_METHOD_LABEL: Record<string, string> = {
   CASH: 'Tiền mặt',
 };
 
-const TransactionHistoryPage: React.FC = () => {
+type PerspectiveFilter = 'ALL' | 'BUYER' | 'SELLER';
+
+interface TransactionHistoryPageProps {
+  /** Khi true: hiển thị link mở trang /my-transactions (dùng trong Profile) */
+  embedded?: boolean;
+}
+
+const TransactionHistoryPage: React.FC<TransactionHistoryPageProps> = ({ embedded = false }) => {
   const { user } = useAuthStore();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [transactions, setTransactions] = useState<PropertyTransaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
+  const [perspectiveFilter, setPerspectiveFilter] = useState<PerspectiveFilter>('ALL');
   const [signingId, setSigningId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -148,7 +158,7 @@ const TransactionHistoryPage: React.FC = () => {
       });
       toast.success('Đã tạo hợp đồng blockchain thành công');
       await fetchTransactions();
-      navigate(`/transactions/${transaction.id}/contract`);
+      navigate(`/transactions/${transaction.id}/blockchain`);
     } catch (error: any) {
       console.error('Error signing on-chain deal:', error);
       const msg =
@@ -161,10 +171,19 @@ const TransactionHistoryPage: React.FC = () => {
     }
   };
 
-  const filteredTransactions =
-    filterStatus === 'ALL'
-      ? transactions
-      : transactions.filter((t) => t.status === filterStatus);
+  const byPerspective = useMemo(() => {
+    if (!user?.id) return transactions;
+    if (perspectiveFilter === 'ALL') return transactions;
+    if (perspectiveFilter === 'BUYER') {
+      return transactions.filter((tx) => String(tx.buyerId) === String(user.id));
+    }
+    return transactions.filter((tx) => String(tx.sellerId) === String(user.id));
+  }, [transactions, perspectiveFilter, user?.id]);
+
+  const filteredTransactions = useMemo(() => {
+    if (filterStatus === 'ALL') return byPerspective;
+    return byPerspective.filter((tx) => tx.status === filterStatus);
+  }, [byPerspective, filterStatus]);
 
   if (loading && transactions.length === 0) {
     return (
@@ -176,29 +195,51 @@ const TransactionHistoryPage: React.FC = () => {
 
   return (
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+      {embedded && (
+        <div className="px-6 py-2.5 bg-red-50/70 border-b border-red-100 flex justify-end">
+          <Link
+            to="/my-transactions"
+            className="text-sm font-medium text-red-700 hover:text-red-800 hover:underline"
+          >
+            {t('transaction.historyList.fullscreenLink')} →
+          </Link>
+        </div>
+      )}
       {/* Header */}
       <div className="px-6 py-5 border-b border-gray-100">
-        <h1 className="text-xl font-semibold text-gray-900">Lịch sử giao dịch</h1>
-        <p className="text-sm text-gray-500 mt-0.5">
-          Xem và quản lý các giao dịch mua bán, cho thuê BĐS của bạn
-        </p>
+        <h1 className="text-xl font-semibold text-gray-900">{t('transaction.historyList.title')}</h1>
+        <p className="text-sm text-gray-500 mt-0.5">{t('transaction.historyList.subtitle')}</p>
       </div>
 
-      {/* Filter */}
-      <div className="px-6 py-3 flex items-center justify-between gap-4 border-b border-gray-100 bg-gray-50/50">
-        <span className="text-sm text-gray-600">Trạng thái</span>
-        <select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-          className="text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white text-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none min-w-[160px]"
-        >
-          <option value="ALL">Tất cả</option>
-          {Object.entries(STATUS_CONFIG).map(([value, { label }]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
+      {/* Filters */}
+      <div className="px-6 py-3 flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-3 border-b border-gray-100 bg-gray-50/50">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-sm text-gray-600">{t('transaction.historyList.perspectiveLabel')}</span>
+          <select
+            value={perspectiveFilter}
+            onChange={(e) => setPerspectiveFilter(e.target.value as PerspectiveFilter)}
+            className="text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white text-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none min-w-[140px]"
+          >
+            <option value="ALL">{t('transaction.historyList.perspectiveAll')}</option>
+            <option value="BUYER">{t('transaction.historyList.perspectiveBuyer')}</option>
+            <option value="SELLER">{t('transaction.historyList.perspectiveSeller')}</option>
+          </select>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-sm text-gray-600">{t('transaction.historyList.statusLabel')}</span>
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white text-gray-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none min-w-[160px]"
+          >
+            <option value="ALL">{t('transaction.historyList.statusAll')}</option>
+            {Object.entries(STATUS_CONFIG).map(([value, { label }]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* List */}
@@ -208,8 +249,10 @@ const TransactionHistoryPage: React.FC = () => {
             <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center mb-4">
               <FileText className="w-7 h-7 text-gray-400" />
             </div>
-            <p className="text-gray-600 font-medium">Chưa có giao dịch nào</p>
-            <p className="text-sm text-gray-500 mt-1">Các giao dịch của bạn sẽ hiển thị tại đây</p>
+            <p className="text-gray-600 font-medium">
+              {transactions.length === 0 ? t('transaction.historyList.empty') : t('transaction.historyList.emptyFiltered')}
+            </p>
+            <p className="text-sm text-gray-500 mt-1">{t('transaction.historyList.emptyHint')}</p>
           </div>
         ) : (
           filteredTransactions.map((tx) => {
@@ -277,6 +320,15 @@ const TransactionHistoryPage: React.FC = () => {
                           {isRent ? 'Cho thuê' : 'Mua bán'}
                         </span>
                       )}
+                      {perspectiveFilter === 'ALL' && (
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                            isBuyer ? 'bg-violet-50 text-violet-800' : 'bg-amber-50 text-amber-800'
+                          }`}
+                        >
+                          {isBuyer ? t('transaction.historyList.roleBuyer') : t('transaction.historyList.roleSeller')}
+                        </span>
+                      )}
                     </div>
                     <p className="text-lg font-semibold text-gray-900 mt-0.5">
                       {formatPrice(Number(tx.totalAmount))}
@@ -294,7 +346,7 @@ const TransactionHistoryPage: React.FC = () => {
                     {/* Blockchain: one line, optional sign button */}
                     {showBlockchainBtn && (
                       <div className="mt-2 flex items-center gap-2">
-                        <span className="text-xs text-gray-500">Chưa ký blockchain</span>
+                        <span className="text-xs text-gray-500">{t('transaction.historyList.notSignedBlockchain')}</span>
                         <button
                           type="button"
                           onClick={() => handleSignOnChain(tx, isRent)}
@@ -306,7 +358,7 @@ const TransactionHistoryPage: React.FC = () => {
                           ) : (
                             <ExternalLink className="w-3 h-3" />
                           )}
-                          Ký MetaMask
+                          {t('transaction.historyList.signMetamask')}
                         </button>
                       </div>
                     )}
@@ -321,7 +373,7 @@ const TransactionHistoryPage: React.FC = () => {
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline mt-1"
                       >
-                        Đã ghi blockchain
+                        {t('transaction.historyList.onChainRecorded')}
                         <ExternalLink className="w-3 h-3" />
                       </a>
                     )}
@@ -334,7 +386,7 @@ const TransactionHistoryPage: React.FC = () => {
                       className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition-colors"
                     >
                       <FileText className="w-4 h-4" />
-                      Xem hợp đồng
+                      {t('transaction.historyList.viewContract')}
                     </button>
                     <a
                       href={`/properties/${tx.propertyId}`}
@@ -343,7 +395,7 @@ const TransactionHistoryPage: React.FC = () => {
                       className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-gray-200 text-gray-700 text-sm hover:bg-gray-50 transition-colors"
                     >
                       <Eye className="w-4 h-4" />
-                      Xem BĐS
+                      {t('transaction.historyList.viewProperty')}
                     </a>
                   </div>
                 </div>
@@ -360,7 +412,7 @@ const TransactionHistoryPage: React.FC = () => {
                     ) : (
                       <ChevronDown className="w-4 h-4" />
                     )}
-                    {isExpanded ? 'Thu gọn' : 'Chi tiết giao dịch'}
+                    {isExpanded ? t('transaction.historyList.collapse') : t('transaction.historyList.expandDetails')}
                   </button>
                   {isExpanded && (
                       <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
@@ -419,17 +471,17 @@ const TransactionHistoryPage: React.FC = () => {
             disabled={currentPage === 0}
             className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white"
           >
-            Trước
+            {t('transaction.historyList.prevPage')}
           </button>
           <span className="text-sm text-gray-600">
-            Trang {currentPage + 1} / {totalPages}
+            {t('transaction.historyList.pageOf', { current: currentPage + 1, total: totalPages })}
           </span>
           <button
             onClick={() => setCurrentPage((p) => Math.min(totalPages - 1, p + 1))}
             disabled={currentPage >= totalPages - 1}
             className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white"
           >
-            Sau
+            {t('transaction.historyList.nextPage')}
           </button>
         </div>
       )}

@@ -83,6 +83,8 @@ export interface Property {
   images: string[];
   features: string[];
   status: 'ACTIVE' | 'SOLD' | 'RENTED' | 'INACTIVE';
+  /** Ngày kết thúc thuê (khi status RENTED) */
+  rentalEndDate?: string;
   views: number;
   isFeatured: boolean;
   createdAt: string;

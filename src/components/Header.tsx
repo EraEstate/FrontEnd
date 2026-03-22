@@ -4,6 +4,8 @@ import {
   X,
   Heart,
   ChevronDown,
+  Wallet,
+  Receipt,
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -431,6 +433,14 @@ export const Header: React.FC = () => {
                         {t('header.profile')}
                       </Link>
                       <Link
+                        to="/my-transactions"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                        onClick={() => setIsUserMenuOpen(false)}
+                      >
+                        <Receipt className="w-4 h-4 opacity-70" />
+                        {t('header.myTransactions')}
+                      </Link>
+                      <Link
                         to="/my-properties"
                         className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
                         onClick={() => setIsUserMenuOpen(false)}
@@ -438,11 +448,26 @@ export const Header: React.FC = () => {
                         {t('header.myProperties')}
                       </Link>
                       <Link
+                        to="/settings"
+                        className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                        onClick={() => setIsUserMenuOpen(false)}
+                      >
+                        {t('header.settings')}
+                      </Link>
+                      <Link
+                        to="/help/wallet"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                        onClick={() => setIsUserMenuOpen(false)}
+                      >
+                        <Wallet className="w-4 h-4 opacity-70" />
+                        {t('header.walletGuide')}
+                      </Link>
+                      <Link
                         to="/security"
                         className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
                         onClick={() => setIsUserMenuOpen(false)}
                       >
-                        Trung tâm bảo mật
+                        {t('header.securityCenter')}
                       </Link>
                       <div className="border-t border-gray-100 my-1"></div>
                       <button
@@ -607,6 +632,49 @@ export const Header: React.FC = () => {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {t('header.register')}
+                </Link>
+              </div>
+            )}
+
+            {isAuthenticated && (
+              <div className="pt-3 mt-3 border-t border-gray-100">
+                <div className="px-4 py-2 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                  {t('header.accountSection')}
+                </div>
+                <Link
+                  to="/profile"
+                  className="flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {t('header.profile')}
+                </Link>
+                <Link
+                  to="/my-transactions"
+                  className="flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {t('header.myTransactions')}
+                </Link>
+                <Link
+                  to="/settings"
+                  className="flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {t('header.settings')}
+                </Link>
+                <Link
+                  to="/help/wallet"
+                  className="flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {t('header.walletGuide')}
+                </Link>
+                <Link
+                  to="/security"
+                  className="flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {t('header.securityCenter')}
                 </Link>
               </div>
             )}

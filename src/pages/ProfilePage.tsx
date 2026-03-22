@@ -720,7 +720,7 @@ const ProfilePage: React.FC = () => {
             {activeTab === 'subscription' && <SubscriptionTab />}
             {activeTab === 'activities' && <ActivityTab />}
             {activeTab === 'bank-accounts' && <BankAccountManagementPage />}
-            {activeTab === 'transactions' && <TransactionHistoryPage />}
+            {activeTab === 'transactions' && <TransactionHistoryPage embedded />}
             {activeTab === 'settings' && <Settings />}
           </div>
         </div>

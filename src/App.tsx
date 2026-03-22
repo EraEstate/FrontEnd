@@ -24,7 +24,6 @@ import AboutPage from './pages/AboutPage';
 import NotFoundPage from './pages/NotFoundPage';
 import FavoritesPage from './pages/FavoritesPage';
 import MyPropertiesPage from './pages/MyPropertiesPage';
-// import SettingsPage from './pages/SettingsPage'; // TODO: Create this page
 import NewsDetailPage from './pages/NewsDetailPage';
 import AgentDetailPage from './pages/AgentDetailPage';
 import RentPage from './pages/RentPage';
@@ -51,6 +50,9 @@ import PublicProfilePage from './pages/PublicProfilePage';
 import TransactionContractPage from './pages/TransactionContractPage';
 import TransactionOverviewPage from './pages/TransactionOverviewPage';
 import TransactionContractReviewPage from './pages/TransactionContractReviewPage';
+import MyTransactionsPage from './pages/MyTransactionsPage';
+import SettingsPage from './pages/SettingsPage';
+import WalletGuidePage from './pages/WalletGuidePage';
 import LegalCenterPage from './pages/LegalCenterPage';
 import SecurityCenterPage from './pages/SecurityCenterPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
@@ -121,12 +123,14 @@ function AppContent() {
           <Route path="/post-property" element={<ProtectedRoute><PostPropertyPage /></ProtectedRoute>} />
           <Route path="/my-properties" element={<ProtectedRoute><MyPropertiesPage /></ProtectedRoute>} />
           <Route path="/edit-property/:id" element={<ProtectedRoute><EditPropertyPage /></ProtectedRoute>} />
-          {/* <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} /> */}
           <Route path="/notifications" element={<ProtectedRoute><NotificationCenter /></ProtectedRoute>} />
           <Route path="/notifications/settings" element={<ProtectedRoute><NotificationSettingsPage /></ProtectedRoute>} />
           <Route path="/payments" element={<ProtectedRoute><PaymentHistoryPage /></ProtectedRoute>} />
           <Route path="/payment/success" element={<PaymentSuccessPage />} />
           <Route path="/payment/failed" element={<PaymentFailedPage />} />
+          <Route path="/my-transactions" element={<ProtectedRoute><MyTransactionsPage /></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+          <Route path="/help/wallet" element={<WalletGuidePage />} />
           <Route path="/transactions/:id" element={<ProtectedRoute><TransactionOverviewPage /></ProtectedRoute>} />
           <Route path="/transactions/:id/contract" element={<ProtectedRoute><TransactionContractReviewPage /></ProtectedRoute>} />
           <Route path="/transactions/:id/blockchain" element={<ProtectedRoute><TransactionContractPage /></ProtectedRoute>} />

@@ -137,6 +137,12 @@ const Footer: React.FC = () => {
                   {t('footer.contactEmail')}
                 </a>
               </li>
+              <li>
+                <Link to="/help/wallet" className="hover:text-red-600 transition-colors inline-flex items-center group">
+                  <ChevronRight className="h-3 w-3 mr-1 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  {t('footer.walletGuide')}
+                </Link>
+              </li>
             </ul>
           </div>
 
