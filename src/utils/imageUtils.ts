@@ -1,8 +1,8 @@
 /**
- * Helper function to get full image URL
- * Backend returns paths like /uploads/avatars/... or /uploads/properties/...
- * Also handles Supabase Storage URLs (full URLs)
- * We need to prepend the backend base URL for relative paths
+ * Helper function to get full image URL for <img src> / CSS url().
+ * - Full URLs (https://...) are returned unchanged — includes Cloudinary (res.cloudinary.com)
+ *   and Supabase Storage.
+ * - Relative paths under /uploads/... get VITE_API_URL prepended (legacy local files).
  */
 export const getImageUrl = (imagePath: string | null | undefined): string | undefined => {
   if (!imagePath || imagePath.trim() === '') {

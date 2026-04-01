@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { newsAPI } from '../api/news';
 import { useAuthStore } from '../store/authStore';
 import { toast } from 'react-toastify';
+import { getImageUrl, getImagePlaceholder } from '../utils/imageUtils';
 
 const NewsDetailPage = () => {
   const { t } = useTranslation();
@@ -128,7 +129,7 @@ const NewsDetailPage = () => {
               {article.imageUrl && (
                 <div className="mb-8">
                   <img
-                    src={article.imageUrl}
+                    src={getImageUrl(article.imageUrl)}
                     alt={article.title}
                     className="w-full h-auto rounded-lg shadow-sm"
                   />
@@ -303,7 +304,7 @@ const NewsDetailPage = () => {
                 >
                   <div className="flex space-x-4">
                     <img
-                      src={news.imageUrl || '/api/placeholder/80/60'}
+                      src={getImageUrl(news.imageUrl) || getImagePlaceholder(80, 60)}
                       alt={news.title}
                       className="w-20 h-15 object-cover rounded-lg group-hover:opacity-80 transition-opacity"
                     />

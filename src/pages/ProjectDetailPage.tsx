@@ -13,6 +13,7 @@ import {
 import { projectAPI } from '../api/services';
 import type { Project } from '../api/types';
 import { useTranslation } from 'react-i18next';
+import { getImageUrl, getImagePlaceholder } from '../utils/imageUtils';
 
 const ProjectDetailPage: React.FC = () => {
   const { t } = useTranslation();
@@ -215,7 +216,7 @@ const ProjectDetailPage: React.FC = () => {
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
               <div className="relative h-96">
                 <img
-                  src={allImages[activeImageIndex] || "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800"}
+                  src={getImageUrl(allImages[activeImageIndex]) || "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800"}
                   alt={project.name}
                   className="w-full h-full object-cover"
                 />
@@ -233,7 +234,7 @@ const ProjectDetailPage: React.FC = () => {
                         }`}
                       >
                         <img
-                          src={image}
+                          src={getImageUrl(image) || getImagePlaceholder(80, 80)}
                           alt={`Image ${index + 1}`}
                           className="w-full h-full object-cover"
                         />

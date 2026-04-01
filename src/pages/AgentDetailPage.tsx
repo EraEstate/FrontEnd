@@ -6,6 +6,7 @@ import { agentAPI } from '../api/agent';
 import { useAuthStore } from '../store/authStore';
 import { toast } from 'react-toastify';
 import { Star, Loader2 } from 'lucide-react';
+import { getImageUrl, getImagePlaceholder } from '../utils/imageUtils';
 
 const AgentDetailPage = () => {
   const { t } = useTranslation();
@@ -264,7 +265,7 @@ const AgentDetailPage = () => {
             <div key={property.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
               <div className="relative">
                 <img
-                  src={property.propertyImages?.[0]?.imageUrl || '/api/placeholder/300/200'}
+                  src={getImageUrl(property.propertyImages?.[0]?.imageUrl) || getImagePlaceholder(400, 192)}
                   alt={property.title}
                   className="w-full h-48 object-cover"
                 />
