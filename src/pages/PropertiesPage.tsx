@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Search,
   Heart,
@@ -9,14 +9,20 @@ import {
   Map,
   User,
   Loader2,
+  Scale,
 } from 'lucide-react';
 import { useProperties } from '../api/hooks';
 import { propertyFavoriteAPI } from '../api';
+import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import type { Property } from '../types';
 import { useAuthStore } from '../store/authStore';
+import { useCompareStore } from '../store/compareStore';
 import { getImageUrl, getImagePlaceholder } from '../utils/imageUtils';
+import { showSuccess, showWarning, showError } from '../utils/toast';
+import { logger } from '../utils/logger';
+import EmptyState from '../components/EmptyState';
 
 const PropertiesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -125,25 +131,18 @@ const PropertiesPage: React.FC = () => {
     event?.stopPropagation();
     
     try {
-      // Check if already favorited before toggle
       const wasFavorited = await propertyFavoriteAPI.isFavorited(propertyId);
       await propertyFavoriteAPI.toggle(propertyId);
-      // Refresh data after toggle
       refetchProperties();
       
-      // Show success message and offer navigation if adding to favorites
       if (!wasFavorited) {
-        const goToFavorites = window.confirm('Đã thêm vào danh sách yêu thích!\n\nBạn có muốn xem danh sách yêu thích không?');
-        if (goToFavorites) {
-          navigate('/favorites');
-        }
+        showSuccess('Đã thêm vào danh sách yêu thích!');
       } else {
-        alert('Đã xóa khỏi danh sách yêu thích');
+        showSuccess('Đã xóa khỏi danh sách yêu thích');
       }
     } catch (error: any) {
-      console.error('Error toggling favorite:', error);
-      const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi cập nhật danh sách yêu thích';
-      alert(errorMessage);
+      logger.warn('Error toggling favorite:', error);
+      showError('Có lỗi xảy ra khi cập nhật danh sách yêu thích');
     }
   };
 
@@ -174,9 +173,9 @@ const PropertiesPage: React.FC = () => {
             </div>
 
             {/* Map Icon */}
-            <button className="p-3 text-gray-600 hover:text-red-600 transition-colors">
+            <Link to="/map-search" className="p-3 text-gray-600 hover:text-red-600 transition-colors" title="Tìm kiếm trên bản đồ">
               <Map className="h-5 w-5" />
-            </button>
+            </Link>
           </div>
 
           {/* Filter Bar - giống batdongsan.com.vn */}
@@ -206,25 +205,46 @@ const PropertiesPage: React.FC = () => {
             </button>
 
             {/* Loại nhà đất */}
-            <div className="relative">
-              <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:border-red-300 transition-colors text-sm">
-                <span>{t('properties.filters.propertyType')}</span>
-                <ChevronDown className="h-4 w-4" />
-              </button>
-            </div>
+            <FilterDropdown
+              label={t('properties.filters.propertyType')}
+              options={[
+                { value: 'APARTMENT', label: 'Căn hộ' },
+                { value: 'HOUSE', label: 'Nhà riêng' },
+                { value: 'VILLA', label: 'Biệt thự' },
+                { value: 'LAND', label: 'Đất nền' },
+                { value: 'OFFICE', label: 'Văn phòng' },
+              ]}
+              value={selectedFilters.propertyType}
+              onChange={(v) => {
+                setSelectedFilters({ ...selectedFilters, propertyType: v });
+                setSearchParams((prev: any) => ({ ...prev, propertyType: v || undefined }));
+                setCurrentPage(0);
+              }}
+            />
 
             {/* Khoảng giá */}
-            <div className="relative">
-              <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:border-red-300 transition-colors text-sm">
-                <span>{t('properties.filters.priceRange')}</span>
-                <ChevronDown className="h-4 w-4" />
-              </button>
-            </div>
-
-            {/* Môi giới chuyên nghiệp */}
-            <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:border-red-300 transition-colors text-sm">
-              <span>{t('properties.filters.professionalBroker')}</span>
-            </button>
+            <FilterDropdown
+              label={t('properties.filters.priceRange')}
+              options={[
+                { value: '0-1000000000', label: 'Dưới 1 tỷ' },
+                { value: '1000000000-3000000000', label: '1 - 3 tỷ' },
+                { value: '3000000000-5000000000', label: '3 - 5 tỷ' },
+                { value: '5000000000-10000000000', label: '5 - 10 tỷ' },
+                { value: '10000000000-', label: 'Trên 10 tỷ' },
+              ]}
+              value={selectedFilters.priceRange}
+              onChange={(v) => {
+                const [min, max] = v.split('-');
+                setSelectedFilters({ ...selectedFilters, priceRange: v, minPrice: min || '', maxPrice: max || '' });
+                const p: any = { ...searchParams };
+                if (min) p.minPrice = parseFloat(min);
+                else delete p.minPrice;
+                if (max) p.maxPrice = parseFloat(max);
+                else delete p.maxPrice;
+                setSearchParams(p);
+                setCurrentPage(0);
+              }}
+            />
           </div>
 
           {/* Advanced Search Panel */}
@@ -431,25 +451,46 @@ const PropertiesPage: React.FC = () => {
                 onToggleFavorite={handleToggleFavorite}
               />
             )) || (
-              <div className="text-center py-8 text-gray-500">
-                {t('properties.noResults')}
-              </div>
+              <EmptyState
+                type="search"
+                title="Không tìm thấy kết quả"
+                description="Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm để xem thêm kết quả."
+                actionLabel="Xem tất cả tin đăng"
+                actionTo="/properties"
+              />
             )}
           </div>
         )}
 
-        {/* Show more properties button */}
-        <div className="text-center mt-8">
-          <button className="px-6 py-3 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-            {t('properties.loadMore')}
-          </button>
-        </div>
+        {/* Pagination */}
+        {properties?.content && properties.content.length > 0 && (
+          <div className="text-center mt-8">
+            {!properties.last ? (
+              <button
+                onClick={() => setCurrentPage(prev => prev + 1)}
+                disabled={propertiesLoading}
+                className="px-6 py-3 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+              >
+                {propertiesLoading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Loader2 className="animate-spin h-4 w-4" />
+                    Đang tải...
+                  </span>
+                ) : (
+                  `${t('properties.loadMore')} (${currentPage + 1}/${properties.totalPages})`
+                )}
+              </button>
+            ) : (
+              <p className="text-sm text-gray-500">Đã hiển thị tất cả {properties.totalElements} tin</p>
+            )}
+          </div>
+        )}
 
         {/* Content Sections - giống batdongsan.com.vn */}
         <div className="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg p-6 shadow-sm">
+            <div className="bg-white rounded-xl p-6 border border-gray-100" style={{ boxShadow: 'var(--shadow-sm)' }}>
               <h2 className="text-xl font-bold text-gray-900 mb-4">
                 {t('properties.content.mainTitle')}
               </h2>
@@ -492,7 +533,7 @@ const PropertiesPage: React.FC = () => {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Mua bán nhà đất by Province */}
-            <div className="bg-white rounded-lg p-6 shadow-sm">
+            <div className="bg-white rounded-xl p-6 border border-gray-100" style={{ boxShadow: 'var(--shadow-sm)' }}>
               <h3 className="font-bold text-gray-900 mb-4">{t('properties.sidebar.byProvince')}</h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
@@ -519,7 +560,7 @@ const PropertiesPage: React.FC = () => {
             </div>
 
             {/* Bài viết được quan tâm */}
-            <div className="bg-white rounded-lg p-6 shadow-sm">
+            <div className="bg-white rounded-xl p-6 border border-gray-100" style={{ boxShadow: 'var(--shadow-sm)' }}>
               <h3 className="font-bold text-gray-900 mb-4">{t('properties.sidebar.popularArticles')}</h3>
               <div className="space-y-4">
                 <div className="flex space-x-3">
@@ -570,6 +611,9 @@ const PropertyListItem: React.FC<{
   const [isFavorited, setIsFavorited] = useState(false);
   const [checkingFavorite, setCheckingFavorite] = useState(true);
   const { isAuthenticated } = useAuthStore();
+  const { compareList, addProperty, removeProperty } = useCompareStore();
+
+  const isComparing = compareList.some(p => p.id === property.id?.toString());
 
   // Check favorite status when component mounts
   useEffect(() => {
@@ -582,8 +626,8 @@ const PropertyListItem: React.FC<{
       try {
         const favorited = await propertyFavoriteAPI.isFavorited(property.id.toString());
         setIsFavorited(favorited);
-      } catch (error) {
-        console.error('Error checking favorite status:', error);
+      } catch {
+        logger.debug('Error checking favorite status for', property.id);
       } finally {
         setCheckingFavorite(false);
       }
@@ -597,7 +641,7 @@ const PropertyListItem: React.FC<{
     e.stopPropagation();
     
     if (!isAuthenticated) {
-      alert('Vui lòng đăng nhập để thêm vào danh sách yêu thích');
+      showWarning('Vui lòng đăng nhập để thêm vào danh sách yêu thích');
       return;
     }
 
@@ -611,8 +655,7 @@ const PropertyListItem: React.FC<{
     try {
       const favorited = await propertyFavoriteAPI.isFavorited(property.id.toString());
       setIsFavorited(favorited);
-    } catch (error) {
-      // Revert on error
+    } catch {
       setIsFavorited(!isFavorited);
     }
   };
@@ -669,31 +712,22 @@ const PropertyListItem: React.FC<{
   // This handles both local paths (/uploads/...) and Supabase Storage URLs (https://...)
   const primaryImage = getImageUrl(rawImagePath) || getImagePlaceholder(400, 300);
   
-  // Debug log in development - only log when there's an actual image to debug
-  // Don't spam console with warnings for properties without images (this is normal)
+  // Use logger instead of console for dev debugging
   if (import.meta.env.DEV && rawImagePath) {
-    console.log('📸 Property image loaded:', {
-      propertyId: property.id,
-      propertyTitle: property.title,
-      rawPath: rawImagePath,
-      processedUrl: primaryImage,
-      isSupabase: rawImagePath.includes('supabase.co'),
-      isFullUrl: rawImagePath.startsWith('http://') || rawImagePath.startsWith('https://')
-    });
-    
-    // Warn if using placeholder but have raw path (this indicates a problem)
-    if (primaryImage.includes('data:image/svg+xml') && rawImagePath) {
-      console.warn('⚠️ Image path exists but failed to load. Using placeholder:', rawImagePath);
-    }
+    logger.debug('Property image:', property.id, rawImagePath);
   }
-  // Note: We don't log warnings for properties without images - this is normal
-  // Properties will show placeholder image automatically via getImagePlaceholder()
 
   return (
-    <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden border border-gray-200">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -5 }}
+      transition={{ duration: 0.3 }}
+      className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100"
+    >
       <div className="flex">
         {/* Image Section */}
-        <div className="relative w-80 h-48 flex-shrink-0 bg-gray-100">
+        <Link to={`/properties/${property.id}`} className="relative w-80 h-48 flex-shrink-0 bg-gray-100 block">
           <img
             src={primaryImage}
             alt={property.title}
@@ -702,25 +736,9 @@ const PropertyListItem: React.FC<{
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               const placeholder = getImagePlaceholder(400, 300);
-              // Only log if it's not already the placeholder
               if (target.src !== placeholder && !target.src.includes('data:image/svg+xml')) {
-                console.error('❌ Failed to load property image:', {
-                  attemptedUrl: target.src,
-                  originalPath: rawImagePath,
-                  propertyId: property.id,
-                  propertyTitle: property.title,
-                  isSupabase: rawImagePath?.includes('supabase.co') || false,
-                  suggestion: rawImagePath?.includes('supabase.co') 
-                    ? 'Check: 1) Bucket is public, 2) CORS configured, 3) URL format correct'
-                    : 'Check: 1) Backend server running, 2) Image file exists, 3) Path correct'
-                });
+                logger.debug('Failed to load image:', rawImagePath);
                 target.src = placeholder;
-              }
-            }}
-            onLoad={() => {
-              // Only log if it's a real image, not placeholder
-              if (import.meta.env.DEV && primaryImage && !primaryImage.includes('data:image/svg+xml')) {
-                console.log('✅ Property image loaded successfully:', primaryImage);
               }
             }}
           />
@@ -731,22 +749,46 @@ const PropertyListItem: React.FC<{
             <button 
               onClick={handleFavoriteClick}
               disabled={checkingFavorite || !isAuthenticated}
-              className={`p-1.5 bg-white bg-opacity-80 rounded hover:bg-opacity-100 transition-colors ${
+              className={`p-2 bg-white/90 backdrop-blur-sm rounded-lg hover:bg-white transition-all duration-200 ${
                 isFavorited ? 'text-red-600' : 'text-gray-600'
-              } ${!isAuthenticated ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+              } ${!isAuthenticated ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:scale-110'}`}
               title={isFavorited ? 'Xóa khỏi danh sách yêu thích' : 'Thêm vào danh sách yêu thích'}
             >
               <Heart className={`h-4 w-4 ${isFavorited ? 'fill-current' : ''}`} />
             </button>
           </div>
-        </div>
+          <div className="absolute bottom-2 left-2">
+            <button 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (isComparing) {
+                  removeProperty(property.id.toString());
+                } else {
+                  addProperty({
+                    id: property.id.toString(),
+                    title: property.title,
+                    price: property.price,
+                    imageUrl: rawImagePath || undefined
+                  });
+                }
+              }}
+              className={`p-2 bg-white/90 backdrop-blur-sm rounded-lg hover:bg-white transition-all duration-200 hover:scale-110 ${
+                isComparing ? 'text-blue-600' : 'text-gray-600'
+              }`}
+              title={isComparing ? 'Huỷ so sánh' : 'Thêm vào so sánh'}
+            >
+              <Scale className={`h-4 w-4`} />
+            </button>
+          </div>
+        </Link>
 
         {/* Content Section */}
         <div className="flex-1 p-4">
           <div className="flex justify-between items-start mb-2">
-            <h3 className="font-semibold text-lg text-gray-900 line-clamp-2 flex-1 mr-4">
+            <Link to={`/properties/${property.id}`} className="font-semibold text-lg text-gray-900 line-clamp-2 flex-1 mr-4 hover:text-red-600 transition-colors duration-200">
               {property.title}
-            </h3>
+            </Link>
             <div className="text-right">
               <div className="text-xl font-bold text-red-600">
                 {property.price ? formatPrice(property.price) : t('properties.status.negotiable')}
@@ -791,8 +833,70 @@ const PropertyListItem: React.FC<{
           </div>
         </div>
       </div>
+    </motion.div>
+  );
+};
+
+// Reusable Filter Dropdown Component
+const FilterDropdown: React.FC<{
+  label: string;
+  options: { value: string; label: string }[];
+  value: string;
+  onChange: (value: string) => void;
+}> = ({ label, options, value, onChange }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const selectedLabel = options.find(o => o.value === value)?.label;
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`flex items-center space-x-2 px-4 py-2 border rounded-lg transition-colors text-sm ${
+          value
+            ? 'border-red-600 bg-red-50 text-red-600'
+            : 'border-gray-300 hover:border-red-300'
+        }`}
+      >
+        <span>{selectedLabel || label}</span>
+        <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+      {isOpen && (
+        <div className="absolute top-full left-0 mt-1 bg-white border border-gray-100 rounded-xl shadow-xl z-50 min-w-[180px] py-1 anim-fade-in-down">
+          <button
+            onClick={() => { onChange(''); setIsOpen(false); }}
+            className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
+              !value ? 'text-red-600 font-medium' : 'text-gray-700'
+            }`}
+          >
+            Tất cả
+          </button>
+          {options.map(opt => (
+            <button
+              key={opt.value}
+              onClick={() => { onChange(opt.value); setIsOpen(false); }}
+              className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
+                value === opt.value ? 'text-red-600 font-medium bg-red-50' : 'text-gray-700'
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
 
-export default PropertiesPage;
+export default PropertiesPage;

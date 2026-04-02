@@ -1656,5 +1656,23 @@
     "linkLegal": "Trung tâm pháp lý",
     "linkSecurity": "Trung tâm bảo mật",
     "linkExplorer": "Mở blockchain explorer"
+  },
+  "chatBox": {
+    "sendMessage": "Nhắn tin",
+    "customer": "Khách hàng",
+    "owner": "Chủ nhà",
+    "customerShort": "KH",
+    "ownerShort": "Chủ",
+    "active": "Đang hoạt động",
+    "maximize": "Mở rộng",
+    "minimize": "Thu nhỏ",
+    "close": "Đóng",
+    "noMessagesOwner": "Chưa có tin nhắn",
+    "waitFirstMessage": "Chờ khách hàng gửi tin nhắn đầu tiên",
+    "startConversation": "Bắt đầu cuộc trò chuyện",
+    "sendToOwner": "Gửi tin nhắn cho chủ nhà về bất động sản này",
+    "inputPlaceholder": "Nhập tin nhắn...",
+    "connecting": "Đang kết nối...",
+    "sending": "Đang gửi..."
   }
 }

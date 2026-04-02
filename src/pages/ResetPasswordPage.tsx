@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Lock, ArrowLeft, Loader2, Eye, EyeOff } from 'lucide-react';
 import { authAPI } from '../api/auth';
-import { toast } from 'react-toastify';
+import toast from '../utils/toast';
 import eraLogo from '../assets/ERA_Real_Estate_logo-244x300.png';
 
 const ResetPasswordPage: React.FC = () => {

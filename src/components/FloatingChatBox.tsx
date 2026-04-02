@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MessageCircle, X, Minimize2, Maximize2, Send } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../store/authStore';
 import { chatAPI, type ChatMessage, type Conversation } from '../api/chat';
 import {
@@ -27,11 +28,13 @@ const FloatingChatBox: React.FC<FloatingChatBoxProps> = ({
   onOpenChange,
   conversationId: externalConversationId
 }) => {
+  const { t } = useTranslation();
   const { user, isAuthenticated } = useAuthStore();
   const [internalIsOpen, setInternalIsOpen] = useState(false);
   
   // Use external control if provided, otherwise use internal state
   const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
+  
   const setIsOpen = (open: boolean) => {
     if (onOpenChange) {
       onOpenChange(open);
@@ -272,33 +275,15 @@ const FloatingChatBox: React.FC<FloatingChatBoxProps> = ({
 
   return (
     <>
-      {/* Chat Button - Chỉ cho KHÁCH */}
-      {shouldShowFloatingButton && (
-        <div className="fixed bottom-6 right-6 z-50">
-          <button
-            onClick={() => setIsOpen(true)}
-            className="relative bg-red-600 text-white p-4 rounded-full shadow-lg hover:bg-red-700 transition-all flex items-center gap-2"
-          >
-          <MessageCircle className="w-6 h-6" />
-          <span className="hidden sm:inline">Nhắn tin</span>
-          {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-yellow-400 text-red-900 text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center animate-pulse">
-              {unreadCount > 9 ? '9+' : unreadCount}
-            </span>
-          )}
-        </button>
-        </div>
-      )}
-
-      {/* Chat Box */}
+      {/* Chat Box (Controlled by FloatingActionHub) */}
       {isOpen && (
         <div
-          className={`fixed bottom-6 right-6 bg-white rounded-lg shadow-2xl border border-gray-100 z-50 flex flex-col transition-all duration-300 ${
-            isMinimized ? 'w-80 h-14' : 'w-96 h-[600px]'
+          className={`fixed bottom-6 right-6 bg-white/95 backdrop-blur-md rounded-2xl shadow-[0_8px_40px_rgb(0,0,0,0.12)] border border-gray-100/50 z-50 flex flex-col transition-all duration-300 overflow-hidden ${
+            isMinimized ? 'w-80 h-16' : 'w-96 h-[600px]'
           }`}
         >
           {/* Header - Giống header hệ thống */}
-          <div className="bg-white border-b border-gray-100 p-4 rounded-t-lg flex items-center justify-between shadow-sm">
+          <div className="bg-white/85 backdrop-blur-md border-b border-gray-100/50 p-4 flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
                 <MessageCircle className="w-4 h-4 text-white" />
@@ -307,12 +292,12 @@ const FloatingChatBox: React.FC<FloatingChatBoxProps> = ({
                 <>
                   <div>
                     <span className="font-semibold text-gray-800 block">
-                      {externalConversationId ? 'Khách hàng' : 'Chủ nhà'} - {otherUserName}
+                      {externalConversationId ? t('chatBox.customer') : t('chatBox.owner')} - {otherUserName}
                     </span>
                     {wsConnected && (
                       <span className="text-xs text-gray-500 flex items-center gap-1">
                         <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
-                        Đang hoạt động
+                        {t('chatBox.active')}
                       </span>
                     )}
                   </div>
@@ -321,7 +306,7 @@ const FloatingChatBox: React.FC<FloatingChatBoxProps> = ({
               {isMinimized && (
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-gray-800">
-                    {externalConversationId ? 'KH' : 'Chủ'} - {otherUserName}
+                    {externalConversationId ? t('chatBox.customerShort') : t('chatBox.ownerShort')} - {otherUserName}
                   </span>
                   {unreadCount > 0 && (
                     <span className="bg-red-600 text-white text-xs font-bold rounded-full px-2 py-0.5 animate-pulse">
@@ -335,7 +320,7 @@ const FloatingChatBox: React.FC<FloatingChatBoxProps> = ({
               <button
                 onClick={() => setIsMinimized(!isMinimized)}
                 className="hover:bg-gray-100 p-2 rounded-lg transition-colors text-gray-600 hover:text-gray-800"
-                title={isMinimized ? 'Mở rộng' : 'Thu nhỏ'}
+                title={isMinimized ? t('chatBox.maximize') : t('chatBox.minimize')}
               >
                 {isMinimized ? (
                   <Maximize2 className="w-4 h-4" />
@@ -346,6 +331,7 @@ const FloatingChatBox: React.FC<FloatingChatBoxProps> = ({
               <button
                 onClick={() => {
                   setIsOpen(false);
+                  if (onOpenChange) onOpenChange(false);
                   setIsMinimized(false);
                   if (unsubscribeRef.current) {
                     unsubscribeRef.current();
@@ -354,7 +340,7 @@ const FloatingChatBox: React.FC<FloatingChatBoxProps> = ({
                   disconnectWebSocket();
                 }}
                 className="hover:bg-gray-100 p-2 rounded-lg transition-colors text-gray-600 hover:text-gray-800"
-                title="Đóng"
+                title={t('chatBox.close')}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -364,7 +350,7 @@ const FloatingChatBox: React.FC<FloatingChatBoxProps> = ({
           {!isMinimized && (
             <>
               {/* Messages - Giống footer bg-gray-50 */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+              <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/50">
                 {loading ? (
                   <div className="flex items-center justify-center h-full">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
@@ -375,14 +361,14 @@ const FloatingChatBox: React.FC<FloatingChatBoxProps> = ({
                     {externalConversationId ? (
                       // CHỦ xem conversation với khách
                       <>
-                        <p className="text-gray-600 font-medium">Chưa có tin nhắn</p>
-                        <p className="text-sm mt-2">Chờ khách hàng gửi tin nhắn đầu tiên</p>
+                        <p className="text-gray-600 font-medium">{t('chatBox.noMessagesOwner')}</p>
+                        <p className="text-sm mt-2">{t('chatBox.waitFirstMessage')}</p>
                       </>
                     ) : (
                       // KHÁCH nhắn tin với chủ
                       <>
-                        <p className="text-gray-600 font-medium">Bắt đầu cuộc trò chuyện</p>
-                        <p className="text-sm mt-2">Gửi tin nhắn cho chủ nhà về bất động sản này</p>
+                        <p className="text-gray-600 font-medium">{t('chatBox.startConversation')}</p>
+                        <p className="text-sm mt-2">{t('chatBox.sendToOwner')}</p>
                       </>
                     )}
                   </div>
@@ -395,10 +381,10 @@ const FloatingChatBox: React.FC<FloatingChatBoxProps> = ({
                         className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
                       >
                         <div
-                          className={`max-w-[80%] rounded-lg p-3 shadow-sm ${
+                          className={`max-w-[80%] p-3 shadow-sm ${
                             isOwn
-                              ? 'bg-red-600 text-white'
-                              : 'bg-white text-gray-800 border border-gray-200'
+                              ? 'bg-gradient-to-r from-red-500 to-red-600 text-white rounded-2xl rounded-tr-sm'
+                              : 'bg-white text-gray-800 border border-gray-100 rounded-2xl rounded-tl-sm'
                           }`}
                         >
                           {!isOwn && (
@@ -423,21 +409,21 @@ const FloatingChatBox: React.FC<FloatingChatBoxProps> = ({
               </div>
 
               {/* Input - Giống header bg-white */}
-              <form onSubmit={handleSendMessage} className="border-t border-gray-100 p-4 bg-white">
+              <form onSubmit={handleSendMessage} className="border-t border-gray-100/50 p-4 bg-white/80 backdrop-blur-sm">
                 <div className="flex gap-2">
                   <input
                     ref={messageInputRef}
                     type="text"
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder="Nhập tin nhắn..."
-                    className="flex-1 border border-gray-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
+                    placeholder={t('chatBox.inputPlaceholder')}
+                    className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-sm transition-colors"
                     disabled={sending || !wsConnected}
                   />
                   <button
                     type="submit"
                     disabled={!newMessage.trim() || sending || !wsConnected}
-                    className="bg-red-600 text-white p-2.5 rounded-lg hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+                    className="bg-red-600 text-white p-2.5 rounded-xl hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center btn-press shadow-sm"
                   >
                     <Send className="w-5 h-5" />
                   </button>
@@ -445,11 +431,11 @@ const FloatingChatBox: React.FC<FloatingChatBoxProps> = ({
                 {!wsConnected && (
                   <p className="text-xs text-yellow-600 mt-2 flex items-center gap-1">
                     <span className="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse"></span>
-                    Đang kết nối...
+                    {t('chatBox.connecting')}
                   </p>
                 )}
                 {sending && wsConnected && (
-                  <p className="text-xs text-gray-500 mt-2">Đang gửi...</p>
+                  <p className="text-xs text-gray-500 mt-2">{t('chatBox.sending')}</p>
                 )}
               </form>
             </>

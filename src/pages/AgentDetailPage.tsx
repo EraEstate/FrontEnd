@@ -4,7 +4,7 @@ import { useAgent, useAgentProperties } from '../api/hooks';
 import { useTranslation } from 'react-i18next';
 import { agentAPI } from '../api/agent';
 import { useAuthStore } from '../store/authStore';
-import { toast } from 'react-toastify';
+import toast from '../utils/toast';
 import { Star, Loader2 } from 'lucide-react';
 import { getImageUrl, getImagePlaceholder } from '../utils/imageUtils';
 

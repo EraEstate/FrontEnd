@@ -3,7 +3,7 @@ import { Check, Clock, Mail, Crown, Star, Zap, Camera, Users, Shield, BarChart3 
 import { useTranslation } from 'react-i18next';
 import { listingPackageAPI } from '../api/misc';
 import { useAuthStore } from '../store/authStore';
-import { toast } from 'react-toastify';
+import toast from '../utils/toast';
 import { useNavigate } from 'react-router-dom';
 import PurchaseModal from '../components/PurchaseModal';
 

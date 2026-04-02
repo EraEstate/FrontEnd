@@ -6,6 +6,8 @@ import { propertyFavoriteAPI } from '../api';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../store/authStore';
 import { getImageUrl, getImagePlaceholder } from '../utils/imageUtils';
+import { showSuccess, showError } from '../utils/toast';
+import { logger } from '../utils/logger';
 
 const FavoritesPage = () => {
   const { t } = useTranslation();
@@ -15,35 +17,17 @@ const FavoritesPage = () => {
   // API Hook
   const { data: favoritesData, loading, error, refetch } = useMyFavorites(currentPage, 12);
 
-  // Debug: Log favorites data
-  React.useEffect(() => {
-    console.log('FavoritesPage - Loading:', loading);
-    console.log('FavoritesPage - Error:', error);
-    console.log('FavoritesPage - Favorites data:', favoritesData);
-    if (favoritesData) {
-      console.log('FavoritesPage - Favorites data loaded:', favoritesData);
-      console.log('FavoritesPage - Favorites data type:', typeof favoritesData);
-      console.log('FavoritesPage - Has content?', 'content' in (favoritesData || {}));
-      console.log('FavoritesPage - Content:', favoritesData.content);
-      console.log('FavoritesPage - Content type:', typeof favoritesData.content);
-      console.log('FavoritesPage - Is array?', Array.isArray(favoritesData.content));
-      console.log('FavoritesPage - Favorites count:', favoritesData.content?.length || 0);
-    }
-  }, [favoritesData, loading, error]);
-
   const removeFavorite = async (propertyId: string, event?: React.MouseEvent) => {
     event?.preventDefault();
     event?.stopPropagation();
     
     try {
-      console.log('FavoritesPage - Removing favorite:', propertyId);
       await propertyFavoriteAPI.removeFromFavorites(propertyId);
-      console.log('FavoritesPage - Favorite removed successfully');
-      refetch(); // Refresh the favorites list
+      showSuccess('Đã xóa khỏi danh sách yêu thích');
+      refetch();
     } catch (error: any) {
-      console.error('FavoritesPage - Error removing favorite:', error);
-      const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi xóa khỏi danh sách yêu thích';
-      alert(errorMessage);
+      logger.warn('Error removing favorite:', error);
+      showError('Có lỗi xảy ra khi xóa khỏi danh sách yêu thích');
     }
   };
 
@@ -70,17 +54,6 @@ const FavoritesPage = () => {
   };
 
   const favorites = favoritesData?.content || [];
-  
-  // Debug: Log raw data
-  React.useEffect(() => {
-    console.log('FavoritesPage - Raw favoritesData:', favoritesData);
-    console.log('FavoritesPage - Favorites array:', favorites);
-    console.log('FavoritesPage - Favorites length:', favorites.length);
-    if (favorites.length > 0) {
-      console.log('FavoritesPage - First favorite:', favorites[0]);
-      console.log('FavoritesPage - First favorite property:', favorites[0]?.property);
-    }
-  }, [favoritesData, favorites]);
 
   // Check if user is authenticated
   if (!isAuthenticated) {
@@ -148,7 +121,7 @@ const FavoritesPage = () => {
           <p className="text-gray-600 mb-6">{t('favorites.emptyDescription')}</p>
           <Link 
             to="/properties" 
-            className="inline-flex items-center px-6 py-3 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors"
+            className="inline-flex items-center px-6 py-3 bg-red-600 text-white font-medium rounded-xl hover:bg-red-700 btn-press"
           >
             {t('favorites.explore')}
           </Link>
@@ -160,7 +133,7 @@ const FavoritesPage = () => {
             
             // Debug: Log if property is missing
             if (!property) {
-              console.warn('FavoritesPage - Favorite without property:', favorite);
+              logger.debug('Favorite without property:', favorite.id);
               return (
                 <div key={favorite.id} className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                   <p className="text-sm text-yellow-800">
@@ -181,7 +154,7 @@ const FavoritesPage = () => {
                                  null;
 
             return (
-              <div key={favorite.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+              <div key={favorite.id} className="bg-white rounded-xl overflow-hidden card-hover border border-gray-100">
                 <Link to={`/properties/${property.id || favorite.propertyId}`} className="block">
                   <div className="relative">
                     <img

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, CreditCard, Building2, Loader2, CheckCircle } from 'lucide-react';
 import { listingPackageAPI } from '../api/misc';
 import { bankAccountAPI } from '../api/bankAccount';
-import { toast } from 'react-toastify';
+import toast from '../utils/toast';
 import type { BankAccount } from '../types';
 
 interface PurchaseModalProps {

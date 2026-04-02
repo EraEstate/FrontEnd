@@ -23,6 +23,7 @@ import ProjectManagement from './admin/ProjectManagement';
 import AgencyManagement from './admin/AgencyManagement';
 import InquiryManagement from './admin/InquiryManagement';
 import MarketAnalysisManagement from './admin/MarketAnalysisManagement';
+import KycManagement from './admin/KycManagement';
 
 // Admin Stats Cards Component
 const AdminStatsCard: React.FC<{
@@ -260,6 +261,7 @@ const AdminDashboardContent: React.FC = () => {
       title: t('admin.menu.management'),
       items: [
         { id: 'users', icon: <Users className="w-5 h-5" />, label: t('admin.menu.users') },
+        { id: 'kyc', icon: <Shield className="w-5 h-5" />, label: 'Quản lý KYC' },
         { id: 'properties', icon: <Building className="w-5 h-5" />, label: t('admin.menu.properties') },
         { id: 'agents', icon: <Briefcase className="w-5 h-5" />, label: t('admin.menu.agents') },
         { id: 'agencies', icon: <Home className="w-5 h-5" />, label: t('admin.menu.agencies') },
@@ -705,6 +707,11 @@ const AdminDashboardContent: React.FC = () => {
           {/* User Management Section */}
           {activeSection === 'users' && (
             <UserManagement />
+          )}
+
+          {/* KYC Management Section */}
+          {activeSection === 'kyc' && (
+            <KycManagement />
           )}
 
           {/* Property Management Section */}

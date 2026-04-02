@@ -101,6 +101,78 @@ export const subscribeToConversation = (
   };
 };
 
+export const subscribeToNotifications = (
+  userId: string,
+  callback: (notification: any) => void
+): (() => void) => {
+  if (!stompClient || !stompClient.connected) {
+    console.error('WebSocket not connected');
+    return () => {};
+  }
+
+  const subscription = stompClient.subscribe(
+    `/queue/notifications/${userId}`,
+    (message: IMessage) => {
+      try {
+        const data = JSON.parse(message.body);
+        callback(data);
+      } catch (error) {
+        console.error('Error parsing notification message:', error);
+      }
+    }
+  );
+
+  return () => {
+    subscription.unsubscribe();
+  };
+};
+
+export interface EscrowUpdatePayload {
+  type: 'NEW_DEPOSIT' | 'HANDOVER_CONFIRMED' | 'REFUNDED' | 'STATUS_CHANGED';
+  id: number;
+  transactionHash: string;
+  propertyId: number;
+  buyerAddress: string;
+  sellerAddress: string;
+  amount: number;
+  status: 'PENDING' | 'LOCKED' | 'RELEASED' | 'REFUNDED';
+  updatedAt: string | null;
+}
+
+/**
+ * Subscribe to real-time escrow updates for a specific wallet address.
+ * Topic: /topic/escrow/{walletAddress}
+ */
+export const subscribeToEscrow = (
+  walletAddress: string,
+  callback: (payload: EscrowUpdatePayload) => void
+): (() => void) => {
+  if (!stompClient || !stompClient.connected) {
+    console.error('WebSocket not connected for escrow subscription');
+    return () => {};
+  }
+
+  const topic = `/topic/escrow/${walletAddress.toLowerCase()}`;
+  const subscription = stompClient.subscribe(
+    topic,
+    (message: IMessage) => {
+      try {
+        const data = JSON.parse(message.body) as EscrowUpdatePayload;
+        callback(data);
+      } catch (error) {
+        console.error('Error parsing escrow WebSocket message:', error);
+      }
+    }
+  );
+
+  console.log(`Subscribed to escrow updates: ${topic}`);
+
+  return () => {
+    subscription.unsubscribe();
+    console.log(`Unsubscribed from escrow updates: ${topic}`);
+  };
+};
+
 export const sendMessage = (
   conversationId: string,
   senderId: string,

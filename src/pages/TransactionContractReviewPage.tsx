@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { propertyTransactionAPI, type PropertyTransaction } from '../api/propertyTransaction';
 import { propertyAPI } from '../api/property';
-import { toast } from 'react-toastify';
+import toast from '../utils/toast';
 import { useTranslation } from 'react-i18next';
 import { TransactionStepper } from '../components/TransactionStepper';
 
@@ -63,7 +63,7 @@ const TransactionContractReviewPage: React.FC = () => {
 
   const goNext = () => {
     if (!agreed) {
-      toast.warn(t('transaction.review.agreeRequired'));
+      toast.warning(t('transaction.review.agreeRequired'));
       return;
     }
     navigate(`/transactions/${transaction.id}/blockchain`);

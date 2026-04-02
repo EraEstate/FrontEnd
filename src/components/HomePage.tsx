@@ -14,7 +14,9 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import { useFeaturedProperties, useFeaturedNews, useTopAgents, useProvinces, useRecentNews } from '../api/hooks';
 import { useTranslation } from 'react-i18next';
+import { useAuthStore } from '../store/authStore';
 import MapPicker from './MapPicker';
+import { motion } from 'framer-motion';
 import { propertyViewAPI } from '../api/propertyView';
 import { propertyAPI } from '../api/property';
 import { getImageUrl, getImagePlaceholder } from '../utils/imageUtils';
@@ -25,6 +27,7 @@ const HomePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('sale');
   const [currentSlide, setCurrentSlide] = useState(0);
   const { t } = useTranslation();
+  const { isAuthenticated } = useAuthStore();
   
   // API Hooks
   const { data: provinces } = useProvinces();
@@ -52,6 +55,8 @@ const HomePage: React.FC = () => {
 
   const [mostViewed, setMostViewed] = useState<any[]>([]);
   const [mostViewedLoading, setMostViewedLoading] = useState(true);
+  const [recommendations, setRecommendations] = useState<any[]>([]);
+  const [recommendationsLoading, setRecommendationsLoading] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -84,6 +89,23 @@ const HomePage: React.FC = () => {
       alive = false;
     };
   }, []);
+
+  // Fetch recommendations
+  useEffect(() => {
+    let alive = true;
+    if (isAuthenticated) {
+      setRecommendationsLoading(true);
+      propertyAPI.getRecommendationsForYou(4)
+        .then(res => {
+          if (alive) setRecommendations(res);
+        })
+        .catch(err => console.error('Failed to load recommendations', err))
+        .finally(() => {
+          if (alive) setRecommendationsLoading(false);
+        });
+    }
+    return () => { alive = false; };
+  }, [isAuthenticated]);
 
   // Chuẩn hoá dữ liệu news để tránh lệch kiểu trả về (list hoặc Page)
   const realEstateNewsArticles: any[] =
@@ -328,7 +350,8 @@ const HomePage: React.FC = () => {
               <button 
                 type="button"
                 onClick={() => setIsMapPickerOpen(true)}
-                className="group relative bg-white rounded-2xl p-8 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:-translate-y-1 border-2 border-transparent hover:border-blue-500"
+                className="group relative bg-white rounded-2xl p-8 card-hover border border-gray-100 hover:border-blue-200"
+                style={{ boxShadow: 'var(--shadow-lg)' }}
               >
                 <div className="flex flex-col items-center space-y-4">
                   <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-full p-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
@@ -338,7 +361,7 @@ const HomePage: React.FC = () => {
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">
                       {t('home.search.viewMap')}
                     </h3>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-500">
                       {t('home.search.viewMapDesc')}
                     </p>
                   </div>
@@ -350,7 +373,8 @@ const HomePage: React.FC = () => {
               <button 
                 type="button"
                 onClick={handleSearch}
-                className="group relative bg-white rounded-2xl p-8 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:-translate-y-1 border-2 border-transparent hover:border-red-500"
+                className="group relative bg-white rounded-2xl p-8 card-hover border border-gray-100 hover:border-red-200"
+                style={{ boxShadow: 'var(--shadow-lg)' }}
               >
                 <div className="flex flex-col items-center space-y-4">
                   <div className="bg-gradient-to-br from-red-500 to-red-600 rounded-full p-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
@@ -360,7 +384,7 @@ const HomePage: React.FC = () => {
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">
                       {t('home.search.searchTitle')}
                     </h3>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-500">
                       {t('home.search.searchDesc')}
                     </p>
                   </div>
@@ -380,13 +404,65 @@ const HomePage: React.FC = () => {
         onSelectLocation={(location) => {
           setSelectedLocation(location.address);
           setSearchLocation(location.address);
-          console.log('Selected location:', location);
         }}
       />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 lg:px-12 py-8">
-        {/* Bất động sản dành cho bạn Section */}
+        {/* AI Recommendations (Gợi ý cho bạn) - Only visible when authenticated */}
+        {isAuthenticated && (recommendationsLoading || recommendations.length > 0) && (
+          <section className="mb-12">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2">
+                <Star className="w-8 h-8 text-yellow-500" />
+                <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">Gợi ý cho bạn</h2>
+              </div>
+              <span className="text-sm text-gray-500 italic">Dựa trên hoạt động của bạn</span>
+            </div>
+            
+            {recommendationsLoading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="h-56 bg-gray-200 rounded-lg animate-pulse" />
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {recommendations.map((property: any) => (
+                  <Link
+                    key={property.id}
+                    to={`/properties/${property.id}`}
+                    className="bg-white rounded-xl overflow-hidden card-hover border border-yellow-100/60 relative"
+                  >
+                    <div className="absolute top-2 left-2 z-10 bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded shadow-sm flex items-center gap-1">
+                      <Star className="w-3 h-3 fill-current" /> Phù hợp
+                    </div>
+                    <div 
+                      className="h-48 bg-cover bg-center bg-no-repeat"
+                      style={{ backgroundImage: `url(${getImageUrl(property.mainImageUrl || property.imageUrl) || getImagePlaceholder(400, 300)})` }}
+                    >
+                      <div className="h-full bg-black bg-opacity-20 hover:bg-opacity-30 transition-all duration-200" />
+                    </div>
+                    <div className="p-4">
+                      <h3 className="font-semibold text-gray-900 mb-2 text-sm line-clamp-2">{property.title}</h3>
+                      <div className="flex items-center justify-between text-sm mb-2">
+                        <span className="text-red-600 font-bold">
+                          {property.price >= 1000000000 ? `${(property.price / 1000000000).toFixed(1)} tỷ` : 
+                           property.price >= 1000000 ? `${(property.price / 1000000).toFixed(0)} triệu` : 
+                           property.price?.toLocaleString('vi-VN')} VND
+                        </span>
+                        <span className="text-gray-600">{property.area}m²</span>
+                      </div>
+                      <p className="text-xs text-gray-500 truncate">{property.address}</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* Bất động sản nổi bật Section */}
         <section className="mb-12">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">{t('home.sections.featuredProperties')}</h2>
@@ -398,7 +474,7 @@ const HomePage: React.FC = () => {
               <Link
                 key={property.id}
                 to={`/properties/${property.id}`}
-                className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow"
+                className="bg-white rounded-xl overflow-hidden card-hover border border-gray-100"
               >
                 <div 
                   className="h-48 bg-cover bg-center bg-no-repeat"
@@ -447,11 +523,17 @@ const HomePage: React.FC = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {mostViewed.map((property: any) => (
-                  <Link
+                  <motion.div
                     key={property.id}
-                    to={`/properties/${property.id}`}
-                    className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow border border-gray-100"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    whileHover={{ y: -5 }}
+                    transition={{ duration: 0.3 }}
                   >
+                    <Link
+                      to={`/properties/${property.id}`}
+                      className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 block h-full"
+                    >
                     <div
                       className="h-48 bg-cover bg-center bg-no-repeat relative"
                       style={{
@@ -481,7 +563,8 @@ const HomePage: React.FC = () => {
                       </div>
                       <p className="text-xs text-gray-500 truncate">{property.address}</p>
                     </div>
-                  </Link>
+                    </Link>
+                  </motion.div>
                 ))}
               </div>
             )}
@@ -503,8 +586,8 @@ const HomePage: React.FC = () => {
             ].map((item, index) => (
               <Link
                 key={index}
-                to={`/category/${item.title.toLowerCase().replace(/\s+/g, '-')}`}
-                className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
+                to="/news"
+                className="bg-white rounded-xl border border-gray-100 overflow-hidden card-hover"
               >
                 <div 
                   className="h-32 bg-cover bg-center bg-no-repeat"
@@ -539,7 +622,7 @@ const HomePage: React.FC = () => {
               <Link 
                 key={article.id} 
                 to={`/news/${article.id}`}
-                className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden"
+                className="bg-white rounded-xl card-hover border border-gray-100 overflow-hidden"
               >
                 <div 
                   className="h-40 bg-cover bg-center bg-no-repeat"
@@ -567,7 +650,7 @@ const HomePage: React.FC = () => {
         <section className="mb-12">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">{t('home.sections.featuredProjects')}</h2>
-            <Link to="/du-an" className="text-red-600 hover:text-red-700 font-bold flex items-center transition-all duration-200 hover:scale-105">
+            <Link to="/projects" className="text-red-600 hover:text-red-700 font-bold flex items-center transition-all duration-200 hover:scale-105">
               {t('home.viewMore')} <ChevronRight className="h-4 w-4 ml-1" />
             </Link>
           </div>
@@ -584,8 +667,8 @@ const HomePage: React.FC = () => {
             ].map((project, index) => (
               <Link
                 key={index}
-                to={`/du-an/${project.name.toLowerCase().replace(/\s+/g, '-')}`}
-                className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow"
+                to="/projects"
+                className="bg-white rounded-xl overflow-hidden card-hover border border-gray-100"
               >
                 <div className="h-48 relative">
                   <div 
@@ -638,8 +721,8 @@ const HomePage: React.FC = () => {
             ].map((location, index) => (
               <Link
                 key={index}
-                to={`/nha-dat-ban-${location.name.toLowerCase().replace(/\s+/g, '-')}`}
-                className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow"
+                to="/properties"
+                className="bg-white rounded-xl overflow-hidden card-hover border border-gray-100"
               >
                 <div className="h-48 relative">
                   <div 
@@ -679,8 +762,8 @@ const HomePage: React.FC = () => {
             ].map((project, index) => (
               <Link
                 key={index}
-                to={`/du-an/${project.toLowerCase().replace(/\s+/g, '-')}`}
-                className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow text-center"
+                to="/projects"
+                className="bg-white border border-gray-100 rounded-xl p-4 card-hover text-center"
               >
                 <h4 className="font-medium text-gray-900 text-sm line-clamp-2">{project}</h4>
               </Link>
@@ -754,7 +837,7 @@ const HomePage: React.FC = () => {
                 ].map((article, index) => (
                   <Link
                     key={index}
-                    to={`/tin-tuc/${article.title.toLowerCase().replace(/\s+/g, '-')}`}
+                    to="/news"
                     className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 border-l-4 border-red-600"
                   >
                     <div className="flex items-start space-x-4">
@@ -793,8 +876,8 @@ const HomePage: React.FC = () => {
             ].map((utility, index) => (
               <Link
                 key={index}
-                to={`/ho-tro-tien-ich/${utility.title.toLowerCase().replace(/\s+/g, '-')}`}
-                className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105 border border-gray-200"
+                to="/utilities"
+                className="bg-white rounded-xl overflow-hidden card-hover border border-gray-100"
               >
                 <div 
                   className="h-32 bg-cover bg-center bg-no-repeat"
@@ -829,8 +912,8 @@ const HomePage: React.FC = () => {
             ].map((company, index) => (
               <Link
                 key={index}
-                to={`/doanh-nghiep/${company.name.toLowerCase().replace(/\s+/g, '-')}`}
-                className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                to="/companies"
+                className="bg-white border border-gray-100 rounded-xl p-4 card-hover"
               >
                 <div className="flex items-center space-x-3">
                   <div 
@@ -889,8 +972,8 @@ const HomePage: React.FC = () => {
             ].map((article, index) => (
               <Link
                 key={index}
-                to={`/bao-chi/${article.title.toLowerCase().replace(/\s+/g, '-')}`}
-                className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden"
+                to="/news"
+                className="bg-white rounded-xl card-hover border border-gray-100 overflow-hidden"
               >
                 <div className="h-40 relative">
                   <div 

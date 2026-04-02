@@ -1,69 +1,22 @@
 import api from './index';
+import { logger } from '../utils/logger';
 
-// Mock data cho development khi backend chưa sẵn sàng
-const MOCK_USERS = [
-  {
-    id: '1',
-    email: 'admin@bds.com',
-    username: 'admin',
-    password: 'admin123',
-    fullName: 'Quản trị viên',
-    phone: '0901234567',
-    role: 'ADMIN',
-    enabled: true,
-    avatar: null,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: '2',
-    email: 'user@bds.com',
-    username: 'user',
-    password: 'user123',
-    fullName: 'Người dùng',
-    phone: '0901234568',
-    role: 'USER',
-    enabled: true,
-    avatar: null,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  }
-];
-
-// Mock JWT token generator
-const generateMockToken = (user: any) => {
-  const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
-  const payload = btoa(JSON.stringify({
-    sub: user.id,
-    username: user.username,
-    role: user.role,
-    exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 hours
-  }));
-  const signature = btoa('mock-signature');
-  return `${header}.${payload}.${signature}`;
-};
-
-// Authentication API - Dựa trên AuthController.java
+// Authentication API - Dựa trên AuthController.java (BE_Potsgre)
 export const authAPI = {
   // Đăng nhập
   login: async (credentials: { 
     email: string; 
     password: string; 
   }) => {
-    console.log('AuthAPI - Login request:', credentials);
+    logger.debug('AuthAPI - Login request for:', credentials.email);
     const response = await api.post('/auth/login', credentials);
-    console.log('AuthAPI - Login response:', response.data);
     return response.data;
   },
 
   // Gửi OTP
   sendOtp: async (email: string) => {
-    try {
-      const response = await api.post('/auth/send-otp', { email });
-      return response.data;
-    } catch (error: any) {
-      throw error;
-    }
+    const response = await api.post('/auth/send-otp', { email });
+    return response.data;
   },
 
   // Đăng ký
@@ -74,64 +27,33 @@ export const authAPI = {
     phone: string;
     otpCode: string;
   }) => {
-    try {
-      const response = await api.post('/auth/register', {
-        email: userData.email,
-        password: userData.password,
-        fullName: userData.fullName,
-        phone: userData.phone,
-        otpCode: userData.otpCode,
-      });
-      return response.data;
-    } catch (error: any) {
-      console.warn('Backend not available, using mock register');
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      // Check if email already exists
-      const existingUser = MOCK_USERS.find(u => u.email === userData.email);
-      if (existingUser) {
-        throw new Error('Email đã được sử dụng');
-      }
-      
-      // Create new user
-      const newUser = {
-        id: (MOCK_USERS.length + 1).toString(),
-        email: userData.email,
-        username: userData.email,
-        password: userData.password,
-        fullName: userData.fullName,
-        phone: userData.phone,
-        role: 'USER',
-        enabled: true,
-        avatar: null,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      
-      MOCK_USERS.push(newUser);
-      
-      const { password, ...userWithoutPassword } = newUser;
-      const token = generateMockToken(newUser);
-      
-      return {
-        token,
-        user: userWithoutPassword,
-        expiresIn: 86400 // 24 hours
-      };
-    }
+    const response = await api.post('/auth/register', {
+      email: userData.email,
+      password: userData.password,
+      fullName: userData.fullName,
+      phone: userData.phone,
+      otpCode: userData.otpCode,
+    });
+    return response.data;
   },
 
   // Đăng xuất
   logout: async () => {
     try {
-      // Gọi API logout từ AuthController
-      await api.post('/auth/logout');
+      // Lấy refreshToken từ store để gửi cho BE revoke
+      let refreshToken: string | undefined;
+      try {
+        const raw = localStorage.getItem('auth-storage');
+        if (raw) {
+          const data = JSON.parse(raw);
+          refreshToken = data.state?.refreshToken;
+        }
+      } catch { /* ignore */ }
+      
+      await api.post('/auth/logout', refreshToken ? { refreshToken } : {});
     } catch (error) {
-      console.warn('Backend logout failed, proceeding with local logout');
+      logger.warn('Backend logout failed, proceeding with local logout');
     } finally {
-      // Luôn xóa token và user khỏi localStorage
       localStorage.removeItem('token');
       localStorage.removeItem('user');
     }
@@ -144,8 +66,8 @@ export const authAPI = {
   },
 
   // Refresh token
-  refreshToken: async () => {
-    const response = await api.post('/auth/refresh');
+  refreshToken: async (token: string) => {
+    const response = await api.post('/auth/refresh', { refreshToken: token });
     return response.data;
   },
 

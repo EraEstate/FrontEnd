@@ -12,8 +12,10 @@ import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../store/authStore';
 import { settingsAPI } from '../api/settings';
 import { getImageUrl, getAvatarPlaceholder } from '../utils/imageUtils';
+import { useWebSocketNotification } from '../hooks/useWebSocketNotification';
 import LanguageSwitcher from './LanguageSwitcher';
 import eraLogo from '../assets/ERA_Real_Estate_logo-244x300.png';
+import { Bell } from 'lucide-react';
 
 export const Header: React.FC = () => {
   const { t } = useTranslation();
@@ -22,7 +24,9 @@ export const Header: React.FC = () => {
   const [isPropertiesMenuOpen, setIsPropertiesMenuOpen] = useState(false);
   const [isNewsMenuOpen, setIsNewsMenuOpen] = useState(false);
   const [isServicesMenuOpen, setIsServicesMenuOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const { unreadCount, setUnreadCount, notifications } = useWebSocketNotification();
   const [userAvatar, setUserAvatar] = useState<string>('');
   const { isAuthenticated, user, logout, updateUser } = useAuthStore();
   const location = useLocation();
@@ -89,10 +93,12 @@ export const Header: React.FC = () => {
       if (!target.closest('.properties-dropdown') && 
           !target.closest('.news-dropdown') && 
           !target.closest('.services-dropdown') && 
+          !target.closest('.notification-dropdown') && 
           !target.closest('.user-dropdown')) {
         setIsPropertiesMenuOpen(false);
         setIsNewsMenuOpen(false);
         setIsServicesMenuOpen(false);
+        setIsNotificationOpen(false);
         setIsUserMenuOpen(false);
       }
     };
@@ -103,10 +109,10 @@ export const Header: React.FC = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-[9999] w-full bg-white transition-shadow duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-[9999] w-full transition-all duration-300 ease-out ${
         isScrolled 
-          ? 'shadow-md border-b border-gray-100' 
-          : 'shadow-sm'
+          ? 'glass shadow-md border-b border-gray-100/80' 
+          : 'bg-white shadow-sm'
       }`}
     >
       {/* Main Header - Modern & Clean */}
@@ -169,7 +175,7 @@ export const Header: React.FC = () => {
 
               {isPropertiesMenuOpen && (
                 <div className="absolute top-full left-0 pt-1 w-56 z-50">
-                  <div className="bg-white rounded-xl shadow-xl py-2 border border-gray-100 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="bg-white rounded-xl shadow-xl py-2 border border-gray-100 anim-fade-in-down">
                     <Link
                       to="/properties"
                       className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
@@ -230,7 +236,7 @@ export const Header: React.FC = () => {
 
               {isNewsMenuOpen && (
                 <div className="absolute top-full left-0 pt-1 w-56 z-50">
-                  <div className="bg-white rounded-xl shadow-xl py-2 border border-gray-100 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="bg-white rounded-xl shadow-xl py-2 border border-gray-100 anim-fade-in-down">
                     <Link
                       to="/news"
                       className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
@@ -291,7 +297,7 @@ export const Header: React.FC = () => {
 
               {isServicesMenuOpen && (
                 <div className="absolute top-full left-0 pt-1 w-56 z-50">
-                  <div className="bg-white rounded-xl shadow-xl py-2 border border-gray-100 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="bg-white rounded-xl shadow-xl py-2 border border-gray-100 anim-fade-in-down">
                     <Link
                       to="/agents"
                       className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
@@ -351,6 +357,57 @@ export const Header: React.FC = () => {
             
             {isAuthenticated ? (
               <>
+                {/* Notification Bell */}
+                <div className="relative notification-dropdown">
+                  <button
+                    onClick={() => {
+                      setIsNotificationOpen(!isNotificationOpen);
+                      setIsUserMenuOpen(false);
+                      setIsPropertiesMenuOpen(false);
+                      setIsNewsMenuOpen(false);
+                      setIsServicesMenuOpen(false);
+                      if (!isNotificationOpen) {
+                        setUnreadCount(0); // Reset unread count when opening
+                      }
+                    }}
+                    className="relative hidden md:flex items-center justify-center w-10 h-10 text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                    title={t('header.notifications')}
+                  >
+                    <Bell className="h-5 w-5" />
+                    {unreadCount > 0 && (
+                      <span className="absolute top-2 right-2 flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                      </span>
+                    )}
+                  </button>
+
+                  {isNotificationOpen && (
+                    <div className="absolute right-0 mt-1 w-80 bg-white rounded-xl shadow-xl z-50 border border-gray-100 anim-fade-in-down">
+                      <div className="px-4 py-3 border-b border-gray-100 flex justify-between items-center">
+                        <h3 className="font-semibold text-gray-900">Thông báo</h3>
+                      </div>
+                      <div className="max-h-[300px] overflow-y-auto">
+                        {notifications.length > 0 ? (
+                          notifications.map((notif, index) => (
+                            <div key={notif.id || index} className="px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                              <p className="text-sm font-medium text-gray-900">{notif.title}</p>
+                              <p className="text-xs text-gray-500 mt-1">{notif.message}</p>
+                              <span className="text-[10px] text-gray-400 mt-1 block">
+                                {new Date(notif.timestamp).toLocaleString('vi-VN')}
+                              </span>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="px-4 py-6 text-center text-gray-500 text-sm">
+                            Không có thông báo mới
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 {/* User Menu - Modern */}
                 <div className="relative user-dropdown">
                   <button
@@ -384,7 +441,7 @@ export const Header: React.FC = () => {
                   </button>
 
                   {isUserMenuOpen && (
-                    <div className="absolute right-0 mt-1 w-64 bg-white rounded-xl shadow-xl py-2 z-50 border border-gray-100 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="absolute right-0 mt-1 w-64 bg-white rounded-xl shadow-xl py-2 z-50 border border-gray-100 anim-fade-in-down">
                       {/* User Info Header */}
                       <div className="px-4 py-3 border-b border-gray-100">
                         <div className="flex items-center space-x-3">
@@ -499,7 +556,7 @@ export const Header: React.FC = () => {
 
             <Link
               to="/post-property"
-              className="whitespace-nowrap bg-red-600 text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-red-700 transition-all duration-200 shadow-sm hover:shadow-md active:scale-95"
+              className="whitespace-nowrap bg-red-600 text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-red-700 btn-press shadow-sm hover:shadow-md"
             >
               {t('header.postProperty')}
             </Link>
@@ -521,7 +578,7 @@ export const Header: React.FC = () => {
 
       {/* Mobile Menu - Modern & Smooth */}
       {isMenuOpen && (
-        <div className="lg:hidden bg-white border-t border-gray-100 animate-in slide-in-from-top duration-200">
+        <div className="lg:hidden bg-white border-t border-gray-100 anim-fade-in-down">
           <div className="px-6 py-4 space-y-1 max-h-[80vh] overflow-y-auto">
             {/* Main Links */}
             <Link

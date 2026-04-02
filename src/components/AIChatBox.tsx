@@ -134,15 +134,21 @@ const AIChatBox: React.FC<AIChatBoxProps> = ({
     }
   };
 
-  // Use external control if provided, otherwise use internal state
   const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
+  
   const setIsOpen = (open: boolean) => {
     if (onOpenChange) {
       onOpenChange(open);
-    } else {
-      setInternalIsOpen(open);
     }
+    setInternalIsOpen(open);
   };
+
+  // Sync external state if changed
+  useEffect(() => {
+    if (externalIsOpen !== undefined) {
+      setInternalIsOpen(externalIsOpen);
+    }
+  }, [externalIsOpen]);
 
   // Scroll to bottom when new message arrives
   useEffect(() => {
@@ -185,13 +191,11 @@ const AIChatBox: React.FC<AIChatBoxProps> = ({
     setIsLoading(true);
 
     try {
-      // CHỈ gửi 1 tin nhắn gần nhất để TỐI THIỂU token (free tier)
-      const recentHistory = messages.length > 1 
-        ? [messages[messages.length - 2]].map(msg => ({
+      // Gửi 8 tin nhắn gần nhất cho Groq context
+      const recentHistory = messages.slice(-8).map(msg => ({
             role: msg.role,
-            content: msg.content.length > 50 ? msg.content.substring(0, 50) : msg.content
-          }))
-        : [];
+            content: msg.content
+          }));
 
       // Send to AI API với sessionId
       const response = await aiChatAPI.sendMessage(userMessage, recentHistory, sessionId);
@@ -239,34 +243,16 @@ const AIChatBox: React.FC<AIChatBoxProps> = ({
     });
   };
 
-  // Chỉ hiển thị floating button khi chat box đóng
-  const shouldShowFloatingButton = !isOpen;
-
   return (
     <>
-      {/* Floating Chat Button */}
-      {shouldShowFloatingButton && (
-        <div className="fixed bottom-6 right-6 z-50">
-          <button
-            onClick={() => setIsOpen(true)}
-            className="relative bg-gradient-to-r from-red-600 to-red-700 text-white p-4 rounded-full shadow-2xl hover:shadow-3xl hover:scale-110 transition-all duration-300 flex items-center gap-2 group"
-            title={t('aiChat.buttonTitle')}
-          >
-            <Bot className="w-6 h-6 group-hover:animate-bounce" />
-            <span className="hidden sm:inline font-medium">{t('aiChat.titleShort')}</span>
-          </button>
-        </div>
-      )}
-
-      {/* Chat Box */}
+      {/* Chat Box (Controlled by FloatingActionHub) */}
       {isOpen && (
         <div
-          className={`fixed bottom-6 right-6 bg-white rounded-lg shadow-2xl border border-gray-200 z-50 flex flex-col transition-all duration-300 ${
-            isMinimized ? 'w-80 h-14' : 'w-96 h-[600px]'
+          className={`fixed bottom-6 right-6 bg-white/95 backdrop-blur-md rounded-2xl shadow-[0_8px_40px_rgb(0,0,0,0.12)] border border-gray-200 z-50 flex flex-col transition-all duration-300 overflow-hidden ${
+            isMinimized ? 'w-80 h-16' : 'w-96 h-[600px]'
           }`}
         >
-          {/* Header */}
-          <div className="bg-gradient-to-r from-red-600 to-red-700 text-white p-4 rounded-t-lg flex items-center justify-between shadow-lg">
+          <div className={`bg-gradient-to-r from-red-600/95 to-red-700/95 backdrop-blur-md text-white p-4 flex items-center justify-between transition-all duration-300 ${isMinimized ? '' : 'shadow-lg border-b border-red-800/20'}`}>
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
                 <Bot className="w-5 h-5" />
@@ -299,12 +285,13 @@ const AIChatBox: React.FC<AIChatBoxProps> = ({
               <button
                 onClick={() => {
                   setIsOpen(false);
+                  if (onOpenChange) onOpenChange(false);
                   setIsMinimized(false);
                 }}
-                className="hover:bg-white/20 p-2 rounded-lg transition-colors"
+                className="p-1.5 hover:bg-white/20 rounded-lg transition-colors"
                 title={t('aiChat.close')}
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5 text-white" />
               </button>
             </div>
           </div>
@@ -312,7 +299,7 @@ const AIChatBox: React.FC<AIChatBoxProps> = ({
           {!isMinimized && (
             <>
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+              <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/50">
                 {messages.map((message, index) => {
                   const isUser = message.role === 'user';
                   return (
@@ -321,10 +308,10 @@ const AIChatBox: React.FC<AIChatBoxProps> = ({
                       className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}
                     >
                       <div
-                        className={`max-w-[85%] rounded-lg p-3 shadow-sm ${
+                        className={`max-w-[85%] p-3 shadow-sm ${
                           isUser
-                            ? 'bg-gradient-to-r from-red-600 to-red-700 text-white'
-                            : 'bg-white text-gray-800 border border-gray-200'
+                            ? 'bg-gradient-to-r from-red-600 to-red-700 text-white rounded-2xl rounded-tr-sm'
+                            : 'bg-white text-gray-800 border border-gray-100 rounded-2xl rounded-tl-sm'
                         }`}
                       >
                         {!isUser && (
@@ -352,7 +339,7 @@ const AIChatBox: React.FC<AIChatBoxProps> = ({
                 
                 {isLoading && (
                   <div className="flex justify-start">
-                    <div className="bg-white border border-gray-200 rounded-lg p-3 shadow-sm">
+                    <div className="bg-white border border-gray-100 rounded-2xl rounded-tl-sm p-3 shadow-sm">
                       <div className="flex items-center gap-2">
                         <Bot className="w-4 h-4 text-red-600" />
                         <Loader2 className="w-4 h-4 text-gray-500 animate-spin" />
@@ -361,12 +348,40 @@ const AIChatBox: React.FC<AIChatBoxProps> = ({
                     </div>
                   </div>
                 )}
+
+                {/* Quick suggestion chips */}
+                {messages.length <= 1 && !isLoading && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {(isAuthenticated ? [
+                      'Hướng dẫn đăng tin bán nhà',
+                      'Cách tìm căn hộ phù hợp?',
+                      'Làm sao để so sánh BĐS?',
+                      'Quy trình giao dịch thế nào?',
+                    ] : [
+                      'Sàn Era Estate có gì?',
+                      'Cách tìm kiếm BĐS?',
+                      'Tôi muốn thuê căn hộ',
+                      'Hướng dẫn đăng ký tài khoản',
+                    ]).map((suggestion) => (
+                      <button
+                        key={suggestion}
+                        onClick={() => {
+                          setInputMessage(suggestion);
+                          inputRef.current?.focus();
+                        }}
+                        className="text-xs px-3 py-1.5 bg-white border border-red-200 text-red-600 rounded-full hover:bg-red-50 hover:border-red-300 transition-colors"
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 
                 <div ref={messagesEndRef} />
               </div>
 
               {/* Input */}
-              <form onSubmit={handleSendMessage} className="border-t border-gray-200 p-4 bg-white rounded-b-lg">
+              <form onSubmit={handleSendMessage} className="border-t border-gray-200 p-4 bg-white/80 backdrop-blur-sm">
                 <div className="flex gap-2">
                   <input
                     ref={inputRef}
@@ -374,13 +389,13 @@ const AIChatBox: React.FC<AIChatBoxProps> = ({
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
                     placeholder={t('aiChat.inputPlaceholder')}
-                    className="flex-1 border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
+                    className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-sm transition-colors"
                     disabled={isLoading}
                   />
                   <button
                     type="submit"
                     disabled={!inputMessage.trim() || isLoading}
-                    className="bg-gradient-to-r from-red-600 to-red-700 text-white p-2.5 rounded-lg hover:from-red-700 hover:to-red-800 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all flex items-center justify-center shadow-md hover:shadow-lg"
+                    className="bg-gradient-to-r from-red-600 to-red-700 text-white p-2.5 rounded-xl hover:from-red-700 hover:to-red-800 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all flex items-center justify-center shadow-sm hover:shadow-md btn-press"
                   >
                     {isLoading ? (
                       <Loader2 className="w-5 h-5 animate-spin" />

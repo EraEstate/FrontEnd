@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, CheckCircle, XCircle, CreditCard, Loader2, ShieldCheck } from 'lucide-react';
 import { bankAccountAPI, type CreateBankAccountRequest } from '../api/bankAccount';
 import type { BankAccount } from '../types';
-import { toast } from 'react-toastify';
+import toast from '../utils/toast';
 
 const BankAccountManagementPage: React.FC = () => {
   const [accounts, setAccounts] = useState<BankAccount[]>([]);

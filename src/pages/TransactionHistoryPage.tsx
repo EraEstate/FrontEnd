@@ -13,9 +13,9 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { propertyTransactionAPI, type PropertyTransaction } from '../api/propertyTransaction';
-import { toast } from 'react-toastify';
+import toast from '../utils/toast';
 import { useAuthStore } from '../store/authStore';
-import { connectMetaMask, sendCreateDealTx } from '../utils/metamask';
+import { connectMetaMask, depositToEscrow } from '../utils/metamask';
 import {
   REALESTATE_CONTRACT_ADDRESS,
   BLOCKCHAIN_EXPLORER_URL,
@@ -142,15 +142,15 @@ const TransactionHistoryPage: React.FC<TransactionHistoryPageProps> = ({ embedde
       const buyerAddress = await connectMetaMask();
       const sellerAddress = buyerAddress;
       const priceBigInt = BigInt(Math.round(transaction.totalAmount));
-      const txHash = await sendCreateDealTx({
+      const result = await depositToEscrow({
         contractAddress: REALESTATE_CONTRACT_ADDRESS,
-        abi: RealEstateEscrowAbi as any[],
+        abi: RealEstateEscrowAbi.abi as any[],
         sellerAddress,
-        buyerAddress,
-        propertyId: transaction.propertyId,
+        propertyId: String(transaction.propertyId),
         price: priceBigInt,
         isRent,
       });
+      const txHash = result.txHash;
       await propertyTransactionAPI.updateBlockchainTx(transaction.id, {
         txHash,
         contractAddress: REALESTATE_CONTRACT_ADDRESS,

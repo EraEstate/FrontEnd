@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, ArrowLeft, Loader2 } from 'lucide-react';
 import { authAPI } from '../api/auth';
-import { toast } from 'react-toastify';
+import toast from '../utils/toast';
 import eraLogo from '../assets/ERA_Real_Estate_logo-244x300.png';
 
 const ForgotPasswordPage: React.FC = () => {
@@ -20,7 +20,7 @@ const ForgotPasswordPage: React.FC = () => {
       if (import.meta.env.DEV && (data as any)?.resetToken) {
         toast.info(
           `Dev: token đặt lại — dán vào URL /reset-password?token=${encodeURIComponent((data as any).resetToken)}`,
-          { autoClose: 8000 }
+          { duration: 8000 }
         );
       }
     } catch (err: any) {

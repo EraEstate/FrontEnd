@@ -2,10 +2,14 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { User, LoginForm, RegisterForm } from '../types';
 import { authAPI } from '../api/auth';
+import { logger } from '../utils/logger';
+import { extractErrorMessage } from '../utils/errorParser';
+import { showSuccess } from '../utils/toast';
 
 interface AuthState {
   user: User | null;
   token: string | null;
+  refreshToken: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
@@ -28,6 +32,7 @@ export const useAuthStore = create<AuthState>()(
     (set, get) => ({
       user: null,
       token: null,
+      refreshToken: null,
       isAuthenticated: false,
       isLoading: false,
       error: null,
@@ -35,30 +40,24 @@ export const useAuthStore = create<AuthState>()(
       login: async (data: LoginForm) => {
         set({ isLoading: true, error: null });
         try {
-          console.log('AuthStore - Login attempt:', data);
           const response = await authAPI.login(data);
-          console.log('AuthStore - Login response:', response);
-          const { user, token } = response;
+          const { user, token, refreshToken } = response;
           set({
             user,
             token,
+            refreshToken: refreshToken || null,
             isAuthenticated: checkIsAuthenticated(user, token),
             isLoading: false,
           });
-          console.log('AuthStore - Login success, auth state updated');
+          logger.info('Login success:', user?.email);
+          showSuccess('Đăng nhập thành công!');
           
           // Manual localStorage save as backup
           localStorage.setItem('jwt', token);
-          console.log('AuthStore - Manual localStorage save completed');
         } catch (error: any) {
           // Backend có thể trả về error hoặc message
-          const errorMessage = error.response?.data?.error || 
-                             error.response?.data?.message || 
-                             error.message || 
-                             'Đăng nhập thất bại';
-          
-          // Chỉ log warning cho auth errors (không phải error)
-          console.warn('AuthStore - Login failed:', errorMessage);
+          const errorMessage = extractErrorMessage(error, 'Đăng nhập thất bại');
+          logger.debug('Login failed:', errorMessage);
           
           set({
             error: errorMessage,
@@ -72,16 +71,17 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true, error: null });
         try {
           const response = await authAPI.register(data);
-          const { user, token } = response;
+          const { user, token, refreshToken } = response;
           set({
             user,
             token,
+            refreshToken: refreshToken || null,
             isAuthenticated: checkIsAuthenticated(user, token),
             isLoading: false,
           });
         } catch (error: any) {
           set({
-            error: error.response?.data?.error || error.response?.data?.message || 'Đăng ký thất bại',
+            error: extractErrorMessage(error, 'Đăng ký thất bại'),
             isLoading: false,
           });
           throw error;
@@ -95,7 +95,7 @@ export const useAuthStore = create<AuthState>()(
           set({ isLoading: false });
         } catch (error: any) {
           set({
-            error: error.response?.data?.error || error.response?.data?.message || 'Không thể gửi mã OTP',
+            error: extractErrorMessage(error, 'Không thể gửi mã OTP'),
             isLoading: false,
           });
           throw error;
@@ -107,7 +107,7 @@ export const useAuthStore = create<AuthState>()(
           // Gọi API logout
           await authAPI.logout();
         } catch (error) {
-          console.warn('Logout API call failed:', error);
+          logger.warn('Logout API call failed:', error);
         } finally {
           // Clear localStorage
           localStorage.removeItem('token');
@@ -116,6 +116,7 @@ export const useAuthStore = create<AuthState>()(
           set({
             user: null,
             token: null,
+            refreshToken: null,
             isAuthenticated: false,
             error: null,
           });
@@ -140,14 +141,7 @@ export const useAuthStore = create<AuthState>()(
         const state = get();
         const isAuthenticated = checkIsAuthenticated(state.user, state.token);
         
-        // Debug: Log auth initialization
-        console.log('AuthStore - Initialize Auth:', {
-          user: state.user,
-          token: state.token ? 'exists' : 'null',
-          isAuthenticated,
-          authStorage: localStorage.getItem('auth-storage') ? 'exists' : 'null',
-          jwt: localStorage.getItem('jwt') ? 'exists' : 'null'
-        });
+        logger.debug('Auth init:', { hasUser: !!state.user, hasToken: !!state.token, isAuthenticated });
         
         set({
           isAuthenticated

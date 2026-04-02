@@ -14,9 +14,12 @@ import {
   MessageCircle,
   Heart,
   Eye,
+  CheckCircle2,
+  Shield,
 } from 'lucide-react';
 import { userAPI } from '../api/user';
 import { propertyAPI } from '../api/property';
+import { kycAPI } from '../api/kyc';
 import { getImageUrl, getAvatarPlaceholder, getImagePlaceholder } from '../utils/imageUtils';
 import { useAuthStore } from '../store/authStore';
 
@@ -36,6 +39,7 @@ const PublicProfilePage: React.FC = () => {
   // Fetch user's properties
   const [propertiesData, setPropertiesData] = useState<any>(null);
   const [propertiesLoading, setPropertiesLoading] = useState(true);
+  const [kycVerified, setKycVerified] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -54,6 +58,12 @@ const PublicProfilePage: React.FC = () => {
     };
 
     fetchProfile();
+  }, [id]);
+
+  // Fetch KYC status for this user
+  useEffect(() => {
+    if (!id) return;
+    kycAPI.isVerified(id).then(v => setKycVerified(v)).catch(() => {});
   }, [id]);
 
   useEffect(() => {
@@ -184,7 +194,14 @@ const PublicProfilePage: React.FC = () => {
             <div className="flex-1 w-full">
               <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-4">
                 <div className="flex-1">
-                  <h1 className="text-3xl font-bold text-gray-800 mb-2">{profile.fullName}</h1>
+                  <h1 className="text-3xl font-bold text-gray-800 mb-2 flex items-center gap-2">
+                    {profile.fullName}
+                    {kycVerified && (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-semibold" title="Đã xác minh CCCD">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Đã xác minh
+                      </span>
+                    )}
+                  </h1>
                   
                   {profile.isAgent && profile.agentLicense && (
                     <div className="flex items-center space-x-4 text-gray-600 mb-2">

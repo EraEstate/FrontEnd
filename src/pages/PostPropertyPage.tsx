@@ -29,6 +29,8 @@ import { uploadAPI } from '../api/upload';
 import type { Province, District, Ward } from '../types';
 import AddressAutocomplete from '../components/AddressAutocomplete';
 import type { AddressDetails } from '../components/AddressAutocomplete';
+import { subscriptionAPI } from '../api/subscription';
+import type { UserSubscription } from '../types';
 
 interface PropertyForm {
   title: string;
@@ -75,6 +77,21 @@ const PostPropertyPage: React.FC = () => {
   
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [subscription, setSubscription] = useState<UserSubscription | null>(null);
+  const [quotaExceeded, setQuotaExceeded] = useState(false);
+
+  React.useEffect(() => {
+    if (user) {
+      subscriptionAPI.getCurrent().then(sub => {
+        setSubscription(sub);
+        if (sub && sub.listingPackage && sub.listingPackage.maxProperties !== null) {
+          if (sub.propertiesUsed >= sub.listingPackage.maxProperties) {
+            setQuotaExceeded(true);
+          }
+        }
+      });
+    }
+  }, [user]);
 
   const [formData, setFormData] = useState<PropertyForm>({
     title: '',
@@ -367,6 +384,33 @@ const PostPropertyPage: React.FC = () => {
             className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700"
           >
             Đăng nhập ngay
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (quotaExceeded) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="text-center p-8 bg-white rounded-xl shadow-sm border border-red-200 max-w-md w-full">
+          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Đã hết hạn mức đăng tin</h2>
+          <p className="text-gray-600 mb-6 text-sm">
+            Bạn đã sử dụng hết <span className="font-bold text-red-600">{subscription?.listingPackage?.maxProperties}</span> lượt đăng tin trong gói <b>{subscription?.listingPackage?.name}</b> hiện tại.<br/><br/>
+            Vui lòng nâng cấp gói để tiếp tục đăng tin bất động sản.
+          </p>
+          <button
+            onClick={() => navigate('/pricing')}
+            className="w-full bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 font-medium shadow-sm transition-colors"
+          >
+            Xem các gói dịch vụ
+          </button>
+          <button
+            onClick={() => navigate('/profile?tab=subscription')}
+            className="w-full mt-3 bg-white text-gray-600 border border-gray-300 px-6 py-3 rounded-lg hover:bg-gray-50 font-medium transition-colors"
+          >
+            Quản lý gói hiện tại
           </button>
         </div>
       </div>

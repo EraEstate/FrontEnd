@@ -25,7 +25,7 @@ const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="bg-gray-50 border-t border-gray-200 mt-auto">
+    <footer className="bg-gray-50/80 border-t border-gray-100 mt-auto">
       <div className="max-w-7xl mx-auto px-6 lg:px-12 py-12 lg:py-16">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 mb-8">
@@ -156,7 +156,7 @@ const Footer: React.FC = () => {
                 href="https://facebook.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-lg bg-gray-200 hover:bg-red-600 flex items-center justify-center transition-colors group"
+                className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-red-600 flex items-center justify-center transition-all duration-200 group hover:scale-110 hover:-rotate-3"
                 aria-label="Facebook"
               >
                 <Facebook className="h-4 w-4 text-gray-600 group-hover:text-white transition-colors" />
@@ -165,7 +165,7 @@ const Footer: React.FC = () => {
                 href="https://twitter.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-lg bg-gray-200 hover:bg-red-600 flex items-center justify-center transition-colors group"
+                className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-red-600 flex items-center justify-center transition-all duration-200 group hover:scale-110 hover:rotate-3"
                 aria-label="Twitter"
               >
                 <Twitter className="h-4 w-4 text-gray-600 group-hover:text-white transition-colors" />
@@ -174,7 +174,7 @@ const Footer: React.FC = () => {
                 href="https://youtube.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-lg bg-gray-200 hover:bg-red-600 flex items-center justify-center transition-colors group"
+                className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-red-600 flex items-center justify-center transition-all duration-200 group hover:scale-110 hover:-rotate-3"
                 aria-label="YouTube"
               >
                 <Youtube className="h-4 w-4 text-gray-600 group-hover:text-white transition-colors" />
@@ -190,12 +190,12 @@ const Footer: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={t('footer.emailPlaceholder')}
-                  className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  className="flex-1 px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-shadow duration-200"
                   required
                 />
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center"
+                  className="px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 btn-press flex items-center justify-center"
                   aria-label={t('footer.subscribeButton')}
                 >
                   <Send className="h-4 w-4" />
@@ -206,7 +206,7 @@ const Footer: React.FC = () => {
         </div>
 
         {/* Divider */}
-        <div className="border-t border-gray-200 pt-8">
+        <div className="border-t border-gray-100 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             {/* Copyright */}
             <p className="text-sm text-gray-500">

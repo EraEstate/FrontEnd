@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { XCircle, RefreshCw, Home, CreditCard } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { toast } from 'react-toastify';
+import toast from '../utils/toast';
 
 const PaymentFailedPage: React.FC = () => {
   const { t } = useTranslation();

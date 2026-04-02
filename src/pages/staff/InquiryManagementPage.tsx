@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MessageSquare, Eye, Loader2, Filter } from 'lucide-react';
 import { propertyInquiryAPI } from '../../api/propertyInquiry';
-import { toast } from 'react-toastify';
+import toast from '../../utils/toast';
 
 const InquiryManagementPage: React.FC = () => {
   const [inquiries, setInquiries] = useState<any[]>([]);

@@ -6,6 +6,8 @@ import { useAuthStore } from '../store/authStore';
 import type { RegisterForm } from '../types';
 import eraLogo from '../assets/ERA_Real_Estate_logo-244x300.png';
 
+const OTP_DURATION_SECONDS = 300; // 5 phút — khớp với backend otp.expiration-minutes=5
+
 const RegisterPage: React.FC = () => {
   const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
@@ -13,6 +15,8 @@ const RegisterPage: React.FC = () => {
   const [showOtpForm, setShowOtpForm] = useState(false);
   const [sendingOtp, setSendingOtp] = useState(false);
   const [otpError, setOtpError] = useState<string | null>(null);
+  const [otpCountdown, setOtpCountdown] = useState(0);
+  const [canResendOtp, setCanResendOtp] = useState(false);
   const [formData, setFormData] = useState<RegisterForm>({
     email: '',
     password: '',
@@ -28,7 +32,6 @@ const RegisterPage: React.FC = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      // Redirect based on role
       if (user?.role === 'ADMIN') {
         navigate('/admin', { replace: true });
       } else if (user?.role === 'STAFF') {
@@ -39,44 +42,96 @@ const RegisterPage: React.FC = () => {
     }
   }, [isAuthenticated, user, navigate]);
 
+  // Countdown timer — đồng bộ với backend 5 phút
+  useEffect(() => {
+    if (otpCountdown <= 0) {
+      if (showOtpForm) setCanResendOtp(true);
+      return;
+    }
+    setCanResendOtp(false);
+    const timer = setInterval(() => {
+      setOtpCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          setCanResendOtp(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [otpCountdown, showOtpForm]);
+
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  };
+
+  // Gửi OTP lần đầu
+  const handleSendOtp = async () => {
+    setSendingOtp(true);
+    setOtpError(null);
+    try {
+      await sendOtp(formData.email);
+      setShowOtpForm(true);
+      setOtpCountdown(OTP_DURATION_SECONDS);
+      setCanResendOtp(false);
+    } catch (err: any) {
+      setOtpError(err.response?.data?.error || 'Không thể gửi mã OTP');
+    } finally {
+      setSendingOtp(false);
+    }
+  };
+
+  // Gửi lại OTP (chỉ khi hết hạn)
+  const handleResendOtp = async () => {
+    if (!canResendOtp) return;
+    setSendingOtp(true);
+    setOtpError(null);
+    setFormData({ ...formData, otpCode: '' });
+    try {
+      await sendOtp(formData.email);
+      setOtpCountdown(OTP_DURATION_SECONDS);
+      setCanResendOtp(false);
+    } catch (err: any) {
+      setOtpError(err.response?.data?.error || 'Không thể gửi lại mã OTP');
+    } finally {
+      setSendingOtp(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
       return;
     }
 
-    // Nếu chưa hiện form OTP, gửi OTP trước
+    // Gửi OTP trước
     if (!showOtpForm) {
-      setSendingOtp(true);
-      setOtpError(null);
-      try {
-        await sendOtp(formData.email);
-        setShowOtpForm(true);
-      } catch (error: any) {
-        setOtpError(error.response?.data?.error || 'Không thể gửi mã OTP');
-      } finally {
-        setSendingOtp(false);
-      }
+      await handleSendOtp();
       return;
     }
 
-    // Nếu đã có form OTP, submit đăng ký
+    // Validate OTP
     if (!formData.otpCode || formData.otpCode.length !== 6) {
       setOtpError('Vui lòng nhập mã OTP 6 chữ số');
       return;
     }
 
+    // Check hết hạn phía client
+    if (otpCountdown <= 0) {
+      setOtpError('Mã OTP đã hết hạn. Vui lòng gửi lại mã mới.');
+      return;
+    }
+
     try {
       await register(formData);
-      // Redirect will be handled by useEffect above
-    } catch (error: any) {
-      // Nếu lỗi OTP, hiển thị lỗi
-      if (error.response?.data?.error?.includes('OTP')) {
-        setOtpError(error.response.data.error);
+    } catch (err: any) {
+      if (err.response?.data?.error?.includes('OTP')) {
+        setOtpError(err.response.data.error);
       }
-      // Error is handled by the store
     }
   };
 
@@ -85,7 +140,6 @@ const RegisterPage: React.FC = () => {
       ...formData,
       [e.target.name]: e.target.value,
     });
-    // Clear OTP error when user types
     if (e.target.name === 'otpCode') {
       setOtpError(null);
     }
@@ -118,7 +172,7 @@ const RegisterPage: React.FC = () => {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+        <div className="bg-white py-8 px-4 sm:px-10 sm:rounded-2xl border border-gray-100 anim-fade-in-up" style={{ boxShadow: 'var(--shadow-lg)' }}>
           {error && (
             <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
               <div className="flex">
@@ -143,7 +197,7 @@ const RegisterPage: React.FC = () => {
                   required
                   value={formData.fullName}
                   onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2.5 pl-10 border border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 sm:text-sm transition-all duration-200"
                   placeholder={t('auth.register.enterFullName')}
                 />
                 <User className="h-5 w-5 text-gray-400 absolute left-3 top-2" />
@@ -163,7 +217,7 @@ const RegisterPage: React.FC = () => {
                   value={formData.email}
                   onChange={handleChange}
                   disabled={showOtpForm}
-                  className="appearance-none block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm disabled:bg-gray-100"
+                  className="appearance-none block w-full px-3 py-2.5 pl-10 border border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 sm:text-sm disabled:bg-gray-50 transition-all duration-200"
                   placeholder={t('auth.login.email')}
                 />
                 <Mail className="h-5 w-5 text-gray-400 absolute left-3 top-2" />
@@ -182,7 +236,7 @@ const RegisterPage: React.FC = () => {
                   required
                   value={formData.phone}
                   onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2.5 pl-10 border border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 sm:text-sm transition-all duration-200"
                   placeholder={t('auth.register.enterPhone')}
                 />
                 <Phone className="h-5 w-5 text-gray-400 absolute left-3 top-2" />
@@ -201,7 +255,7 @@ const RegisterPage: React.FC = () => {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2 pl-10 pr-10 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2.5 pl-10 pr-10 border border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 sm:text-sm transition-all duration-200"
                   placeholder={t('auth.register.enterPassword')}
                 />
                 <Lock className="h-5 w-5 text-gray-400 absolute left-3 top-2" />
@@ -239,7 +293,7 @@ const RegisterPage: React.FC = () => {
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2 pl-10 pr-10 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2.5 pl-10 pr-10 border border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 sm:text-sm transition-all duration-200"
                   placeholder={t('auth.register.reEnterPassword')}
                 />
                 <Lock className="h-5 w-5 text-gray-400 absolute left-3 top-2" />
@@ -265,32 +319,72 @@ const RegisterPage: React.FC = () => {
               )}
             </div>
 
+            {/* ═══ OTP Section ═══ */}
             {showOtpForm && (
-              <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-4">
-                <p className="text-sm text-blue-800 mb-3">
-                  Mã OTP đã được gửi đến email <strong>{formData.email}</strong>. Vui lòng kiểm tra email và nhập mã OTP bên dưới.
-                </p>
-                <div>
-                  <label htmlFor="otpCode" className="block text-sm font-medium text-gray-700">
-                    Mã OTP <span className="text-red-500">*</span>
-                  </label>
-                  <div className="mt-1 relative">
-                    <input
-                      id="otpCode"
-                      name="otpCode"
-                      type="text"
-                      required
-                      maxLength={6}
-                      value={formData.otpCode}
-                      onChange={handleChange}
-                      className="appearance-none block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
-                      placeholder="Nhập mã OTP 6 chữ số"
-                    />
-                    <KeyRound className="h-5 w-5 text-gray-400 absolute left-3 top-2" />
+              <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 space-y-4">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">Nhập mã xác thực</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Đã gửi đến <span className="font-medium text-gray-700">{formData.email}</span>
+                    </p>
                   </div>
-                  {otpError && (
-                    <p className="mt-1 text-sm text-red-600">{otpError}</p>
-                  )}
+                  {/* Timer badge */}
+                  <div className={`flex items-center px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+                    otpCountdown > 60
+                      ? 'bg-green-50 text-green-700'
+                      : otpCountdown > 0
+                      ? 'bg-amber-50 text-amber-700'
+                      : 'bg-red-50 text-red-700'
+                  }`}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1 flex-shrink-0">
+                      <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    {otpCountdown > 0 ? formatTime(otpCountdown) : 'Hết hạn'}
+                  </div>
+                </div>
+
+                {/* OTP Input */}
+                <div className="relative">
+                  <input
+                    id="otpCode"
+                    name="otpCode"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    required
+                    maxLength={6}
+                    value={formData.otpCode}
+                    onChange={handleChange}
+                    className="appearance-none block w-full px-3 py-3 pl-10 border border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 text-center text-lg tracking-[0.3em] font-mono transition-all duration-200"
+                    placeholder="000000"
+                    autoComplete="one-time-code"
+                  />
+                  <KeyRound className="h-5 w-5 text-gray-400 absolute left-3 top-3.5" />
+                </div>
+
+                {otpError && (
+                  <p className="text-sm text-red-600 flex items-center">
+                    <AlertCircle className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" />
+                    {otpError}
+                  </p>
+                )}
+
+                {/* Resend */}
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-gray-400">Mã gồm 6 chữ số</p>
+                  <button
+                    type="button"
+                    disabled={!canResendOtp || sendingOtp}
+                    onClick={handleResendOtp}
+                    className={`text-xs font-medium transition-colors ${
+                      canResendOtp && !sendingOtp
+                        ? 'text-red-600 hover:text-red-700 cursor-pointer'
+                        : 'text-gray-300 cursor-not-allowed'
+                    }`}
+                  >
+                    {sendingOtp ? 'Đang gửi...' : canResendOtp ? 'Gửi lại mã' : `Gửi lại sau ${formatTime(otpCountdown)}`}
+                  </button>
                 </div>
               </div>
             )}
@@ -320,7 +414,7 @@ const RegisterPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading || sendingOtp || !passwordsMatch || !isPasswordValid || (showOtpForm && !formData.otpCode)}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="group relative w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-semibold rounded-xl text-white bg-red-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed btn-press"
               >
                 {sendingOtp ? (
                   <div className="flex items-center">
@@ -352,7 +446,7 @@ const RegisterPage: React.FC = () => {
             </div>
 
             <div className="mt-6 grid grid-cols-2 gap-3">
-              <button className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+              <button className="w-full inline-flex justify-center py-2.5 px-4 border border-gray-200 rounded-xl bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 hover:scale-[1.02] btn-press">
                 <svg className="h-5 w-5" viewBox="0 0 24 24">
                   <path
                     fill="currentColor"
@@ -374,7 +468,7 @@ const RegisterPage: React.FC = () => {
                 <span className="ml-2">Google</span>
               </button>
 
-              <button className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+              <button className="w-full inline-flex justify-center py-2.5 px-4 border border-gray-200 rounded-xl bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 hover:scale-[1.02] btn-press">
                 <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                 </svg>
@@ -385,7 +479,7 @@ const RegisterPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Footer để tạo chiều cao scroll */}
+      {/* Footer */}
       <div className="mt-16 pb-16 text-center text-gray-400">
         <div className="max-w-md mx-auto px-4">
           <p className="text-sm mb-4">

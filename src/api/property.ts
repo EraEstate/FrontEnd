@@ -217,4 +217,56 @@ export const propertyAPI = {
     });
     return response.data;
   },
+
+  // ========== AI RECOMMENDATION ENDPOINTS ==========
+
+  // Lấy danh sách gợi ý cho user hiện tại
+  getRecommendationsForYou: async (limit = 8) => {
+    const response = await api.get('/recommendations/for-you', {
+      params: { limit }
+    });
+    return response.data;
+  },
+
+  // Lấy danh sách BDS tương tự
+  getSimilarProperties: async (propertyId: string, limit = 6) => {
+    const response = await api.get(`/recommendations/similar/${propertyId}`, {
+      params: { limit }
+    });
+    return response.data;
+  },
+
+  // ========== ADVANCED FEATURES ==========
+
+  searchByGeo: async (polygon: number[][]) => {
+    const response = await api.post('/properties/search/geo', { polygon });
+    return response.data;
+  },
+
+  getPropertiesForCompare: async (ids: string[]) => {
+    const params = new URLSearchParams();
+    ids.forEach(id => params.append('ids', id));
+    const response = await api.get(`/properties/compare?${params.toString()}`);
+    return response.data;
+  },
+
+  getPriceHistory: async (propertyId: string) => {
+    const response = await api.get(`/price-history/${propertyId}`);
+    return response.data;
+  },
+
+  createPriceAlert: async (data: { propertyId: string, targetPrice: number }) => {
+    const response = await api.post('/price-history/alerts', data);
+    return response.data;
+  },
+
+  getUserPriceAlerts: async () => {
+    const response = await api.get('/price-history/alerts');
+    return response.data;
+  },
+
+  deletePriceAlert: async (alertId: string) => {
+    const response = await api.delete(`/price-history/alerts/${alertId}`);
+    return response.data;
+  },
 };

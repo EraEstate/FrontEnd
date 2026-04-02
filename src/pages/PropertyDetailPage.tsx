@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   MapPin,
@@ -30,6 +30,7 @@ import {
   Loader2,
   Flag,
   X,
+  CheckCircle,
 } from 'lucide-react';
 import { useProperty, useFavoriteStatus } from '../api/hooks';
 import { propertyFavoriteAPI } from '../api';
@@ -38,10 +39,16 @@ import { propertyTransactionAPI } from '../api/propertyTransaction';
 import { useTranslation } from 'react-i18next';
 import { getImageUrl, getImagePlaceholder } from '../utils/imageUtils';
 import { useAuthStore } from '../store/authStore';
-import FloatingChatBox from '../components/FloatingChatBox';
+import { useUIStore } from '../store/uiStore';
 import PropertyChatList from '../components/PropertyChatList';
+import PriceHistoryChart from '../components/PriceHistoryChart';
+import PropertyReviewSection from '../components/PropertyReviewSection';
+import PriceAlertButton from '../components/PriceAlertButton';
+import VRTour from '../components/vr-tour';
 import type { Conversation } from '../api/chat';
-import { toast } from 'react-toastify';
+import toast from '../utils/toast';
+import { showSuccess, showWarning, showError } from '../utils/toast';
+import { logger } from '../utils/logger';
 import { REALESTATE_CONTRACT_ADDRESS } from '../config/blockchain';
 
 const PropertyDetailPage: React.FC = () => {
@@ -56,44 +63,59 @@ const PropertyDetailPage: React.FC = () => {
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [creatingContract, setCreatingContract] = useState(false);
   const [showContractModal, setShowContractModal] = useState(false);
+  const [showVRModal, setShowVRModal] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState('INACCURATE');
   const [reportDescription, setReportDescription] = useState('');
   const [reportSubmitting, setReportSubmitting] = useState(false);
+  const [similarProperties, setSimilarProperties] = useState<any[]>([]);
+  const [similarLoading, setSimilarLoading] = useState(false);
+  const { registerOwnerChat, unregisterOwnerChat } = useUIStore();
   
   // API Hooks
   const { data: property, loading, error, refetch } = useProperty(id || '');
   const { data: isFavorited, refetch: refetchFavoriteStatus } = useFavoriteStatus(id || '');
 
+  // Fetch similar properties
+  React.useEffect(() => {
+    let alive = true;
+    if (id) {
+      setSimilarLoading(true);
+      propertyAPI.getSimilarProperties(id, 4)
+        .then(res => {
+          if (alive) setSimilarProperties(res);
+        })
+        .catch(err => console.error('Failed to load similar properties', err))
+        .finally(() => {
+          if (alive) setSimilarLoading(false);
+        });
+    }
+    return () => { alive = false; };
+  }, [id]);
+
   // Toggle favorite
   const handleToggleFavorite = async () => {
     if (!id || !isAuthenticated) {
-      alert(t('propertyDetail.loginToFavorite'));
+      showWarning(t('propertyDetail.loginToFavorite'));
       return;
     }
     
-    if (togglingFavorite) return; // Prevent double click
+    if (togglingFavorite) return;
     
     try {
       setTogglingFavorite(true);
       const wasFavorited = isFavorited;
       await propertyFavoriteAPI.toggle(id);
-      // Refetch favorite status after toggle
       await refetchFavoriteStatus();
       
-      // Show success message and offer navigation if adding to favorites
       if (!wasFavorited) {
-        const goToFavorites = window.confirm(`${t('propertyDetail.addedToFavorites')}\n\n${t('propertyDetail.viewFavorites')}`);
-        if (goToFavorites) {
-          navigate('/favorites');
-        }
+        showSuccess(t('propertyDetail.addedToFavorites'));
       } else {
-        alert(t('propertyDetail.removedFromFavorites'));
+        showSuccess(t('propertyDetail.removedFromFavorites'));
       }
     } catch (error: any) {
-      console.error('Error toggling favorite:', error);
-      const errorMessage = error.response?.data?.message || t('propertyDetail.favoriteError');
-      alert(errorMessage);
+      logger.warn('Error toggling favorite:', error);
+      showError(t('propertyDetail.favoriteError'));
     } finally {
       setTogglingFavorite(false);
     }
@@ -158,6 +180,8 @@ const PropertyDetailPage: React.FC = () => {
   
   // Load property details - use direct fields from property or from propertyDetails
   const details = property.propertyDetails?.[0];
+
+
   
   // Build full address from location data
   const fullAddress = property.location?.fullAddress || 
@@ -167,9 +191,26 @@ const PropertyDetailPage: React.FC = () => {
   
   // Get owner information
   const owner = property.owner || property.user;
-  const ownerName: string = (owner?.fullName ?? t('propertyDetail.notUpdated') ?? '') as string;
+  const ownerName: string = property?.owner?.fullName || property?.owner?.username || t('propertyDetail.unknown');
   const ownerPhone = owner?.phone || property.owner?.phone || '';
   const ownerEmail = owner?.email || property.owner?.email || '';
+
+  // Register owner chat with UI Store when property loads
+  useEffect(() => {
+    const isOwner = isAuthenticated && owner && user?.id === owner.id;
+    if (property?.owner && !isOwner) {
+      registerOwnerChat({
+        propertyId: property.id,
+        propertyOwnerId: property.owner.id,
+        propertyOwnerName: ownerName,
+        conversationId: selectedConversation?.id
+      });
+    }
+    
+    return () => {
+      unregisterOwnerChat();
+    };
+  }, [property, isAuthenticated, user, owner, ownerName, selectedConversation, registerOwnerChat, unregisterOwnerChat]);
   
   // Format phone number for Zalo (remove spaces, dashes, and ensure it starts with 0 or country code)
   const formatPhoneForZalo = (phone: string): string => {
@@ -255,7 +296,7 @@ const PropertyDetailPage: React.FC = () => {
       setShowContractModal(false);
       navigate(`/transactions/${transaction.id}/contract`);
     } catch (error: any) {
-      console.error('Failed to create transaction from property detail:', error);
+      console.error('Failed to create transaction:', error);
       const msg =
         error?.message ||
         error?.response?.data?.error ||
@@ -273,7 +314,7 @@ const PropertyDetailPage: React.FC = () => {
         <div className="max-w-7xl mx-auto">
           {images.length > 0 ? (
             <div className="relative">
-              <div className="aspect-[16/9] lg:aspect-[21/9] overflow-hidden">
+              <div className="aspect-[16/9] lg:aspect-[21/9] overflow-hidden rounded-2xl" style={{ boxShadow: 'var(--shadow-md)' }}>
                 <img
                   src={getImageUrl(images[currentImageIndex]?.imageUrl) || getImagePlaceholder(1200, 600)}
                   alt={property.title}
@@ -289,21 +330,32 @@ const PropertyDetailPage: React.FC = () => {
                 <>
                   <button
                     onClick={prevImage}
-                    className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all"
+                    className="absolute left-4 top-1/2 transform -translate-y-1/2 glass text-gray-800 p-3 rounded-full hover:bg-white hover:scale-110 transition-all duration-200 shadow-sm"
                   >
                     <ChevronLeft className="h-6 w-6" />
                   </button>
                   <button
                     onClick={nextImage}
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all"
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 glass text-gray-800 p-3 rounded-full hover:bg-white hover:scale-110 transition-all duration-200 shadow-sm"
                   >
                     <ChevronRight className="h-6 w-6" />
                   </button>
                   
-                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm">
+                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 glass text-gray-800 font-medium px-4 py-1.5 rounded-full text-sm shadow-sm">
                     {currentImageIndex + 1} / {images.length}
                   </div>
                 </>
+              )}
+
+              {/* VR 360 Tour Button — only show when there are images */}
+              {images.length > 0 && (
+                <button
+                   onClick={() => setShowVRModal(true)}
+                   className="absolute bottom-4 left-4 bg-red-600/90 hover:bg-red-700 text-white px-4 py-2 rounded-xl font-medium text-sm flex items-center shadow-lg transition-all hover:scale-105 backdrop-blur-sm gap-2"
+                >
+                   <Eye className="w-4 h-4" />
+                   Tham quan VR 360°
+                </button>
               )}
 
               {/* Action Buttons */}
@@ -311,10 +363,10 @@ const PropertyDetailPage: React.FC = () => {
                 <button
                   onClick={handleToggleFavorite}
                   disabled={togglingFavorite || !isAuthenticated}
-                  className={`p-3 rounded-full transition-colors ${
+                  className={`p-3 rounded-full transition-all duration-200 shadow-sm hover:scale-110 ${
                     isFavorited 
-                      ? 'bg-red-600 text-white' 
-                      : 'bg-white bg-opacity-90 text-gray-600 hover:bg-opacity-100'
+                      ? 'bg-red-600 text-white hover:bg-red-700' 
+                      : 'glass text-gray-700 hover:bg-white'
                   } ${!isAuthenticated ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                   title={isFavorited ? t('propertyDetail.removeFromFavorites') : t('propertyDetail.addToFavorites')}
                 >
@@ -330,7 +382,7 @@ const PropertyDetailPage: React.FC = () => {
                     void navigator.clipboard?.writeText(window.location.href);
                     toast.info('Đã sao chép liên kết tin đăng.');
                   }}
-                  className="p-3 bg-white bg-opacity-90 text-gray-600 rounded-full hover:bg-opacity-100 transition-colors"
+                  className="p-3 glass text-gray-700 rounded-full hover:bg-white hover:scale-110 transition-all duration-200 shadow-sm"
                   title="Chia sẻ / sao chép link"
                 >
                   <Share2 className="h-5 w-5" />
@@ -339,7 +391,7 @@ const PropertyDetailPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setShowReportModal(true)}
-                    className="p-3 bg-white bg-opacity-90 text-gray-600 rounded-full hover:bg-red-50 hover:text-red-600 transition-colors"
+                    className="p-3 glass text-gray-700 rounded-full hover:bg-white hover:text-red-600 hover:scale-110 transition-all duration-200 shadow-sm"
                     title="Báo cáo tin vi phạm"
                   >
                     <Flag className="h-5 w-5" />
@@ -390,7 +442,7 @@ const PropertyDetailPage: React.FC = () => {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Header */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <span className={`inline-block px-3 py-1 text-sm font-medium rounded-full text-white mb-3 ${
@@ -398,6 +450,32 @@ const PropertyDetailPage: React.FC = () => {
                   }`}>
                     {(property.listingType || property.transactionType) === 'SALE' ? t('common.sell') : t('postProperty.forRent')}
                   </span>
+                  {/* Rental Status Badge */}
+                  {property.status === 'RENTED' && property.rentalEndDate && (
+                    <div className="flex items-center gap-2 mb-3 px-4 py-2.5 bg-amber-50 border border-amber-200 rounded-xl">
+                      <Clock className="w-5 h-5 text-amber-600 flex-shrink-0" />
+                      <div className="text-sm">
+                        <span className="font-semibold text-amber-800">Đang cho thuê</span>
+                        <span className="text-amber-600 ml-1">
+                          — Hết hạn {new Date(property.rentalEndDate).toLocaleDateString('vi-VN')}
+                          {(() => {
+                            const days = Math.ceil((new Date(property.rentalEndDate).getTime() - Date.now()) / 86400000);
+                            if (days > 0) return ` (còn ${days} ngày)`;
+                            return ' (đã hết hạn)';
+                          })()}
+                        </span>
+                        {isOwner && (
+                          <span className="block text-amber-500 text-xs mt-0.5">Tin sẽ tự động hiển thị lại sau khi hết hạn thuê</span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  {property.status === 'SOLD' && (
+                    <div className="flex items-center gap-2 mb-3 px-4 py-2.5 bg-red-50 border border-red-200 rounded-xl">
+                      <CheckCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+                      <span className="text-sm font-semibold text-red-800">Đã bán</span>
+                    </div>
+                  )}
                   <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
                     {property.title}
                   </h1>
@@ -414,6 +492,10 @@ const PropertyDetailPage: React.FC = () => {
                       {Math.round(Number(property.price) / Number(property.area)).toLocaleString()} {t('propertyDetail.vndPerSqm')}
                     </div>
                   )}
+                  {/* Price Alert Button */}
+                  <div className="mt-2">
+                    <PriceAlertButton propertyId={property.id} currentPrice={Number(property.price)} />
+                  </div>
                 </div>
               </div>
 
@@ -442,13 +524,13 @@ const PropertyDetailPage: React.FC = () => {
 
             {/* Features */}
             {features.length > 0 && (
-              <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">{t('propertyDetail.detailInfo')}</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {features.map((feature, index) => {
                     const Icon = feature.icon;
                     return (
-                      <div key={index} className="text-center p-4 bg-gray-50 rounded-lg">
+                      <div key={index} className="text-center p-4 bg-gray-50/80 hover:bg-gray-50 rounded-xl transition-colors border border-gray-100/50">
                         <Icon className="h-8 w-8 text-red-600 mx-auto mb-2" />
                         <div className="font-medium text-gray-900">{feature.value}</div>
                         <div className="text-sm text-gray-600">{feature.label}</div>
@@ -460,7 +542,7 @@ const PropertyDetailPage: React.FC = () => {
             )}
 
             {/* Description */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
               <h2 className="text-xl font-bold text-gray-900 mb-4">{t('propertyDetail.description')}</h2>
               <div className="prose max-w-none text-gray-700">
                 {property.description.split('\n').map((paragraph: string, index: number) => (
@@ -471,14 +553,20 @@ const PropertyDetailPage: React.FC = () => {
 
             {/* Additional Features */}
             {details?.additionalFeatures && (
-              <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">{t('propertyDetail.additionalFeatures')}</h2>
                 <p className="text-gray-700">{details.additionalFeatures}</p>
               </div>
             )}
 
+            {/* Price History Chart */}
+            <PriceHistoryChart propertyId={id || ''} currentPrice={property.price} />
+
+            {/* Reviews Section */}
+            <PropertyReviewSection propertyId={property.id} />
+
             {/* Map */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
               <h2 className="text-xl font-bold text-gray-900 mb-4">{t('propertyDetail.location')}</h2>
               <div className="aspect-[16/9] bg-gray-200 rounded-lg flex items-center justify-center">
                 <div className="text-center">
@@ -487,6 +575,53 @@ const PropertyDetailPage: React.FC = () => {
                 </div>
               </div>
             </div>
+
+            {/* Bất động sản tương tự */}
+            {(similarLoading || similarProperties.length > 0) && (
+              <div className="bg-white rounded-2xl shadow-sm p-6 mt-8 border border-gray-100">
+                <div className="flex items-center gap-2 mb-6">
+                  <Star className="w-6 h-6 text-yellow-500 fill-current" />
+                  <h2 className="text-xl font-bold text-gray-900">Bất động sản tương tự</h2>
+                </div>
+                
+                {similarLoading ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {[...Array(4)].map((_, i) => (
+                      <div key={i} className="h-32 bg-gray-200 rounded-lg animate-pulse" />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {similarProperties.map((simProp: any) => (
+                      <Link
+                        key={simProp.id}
+                        to={`/properties/${simProp.id}`}
+                        className="flex border border-gray-100 rounded-xl overflow-hidden card-hover group bg-white"
+                      >
+                        <div 
+                          className="w-1/3 bg-cover bg-center"
+                          style={{ backgroundImage: `url(${getImageUrl(simProp.mainImageUrl || simProp.imageUrl) || getImagePlaceholder(200, 200)})` }}
+                        />
+                        <div className="w-2/3 p-3 flex flex-col justify-between">
+                          <div>
+                            <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 group-hover:text-red-600 transition-colors">{simProp.title}</h3>
+                            <p className="text-xs text-gray-500 mt-1 truncate">{simProp.address}</p>
+                          </div>
+                          <div className="mt-2 flex items-center justify-between">
+                            <span className="text-red-600 font-bold text-sm">
+                              {simProp.price >= 1000000000 ? `${(simProp.price / 1000000000).toFixed(1)} tỷ` : 
+                               simProp.price >= 1000000 ? `${(simProp.price / 1000000).toFixed(0)} triệu` : 
+                               simProp.price?.toLocaleString('vi-VN')}
+                            </span>
+                            <span className="text-xs text-gray-500">{simProp.area}m²</span>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Sidebar */}
@@ -500,7 +635,7 @@ const PropertyDetailPage: React.FC = () => {
               />
             ) : (
               /* Client View: Show contact card */
-              <div className="bg-white rounded-lg shadow-sm p-6 sticky top-24">
+              <div className="bg-white rounded-2xl shadow-sm p-6 sticky top-24 border border-gray-100">
                 <div className="text-center mb-6">
                   <Link to={`/users/${owner?.id}`} className="block group">
                     <div className="relative w-20 h-20 mx-auto mb-4">
@@ -550,7 +685,7 @@ const PropertyDetailPage: React.FC = () => {
                 <div className="space-y-3 mb-6">
                   <a 
                     href={`tel:${ownerPhone}`}
-                    className="w-full bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 transition-colors font-medium flex items-center justify-center"
+                    className="w-full bg-red-600 text-white py-3.5 px-4 rounded-xl hover:bg-red-700 font-semibold flex items-center justify-center btn-press shadow-sm"
                   >
                     <Phone className="h-5 w-5 mr-2" />
                     {t('propertyDetail.call')}
@@ -560,7 +695,7 @@ const PropertyDetailPage: React.FC = () => {
                       href={zaloLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full bg-blue-500 text-white py-3 px-4 rounded-lg hover:bg-blue-600 transition-colors font-medium flex items-center justify-center"
+                      className="w-full bg-blue-500 text-white py-3.5 px-4 rounded-xl hover:bg-blue-600 font-semibold flex items-center justify-center btn-press shadow-sm"
                     >
                       <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.58 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.64 20.28 9.7 20.28 11.91C20.28 16.31 16.45 20.14 12.05 20.14C10.56 20.14 9.11 19.76 7.85 19.06L7.55 18.91L4.43 19.65L5.17 16.58L5.02 16.28C4.28 14.95 3.89 13.46 3.89 11.91C3.89 7.5 7.72 3.67 12.05 3.67M8.53 7.33C8.37 7.33 8.1 7.39 7.87 7.64C7.65 7.89 7 8.5 7 9.71C7 10.93 7.89 12.1 8 12.27C8.14 12.44 9.76 14.94 12.25 15.87C12.84 16.07 13.3 16.18 13.66 16.26C14.25 16.4 14.79 16.36 15.22 16.28C15.7 16.18 16.68 15.6 16.89 15C17.1 14.38 17.1 13.87 17.04 13.75C16.97 13.64 16.81 13.58 16.56 13.45C16.31 13.33 14.77 12.55 14.44 12.42C14.12 12.29 13.91 12.23 13.7 12.5C13.5 12.74 12.89 13.5 12.69 13.71C12.5 13.92 12.31 13.95 12.06 13.82C11.81 13.69 10.89 13.33 9.76 12.3C8.89 11.5 8.27 10.55 8.08 10.3C7.89 10.05 8.05 9.96 8.22 9.78C8.39 9.61 8.58 9.36 8.72 9.17C8.87 8.97 8.97 8.83 9.13 8.66C9.28 8.5 9.19 8.36 9.08 8.22C8.97 8.08 8.53 7.33 8.53 7.33Z" />
@@ -570,14 +705,14 @@ const PropertyDetailPage: React.FC = () => {
                   )}
                   <button 
                     onClick={() => setIsChatOpen(true)}
-                    className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center justify-center"
+                    className="w-full bg-green-600 text-white py-3.5 px-4 rounded-xl hover:bg-green-700 font-semibold flex items-center justify-center btn-press shadow-sm"
                   >
                     <MessageCircle className="h-5 w-5 mr-2" />
                     {t('propertyDetail.sendMessage')}
                   </button>
                   <button
                     onClick={() => setShowContactForm(!showContactForm)}
-                    className="w-full border border-red-600 text-red-600 py-3 px-4 rounded-lg hover:bg-red-50 transition-colors font-medium flex items-center justify-center"
+                    className="w-full border-2 border-red-600 text-red-600 py-3.5 px-4 rounded-xl hover:bg-red-50 font-semibold flex items-center justify-center btn-press"
                   >
                     <Mail className="h-5 w-5 mr-2" />
                     {t('propertyDetail.contact')}
@@ -586,7 +721,7 @@ const PropertyDetailPage: React.FC = () => {
                   {!isOwner && (
                     <button
                       onClick={handleOpenContractModal}
-                      className="w-full bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 transition-colors font-medium flex items-center justify-center"
+                      className="w-full bg-red-600 text-white py-3.5 px-4 rounded-xl hover:bg-red-700 font-semibold flex items-center justify-center btn-press shadow-sm"
                     >
                       <Shield className="h-5 w-5 mr-2" />
                       {isRentListing ? 'Mở hợp đồng thuê' : 'Mở hợp đồng mua bán'}
@@ -602,22 +737,22 @@ const PropertyDetailPage: React.FC = () => {
                       <input
                         type="text"
                         placeholder={t('propertyDetail.fullName')}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-colors"
                       />
                       <input
                         type="tel"
                         placeholder={t('propertyDetail.phoneNumber')}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-colors"
                       />
                       <textarea
                         placeholder={t('propertyDetail.messagePlaceholder')}
                         rows={4}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
+                        className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 resize-none transition-colors"
                         defaultValue={`${t('propertyDetail.interestedIn')}"${property.title}". ${t('propertyDetail.contact')}.`}
                       />
                       <button
                         type="submit"
-                        className="w-full bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 transition-colors font-medium"
+                        className="w-full bg-red-600 text-white py-3.5 px-4 rounded-xl hover:bg-red-700 font-semibold btn-press shadow-sm"
                       >
                         {t('propertyDetail.sendMessageButton')}
                       </button>
@@ -646,7 +781,7 @@ const PropertyDetailPage: React.FC = () => {
             )}
 
             {/* Quick Stats */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
               <h3 className="font-semibold text-gray-900 mb-4">{t('propertyDetail.quickStats')}</h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
@@ -676,20 +811,7 @@ const PropertyDetailPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Floating Chat Box */}
-      {property.owner && (
-        <FloatingChatBox
-          propertyId={property.id}
-          propertyOwnerId={isOwner ? undefined : property.owner.id}
-          propertyOwnerName={ownerName}
-          isOpen={isChatOpen}
-          onOpenChange={(open) => {
-            setIsChatOpen(open);
-            if (!open) setSelectedConversation(null); // Clear selected conversation when closing
-          }}
-          conversationId={selectedConversation?.id}
-        />
-      )}
+      {/* Floating Chat Box is now managed by FloatingActionHub */}
 
       {/* Blockchain contract preview modal */}
       {showReportModal && id && (
@@ -857,6 +979,15 @@ const PropertyDetailPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* VR 360 Tour — uses property images from database */}
+      <VRTour
+        isOpen={showVRModal}
+        onClose={() => setShowVRModal(false)}
+        propertyImages={images}
+        propertyTitle={property.title}
+        propertyAddress={fullAddress}
+      />
     </div>
   );
 };

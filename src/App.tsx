@@ -1,11 +1,12 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { Toaster } from 'sonner';
 import { Header } from './components/Header';
 import Footer from './components/Footer';
 import AccountDisabledBanner from './components/AccountDisabledBanner';
-import AIChatBox from './components/AIChatBox';
+import FloatingActionHub from './components/FloatingActionHub';
+import ScrollToTop from './components/ScrollToTop';
+import TopProgressBar from './components/TopProgressBar';
 import { useAuthStore } from './store/authStore';
 import HomePage from './components/HomePage';
 import PropertiesPage from './pages/PropertiesPage';
@@ -59,6 +60,12 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import VerifyEmailPage from './pages/VerifyEmailPage';
 import NotificationSettingsPage from './pages/NotificationSettingsPage';
+import PropertyComparisonPage from './pages/PropertyComparisonPage';
+import MapSearchPage from './pages/MapSearchPage';
+import CompareFloatingBar from './components/CompareFloatingBar';
+import EscrowDashboard from './pages/EscrowDashboard';
+import KycVerificationPage from './pages/KycVerificationPage';
+import LandlordAnalyticsPage from './pages/LandlordAnalyticsPage';
 
 function AppContent() {
   const location = useLocation();
@@ -68,6 +75,9 @@ function AppContent() {
 
   return (
     <div className="min-h-screen flex flex-col w-full">
+      {/* Top Progress Bar — hiệu ứng loading khi chuyển trang */}
+      <TopProgressBar />
+      
       {/* Conditionally render Header - hide on dashboard pages */}
       {!isDashboardRoute && <Header />}
       
@@ -94,6 +104,8 @@ function AppContent() {
           <Route path="/" element={<HomePage />} />
           <Route path="/properties" element={<PropertiesPage />} />
           <Route path="/properties/:id" element={<PropertyDetailPage />} />
+          <Route path="/compare" element={<PropertyComparisonPage />} />
+          <Route path="/map-search" element={<MapSearchPage />} />
           <Route path="/rent" element={<RentPage />} />
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/projects/:id" element={<ProjectDetailPage />} />
@@ -129,11 +141,14 @@ function AppContent() {
           <Route path="/payment/success" element={<PaymentSuccessPage />} />
           <Route path="/payment/failed" element={<PaymentFailedPage />} />
           <Route path="/my-transactions" element={<ProtectedRoute><MyTransactionsPage /></ProtectedRoute>} />
+          <Route path="/landlord-analytics" element={<ProtectedRoute><LandlordAnalyticsPage /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
           <Route path="/help/wallet" element={<WalletGuidePage />} />
           <Route path="/transactions/:id" element={<ProtectedRoute><TransactionOverviewPage /></ProtectedRoute>} />
           <Route path="/transactions/:id/contract" element={<ProtectedRoute><TransactionContractReviewPage /></ProtectedRoute>} />
           <Route path="/transactions/:id/blockchain" element={<ProtectedRoute><TransactionContractPage /></ProtectedRoute>} />
+          <Route path="/escrow" element={<ProtectedRoute><EscrowDashboard /></ProtectedRoute>} />
+          <Route path="/kyc-verify" element={<ProtectedRoute><KycVerificationPage /></ProtectedRoute>} />
           <Route path="/inquiries" element={<ProtectedRoute><InquiryPage /></ProtectedRoute>} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/legal" element={<LegalCenterPage />} />
@@ -147,22 +162,16 @@ function AppContent() {
       {/* Conditionally render Footer - hide on dashboard pages */}
       {!isDashboardRoute && <Footer />}
       
-      {/* AI Chat Box - hiển thị trên tất cả các trang ngoài dashboard */}
-      {!isDashboardRoute && <AIChatBox />}
+      {/* Floating Action Hub (AI Chat & Owner Chat) */}
+      {!isDashboardRoute && <FloatingActionHub />}
       
+      {/* Scroll to Top Button */}
+      {!isDashboardRoute && <ScrollToTop />}
+      {/* Compare Floating Bar */}
+      {!isDashboardRoute && <CompareFloatingBar />}
+
       {/* Toast Notifications */}
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
+      <Toaster position="top-right" richColors />
     </div>
   );
 }

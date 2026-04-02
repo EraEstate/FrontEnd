@@ -15,18 +15,28 @@ import {
   ClipboardList,
   CheckCircle2,
   Circle,
-  CircleDot
+  CircleDot,
+  Sparkles,
+  X,
+  Loader2,
+  AlertTriangle,
+  ShieldCheck,
+  ShieldAlert
 } from 'lucide-react';
 import { useMyProperties } from '../api/hooks';
 import type { Property } from '../types';
 import { useTranslation } from 'react-i18next';
 import { getImageUrl, getImagePlaceholder } from '../utils/imageUtils';
+import { aiAgentAPI, type FullAnalysis } from '../api/aiAgent';
 
 const MyPropertiesPage = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'all' | 'available' | 'sold' | 'rented'>('all');
   const [currentPage] = useState(0);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [analysisData, setAnalysisData] = useState<FullAnalysis | null>(null);
+  const [analysisLoading, setAnalysisLoading] = useState<string | null>(null);
+  const [showAnalysis, setShowAnalysis] = useState(false);
 
   // API Hook
   const { data: propertiesData, loading } = useMyProperties(currentPage, 50);
@@ -77,6 +87,30 @@ const MyPropertiesPage = () => {
     { label: t('myProperties.sold'), value: properties.filter((p: Property) => p.status === 'SOLD').length, icon: BarChart3, color: 'text-gray-600 bg-gray-50' },
     { label: t('myProperties.rented'), value: properties.filter((p: Property) => p.status === 'RENTED').length, icon: DollarSign, color: 'text-purple-600 bg-purple-50' },
   ];
+
+  const handleAnalyze = async (propertyId: string) => {
+    setAnalysisLoading(propertyId);
+    try {
+      const data = await aiAgentAPI.fullAnalysis(propertyId);
+      setAnalysisData(data);
+      setShowAnalysis(true);
+    } catch {
+      alert('Không thể phân tích tin đăng. Vui lòng thử lại.');
+    } finally {
+      setAnalysisLoading(null);
+    }
+  };
+
+  const getGradeColor = (grade: string) => {
+    const colors: Record<string, string> = {
+      'A': 'bg-emerald-100 text-emerald-700 border-emerald-300',
+      'B': 'bg-blue-100 text-blue-700 border-blue-300',
+      'C': 'bg-amber-100 text-amber-700 border-amber-300',
+      'D': 'bg-orange-100 text-orange-700 border-orange-300',
+      'F': 'bg-red-100 text-red-700 border-red-300',
+    };
+    return colors[grade] || colors['C'];
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 mt-16">
@@ -313,6 +347,14 @@ const MyPropertiesPage = () => {
                         {t('myProperties.viewDetails')}
                       </Link>
                       <button 
+                        onClick={() => handleAnalyze(String(property.id))}
+                        disabled={analysisLoading === String(property.id)}
+                        className="px-4 py-2.5 border-2 border-purple-200 text-purple-700 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all text-sm font-semibold disabled:opacity-50"
+                        title="AI Phan tich"
+                      >
+                        {analysisLoading === String(property.id) ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                      </button>
+                      <button 
                         className="px-4 py-2.5 border-2 border-gray-200 text-gray-700 rounded-xl hover:border-red-600 hover:text-red-600 transition-all text-sm font-semibold"
                         title={t('myProperties.statistics')}
                       >
@@ -402,6 +444,118 @@ const MyPropertiesPage = () => {
           </div>
         )}
       </div>
+
+      {/* AI Analysis Modal */}
+      {showAnalysis && analysisData && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-purple-100 rounded-xl">
+                  <Sparkles className="h-5 w-5 text-purple-600" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg text-gray-900">AI Phân tích</h3>
+                  <p className="text-xs text-gray-500">Kết quả phân tích tự động</p>
+                </div>
+              </div>
+              <button onClick={() => setShowAnalysis(false)} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
+                <X className="h-5 w-5 text-gray-500" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-5">
+              {/* Quality Score */}
+              <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-5 border border-gray-200">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="font-semibold text-gray-800">Chất lượng tin đăng</span>
+                  <span className={`px-3 py-1 rounded-full text-sm font-bold border ${getGradeColor(analysisData.quality.grade)}`}>
+                    {analysisData.quality.grade} — {analysisData.quality.score}/100
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2.5 mb-3">
+                  <div
+                    className={`h-2.5 rounded-full transition-all duration-500 ${
+                      analysisData.quality.score >= 80 ? 'bg-emerald-500' :
+                      analysisData.quality.score >= 60 ? 'bg-amber-500' : 'bg-red-500'
+                    }`}
+                    style={{ width: `${analysisData.quality.score}%` }}
+                  />
+                </div>
+                {analysisData.quality.issues.length > 0 && (
+                  <div className="space-y-1.5 mb-2">
+                    <p className="text-xs font-semibold text-red-600 flex items-center gap-1"><AlertTriangle className="h-3.5 w-3.5" /> Vấn đề:</p>
+                    {analysisData.quality.issues.map((issue, i) => (
+                      <p key={i} className="text-xs text-red-600 pl-5">• {issue}</p>
+                    ))}
+                  </div>
+                )}
+                {analysisData.quality.suggestions.length > 0 && (
+                  <div className="space-y-1.5">
+                    <p className="text-xs font-semibold text-blue-600 flex items-center gap-1"><Sparkles className="h-3.5 w-3.5" /> Gợi ý:</p>
+                    {analysisData.quality.suggestions.map((s, i) => (
+                      <p key={i} className="text-xs text-blue-600 pl-5">• {s}</p>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Moderation */}
+              <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-5 border border-gray-200">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-semibold text-gray-800">Kiểm duyệt nội dung</span>
+                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold ${
+                    analysisData.moderation.decision === 'APPROVED' ? 'bg-emerald-100 text-emerald-700' :
+                    analysisData.moderation.decision === 'FLAGGED' ? 'bg-amber-100 text-amber-700' :
+                    'bg-red-100 text-red-700'
+                  }`}>
+                    {analysisData.moderation.decision === 'APPROVED' && <ShieldCheck className="h-3.5 w-3.5" />}
+                    {analysisData.moderation.decision === 'FLAGGED' && <AlertTriangle className="h-3.5 w-3.5" />}
+                    {analysisData.moderation.decision === 'REJECTED' && <ShieldAlert className="h-3.5 w-3.5" />}
+                    {analysisData.moderation.decision === 'APPROVED' ? 'Đạt' :
+                     analysisData.moderation.decision === 'FLAGGED' ? 'Cần xem lại' : 'Vi phạm'}
+                  </span>
+                </div>
+                {analysisData.moderation.flags.length > 0 && (
+                  <div className="space-y-1 mt-2">
+                    {analysisData.moderation.flags.map((f, i) => (
+                      <p key={i} className="text-xs text-amber-700">⚠ {f}</p>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Price Estimation */}
+              {analysisData.priceEstimation.status === 'OK' && (
+                <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-5 border border-gray-200">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="font-semibold text-gray-800">Ước tính giá thị trường</span>
+                    <span className={`px-3 py-1 rounded-full text-sm font-bold ${
+                      analysisData.priceEstimation.priceAssessment === 'HỢP LÝ' ? 'bg-emerald-100 text-emerald-700' :
+                      analysisData.priceEstimation.priceAssessment === 'CAO' ? 'bg-red-100 text-red-700' :
+                      'bg-blue-100 text-blue-700'
+                    }`}>
+                      {analysisData.priceEstimation.priceAssessment}
+                    </span>
+                  </div>
+                  {analysisData.priceEstimation.estimatedPrice && (
+                    <p className="text-sm text-gray-600">
+                      Giá ước tính: <span className="font-bold text-gray-900">
+                        {(analysisData.priceEstimation.estimatedPrice / 1000000000).toFixed(1)} tỷ
+                      </span>
+                    </p>
+                  )}
+                  {analysisData.priceEstimation.note && (
+                    <p className="text-xs text-gray-500 mt-1">{analysisData.priceEstimation.note}</p>
+                  )}
+                  <p className="text-xs text-gray-400 mt-2">Dựa trên {analysisData.priceEstimation.sampleSize} BĐS tương tự</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

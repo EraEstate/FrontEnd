@@ -5,7 +5,7 @@ import type { News } from '../types';
 import { useTranslation } from 'react-i18next';
 import { newsAPI } from '../api/news';
 import { useAuthStore } from '../store/authStore';
-import { toast } from 'react-toastify';
+import toast from '../utils/toast';
 import { getImageUrl, getImagePlaceholder } from '../utils/imageUtils';
 
 const NewsDetailPage = () => {

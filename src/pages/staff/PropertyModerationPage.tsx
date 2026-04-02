@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CheckCircle, XCircle, Eye, Loader2 } from 'lucide-react';
 import { propertyAPI } from '../../api/property';
-import { toast } from 'react-toastify';
+import toast from '../../utils/toast';
 
 const PropertyModerationPage: React.FC = () => {
   const [properties, setProperties] = useState<any[]>([]);

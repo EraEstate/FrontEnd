@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Bell, ArrowLeft, Loader2 } from 'lucide-react';
 import { notificationAPI } from '../api/misc';
-import { toast } from 'react-toastify';
+import toast from '../utils/toast';
 
 export type NotificationPrefs = {
   emailNotifications: boolean;

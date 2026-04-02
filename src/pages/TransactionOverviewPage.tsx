@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Loader2, Home, DollarSign, User, ArrowLeft } from 'lucide-react';
 import { propertyTransactionAPI, type PropertyTransaction } from '../api/propertyTransaction';
 import { propertyAPI } from '../api/property';
-import { toast } from 'react-toastify';
+import toast from '../utils/toast';
 import { useTranslation } from 'react-i18next';
 import { TransactionStepper } from '../components/TransactionStepper';
 

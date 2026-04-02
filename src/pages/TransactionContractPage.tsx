@@ -17,8 +17,10 @@ import {
 import { propertyTransactionAPI, type PropertyTransaction } from '../api/propertyTransaction';
 import { propertyAPI } from '../api/property';
 import { useAuthStore } from '../store/authStore';
-import { toast } from 'react-toastify';
-import { connectMetaMask, sendCreateDealTx } from '../utils/metamask';
+import toast from '../utils/toast';
+import { connectMetaMask, depositToEscrow } from '../utils/metamask';
+import { escrowAPI } from '../api/escrow';
+import { kycAPI } from '../api/kyc';
 import { REALESTATE_CONTRACT_ADDRESS, BLOCKCHAIN_EXPLORER_URL, BLOCKCHAIN_NETWORK_NAME } from '../config/blockchain';
 import { createVnpayPaymentUrl } from '../config/vnpay';
 import RealEstateEscrowAbi from '../abi/RealEstateEscrow.json';
@@ -126,6 +128,16 @@ const TransactionContractPage: React.FC = () => {
     try {
       setSigning(true);
 
+      // KYC check: yêu cầu xác minh CCCD trước khi giao dịch blockchain
+      if (user?.id) {
+        const isKycVerified = await kycAPI.isVerified(String(user.id)).catch(() => false);
+        if (!isKycVerified) {
+          toast.error('Bạn cần xác minh CCCD trước khi thực hiện giao dịch blockchain. Vui lòng truy cập trang Xác minh CCCD.');
+          setSigning(false);
+          return;
+        }
+      }
+
       const buyerAddress = await connectMetaMask();
       // TODO: map ví on-chain của người bán; hiện tại dùng buyerAddress cho cả 2 để đánh dấu on-chain
       const sellerAddress = buyerAddress;
@@ -138,24 +150,37 @@ const TransactionContractPage: React.FC = () => {
 
       const priceBigInt = BigInt(Math.round(total));
 
-      const txHash = await sendCreateDealTx({
+      const result = await depositToEscrow({
         contractAddress: REALESTATE_CONTRACT_ADDRESS,
-        abi: RealEstateEscrowAbi as any[],
-        sellerAddress,
-        buyerAddress,
-        propertyId: transaction.propertyId,
+        abi: RealEstateEscrowAbi.abi as any[],
+        sellerAddress: sellerAddress,
+        propertyId: String(transaction.propertyId),
         price: priceBigInt,
         isRent: property?.transactionType === 'RENT',
       });
 
+      if (!result) throw new Error('Không nhận được kết quả từ MetaMask');
+
+      // Ghi log vào Backend Escrow Service
+      await escrowAPI.logTransaction({
+        txHash: result.txHash,
+        propertyId: Number(transaction.propertyId),
+        buyerAddress,
+        sellerAddress,
+        amount: total,
+        status: 'LOCKED'
+      });
+
       const updated = await propertyTransactionAPI.updateBlockchainTx(transaction.id, {
-        txHash,
+        txHash: result.txHash,
         contractAddress: REALESTATE_CONTRACT_ADDRESS,
         network: BLOCKCHAIN_NETWORK_NAME,
       });
 
       setTransaction(updated);
       toast.success(t('transaction.success.signed'));
+      // Điều hướng người dùng tới Escrow Dashboard để xem trạng thái giao dịch
+      navigate('/escrow');
     } catch (error: any) {
       console.error('Failed to sign on-chain from contract page:', error);
       
@@ -204,7 +229,7 @@ const TransactionContractPage: React.FC = () => {
       }
       
       toast.error(errorMessage, {
-        autoClose: errorMessage.includes('\n') ? 10000 : 5000,
+        duration: errorMessage.includes('\n') ? 10000 : 5000,
       });
     } finally {
       setSigning(false);

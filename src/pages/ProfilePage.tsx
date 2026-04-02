@@ -26,13 +26,14 @@ import { useAuthStore } from '../store/authStore';
 import { useMyProperties, useMyFavorites } from '../api/hooks';
 import { settingsAPI } from '../api/settings';
 import { subscriptionAPI } from '../api/subscription';
+import { kycAPI } from '../api/kyc';
 import type { UserSubscription } from '../types';
 import { getImageUrl, getAvatarPlaceholder, getImagePlaceholder } from '../utils/imageUtils';
 import Settings from '../components/Settings';
 import ActivityTab from '../components/ActivityTab';
 import BankAccountManagementPage from './BankAccountManagementPage';
 import TransactionHistoryPage from './TransactionHistoryPage';
-import { toast } from 'react-toastify';
+import toast from '../utils/toast';
 import AccountDisabledBanner from '../components/AccountDisabledBanner';
 
 const ProfilePage: React.FC = () => {
@@ -41,6 +42,8 @@ const ProfilePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [userProfile, setUserProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [kycVerified, setKycVerified] = useState(false);
+  const [kycStatus, setKycStatus] = useState<string>('NOT_SUBMITTED');
 
   // API Hooks
   const { data: myPropertiesData } = useMyProperties(0, 10);
@@ -78,6 +81,18 @@ const ProfilePage: React.FC = () => {
       setLoading(false);
     }
   }, [user]);
+
+  // Load KYC status
+  useEffect(() => {
+    if (user?.id) {
+      kycAPI.getStatus(String(user.id)).then(data => {
+        if ('id' in data) {
+          setKycStatus(data.status);
+          setKycVerified(data.status === 'VERIFIED');
+        }
+      }).catch(() => {});
+    }
+  }, [user?.id]);
 
 
   const tabs = [
@@ -170,7 +185,18 @@ const ProfilePage: React.FC = () => {
               </button>
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">{userProfile?.fullName || t('profile.user')}</h2>
+              <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                {userProfile?.fullName || t('profile.user')}
+                {kycVerified ? (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-semibold" title="Đã xác minh CCCD">
+                    <CheckCircle2 className="w-3 h-3" /> Đã xác minh
+                  </span>
+                ) : (
+                  <Link to="/kyc-verify" className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-xs font-semibold hover:bg-amber-200 transition-colors" title="Chưa xác minh — Nhấn để xác minh">
+                    <Shield className="w-3 h-3" /> Chưa xác minh
+                  </Link>
+                )}
+              </h2>
               <div className="flex items-center text-gray-600 mt-1">
                 <Award className="w-4 h-4 mr-1" />
                 <span>{t('profile.memberSince')} {new Date(userProfile?.createdAt || Date.now()).getFullYear()}</span>
@@ -217,7 +243,7 @@ const ProfilePage: React.FC = () => {
 
           <div>
             <h3 className="font-semibold text-gray-900 mb-3">{t('profile.activityStatistics')}</h3>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               <div className="bg-gray-50 rounded-lg p-3 text-center">
                 <div className="text-2xl font-bold text-red-600">{myProperties.length}</div>
                 <div className="text-sm text-gray-600">{t('myProperties.total')}</div>
@@ -226,17 +252,52 @@ const ProfilePage: React.FC = () => {
                 <div className="text-2xl font-bold text-blue-600">{favorites.length}</div>
                 <div className="text-sm text-gray-600">{t('profile.savedListings')}</div>
               </div>
-              <div className="bg-gray-50 rounded-lg p-3 text-center">
-                <div className="text-2xl font-bold text-green-600">156</div>
-                <div className="text-sm text-gray-600">{t('profile.views')}</div>
-              </div>
-              <div className="bg-gray-50 rounded-lg p-3 text-center">
-                <div className="text-2xl font-bold text-purple-600">12</div>
-                <div className="text-sm text-gray-600">{t('profile.contacts')}</div>
-              </div>
+              <button
+                onClick={() => navigate('/landlord-analytics')}
+                className="bg-red-50 border border-red-100 rounded-lg p-3 text-center hover:bg-red-100 transition-colors cursor-pointer group flex flex-col items-center justify-center col-span-2 md:col-span-1"
+              >
+                <TrendingUp className="w-6 h-6 mb-1 text-red-600 group-hover:scale-110 transition-transform" />
+                <div className="text-sm font-semibold text-red-800">Thống kê BĐS</div>
+              </button>
             </div>
           </div>
         </div>
+      </div>
+
+      {/* KYC Verification Card */}
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+          <Shield className="w-4 h-4 text-blue-600" />
+          Xác minh danh tính (KYC)
+        </h3>
+        {kycVerified ? (
+          <div className="flex items-center gap-2 text-sm text-emerald-700 bg-emerald-50 rounded-lg px-3 py-2">
+            <CheckCircle2 className="w-4 h-4" />
+            <span>Tài khoản đã xác minh CCCD — Hiển thị badge uy tín trên trang cá nhân và hợp đồng</span>
+          </div>
+        ) : kycStatus === 'PENDING' ? (
+          <div className="flex items-center gap-2 text-sm text-amber-700 bg-amber-50 rounded-lg px-3 py-2">
+            <Clock className="w-4 h-4" />
+            <span>Đang chờ xác minh</span>
+          </div>
+        ) : kycStatus === 'REJECTED' ? (
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm text-red-700 bg-red-50 rounded-lg px-3 py-2">
+              <XCircle className="w-4 h-4" />
+              <span>Xác minh bị từ chối — vui lòng thử lại</span>
+            </div>
+            <Link to="/kyc-verify" className="block text-center px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
+              Xác minh lại
+            </Link>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-gray-600">Xác minh CCCD để tăng uy tín và mở khoá giao dịch hợp đồng.</p>
+            <Link to="/kyc-verify" className="shrink-0 ml-4 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
+              Xác minh ngay
+            </Link>
+          </div>
+        )}
       </div>
 
       {/* Recent Activity */}

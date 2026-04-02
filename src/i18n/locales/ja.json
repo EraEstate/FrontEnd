@@ -1588,5 +1588,23 @@
     "linkLegal": "法務センター",
     "linkSecurity": "セキュリティセンター",
     "linkExplorer": "ブロックチェーンエクスプローラーを開く"
+  },
+  "chatBox": {
+    "sendMessage": "メッセージ",
+    "customer": "顧客",
+    "owner": "オーナー",
+    "customerShort": "客",
+    "ownerShort": "主",
+    "active": "オンライン",
+    "maximize": "最大化",
+    "minimize": "最小化",
+    "close": "閉じる",
+    "noMessagesOwner": "メッセージはまだありません",
+    "waitFirstMessage": "顧客からの最初のメッセージを待っています",
+    "startConversation": "会話を始める",
+    "sendToOwner": "この物件についてオーナーにメッセージを送信",
+    "inputPlaceholder": "メッセージを入力...",
+    "connecting": "接続中...",
+    "sending": "送信中..."
   }
 }

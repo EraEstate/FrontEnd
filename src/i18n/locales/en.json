@@ -1657,5 +1657,23 @@
     "linkLegal": "Legal center",
     "linkSecurity": "Security center",
     "linkExplorer": "Open blockchain explorer"
+  },
+  "chatBox": {
+    "sendMessage": "Message",
+    "customer": "Customer",
+    "owner": "Owner",
+    "customerShort": "Cus",
+    "ownerShort": "Own",
+    "active": "Active now",
+    "maximize": "Maximize",
+    "minimize": "Minimize",
+    "close": "Close",
+    "noMessagesOwner": "No messages yet",
+    "waitFirstMessage": "Waiting for the first message from customer",
+    "startConversation": "Start a conversation",
+    "sendToOwner": "Send a message to the owner about this property",
+    "inputPlaceholder": "Type a message...",
+    "connecting": "Connecting...",
+    "sending": "Sending..."
   }
 }
