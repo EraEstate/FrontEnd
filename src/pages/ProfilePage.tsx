@@ -252,13 +252,13 @@ const ProfilePage: React.FC = () => {
                 <div className="text-2xl font-bold text-blue-600">{favorites.length}</div>
                 <div className="text-sm text-gray-600">{t('profile.savedListings')}</div>
               </div>
-              <button
-                onClick={() => navigate('/landlord-analytics')}
+              <Link
+                to="/landlord-analytics"
                 className="bg-red-50 border border-red-100 rounded-lg p-3 text-center hover:bg-red-100 transition-colors cursor-pointer group flex flex-col items-center justify-center col-span-2 md:col-span-1"
               >
                 <TrendingUp className="w-6 h-6 mb-1 text-red-600 group-hover:scale-110 transition-transform" />
                 <div className="text-sm font-semibold text-red-800">Thống kê BĐS</div>
-              </button>
+              </Link>
             </div>
           </div>
         </div>

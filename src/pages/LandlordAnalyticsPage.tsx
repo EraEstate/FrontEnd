@@ -6,7 +6,7 @@ import {
 import { 
   TrendingUp, Eye, Heart, MessageSquare, AlertCircle, Loader2, ArrowLeft 
 } from 'lucide-react';
-import { analyticsAPI, LandlordAnalyticsResponse } from '../api/analytics';
+import { analyticsAPI, type LandlordAnalyticsResponse } from '../api/analytics';
 import { useNavigate } from 'react-router-dom';
 
 const LandlordAnalyticsPage: React.FC = () => {

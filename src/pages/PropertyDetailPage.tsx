@@ -45,6 +45,8 @@ import PriceHistoryChart from '../components/PriceHistoryChart';
 import PropertyReviewSection from '../components/PropertyReviewSection';
 import PriceAlertButton from '../components/PriceAlertButton';
 import VRTour from '../components/vr-tour';
+import MortgageCalculator from '../components/MortgageCalculator';
+import PoiMap from '../components/PoiMap';
 import type { Conversation } from '../api/chat';
 import toast from '../utils/toast';
 import { showSuccess, showWarning, showError } from '../utils/toast';
@@ -92,6 +94,38 @@ const PropertyDetailPage: React.FC = () => {
     }
     return () => { alive = false; };
   }, [id]);
+
+  // Owner chat registration — must stay above loading/error returns (Rules of Hooks).
+  useEffect(() => {
+    if (!property) {
+      return () => {
+        unregisterOwnerChat();
+      };
+    }
+    const ownerForChat = property.owner || property.user;
+    const ownerDisplayName: string =
+      property.owner?.fullName || property.owner?.username || t('propertyDetail.unknown');
+    const isOwnerUser = isAuthenticated && ownerForChat && user?.id === ownerForChat.id;
+    if (property.owner && !isOwnerUser) {
+      registerOwnerChat({
+        propertyId: property.id,
+        propertyOwnerId: property.owner.id,
+        propertyOwnerName: ownerDisplayName,
+        conversationId: selectedConversation?.id,
+      });
+    }
+    return () => {
+      unregisterOwnerChat();
+    };
+  }, [
+    property,
+    isAuthenticated,
+    user,
+    selectedConversation?.id,
+    registerOwnerChat,
+    unregisterOwnerChat,
+    t,
+  ]);
 
   // Toggle favorite
   const handleToggleFavorite = async () => {
@@ -195,23 +229,6 @@ const PropertyDetailPage: React.FC = () => {
   const ownerPhone = owner?.phone || property.owner?.phone || '';
   const ownerEmail = owner?.email || property.owner?.email || '';
 
-  // Register owner chat with UI Store when property loads
-  useEffect(() => {
-    const isOwner = isAuthenticated && owner && user?.id === owner.id;
-    if (property?.owner && !isOwner) {
-      registerOwnerChat({
-        propertyId: property.id,
-        propertyOwnerId: property.owner.id,
-        propertyOwnerName: ownerName,
-        conversationId: selectedConversation?.id
-      });
-    }
-    
-    return () => {
-      unregisterOwnerChat();
-    };
-  }, [property, isAuthenticated, user, owner, ownerName, selectedConversation, registerOwnerChat, unregisterOwnerChat]);
-  
   // Format phone number for Zalo (remove spaces, dashes, and ensure it starts with 0 or country code)
   const formatPhoneForZalo = (phone: string): string => {
     if (!phone) return '';
@@ -562,19 +579,30 @@ const PropertyDetailPage: React.FC = () => {
             {/* Price History Chart */}
             <PriceHistoryChart propertyId={id || ''} currentPrice={property.price} />
 
+            {/* Mortgage Calculator */}
+            <MortgageCalculator propertyPrice={Number(property.price)} isRent={isRentListing} />
+
             {/* Reviews Section */}
             <PropertyReviewSection propertyId={property.id} />
 
-            {/* Map */}
-            <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">{t('propertyDetail.location')}</h2>
-              <div className="aspect-[16/9] bg-gray-200 rounded-lg flex items-center justify-center">
-                <div className="text-center">
-                  <Navigation className="h-12 w-12 text-gray-400 mx-auto mb-2" />
-                  <p className="text-gray-500">{t('propertyDetail.mapPlaceholder')}</p>
+            {/* Map & POI */}
+            {property.location?.latitude && property.location?.longitude ? (
+              <PoiMap
+                lat={property.location.latitude}
+                lng={property.location.longitude}
+                address={fullAddress}
+              />
+            ) : (
+              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">{t('propertyDetail.location')}</h2>
+                <div className="aspect-[16/9] bg-gray-200 rounded-lg flex items-center justify-center">
+                  <div className="text-center">
+                    <Navigation className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+                    <p className="text-gray-500">{t('propertyDetail.mapPlaceholder')}</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Bất động sản tương tự */}
             {(similarLoading || similarProperties.length > 0) && (

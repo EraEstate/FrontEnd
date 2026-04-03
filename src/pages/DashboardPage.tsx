@@ -1,4 +1,5 @@
 import React from 'react';
+import PersonalizedRecommendations from '../components/PersonalizedRecommendations';
 import { useTranslation } from 'react-i18next';
 import {
   BarChart3,
@@ -245,6 +246,11 @@ const DashboardPage: React.FC = () => {
               <span className="text-sm font-medium text-gray-900">Thanh toán</span>
             </a>
           </div>
+        </div>
+
+        {/* Personalized Recommendations */}
+        <div className="mt-8">
+          <PersonalizedRecommendations />
         </div>
       </div>
     </div>

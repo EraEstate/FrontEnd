@@ -46,42 +46,58 @@ const PropertyComparisonPage: React.FC = () => {
   const generateChartData = () => {
     if (properties.length === 0) return [];
     
-    // Find max values to normalize to 100
+    // Collect all values for normalization
     const maxPrice = Math.max(...properties.map(p => p.price || 0));
     const maxArea = Math.max(...properties.map(p => p.area || 0));
     const maxBed = Math.max(...properties.map(p => p.bedrooms || p.propertyDetails?.[0]?.bedrooms || 0));
     const maxBath = Math.max(...properties.map(p => p.bathrooms || p.propertyDetails?.[0]?.bathrooms || 0));
+    const maxPricePerSqm = Math.max(...properties.map(p => (p.price && p.area) ? p.price / p.area : 0));
+
+    // Count amenities per property
+    const countAmenities = (p: any) => {
+      const d = p.propertyDetails?.[0] || {};
+      let count = 0;
+      if (d.parking) count++;
+      if (d.security) count++;
+      if (d.airConditioning) count++;
+      if (d.balcony) count++;
+      if (d.garden) count++;
+      if (d.elevator) count++;
+      if (d.swimmingPool) count++;
+      return count;
+    };
+    const maxAmenities = Math.max(...properties.map(p => countAmenities(p)), 1);
 
     const metrics = [
       { key: 'price', label: 'Giá trị' },
       { key: 'area', label: 'Diện tích' },
       { key: 'bedrooms', label: 'Phòng ngủ' },
-      { key: 'bathrooms', label: 'Phòng tắm' }
+      { key: 'bathrooms', label: 'Phòng tắm' },
+      { key: 'pricePerSqm', label: 'Đơn giá/m²' },
+      { key: 'amenities', label: 'Tiện ích' },
     ];
 
     return metrics.map(metric => {
       const dataPoint: any = { subject: metric.label };
       properties.forEach((p, index) => {
-        let value = 0;
         let normalized = 0;
         if (metric.key === 'price') {
-          value = p.price || 0;
-          normalized = maxPrice ? (value / maxPrice) * 100 : 0;
-          // For price, lower might be better, but we just show relative scale
-          dataPoint[`BDS ${index + 1}`] = normalized;
+          normalized = maxPrice ? ((p.price || 0) / maxPrice) * 100 : 0;
         } else if (metric.key === 'area') {
-          value = p.area || 0;
-          normalized = maxArea ? (value / maxArea) * 100 : 0;
-          dataPoint[`BDS ${index + 1}`] = normalized;
+          normalized = maxArea ? ((p.area || 0) / maxArea) * 100 : 0;
         } else if (metric.key === 'bedrooms') {
-          value = p.bedrooms || p.propertyDetails?.[0]?.bedrooms || 0;
-          normalized = maxBed ? (value / maxBed) * 100 : 0;
-          dataPoint[`BDS ${index + 1}`] = normalized;
+          const val = p.bedrooms || p.propertyDetails?.[0]?.bedrooms || 0;
+          normalized = maxBed ? (val / maxBed) * 100 : 0;
         } else if (metric.key === 'bathrooms') {
-          value = p.bathrooms || p.propertyDetails?.[0]?.bathrooms || 0;
-          normalized = maxBath ? (value / maxBath) * 100 : 0;
-          dataPoint[`BDS ${index + 1}`] = normalized;
+          const val = p.bathrooms || p.propertyDetails?.[0]?.bathrooms || 0;
+          normalized = maxBath ? (val / maxBath) * 100 : 0;
+        } else if (metric.key === 'pricePerSqm') {
+          const val = (p.price && p.area) ? p.price / p.area : 0;
+          normalized = maxPricePerSqm ? (val / maxPricePerSqm) * 100 : 0;
+        } else if (metric.key === 'amenities') {
+          normalized = (countAmenities(p) / maxAmenities) * 100;
         }
+        dataPoint[`BDS ${index + 1}`] = Math.round(normalized);
       });
       return dataPoint;
     });
