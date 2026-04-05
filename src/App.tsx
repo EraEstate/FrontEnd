@@ -67,6 +67,7 @@ import EscrowDashboard from './pages/EscrowDashboard';
 import KycVerificationPage from './pages/KycVerificationPage';
 import LandlordAnalyticsPage from './pages/LandlordAnalyticsPage';
 import ValuationPage from './pages/ValuationPage';
+import MyViewingsPage from './pages/MyViewingsPage';
 
 function AppContent() {
   const location = useLocation();
@@ -151,6 +152,7 @@ function AppContent() {
           <Route path="/escrow" element={<ProtectedRoute><EscrowDashboard /></ProtectedRoute>} />
           <Route path="/kyc-verify" element={<ProtectedRoute><KycVerificationPage /></ProtectedRoute>} />
           <Route path="/inquiries" element={<ProtectedRoute><InquiryPage /></ProtectedRoute>} />
+          <Route path="/my-viewings" element={<ProtectedRoute><MyViewingsPage /></ProtectedRoute>} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/valuation" element={<ValuationPage />} />
           <Route path="/legal" element={<LegalCenterPage />} />

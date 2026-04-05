@@ -6,6 +6,7 @@ import {
   ChevronDown,
   Wallet,
   Receipt,
+  CalendarCheck,
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -505,6 +506,14 @@ export const Header: React.FC = () => {
                         {t('header.myProperties')}
                       </Link>
                       <Link
+                        to="/my-viewings"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                        onClick={() => setIsUserMenuOpen(false)}
+                      >
+                        <CalendarCheck className="w-4 h-4 opacity-70" />
+                        Lịch xem nhà
+                      </Link>
+                      <Link
                         to="/settings"
                         className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
                         onClick={() => setIsUserMenuOpen(false)}
@@ -718,6 +727,14 @@ export const Header: React.FC = () => {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {t('header.settings')}
+                </Link>
+                <Link
+                  to="/my-viewings"
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <CalendarCheck className="w-4 h-4 opacity-70" />
+                  Lịch xem nhà
                 </Link>
                 <Link
                   to="/help/wallet"

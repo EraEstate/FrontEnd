@@ -47,6 +47,7 @@ import PriceAlertButton from '../components/PriceAlertButton';
 import VRTour from '../components/vr-tour';
 import MortgageCalculator from '../components/MortgageCalculator';
 import PoiMap from '../components/PoiMap';
+import ViewingScheduler from '../components/ViewingScheduler';
 import type { Conversation } from '../api/chat';
 import toast from '../utils/toast';
 import { showSuccess, showWarning, showError } from '../utils/toast';
@@ -806,6 +807,15 @@ const PropertyDetailPage: React.FC = () => {
                   </div>
                 </div>
               </div>
+            )}
+
+            {/* Viewing Scheduler */}
+            {owner && (
+              <ViewingScheduler
+                propertyId={property.id}
+                ownerId={owner.id}
+                isOwner={!!isOwner}
+              />
             )}
 
             {/* Quick Stats */}

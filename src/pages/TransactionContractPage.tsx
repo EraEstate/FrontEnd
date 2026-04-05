@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -13,6 +13,11 @@ import {
   Link as LinkIcon,
   CreditCard,
   Info,
+  PenTool,
+  FileText,
+  Download,
+  Hash,
+  Eye,
 } from 'lucide-react';
 import { propertyTransactionAPI, type PropertyTransaction } from '../api/propertyTransaction';
 import { propertyAPI } from '../api/property';
@@ -20,12 +25,14 @@ import { useAuthStore } from '../store/authStore';
 import toast from '../utils/toast';
 import { connectMetaMask, depositToEscrow } from '../utils/metamask';
 import { escrowAPI } from '../api/escrow';
-import { kycAPI } from '../api/kyc';
+import { kycAPI, type KycVerification } from '../api/kyc';
 import { REALESTATE_CONTRACT_ADDRESS, BLOCKCHAIN_EXPLORER_URL, BLOCKCHAIN_NETWORK_NAME } from '../config/blockchain';
 import { createVnpayPaymentUrl } from '../config/vnpay';
 import RealEstateEscrowAbi from '../abi/RealEstateEscrow.json';
 import { useTranslation } from 'react-i18next';
 import { TransactionStepper } from '../components/TransactionStepper';
+import SignatureCanvas from '../components/SignatureCanvas';
+import { generateContractPdf, computeContractHash } from '../utils/contractPdf';
 
 const TransactionContractPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -43,6 +50,16 @@ const TransactionContractPage: React.FC = () => {
   const [signConsent, setSignConsent] = useState(false);
   const [privacyMaskContact, setPrivacyMaskContact] = useState(false);
   const [privacyHideRealName, setPrivacyHideRealName] = useState(false);
+
+  // === E-Signature States ===
+  const [buyerSignature, setBuyerSignature] = useState<string | null>(null);
+  const [sellerSignature, setSellerSignature] = useState<string | null>(null);
+  const [buyerKyc, setBuyerKyc] = useState<KycVerification | null>(null);
+  const [sellerKyc, setSellerKyc] = useState<KycVerification | null>(null);
+  const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
+  const [contractHash, setContractHash] = useState<string | null>(null);
+  const [generatingPdf, setGeneratingPdf] = useState(false);
+  const [savingHash, setSavingHash] = useState(false);
 
   const fetchTransaction = async () => {
     if (!id) return;
@@ -94,6 +111,92 @@ const TransactionContractPage: React.FC = () => {
       setSearchParams({}, { replace: true });
     }
   }, [searchParams]);
+
+  // Fetch KYC data for both parties (for PDF generation)
+  useEffect(() => {
+    if (!transaction) return;
+    const fetchKyc = async (userId: string, setter: (v: KycVerification | null) => void) => {
+      try {
+        const status = await kycAPI.getStatus(userId);
+        if ('cccdNumber' in status) setter(status as KycVerification);
+      } catch { /* no KYC data */ }
+    };
+    if (transaction.buyerId) fetchKyc(transaction.buyerId, setBuyerKyc);
+    if (transaction.sellerId) fetchKyc(transaction.sellerId, setSellerKyc);
+  }, [transaction?.buyerId, transaction?.sellerId]);
+
+  // Set existing contract hash from transaction
+  useEffect(() => {
+    if (transaction?.contractHash) setContractHash(transaction.contractHash);
+  }, [transaction?.contractHash]);
+
+  // === E-Sign Handlers ===
+  const handleGeneratePdf = useCallback(async () => {
+    if (!transaction || !property) return;
+    setGeneratingPdf(true);
+    try {
+      const blob = await generateContractPdf({
+        transactionId: transaction.id,
+        propertyTitle: property?.title || transaction.property?.title || 'Bất động sản',
+        propertyAddress: property?.address,
+        propertyArea: property?.area,
+        totalAmount: transaction.totalAmount,
+        sellerAmount: transaction.sellerAmount,
+        taxAmount: transaction.taxAmount,
+        serviceFee: transaction.serviceFee,
+        paymentMethod: transaction.paymentMethod,
+        isRent: property?.transactionType === 'RENT',
+        contractDate: new Date(transaction.createdAt).toLocaleDateString('vi-VN'),
+        sellerName: transaction.seller?.fullName || property?.owner?.fullName || 'Bên A',
+        sellerEmail: transaction.seller?.email || property?.owner?.email,
+        sellerKyc: sellerKyc,
+        buyerName: transaction.buyer?.fullName || (user?.fullName || 'Bên B'),
+        buyerEmail: transaction.buyer?.email || user?.email,
+        buyerKyc: buyerKyc,
+        sellerSignature,
+        buyerSignature,
+        blockchainTxHash: transaction.blockchainTxHash,
+        blockchainNetwork: transaction.blockchainNetwork || BLOCKCHAIN_NETWORK_NAME,
+      });
+
+      const hash = await computeContractHash(blob);
+      setContractHash(hash);
+
+      const url = URL.createObjectURL(blob);
+      setPdfBlobUrl(url);
+
+      toast.success('Đã tạo PDF hợp đồng thành công!');
+    } catch (err: any) {
+      console.error('PDF generation error:', err);
+      toast.error('Không thể tạo PDF: ' + (err?.message || 'Lỗi không xác định'));
+    } finally {
+      setGeneratingPdf(false);
+    }
+  }, [transaction, property, sellerKyc, buyerKyc, sellerSignature, buyerSignature, user]);
+
+  const handleSaveContractHash = useCallback(async () => {
+    if (!transaction || !contractHash || !id) return;
+    setSavingHash(true);
+    try {
+      const isBuyerUser = user && String(transaction.buyerId) === String(user.id);
+      const role = isBuyerUser ? 'BUYER' : 'SELLER';
+      const updated = await propertyTransactionAPI.saveContractHash(id, { contractHash, signedByRole: role });
+      setTransaction(updated);
+      toast.success(`Chữ ký ${role === 'BUYER' ? 'Bên mua' : 'Bên bán'} đã được lưu trên hệ thống!`);
+    } catch (err: any) {
+      toast.error(err?.response?.data?.error || 'Không thể lưu chữ ký');
+    } finally {
+      setSavingHash(false);
+    }
+  }, [transaction, contractHash, id, user]);
+
+  const handleDownloadPdf = useCallback(() => {
+    if (!pdfBlobUrl || !transaction) return;
+    const a = document.createElement('a');
+    a.href = pdfBlobUrl;
+    a.download = `HopDong_${transaction.id.slice(0, 8)}.pdf`;
+    a.click();
+  }, [pdfBlobUrl, transaction]);
 
   const formatPrice = (price: number | undefined) => {
     if (!price && price !== 0) return '-';
@@ -1280,16 +1383,169 @@ const TransactionContractPage: React.FC = () => {
                   <div className="text-center">
                     <p className="font-semibold text-gray-900">{t('transaction.contract.partyALabel')}</p>
                     <p className="text-gray-600 text-xs">({t('transaction.seller').split(' - ')[1]})</p>
-                    <p className="mt-10 text-gray-500 text-xs italic">{t('transaction.contract.partyASign')}</p>
+                    {transaction.sellerSigned ? (
+                      <div className="mt-3 flex flex-col items-center gap-1">
+                        <span className="inline-flex items-center gap-1 text-xs text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full font-medium">
+                          <CheckCircle className="w-3.5 h-3.5" /> Đã ký điện tử
+                        </span>
+                      </div>
+                    ) : (
+                      <p className="mt-10 text-gray-500 text-xs italic">{t('transaction.contract.partyASign')}</p>
+                    )}
                   </div>
                   <div className="text-center">
                     <p className="font-semibold text-gray-900">{t('transaction.contract.partyBLabel')}</p>
                     <p className="text-gray-600 text-xs">({t('transaction.buyer').split(' - ')[1]})</p>
-                    <p className="mt-10 text-gray-500 text-xs italic">{t('transaction.contract.partyASign')}</p>
+                    {transaction.buyerSigned ? (
+                      <div className="mt-3 flex flex-col items-center gap-1">
+                        <span className="inline-flex items-center gap-1 text-xs text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full font-medium">
+                          <CheckCircle className="w-3.5 h-3.5" /> Đã ký điện tử
+                        </span>
+                      </div>
+                    ) : (
+                      <p className="mt-10 text-gray-500 text-xs italic">{t('transaction.contract.partyASign')}</p>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
+
+            {/* === E-SIGNATURE SECTION === */}
+            {isParticipant && (
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                    <PenTool className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Ký hợp đồng điện tử</h3>
+                    <p className="text-xs text-gray-500">Ký tên bằng chuột hoặc màn hình cảm ứng</p>
+                  </div>
+                  {transaction.buyerSigned && transaction.sellerSigned && (
+                    <span className="ml-auto inline-flex items-center gap-1 text-xs text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-full font-medium border border-emerald-200">
+                      <CheckCircle className="w-4 h-4" /> Cả hai bên đã ký
+                    </span>
+                  )}
+                </div>
+
+                {/* Signature pads */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <SignatureCanvas
+                      label={`Bên A (${sellerName})`}
+                      onSignatureChange={setSellerSignature}
+                      disabled={!isSeller || !!transaction.sellerSigned}
+                      existingSignature={null}
+                      height={140}
+                    />
+                    {!isSeller && (
+                      <p className="text-[10px] text-gray-400 mt-1 text-center">
+                        {transaction.sellerSigned ? '✅ Bên bán đã ký' : '⏳ Chờ bên bán ký'}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <SignatureCanvas
+                      label={`Bên B (${buyerName})`}
+                      onSignatureChange={setBuyerSignature}
+                      disabled={!isBuyer || !!transaction.buyerSigned}
+                      existingSignature={null}
+                      height={140}
+                    />
+                    {!isBuyer && (
+                      <p className="text-[10px] text-gray-400 mt-1 text-center">
+                        {transaction.buyerSigned ? '✅ Bên mua đã ký' : '⏳ Chờ bên mua ký'}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Action buttons */}
+                <div className="flex flex-wrap items-center gap-2 mb-4">
+                  <button
+                    type="button"
+                    onClick={handleGeneratePdf}
+                    disabled={generatingPdf || (isBuyer && !buyerSignature) || (isSeller && !sellerSignature)}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-medium hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
+                  >
+                    {generatingPdf ? (
+                      <><Loader2 className="w-4 h-4 animate-spin" /> Đang tạo PDF...</>
+                    ) : (
+                      <><FileText className="w-4 h-4" /> Xem trước & Tạo PDF</>
+                    )}
+                  </button>
+
+                  {pdfBlobUrl && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={handleDownloadPdf}
+                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-gray-300 text-gray-700 text-sm font-medium hover:bg-gray-50 transition-colors"
+                      >
+                        <Download className="w-4 h-4" /> Tải PDF
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => window.open(pdfBlobUrl, '_blank')}
+                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-gray-300 text-gray-700 text-sm font-medium hover:bg-gray-50 transition-colors"
+                      >
+                        <Eye className="w-4 h-4" /> Xem PDF
+                      </button>
+                    </>
+                  )}
+                </div>
+
+                {/* Contract Hash Display */}
+                {contractHash && (
+                  <div className="bg-gray-50 rounded-lg border border-gray-200 p-3 mb-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Hash className="w-4 h-4 text-indigo-500" />
+                      <span className="text-xs font-semibold text-gray-700">SHA-256 Hash hợp đồng</span>
+                    </div>
+                    <p className="font-mono text-[10px] text-gray-600 break-all select-all">{contractHash}</p>
+                    <p className="text-[10px] text-gray-400 mt-1">
+                      Mã hash này đảm bảo tính toàn vẹn — bất kỳ thay đổi nào trên PDF sẽ tạo ra hash khác.
+                    </p>
+                  </div>
+                )}
+
+                {/* Save signature button */}
+                {contractHash && (
+                  <button
+                    type="button"
+                    onClick={handleSaveContractHash}
+                    disabled={savingHash || (isBuyer && !!transaction.buyerSigned) || (isSeller && !!transaction.sellerSigned)}
+                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-gradient-to-r from-emerald-600 to-green-600 text-white text-sm font-semibold hover:from-emerald-700 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
+                  >
+                    {savingHash ? (
+                      <><Loader2 className="w-4 h-4 animate-spin" /> Đang lưu chữ ký...</>
+                    ) : (isBuyer && transaction.buyerSigned) || (isSeller && transaction.sellerSigned) ? (
+                      <><CheckCircle className="w-4 h-4" /> Bạn đã ký hợp đồng này</>
+                    ) : (
+                      <><Shield className="w-4 h-4" /> Xác nhận ký & Lưu Hash hợp đồng</>
+                    )}
+                  </button>
+                )}
+
+                {/* Both signed success message */}
+                {transaction.buyerSigned && transaction.sellerSigned && transaction.contractSignedAt && (
+                  <div className="mt-4 bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-lg p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <CheckCircle className="w-5 h-5 text-emerald-600" />
+                      <span className="font-semibold text-emerald-800">Hợp đồng đã được ký bởi cả hai bên</span>
+                    </div>
+                    <p className="text-xs text-emerald-700">
+                      Thời điểm ký: {new Date(transaction.contractSignedAt).toLocaleString('vi-VN')}
+                    </p>
+                    {transaction.contractHash && (
+                      <p className="text-xs text-emerald-600 mt-1 font-mono break-all">
+                        Hash: {transaction.contractHash.slice(0, 16)}...{transaction.contractHash.slice(-16)}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

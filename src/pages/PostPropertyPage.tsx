@@ -20,16 +20,27 @@ import {
   Wind,
   AlertCircle,
   CheckCircle,
-  Upload
+  Upload,
+  Wand2,
+  Sparkles,
+  Eye,
+  Loader2,
+  RotateCcw,
+  Copy,
+  Check,
+  FileText,
+  Pencil
 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useProvinces, useDistricts, useWards } from '../api/hooks';
 import { propertyAPI } from '../api';
 import { uploadAPI } from '../api/upload';
+import toast from '../utils/toast';
 import type { Province, District, Ward } from '../types';
 import AddressAutocomplete from '../components/AddressAutocomplete';
 import type { AddressDetails } from '../components/AddressAutocomplete';
 import { subscriptionAPI } from '../api/subscription';
+import { aiListingAPI } from '../api/aiListing';
 import type { UserSubscription } from '../types';
 
 interface PropertyForm {
@@ -57,7 +68,6 @@ const TitleInput = memo<{
   value: string;
   onChange: (value: string) => void;
 }>(({ value, onChange }) => {
-  console.log('TitleInput render');
   return (
     <input
       id="title"
@@ -79,6 +89,16 @@ const PostPropertyPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [subscription, setSubscription] = useState<UserSubscription | null>(null);
   const [quotaExceeded, setQuotaExceeded] = useState(false);
+
+  // === AI Listing Content States ===
+  const [aiEnabled, setAiEnabled] = useState(true);
+  const [aiGenerating, setAiGenerating] = useState(false);
+  const [aiPreviewOpen, setAiPreviewOpen] = useState(false);
+  const [aiTitle, setAiTitle] = useState('');
+  const [aiDescription, setAiDescription] = useState('');
+  const [aiKeywords, setAiKeywords] = useState<string[]>([]);
+  const [aiRawNotes, setAiRawNotes] = useState('');
+  const [aiError, setAiError] = useState('');
 
   React.useEffect(() => {
     if (user) {
@@ -154,7 +174,62 @@ const PostPropertyPage: React.FC = () => {
     { id: 5, title: t('postProperty.previewAndPost'), description: t('postProperty.reviewAndComplete') },
   ];
 
+  // === AI Generate Handler ===
+  const handleAIGenerate = useCallback(async () => {
+    setAiGenerating(true);
+    setAiError('');
+    try {
+      // Lấy tên tỉnh/quận/phường từ ID
+      const provinceName = provinces?.find((p: Province) => p.id.toString() === formData.provinceId)?.name || '';
+      const districtName = districts?.find((d: District) => d.id.toString() === formData.districtId)?.name || '';
+      const wardName = wards?.find((w: Ward) => w.id.toString() === formData.wardId)?.name || '';
 
+      const result = await aiListingAPI.generate({
+        propertyType: formData.propertyType,
+        transactionType: formData.transactionType,
+        area: formData.area,
+        price: formData.price,
+        address: formData.address,
+        provinceName,
+        districtName,
+        wardName,
+        bedrooms: formData.bedrooms,
+        bathrooms: formData.bathrooms,
+        floors: formData.floors,
+        yearBuilt: formData.yearBuilt,
+        furnishing: formData.furnishing,
+        features: formData.features,
+        rawNotes: aiRawNotes,
+        currentTitle: formData.title || undefined,
+        currentDescription: formData.description || undefined,
+      });
+
+      if (result.status === 'success') {
+        setAiTitle(result.title || '');
+        setAiDescription(result.description || '');
+        setAiKeywords(result.seoKeywords || []);
+        setAiPreviewOpen(true);
+      } else {
+        setAiError('Không thể tạo nội dung. Vui lòng thử lại.');
+      }
+    } catch (err: any) {
+      const errMsg = err?.response?.data?.error || 'Có lỗi xảy ra khi tạo nội dung AI.';
+      setAiError(errMsg);
+      toast.error(errMsg);
+    } finally {
+      setAiGenerating(false);
+    }
+  }, [formData, provinces, districts, wards, aiRawNotes]);
+
+  // Apply AI content to form
+  const handleApplyAIContent = useCallback(() => {
+    setFormData(prev => ({
+      ...prev,
+      title: aiTitle,
+      description: aiDescription,
+    }));
+    setAiPreviewOpen(false);
+  }, [aiTitle, aiDescription]);
 
   const handleInputChange = useCallback((field: keyof PropertyForm, value: string | string[] | File[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -274,9 +349,9 @@ const PostPropertyPage: React.FC = () => {
       case 1:
         return !!(formData.propertyType && formData.transactionType);
       case 2:
-        return !!(formData.title && formData.price && formData.area && formData.provinceId && formData.districtId);
+        return !!(formData.price && formData.area && formData.provinceId && formData.districtId);
       case 3:
-        return !!formData.description;
+        return !!(formData.title && formData.description);
       case 4:
         return formData.images.length >= 1;
       default:
@@ -302,12 +377,12 @@ const PostPropertyPage: React.FC = () => {
 
     // Validation
     if (!formData.provinceId || !formData.districtId || !formData.wardId) {
-      alert('Vui lòng chọn đầy đủ Tỉnh/Thành phố, Quận/Huyện và Phường/Xã');
+      toast.error('Vui lòng chọn đầy đủ Tỉnh/Thành phố, Quận/Huyện và Phường/Xã');
       return;
     }
 
     if (!formData.transactionType) {
-      alert('Vui lòng chọn hình thức giao dịch (Bán hoặc Cho thuê)');
+      toast.error('Vui lòng chọn hình thức giao dịch (Bán hoặc Cho thuê)');
       return;
     }
 
@@ -323,7 +398,7 @@ const PostPropertyPage: React.FC = () => {
           }
         } catch (error: any) {
           console.error('Error uploading images:', error);
-          alert('Lỗi khi upload ảnh: ' + (error.response?.data?.error || error.message));
+          toast.error('Lỗi khi upload ảnh: ' + (error.response?.data?.error || error.message));
           setLoading(false);
           return;
         }
@@ -350,10 +425,11 @@ const PostPropertyPage: React.FC = () => {
       await propertyAPI.create(propertyData);
       
       // Success
+      toast.success('Đăng tin thành công! 🎉');
       navigate('/profile?tab=properties');
     } catch (error) {
       console.error('Error posting property:', error);
-      alert(t('postProperty.postError'));
+      toast.error(t('postProperty.postError'));
     } finally {
       setLoading(false);
     }
@@ -502,16 +578,6 @@ const PostPropertyPage: React.FC = () => {
 
   const renderStep2 = () => (
     <div className="bg-white rounded-lg shadow-sm p-6 space-y-6">
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Tiêu đề tin đăng <span className="text-red-500">*</span>
-        </label>
-        <TitleInput
-          value={formData.title}
-          onChange={(value) => handleInputChange('title', value)}
-        />
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -690,68 +756,180 @@ const PostPropertyPage: React.FC = () => {
   );
 
   const renderStep3 = () => (
-    <div className="bg-white rounded-lg shadow-sm p-6 space-y-6">
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Mô tả chi tiết <span className="text-red-500">*</span>
-        </label>
-        <textarea
-          value={formData.description}
-          onChange={(e) => handleInputChange('description', e.target.value)}
-          rows={6}
-          placeholder="Mô tả chi tiết về bất động sản: vị trí, thiết kế, tiện ích xung quanh..."
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-        />
-        <p className="text-sm text-gray-500 mt-1">
-          {formData.description.length}/1000 ký tự
-        </p>
+    <div className="space-y-6">
+      {/* === AI Toggle Banner === */}
+      <div className="bg-gradient-to-r from-violet-50 via-purple-50 to-indigo-50 rounded-xl border border-purple-200 p-5">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-200">
+              <Sparkles className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-gray-900">Trợ lý AI viết nội dung</h3>
+              <p className="text-xs text-gray-500">AI sẽ biến ghi chú của bạn thành bài đăng chuyên nghiệp, chuẩn SEO</p>
+            </div>
+          </div>
+          <button
+            onClick={() => setAiEnabled(!aiEnabled)}
+            className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors duration-300 focus:outline-none ${
+              aiEnabled ? 'bg-purple-600' : 'bg-gray-300'
+            }`}
+            id="ai-toggle"
+          >
+            <span className={`inline-block h-5 w-5 rounded-full bg-white shadow-md transform transition-transform duration-300 ${
+              aiEnabled ? 'translate-x-6' : 'translate-x-1'
+            }`} />
+          </button>
+        </div>
+
+        {aiEnabled && (
+          <div className="space-y-4 mt-4">
+            {/* Raw Notes Input */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <FileText className="w-4 h-4 inline mr-1.5 text-purple-500" />
+                Ghi chú nhanh cho AI <span className="text-gray-400 font-normal">(tuỳ chọn)</span>
+              </label>
+              <textarea
+                value={aiRawNotes}
+                onChange={(e) => setAiRawNotes(e.target.value)}
+                rows={3}
+                placeholder={"VD: Nhà 50m2, 2 lầu, gần chợ Bà Chiểu, hẻm xe hơi 6m\nCó sân thượng, mới sơn sửa\nPhù hợp ở hoặc kinh doanh nhỏ..."}
+                className="w-full px-4 py-3 border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white placeholder-gray-400 text-sm"
+              />
+              <p className="text-xs text-gray-500 mt-1.5">
+                💡 Viết bất kỳ gạch đầu dòng, từ khóa, ưu điểm nào — AI sẽ tự chải chuốt thành bài viết hấp dẫn
+              </p>
+            </div>
+
+            {/* Generate Button */}
+            <button
+              onClick={handleAIGenerate}
+              disabled={aiGenerating || !formData.propertyType}
+              className="w-full flex items-center justify-center gap-2.5 px-6 py-3.5 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-xl hover:from-violet-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg shadow-purple-200 hover:shadow-xl hover:shadow-purple-300 font-medium"
+              id="ai-generate-btn"
+            >
+              {aiGenerating ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>AI đang sáng tạo nội dung...</span>
+                </>
+              ) : (
+                <>
+                  <Wand2 className="w-5 h-5" />
+                  <span>🪄 Tạo Tiêu đề & Mô tả bằng AI</span>
+                </>
+              )}
+            </button>
+
+            {!formData.propertyType && (
+              <p className="text-xs text-amber-600 flex items-center gap-1">
+                <AlertCircle className="w-3.5 h-3.5" />
+                Vui lòng chọn loại hình BĐS ở Bước 1 trước khi dùng AI
+              </p>
+            )}
+
+            {aiError && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700 flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <span>{aiError}</span>
+              </div>
+            )}
+
+            {/* Show badge when AI was already applied */}
+            {formData.title && formData.description && (
+              <div className="flex items-center gap-2 text-xs text-green-600 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                <CheckCircle className="w-4 h-4" />
+                <span>Nội dung AI đã được áp dụng. Bạn có thể chỉnh sửa bên dưới hoặc tạo lại.</span>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
-      {formData.propertyType && ['APARTMENT', 'HOUSE', 'VILLA'].includes(formData.propertyType) && (
+      {/* === Manual Title & Description Section === */}
+      <div className="bg-white rounded-lg shadow-sm p-6 space-y-6">
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Tiêu đề tin đăng <span className="text-red-500">*</span>
+            </label>
+            {formData.title && (
+              <span className="text-xs text-gray-400">{formData.title.length} ký tự</span>
+            )}
+          </div>
+          <input
+            id="title-step3"
+            type="text"
+            value={formData.title}
+            onChange={(e) => handleInputChange('title', e.target.value)}
+            placeholder="VD: Căn hộ cao cấp 2PN2WC view sông tại Vinhomes Central Park"
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Mô tả chi tiết <span className="text-red-500">*</span>
+          </label>
+          <textarea
+            value={formData.description}
+            onChange={(e) => handleInputChange('description', e.target.value)}
+            rows={8}
+            placeholder="Mô tả chi tiết về bất động sản: vị trí, thiết kế, tiện ích xung quanh..."
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+          />
+          <p className="text-sm text-gray-500 mt-1">
+            {formData.description.length}/2000 ký tự
+          </p>
+        </div>
+
+        {formData.propertyType && ['APARTMENT', 'HOUSE', 'VILLA'].includes(formData.propertyType) && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-4">
+              Tình trạng nội thất
+            </label>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {furnishingOptions.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => handleInputChange('furnishing', option.value)}
+                  className={`p-4 border-2 rounded-lg text-center transition-all ${
+                    formData.furnishing === option.value
+                      ? 'border-red-600 bg-red-50 text-red-700'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-4">
-            Tình trạng nội thất
+            Tiện ích và đặc điểm
           </label>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {furnishingOptions.map((option) => (
-              <button
-                key={option.value}
-                onClick={() => handleInputChange('furnishing', option.value)}
-                className={`p-4 border-2 rounded-lg text-center transition-all ${
-                  formData.furnishing === option.value
-                    ? 'border-red-600 bg-red-50 text-red-700'
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                {option.label}
-              </button>
-            ))}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {availableFeatures.map((feature) => {
+              const Icon = feature.icon;
+              return (
+                <button
+                  key={feature.id}
+                  onClick={() => handleFeatureToggle(feature.id)}
+                  className={`p-4 border-2 rounded-lg text-center transition-all ${
+                    formData.features.includes(feature.id)
+                      ? 'border-red-600 bg-red-50 text-red-700'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <Icon className="w-6 h-6 mx-auto mb-2" />
+                  <div className="text-sm font-medium">{feature.label}</div>
+                </button>
+              );
+            })}
           </div>
-        </div>
-      )}
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-4">
-          Tiện ích và đặc điểm
-        </label>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {availableFeatures.map((feature) => {
-            const Icon = feature.icon;
-            return (
-              <button
-                key={feature.id}
-                onClick={() => handleFeatureToggle(feature.id)}
-                className={`p-4 border-2 rounded-lg text-center transition-all ${
-                  formData.features.includes(feature.id)
-                    ? 'border-red-600 bg-red-50 text-red-700'
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                <Icon className="w-6 h-6 mx-auto mb-2" />
-                <div className="text-sm font-medium">{feature.label}</div>
-              </button>
-            );
-          })}
         </div>
       </div>
     </div>
@@ -867,7 +1045,7 @@ const PostPropertyPage: React.FC = () => {
             </div>
           )}
 
-          <p className="text-gray-700 mb-4">{formData.description}</p>
+          <p className="text-gray-700 mb-4 whitespace-pre-wrap leading-relaxed">{formData.description}</p>
 
           {formData.features.length > 0 && (
             <div className="flex flex-wrap gap-2">
@@ -906,6 +1084,110 @@ const PostPropertyPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* === AI Preview Modal === */}
+      {aiPreviewOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-violet-600 to-purple-600 px-6 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center">
+                  <Sparkles className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white">Nội dung AI đã tạo</h3>
+                  <p className="text-xs text-purple-200">Xem trước, chỉnh sửa rồi áp dụng vào tin đăng</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setAiPreviewOpen(false)}
+                className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors"
+              >
+                <X className="w-4 h-4 text-white" />
+              </button>
+            </div>
+
+            {/* Modal Body - Scrollable */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-5">
+              {/* AI Title */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
+                  <Pencil className="w-4 h-4 text-purple-500" />
+                  Tiêu đề
+                </label>
+                <input
+                  type="text"
+                  value={aiTitle}
+                  onChange={(e) => setAiTitle(e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-base font-medium"
+                />
+              </div>
+
+              {/* AI Description */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
+                  <FileText className="w-4 h-4 text-purple-500" />
+                  Mô tả chi tiết
+                </label>
+                <textarea
+                  value={aiDescription}
+                  onChange={(e) => setAiDescription(e.target.value)}
+                  rows={12}
+                  className="w-full px-4 py-3 border-2 border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm leading-relaxed"
+                />
+                <p className="text-xs text-gray-400 mt-1 text-right">{aiDescription.length} ký tự</p>
+              </div>
+
+              {/* SEO Keywords */}
+              {aiKeywords.length > 0 && (
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    🔍 Từ khóa SEO gợi ý
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {aiKeywords.map((kw, i) => (
+                      <span key={i} className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200">
+                        {kw}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="border-t border-gray-200 px-6 py-4 bg-gray-50 flex items-center justify-between">
+              <button
+                onClick={() => {
+                  setAiPreviewOpen(false);
+                  handleAIGenerate();
+                }}
+                disabled={aiGenerating}
+                className="flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-xl text-gray-700 hover:bg-white transition-colors text-sm font-medium"
+              >
+                <RotateCcw className="w-4 h-4" />
+                Tạo lại
+              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setAiPreviewOpen(false)}
+                  className="px-5 py-2.5 border border-gray-300 rounded-xl text-gray-600 hover:bg-white transition-colors text-sm"
+                >
+                  Huỷ
+                </button>
+                <button
+                  onClick={handleApplyAIContent}
+                  className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-xl hover:from-violet-700 hover:to-purple-700 transition-all shadow-lg shadow-purple-200 text-sm font-semibold"
+                >
+                  <Check className="w-4 h-4" />
+                  Áp dụng nội dung AI
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="container mx-auto px-4 py-8">
         
         <div className="max-w-4xl mx-auto">

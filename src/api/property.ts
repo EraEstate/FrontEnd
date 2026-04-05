@@ -218,6 +218,14 @@ export const propertyAPI = {
     return response.data;
   },
 
+  // Lấy tin đăng theo trạng thái — moderation history (STAFF/ADMIN)
+  getPropertiesByStatus: async (status: string, page = 0, size = 20) => {
+    const response = await api.get('/properties/by-status', {
+      params: { status, page, size }
+    });
+    return response.data;
+  },
+
   // ========== AI RECOMMENDATION ENDPOINTS ==========
 
   // Lấy danh sách gợi ý cho user hiện tại

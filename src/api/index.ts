@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { logger } from '../utils/logger';
-import { showWarning } from '../utils/toast';
+import { showWarning, showError } from '../utils/toast';
 
 // Determine API base URL from environment (Vercel/Vite) or fall back to local dev
 const API_BASE_URL =
@@ -205,6 +205,20 @@ api.interceptors.response.use(
       } finally {
         isRefreshing = false;
       }
+    }
+
+    // ============ Global error toasts (network, server) ============
+    if (!error.response) {
+      // Network error — server down, timeout, CORS
+      if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+        showError('Kết nối quá hạn. Vui lòng kiểm tra mạng và thử lại.');
+      } else if (error.message?.includes('Network Error')) {
+        showError('Không thể kết nối đến máy chủ. Vui lòng thử lại sau.');
+      }
+    } else if (error.response.status === 403) {
+      showError('Bạn không có quyền thực hiện thao tác này.');
+    } else if (error.response.status >= 500) {
+      showError('Hệ thống đang gặp sự cố. Vui lòng thử lại sau ít phút.');
     }
 
     return Promise.reject(error);

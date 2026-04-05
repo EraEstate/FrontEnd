@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { marketAnalysisAPI } from '../api/marketAnalysis';
 import type { MarketAnalysis } from '../api/types';
 import { useTranslation } from 'react-i18next';
+import toast from '../utils/toast';
 
 const MarketAnalysisDetailPage: React.FC = () => {
   const { t } = useTranslation();
@@ -66,7 +67,7 @@ const MarketAnalysisDetailPage: React.FC = () => {
         });
       } else {
         navigator.clipboard.writeText(window.location.href);
-        alert(t('common.linkCopied'));
+        toast.success(t('common.linkCopied'));
       }
     } catch (err) {
       console.error('Error incrementing share count:', err);

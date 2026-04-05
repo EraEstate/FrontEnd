@@ -28,6 +28,7 @@ import type { Property } from '../types';
 import { useTranslation } from 'react-i18next';
 import { getImageUrl, getImagePlaceholder } from '../utils/imageUtils';
 import { aiAgentAPI, type FullAnalysis } from '../api/aiAgent';
+import toast from '../utils/toast';
 
 const MyPropertiesPage = () => {
   const { t } = useTranslation();
@@ -95,7 +96,7 @@ const MyPropertiesPage = () => {
       setAnalysisData(data);
       setShowAnalysis(true);
     } catch {
-      alert('Không thể phân tích tin đăng. Vui lòng thử lại.');
+      toast.error('Không thể phân tích tin đăng. Vui lòng thử lại.');
     } finally {
       setAnalysisLoading(null);
     }

@@ -28,6 +28,11 @@ export interface PropertyTransaction {
   blockchainNetwork?: string;
   blockchainTxHash?: string;
   blockchainStatus?: 'NOT_CREATED' | 'PENDING_ONCHAIN' | 'ONCHAIN_CONFIRMED' | 'ONCHAIN_FAILED' | 'ONCHAIN_CANCELLED';
+  // E-Signature & Contract fields
+  contractHash?: string;
+  contractSignedAt?: string;
+  buyerSigned?: boolean;
+  sellerSigned?: boolean;
   property?: {
     id: string;
     title: string;
@@ -119,6 +124,12 @@ export const propertyTransactionAPI = {
   // FE (MetaMask) gửi transaction hash + info blockchain cho giao dịch
   updateBlockchainTx: async (id: string, data: UpdateBlockchainTxRequest) => {
     const response = await api.post<PropertyTransaction>(`/property-transactions/${id}/blockchain-tx`, data);
+    return response.data;
+  },
+
+  // E-Signature: lưu contract hash (SHA-256 của PDF đã ký)
+  saveContractHash: async (id: string, data: { contractHash: string; signedByRole: 'BUYER' | 'SELLER' }) => {
+    const response = await api.post<PropertyTransaction>(`/property-transactions/${id}/contract-hash`, data);
     return response.data;
   },
 };

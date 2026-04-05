@@ -5,6 +5,7 @@ import { useProperty, useUpdateProperty, useProvinces, useDistricts, useWards } 
 import { uploadAPI } from '../api/upload';
 import { getImageUrl, getImagePlaceholder } from '../utils/imageUtils';
 import { useTranslation } from 'react-i18next';
+import toast from '../utils/toast';
 
 const EditPropertyPage: React.FC = () => {
   const { t } = useTranslation();
@@ -46,7 +47,6 @@ const EditPropertyPage: React.FC = () => {
 
   useEffect(() => {
     if (property) {
-      console.log('Loading property data:', property);
       
       // Load existing images from database
       // Backend returns propertyImages (not images) with @JsonProperty("propertyImages")
@@ -93,24 +93,6 @@ const EditPropertyPage: React.FC = () => {
         url,
         isNew: false
       })));
-      
-      console.log('Form data loaded:', {
-        formData: {
-          title: property.title,
-          price: property.price,
-          area: property.area,
-          bedrooms: property.bedrooms,
-          bathrooms: property.bathrooms,
-          propertyType: property.propertyType,
-          listingType: property.listingType,
-        },
-        location: {
-          provinceId: provinceId,
-          districtId: districtId,
-          wardId: wardId,
-        },
-        images: existingImageUrls.length
-      });
     }
   }, [property]);
 
@@ -159,7 +141,7 @@ const EditPropertyPage: React.FC = () => {
       
       // Validate file count
       if (imagePreviews.length + fileArray.length > 10) {
-        alert('Tối đa 10 hình ảnh');
+        toast.error('Tối đa 10 hình ảnh');
         e.target.value = '';
         return;
       }
@@ -167,12 +149,12 @@ const EditPropertyPage: React.FC = () => {
       // Validate file size and type
       for (const file of fileArray) {
         if (file.size > 5 * 1024 * 1024) {
-          alert(`File ${file.name} vượt quá 5MB`);
+          toast.error(`File ${file.name} vượt quá 5MB`);
           e.target.value = '';
           return;
         }
         if (!file.type.startsWith('image/')) {
-          alert(`File ${file.name} không phải là hình ảnh`);
+          toast.error(`File ${file.name} không phải là hình ảnh`);
           e.target.value = '';
           return;
         }
@@ -237,7 +219,7 @@ const EditPropertyPage: React.FC = () => {
       const wardId = selectedWard || property?.location?.ward?.id;
       
       if (!provinceId || !districtId || !wardId) {
-        alert('Vui lòng chọn đầy đủ Tỉnh/Thành phố, Quận/Huyện và Phường/Xã');
+        toast.error('Vui lòng chọn đầy đủ Tỉnh/Thành phố, Quận/Huyện và Phường/Xã');
         setUploadingImages(false);
         return;
       }
@@ -261,10 +243,10 @@ const EditPropertyPage: React.FC = () => {
       };
 
       await updateProperty({ id: id!, data: updateData });
+      toast.success('Cập nhật bất động sản thành công!');
       navigate(`/properties/${id}`);
     } catch (error: any) {
-      console.error('Error updating property:', error);
-      alert('Cập nhật thất bại: ' + (error.response?.data?.message || error.message));
+      toast.error('Cập nhật thất bại: ' + (error.response?.data?.message || error.message));
     } finally {
       setUploadingImages(false);
     }

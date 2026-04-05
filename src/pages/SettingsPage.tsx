@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Settings from '../components/Settings';
+import OwnerAvailabilitySettings from '../components/OwnerAvailabilitySettings';
 
 const SettingsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -18,6 +19,11 @@ const SettingsPage: React.FC = () => {
           {t('transaction.historyList.backProfile')}
         </Link>
         <Settings />
+
+        {/* Owner Availability — visible to all authenticated users */}
+        <div className="mt-6">
+          <OwnerAvailabilitySettings />
+        </div>
       </div>
     </div>
   );

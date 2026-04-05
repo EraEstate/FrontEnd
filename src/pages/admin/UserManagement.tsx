@@ -8,6 +8,7 @@ import {
 import { userAPI } from '../../api/user';
 import { getImageUrl } from '../../utils/imageUtils';
 import api from '../../api/index';
+import toast from '../../utils/toast';
 
 interface User {
   id: string;
@@ -53,7 +54,6 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ user, isOpen, onClose, on
         role: user.role,
         enabled: user.enabled !== undefined ? user.enabled : true
       });
-      console.log('EditUserModal - User enabled status:', user.enabled);
     } else {
       // Reset form for new user
       setFormData({
@@ -320,24 +320,8 @@ const UserManagement: React.FC = () => {
       }
 
       // Map and normalize user data to ensure createdAt is available
-      const mappedUsers = filteredContent.map((user: any, index: number) => {
-        // Try multiple possible field names for createdAt
-        // Backend uses snake_case (created_at) but might serialize as camelCase (createdAt)
+      const mappedUsers = filteredContent.map((user: any) => {
         const createdAt = user.createdAt || user.created_at || user.createdDate || user.dateCreated || null;
-        
-        // Log first user to debug
-        if (index === 0) {
-          console.log('Sample user data from API:', {
-            id: user.id,
-            email: user.email,
-            allFields: Object.keys(user),
-            createdAt: createdAt,
-            rawCreatedAt: user.createdAt,
-            rawCreated_at: user.created_at,
-            fullUserObject: user
-          });
-        }
-        
         return {
           ...user,
           createdAt: createdAt
@@ -349,7 +333,7 @@ const UserManagement: React.FC = () => {
       setTotalElements(response.totalElements || 0);
     } catch (error) {
       console.error('Failed to fetch users:', error);
-      alert('Không thể tải danh sách users. Vui lòng thử lại.');
+      toast.error('Không thể tải danh sách users. Vui lòng thử lại.');
     } finally {
       setLoading(false);
     }
@@ -376,12 +360,11 @@ const UserManagement: React.FC = () => {
       try {
         setActionLoading(userId);
         await userAPI.delete(userId);
-        alert('Xóa user thành công!');
+        toast.success('Xóa user thành công!');
         fetchUsers();
         fetchRoleStats();
       } catch (error: any) {
-        console.error('Failed to delete user:', error);
-        alert(error.response?.data?.message || 'Không thể xóa user. Vui lòng thử lại.');
+        toast.error(error.response?.data?.message || 'Không thể xóa user. Vui lòng thử lại.');
       } finally {
         setActionLoading(null);
       }
@@ -393,13 +376,12 @@ const UserManagement: React.FC = () => {
       try {
         setActionLoading('bulk');
         await Promise.all(selectedUsers.map(id => userAPI.delete(id)));
-        alert(`Đã xóa ${selectedUsers.length} users thành công!`);
+        toast.success(`Đã xóa ${selectedUsers.length} users thành công!`);
         setSelectedUsers([]);
         fetchUsers();
         fetchRoleStats();
       } catch (error: any) {
-        console.error('Failed to delete users:', error);
-        alert('Có lỗi xảy ra khi xóa users. Vui lòng thử lại.');
+        toast.error('Có lỗi xảy ra khi xóa users. Vui lòng thử lại.');
       } finally {
         setActionLoading(null);
       }
@@ -410,12 +392,11 @@ const UserManagement: React.FC = () => {
     try {
       setActionLoading(userId);
       await userAPI.changeRole(userId, newRole);
-      alert(`Đã đổi role thành công!`);
+      toast.success(`Đã đổi role thành công!`);
       fetchUsers();
       fetchRoleStats();
     } catch (error: any) {
-      console.error('Failed to change role:', error);
-      alert(error.response?.data?.message || 'Không thể đổi role. Vui lòng thử lại.');
+      toast.error(error.response?.data?.message || 'Không thể đổi role. Vui lòng thử lại.');
     } finally {
       setActionLoading(null);
     }
@@ -432,21 +413,18 @@ const UserManagement: React.FC = () => {
       let result;
       if (currentEnabled) {
         result = await userAPI.disable(userId);
-        console.log('User disabled:', result);
       } else {
         result = await userAPI.enable(userId);
-        console.log('User enabled:', result);
       }
       
       // Refresh data
       await fetchUsers();
       await fetchRoleStats();
       
-      alert(`Đã ${action} user thành công!`);
+      toast.success(`Đã ${action} user thành công!`);
     } catch (error: any) {
-      console.error('Failed to toggle enabled:', error);
       const errorMessage = error.response?.data?.message || error.message || 'Không thể thay đổi trạng thái. Vui lòng thử lại.';
-      alert(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setActionLoading(null);
     }
