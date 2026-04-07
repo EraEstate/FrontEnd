@@ -116,6 +116,10 @@ const PropertyModerationPage: React.FC = () => {
 
   // Reject modal
   const [rejectModal, setRejectModal] = useState<{ open: boolean; id: string; title: string }>({ open: false, id: '', title: '' });
+  // Bulk reject modal
+  const [bulkRejectModal, setBulkRejectModal] = useState(false);
+  const [bulkRejectReason, setBulkRejectReason] = useState('');
+  const [bulkRejectCustom, setBulkRejectCustom] = useState('');
 
   // ── Fetch ──
   const fetchProperties = useCallback(async () => {
@@ -249,6 +253,30 @@ const PropertyModerationPage: React.FC = () => {
     }
   };
 
+  // ── Bulk Reject ──
+  const handleBulkReject = async () => {
+    if (selectedIds.size === 0) return;
+    const reason = bulkRejectReason === 'Khác' ? bulkRejectCustom : bulkRejectReason;
+    if (!reason.trim()) { toast.error('Vui lòng chọn hoặc nhập lý do từ chối'); return; }
+    setBulkProcessing(true);
+    const backup = [...properties];
+    setProperties(prev => prev.filter(p => !selectedIds.has(p.id)));
+    try {
+      const result = await staffDashboardAPI.bulkReject(Array.from(selectedIds), reason);
+      toast.success(result.message || `Đã từ chối ${result.rejectedCount} tin`);
+      setSelectedIds(new Set());
+      setBulkRejectModal(false);
+      setBulkRejectReason('');
+      setBulkRejectCustom('');
+      fetchTabCounts();
+    } catch {
+      setProperties(backup);
+      toast.error('Không thể từ chối hàng loạt');
+    } finally {
+      setBulkProcessing(false);
+    }
+  };
+
   const toggleSelect = (id: string) => {
     setSelectedIds(prev => { const n = new Set(prev); if (n.has(id)) n.delete(id); else n.add(id); return n; });
   };
@@ -323,11 +351,18 @@ const PropertyModerationPage: React.FC = () => {
             className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent" />
         </div>
         {isPending && selectedIds.size > 0 && (
-          <button onClick={handleBulkApprove} disabled={bulkProcessing}
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 disabled:opacity-50 text-sm font-medium">
-            {bulkProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
-            Duyệt {selectedIds.size} tin
-          </button>
+          <div className="flex gap-2">
+            <button onClick={handleBulkApprove} disabled={bulkProcessing}
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 disabled:opacity-50 text-sm font-medium">
+              {bulkProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+              Duyệt {selectedIds.size} tin
+            </button>
+            <button onClick={() => setBulkRejectModal(true)} disabled={bulkProcessing}
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 disabled:opacity-50 text-sm font-medium">
+              {bulkProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
+              Từ chối {selectedIds.size} tin
+            </button>
+          </div>
         )}
       </div>
 
@@ -494,6 +529,43 @@ const PropertyModerationPage: React.FC = () => {
 
       <RejectModal open={rejectModal.open} onClose={() => setRejectModal({ open: false, id: '', title: '' })}
         onSubmit={handleRejectSubmit} loading={processingId === rejectModal.id} propertyTitle={rejectModal.title} />
+
+      {/* Bulk Reject Modal */}
+      {bulkRejectModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={() => setBulkRejectModal(false)}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-5 border-b border-gray-100">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Từ chối hàng loạt</h3>
+                <p className="text-sm text-gray-500 mt-0.5">{selectedIds.size} tin đăng sẽ bị từ chối</p>
+              </div>
+              <button onClick={() => setBulkRejectModal(false)} className="p-1.5 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5 text-gray-500" /></button>
+            </div>
+            <div className="p-5 space-y-3">
+              <p className="text-sm font-medium text-gray-700 mb-2">Chọn lý do từ chối:</p>
+              {['Thông tin không chính xác', 'Hình ảnh không phù hợp', 'Nội dung vi phạm chính sách', 'Trùng lặp tin đăng', 'Giá không hợp lý', 'Thiếu thông tin quan trọng', 'Khác'].map(r => (
+                <label key={r} className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
+                  bulkRejectReason === r ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                }`}>
+                  <input type="radio" name="bulkReason" checked={bulkRejectReason === r} onChange={() => setBulkRejectReason(r)} className="w-4 h-4 text-red-600 focus:ring-red-500" />
+                  <span className="text-sm text-gray-700">{r}</span>
+                </label>
+              ))}
+              {bulkRejectReason === 'Khác' && (
+                <textarea value={bulkRejectCustom} onChange={e => setBulkRejectCustom(e.target.value)} placeholder="Nhập lý do chi tiết..." rows={3}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none" />
+              )}
+            </div>
+            <div className="flex gap-3 p-5 border-t border-gray-100 bg-gray-50">
+              <button onClick={() => setBulkRejectModal(false)} className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-100 text-sm font-medium">Hủy</button>
+              <button onClick={handleBulkReject} disabled={bulkProcessing || !bulkRejectReason}
+                className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 disabled:opacity-50 text-sm font-medium flex items-center justify-center gap-2">
+                {bulkProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />} Từ chối {selectedIds.size} tin
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
