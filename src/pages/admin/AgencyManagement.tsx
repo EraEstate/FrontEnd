@@ -7,6 +7,7 @@ import {
 import { agencyAPI } from '../../api/agency';
 import { agentAPI } from '../../api/agent';
 import { getImageUrl, getImagePlaceholder } from '../../utils/imageUtils';
+import toast from '../../utils/toast';
 
 const AgencyManagement: React.FC = () => {
   const { t } = useTranslation();
@@ -24,7 +25,7 @@ const AgencyManagement: React.FC = () => {
     try {
       setLoading(true);
       const response = await agencyAPI.getAll({ page: currentPage, size: 12 });
-      console.log('Agencies response:', response);
+
       
       const agenciesList = response.content || [];
       
@@ -66,7 +67,7 @@ const AgencyManagement: React.FC = () => {
       setAgencies(agenciesWithStats);
       setTotalPages(response.totalPages || 1);
     } catch (error) {
-      console.error('Failed to fetch agencies:', error);
+      toast.error('Không thể tải danh sách công ty');
     } finally {
       setLoading(false);
     }
@@ -87,13 +88,13 @@ const AgencyManagement: React.FC = () => {
   }, [agencies, searchTerm]);
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('Delete this agency?')) {
-      try {
-        await agencyAPI.delete(id);
-        fetchAgencies();
-      } catch (error) {
-        console.error('Failed to delete agency:', error);
-      }
+    if (!window.confirm('Xóa công ty này?')) return;
+    try {
+      await agencyAPI.delete(id);
+      toast.success('Đã xóa công ty');
+      fetchAgencies();
+    } catch (error) {
+      toast.error('Không thể xóa công ty');
     }
   };
 

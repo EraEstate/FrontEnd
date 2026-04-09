@@ -18,6 +18,7 @@ import {
 import { wikiAPI } from '../api/services';
 import type { WikiArticle } from '../api/types';
 import { useTranslation } from 'react-i18next';
+import toast from '../utils/toast';
 
 interface WikiCategory {
   id: string;
@@ -135,7 +136,6 @@ const WikiPage: React.FC = () => {
         // But also handle case where response might be array directly
         let articlesData: any[] = [];
         
-        console.log('Wiki API Response:', response); // Debug log
         
         if (Array.isArray(response)) {
           articlesData = response;
@@ -144,11 +144,9 @@ const WikiPage: React.FC = () => {
         } else if (response && Array.isArray(response)) {
           articlesData = response;
         } else {
-          console.warn('Unexpected response structure:', response);
           articlesData = [];
         }
 
-        console.log('Extracted articles data:', articlesData); // Debug log
 
         // Transform API response to match our interface
         const transformedArticles = articlesData.map((article: any) => ({
@@ -169,7 +167,6 @@ const WikiPage: React.FC = () => {
           author: article.author
         }));
 
-        console.log('Transformed articles:', transformedArticles); // Debug log
         
         // Đảm bảo loading indicator hiển thị ít nhất minLoadingTime
         const elapsedTime = Date.now() - startTime;
@@ -179,7 +176,7 @@ const WikiPage: React.FC = () => {
         
         setArticles(transformedArticles as WikiArticle[]);
       } catch (error: any) {
-        console.error('Error loading wiki articles:', error);
+        toast.error('Kh�ng th? t?i danh s�ch Wiki');
         setError(error.response?.data?.message || error.message || t('wiki.errorLoading'));
         // Fallback to empty array if API fails
         setArticles([]);

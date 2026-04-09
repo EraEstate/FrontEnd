@@ -28,11 +28,11 @@ const TransactionOverviewPage: React.FC = () => {
             const prop = await propertyAPI.getById(tx.propertyId);
             setProperty(prop);
           } catch (e) {
-            console.error('Failed to load property for overview page:', e);
+            toast.error('Không th? t?i thông tin BÐS');
           }
         }
       } catch (error) {
-        console.error('Failed to load transaction overview:', error);
+        toast.error('Không th? t?i t?ng quan giao d?ch');
         toast.error(t('transaction.overview.notFound'));
         navigate('/profile');
       } finally {

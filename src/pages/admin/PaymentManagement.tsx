@@ -5,6 +5,7 @@ import {
   DollarSign, CreditCard, Calendar, CheckCircle, XCircle, Clock
 } from 'lucide-react';
 import { paymentAPI } from '../../api/payment';
+import toast from '../../utils/toast';
 
 const PaymentManagement: React.FC = () => {
   const { t } = useTranslation();
@@ -72,7 +73,7 @@ const PaymentManagement: React.FC = () => {
       setPayments(response.content || []);
       setTotalPages(response.totalPages || 1);
     } catch (error) {
-      console.error('Failed to fetch payments:', error);
+      toast.error('Không thể tải danh sách thanh toán');
     } finally {
       setLoading(false);
     }

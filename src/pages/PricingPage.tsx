@@ -51,7 +51,7 @@ const PricingPage: React.FC = () => {
       setPackages({ content: transformed });
     } catch (err: any) {
       setError('Không thể tải danh sách gói dịch vụ');
-      console.error(err);
+      toast.error('Kh�ng th? t?i g�i d?ch v?');
     } finally {
       setLoading(false);
     }

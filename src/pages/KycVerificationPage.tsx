@@ -10,6 +10,7 @@ import {
   ArrowLeft, Sparkles
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import toast from '../utils/toast';
 
 type Step = 'upload' | 'scanning' | 'review' | 'done';
 
@@ -103,7 +104,7 @@ const KycVerificationPage: React.FC = () => {
         toast.warning('Không nhận diện được thông tin CCCD. Vui lòng thử lại với ảnh rõ hơn.');
       }
     } catch (error: any) {
-      console.error('OCR Error:', error);
+      toast.error('L?i x? l� ?nh CCCD');
       toast.error('Lỗi quét ảnh: ' + (error.message || 'Không xác định'));
       setStep('upload');
     }

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { companyAPI } from '../api/services';
 import type { Company } from '../api/types';
 import { useTranslation } from 'react-i18next';
+import toast from '../utils/toast';
 
 const CompaniesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -31,7 +32,7 @@ const CompaniesPage: React.FC = () => {
           setCompanies(response.content);
         }
       } catch (error) {
-        console.error('Error loading companies:', error);
+        toast.error('Không th? t?i danh sách công ty');
         // Fallback to mock data if API fails
         setCompanies(getMockCompanies());
       } finally {

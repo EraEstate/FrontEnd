@@ -14,6 +14,7 @@ import {
 import { companyAPI } from '../api/services';
 import type { Company } from '../api/types';
 import { useTranslation } from 'react-i18next';
+import toast from '../utils/toast';
 
 const CompanyDetailPage: React.FC = () => {
   const { t } = useTranslation();
@@ -34,7 +35,7 @@ const CompanyDetailPage: React.FC = () => {
           setCompany(response);
         }
       } catch (error) {
-        console.error('Error loading company:', error);
+        toast.error('Không th? t?i thông tin công ty');
         // KhÃ´ng cÃ³ fallback data, chá»‰ log error
       } finally {
         setLoading(false);

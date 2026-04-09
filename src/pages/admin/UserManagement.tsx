@@ -297,7 +297,7 @@ const UserManagement: React.FC = () => {
         }
       });
     } catch (error) {
-      console.error('Failed to fetch role stats:', error);
+      // silently fail — role stats are supplementary
     }
   };
 
@@ -332,7 +332,7 @@ const UserManagement: React.FC = () => {
       setTotalPages(response.totalPages || 1);
       setTotalElements(response.totalElements || 0);
     } catch (error) {
-      console.error('Failed to fetch users:', error);
+      // toast below handles user notification
       toast.error('Không thể tải danh sách users. Vui lòng thử lại.');
     } finally {
       setLoading(false);

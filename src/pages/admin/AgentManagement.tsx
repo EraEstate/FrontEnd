@@ -7,6 +7,7 @@ import {
 import { agentAPI } from '../../api/agent';
 import { getImageUrl, getAvatarPlaceholder } from '../../utils/imageUtils';
 import api from '../../api/index';
+import toast from '../../utils/toast';
 
 const AgentManagement: React.FC = () => {
   const { t } = useTranslation();
@@ -40,7 +41,7 @@ const AgentManagement: React.FC = () => {
       setLoading(true);
       const response = await agentAPI.getAll({ page: currentPage, size: 20 });
       
-      console.log('Agents API Response:', response);
+
 
       // Handle both Page format and List format
       let agentsList = [];
@@ -93,18 +94,7 @@ const AgentManagement: React.FC = () => {
           };
           
           // Debug log for each agent
-          console.log(`Agent ${mappedAgent.id} mapped data:`, {
-            fullName: mappedAgent.fullName,
-            email: mappedAgent.email,
-            phoneNumber: mappedAgent.phoneNumber,
-            location: mappedAgent.location,
-            totalListings: mappedAgent.totalListings,
-            totalDeals: mappedAgent.totalDeals,
-            rating: mappedAgent.rating,
-            totalReviews: mappedAgent.totalReviews,
-            specialty: mappedAgent.specialty,
-            experienceYears: mappedAgent.experienceYears
-          });
+
           
           return mappedAgent;
         })
@@ -136,12 +126,12 @@ const AgentManagement: React.FC = () => {
       const endIndex = startIndex + itemsPerPage;
       const paginatedAgents = filteredAgents.slice(startIndex, endIndex);
 
-      console.log('Processed agents list:', paginatedAgents);
+
 
       setAgents(paginatedAgents);
       setTotalPages(response?.totalPages || Math.ceil(totalItems / itemsPerPage) || 1);
     } catch (error) {
-      console.error('Failed to fetch agents:', error);
+      toast.error('Không thể tải danh sách đại lý');
       setAgents([]);
       setTotalPages(1);
     } finally {
@@ -150,13 +140,13 @@ const AgentManagement: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('Delete this agent?')) {
-      try {
-        await agentAPI.deactivate(id);
-        fetchAgents();
-      } catch (error) {
-        console.error('Failed to delete agent:', error);
-      }
+    if (!window.confirm('Xóa đại lý này?')) return;
+    try {
+      await agentAPI.deactivate(id);
+      toast.success('Đã xóa đại lý');
+      fetchAgents();
+    } catch (error) {
+      toast.error('Không thể xóa đại lý');
     }
   };
 

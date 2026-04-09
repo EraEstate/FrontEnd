@@ -29,11 +29,11 @@ const TransactionContractReviewPage: React.FC = () => {
             const prop = await propertyAPI.getById(tx.propertyId);
             setProperty(prop);
           } catch (e) {
-            console.error('Failed to load property for contract review page:', e);
+            toast.error('Không th? t?i thông tin BÐS');
           }
         }
       } catch (error) {
-        console.error('Failed to load transaction for contract review:', error);
+        toast.error('Không th? t?i giao d?ch');
         toast.error(t('transaction.review.notFound'));
         navigate('/profile');
       } finally {

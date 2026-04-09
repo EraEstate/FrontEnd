@@ -49,7 +49,7 @@ import {
         setResponse('');
       }
     } catch (error) {
-      console.error('Error updating inquiry status:', error);
+      toast.error('C?p nh?t tr?ng thái th?t b?i');
     }
   };
 
@@ -62,7 +62,7 @@ import {
           setSelectedInquiry(null);
         }
       } catch (error) {
-        console.error('Error deleting inquiry:', error);
+        toast.error('Xóa yêu c?u th?t b?i');
       }
     }
   };

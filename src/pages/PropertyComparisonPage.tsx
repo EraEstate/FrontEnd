@@ -14,6 +14,7 @@ import {
   Tooltip,
   Legend
 } from 'recharts';
+import toast from '../utils/toast';
 
 const COLORS = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b']; // Red, Blue, Green, Yellow
 
@@ -31,7 +32,7 @@ const PropertyComparisonPage: React.FC = () => {
         .then((res) => {
           if (alive) setProperties(res);
         })
-        .catch(err => console.error(err))
+        .catch(() => toast.error('Không thể tải dữ liệu so sánh'))
         .finally(() => {
           if (alive) setLoading(false);
         });

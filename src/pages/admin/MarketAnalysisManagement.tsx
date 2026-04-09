@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Search, ExternalLink, Trash2, TrendingUp } from 'lucide-react';
 import { marketAnalysisAPI } from '../../api/marketAnalysis';
+import toast from '../../utils/toast';
 
 const MarketAnalysisManagement: React.FC = () => {
   const { t } = useTranslation();
@@ -23,7 +24,7 @@ const MarketAnalysisManagement: React.FC = () => {
       setItems(response.content || response || []);
       setTotalPages(response.totalPages || 1);
     } catch (error) {
-      console.error('Failed to fetch market analyses:', error);
+      toast.error('Không thể tải danh sách phân tích');
       setItems([]);
     } finally {
       setLoading(false);
@@ -36,7 +37,8 @@ const MarketAnalysisManagement: React.FC = () => {
       await marketAnalysisAPI.delete(id);
       fetchList();
     } catch (e) {
-      console.error(e);
+      // toast.error already shown below
+      toast.error('Không thể xóa bài phân tích');
     }
   };
 

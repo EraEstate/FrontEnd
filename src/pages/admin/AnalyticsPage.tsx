@@ -209,7 +209,7 @@ const AnalyticsPage: React.FC = () => {
       }));
       setInquiryStatusData(mappedInquiryData);
     } catch (error) {
-      console.error('Failed to fetch analytics:', error);
+      // Fallback to mock data if API fails
       // Fallback to mock data if API fails
       const { startDate, endDate } = getDateRange();
       setRevenueData(fetchRevenueDataFallback(startDate, endDate));

@@ -66,7 +66,7 @@ const ProfilePage: React.FC = () => {
           phoneNumber: settings.phone || user?.phoneNumber,
         });
       } catch (error: any) {
-        console.error('Failed to load user profile:', error);
+        toast.error('Kh�ng th? t?i th�ng tin c� nh�n');
         // Fallback to user from auth store
         setUserProfile(user);
       } finally {
@@ -529,13 +529,13 @@ const ProfilePage: React.FC = () => {
               return null;
             }
             // Chỉ log error cho các lỗi khác 404
-            console.error('Failed to get current subscription:', error);
+            // subscription fetch failed silently;
             throw error;
           }),
           subscriptionAPI.getHistory(0, 10).catch((error: any) => {
             // Log error nếu không phải 404
             if (error.response?.status !== 404) {
-              console.error('Failed to get subscription history:', error);
+              // history fetch failed silently;
             }
             return { content: [], totalElements: 0 };
           })
@@ -545,7 +545,7 @@ const ProfilePage: React.FC = () => {
       } catch (error: any) {
         // Chỉ log error nếu không phải 404 (đã được xử lý ở trên)
         if (error.response?.status !== 404) {
-          console.error('Failed to load subscription:', error);
+          toast.error('Kh�ng th? t?i th�ng tin g�i d?ch v?');
         }
         // Set empty state on error
         setCurrentSubscription(null);

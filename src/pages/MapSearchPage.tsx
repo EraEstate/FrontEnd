@@ -9,6 +9,7 @@ import { ChevronLeft, MapPin, X, Loader2, Layers } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { getImageUrl, getImagePlaceholder } from '../utils/imageUtils';
 import { formatVND } from '../utils/format';
+import toast from '../utils/toast';
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -89,7 +90,7 @@ const MapSearchPage: React.FC = () => {
         const res = await propertyAPI.searchByGeo(polygon);
         setProperties(res);
       } catch (err) {
-        console.error('Lỗi tìm kiếm:', err);
+        toast.error('Lỗi tìm kiếm trên bản đồ');
       } finally {
         setLoading(false);
       }

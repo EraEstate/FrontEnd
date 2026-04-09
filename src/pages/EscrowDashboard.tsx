@@ -87,7 +87,7 @@ const EscrowDashboard: React.FC = () => {
 
   // ─── REALTIME: WebSocket subscription ───
   const handleEscrowWsUpdate = useCallback((payload: EscrowUpdatePayload) => {
-    console.log('[Escrow WS] Received realtime update:', payload);
+    // Escrow WS realtime update received
 
     setTransactions(prev => {
       const existingIdx = prev.findIndex(t => t.transactionHash === payload.transactionHash);
@@ -139,7 +139,7 @@ const EscrowDashboard: React.FC = () => {
             unsubEscrowRef.current = subscribeToEscrow(walletAddress, handleEscrowWsUpdate);
           },
           (err) => {
-            console.error('[Escrow WS] Connection error:', err);
+            // WS connection error handled silently
             setWsConnected(false);
           }
         );

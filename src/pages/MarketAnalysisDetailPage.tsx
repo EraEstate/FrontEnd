@@ -36,7 +36,7 @@ const MarketAnalysisDetailPage: React.FC = () => {
 
     } catch (err) {
       setError(t('marketAnalysis.loadArticleError'));
-      console.error('Error loading market analysis:', err);
+      toast.error('Không th? t?i bài phân tích');
     } finally {
       setLoading(false);
     }
@@ -48,7 +48,7 @@ const MarketAnalysisDetailPage: React.FC = () => {
       await marketAnalysisAPI.incrementLikeCount(analysis.id.toString());
       setAnalysis(prev => prev ? { ...prev, likeCount: prev.likeCount + 1 } : null);
     } catch (err) {
-      console.error('Error incrementing like count:', err);
+      toast.error('L?i khi thích bài vi?t');
     }
   };
 
@@ -70,7 +70,7 @@ const MarketAnalysisDetailPage: React.FC = () => {
         toast.success(t('common.linkCopied'));
       }
     } catch (err) {
-      console.error('Error incrementing share count:', err);
+      toast.error('L?i khi chia s? bài vi?t');
     }
   };
 

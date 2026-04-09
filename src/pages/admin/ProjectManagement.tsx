@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { projectAPI } from '../../api/project';
 import { getImageUrl, getImagePlaceholder } from '../../utils/imageUtils';
+import toast from '../../utils/toast';
 
 const ProjectManagement: React.FC = () => {
   const { t } = useTranslation();
@@ -55,7 +56,7 @@ const ProjectManagement: React.FC = () => {
         });
       }
 
-      console.log('Projects API Response:', response);
+
 
       // Handle both Page format and array format
       let projectsList = [];
@@ -95,12 +96,12 @@ const ProjectManagement: React.FC = () => {
         );
       }
 
-      console.log('Processed projects list:', projectsList);
+
 
       setProjects(projectsList);
       setTotalPages(response?.totalPages || response?.data?.totalPages || Math.ceil(projectsList.length / 12) || 1);
     } catch (error) {
-      console.error('Failed to fetch projects:', error);
+      toast.error('Không thể tải danh sách dự án');
       setProjects([]);
       setTotalPages(1);
     } finally {
@@ -109,13 +110,13 @@ const ProjectManagement: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('Delete this project?')) {
-      try {
-        await projectAPI.delete(id);
-        fetchProjects();
-      } catch (error) {
-        console.error('Failed to delete project:', error);
-      }
+    if (!window.confirm('Xóa dự án này?')) return;
+    try {
+      await projectAPI.delete(id);
+      toast.success('Đã xóa dự án');
+      fetchProjects();
+    } catch (error) {
+      toast.error('Không thể xóa dự án');
     }
   };
 

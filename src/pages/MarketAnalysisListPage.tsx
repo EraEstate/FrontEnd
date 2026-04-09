@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { marketAnalysisAPI } from '../api/marketAnalysis';
 import type { MarketAnalysis } from '../api/types';
 import { useTranslation } from 'react-i18next';
+import toast from '../utils/toast';
 
 const MarketAnalysisListPage: React.FC = () => {
   const { t } = useTranslation();
@@ -28,7 +29,7 @@ const MarketAnalysisListPage: React.FC = () => {
       setAnalyses(data);
     } catch (err) {
       setError(t('marketAnalysis.loadError'));
-      console.error('Error loading market analyses:', err);
+      toast.error('Không th? t?i danh sách phân tích');
     } finally {
       setLoading(false);
     }

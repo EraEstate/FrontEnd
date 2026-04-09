@@ -15,6 +15,7 @@ import {
   Linkedin
 } from 'lucide-react';
 import { useCreateInquiryNew } from '../api/hooks';
+import toast from '../utils/toast';
 
 const ContactPage: React.FC = () => {
   const { t } = useTranslation();
@@ -66,7 +67,7 @@ const ContactPage: React.FC = () => {
         message: ''
       });
     } catch (error) {
-      console.error('Error submitting contact form:', error);
+      toast.error('G?i form liên h? th?t b?i');
       // You could add error handling UI here
     } finally {
       setIsSubmitting(false);

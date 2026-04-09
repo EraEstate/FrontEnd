@@ -14,6 +14,7 @@ import { projectAPI } from '../api/services';
 import type { Project } from '../api/types';
 import { useTranslation } from 'react-i18next';
 import { getImageUrl, getImagePlaceholder } from '../utils/imageUtils';
+import toast from '../utils/toast';
 
 const ProjectDetailPage: React.FC = () => {
   const { t } = useTranslation();
@@ -37,7 +38,7 @@ const ProjectDetailPage: React.FC = () => {
           await projectAPI.incrementViewCount(id);
         }
       } catch (error) {
-        console.error('Error loading project:', error);
+        toast.error('Không th? t?i thông tin d? án');
         // KhÃ´ng cÃ³ fallback data, chá»‰ log error
       } finally {
         setLoading(false);

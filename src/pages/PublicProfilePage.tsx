@@ -22,6 +22,7 @@ import { propertyAPI } from '../api/property';
 import { kycAPI } from '../api/kyc';
 import { getImageUrl, getAvatarPlaceholder, getImagePlaceholder } from '../utils/imageUtils';
 import { useAuthStore } from '../store/authStore';
+import toast from '../utils/toast';
 
 const PublicProfilePage: React.FC = () => {
   const { t } = useTranslation();
@@ -75,7 +76,7 @@ const PublicProfilePage: React.FC = () => {
         const data = await propertyAPI.getByOwner(id, currentPage, pageSize);
         setPropertiesData(data);
       } catch (err: any) {
-        console.error('Error fetching properties:', err);
+        toast.error('Không th? t?i danh sách b?t d?ng s?n');
         setPropertiesData({ content: [], totalPages: 0 });
       } finally {
         setPropertiesLoading(false);

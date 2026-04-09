@@ -28,7 +28,7 @@ const BankAccountManagementPage: React.FC = () => {
       const data = await bankAccountAPI.getMyAccounts();
       setAccounts(data);
     } catch (error: any) {
-      console.error('Failed to fetch bank accounts:', error);
+      toast.error('KhÙng th? t?i danh s·ch t‡i kho?n ng‚n h‡ng');
       toast.error('Kh√¥ng th·ªÉ t·∫£i danh s√°ch t√†i kho·∫£n ng√¢n h√†ng');
     } finally {
       setLoading(false);

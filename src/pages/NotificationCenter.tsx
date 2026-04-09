@@ -20,6 +20,7 @@ import {
   useMarkAllAsRead, 
   useDeleteNotification 
 } from '../api/hooks';
+import toast from '../utils/toast';
 
 interface NotificationItem {
   id: string;
@@ -52,7 +53,7 @@ const NotificationCenter: React.FC = () => {
       refetch();
       refetchUnreadCount();
     } catch (error) {
-      console.error('Error marking notification as read:', error);
+      toast.error('Không th? dánh d?u dã d?c');
     }
   };
 
@@ -62,7 +63,7 @@ const NotificationCenter: React.FC = () => {
       refetch();
       refetchUnreadCount();
     } catch (error) {
-      console.error('Error marking all notifications as read:', error);
+      toast.error('Không th? dánh d?u t?t c? dã d?c');
     }
   };
 
@@ -72,7 +73,7 @@ const NotificationCenter: React.FC = () => {
       refetch();
       refetchUnreadCount();
     } catch (error) {
-      console.error('Error deleting notification:', error);
+      toast.error('Không th? xóa thông báo');
     }
   };
 

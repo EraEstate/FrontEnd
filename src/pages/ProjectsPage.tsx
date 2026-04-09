@@ -4,6 +4,7 @@ import { projectAPI } from '../api/services';
 import type { Project } from '../api/types';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../store/authStore';
+import toast from '../utils/toast';
 
 const ProjectsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -44,7 +45,7 @@ const ProjectsPage: React.FC = () => {
           setProjects(response.content);
         }
       } catch (error) {
-        console.error('Error loading projects:', error);
+        toast.error('Không th? t?i danh sách d? án');
         // Fallback to mock data if API fails
         setProjects(getMockProjects());
       } finally {

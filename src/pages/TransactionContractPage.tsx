@@ -72,11 +72,11 @@ const TransactionContractPage: React.FC = () => {
           const prop = await propertyAPI.getById(tx.propertyId);
           setProperty(prop);
         } catch (e) {
-          console.error('Failed to load property for contract page:', e);
+          toast.error('Kh�ng th? t?i th�ng tin B�S');
         }
       }
     } catch (error: any) {
-      console.error('Failed to load transaction:', error);
+      toast.error('Kh�ng th? t?i giao d?ch');
       toast.error(t('transaction.errors.notFound'));
       navigate('/profile');
     } finally {
@@ -167,7 +167,7 @@ const TransactionContractPage: React.FC = () => {
 
       toast.success('Đã tạo PDF hợp đồng thành công!');
     } catch (err: any) {
-      console.error('PDF generation error:', err);
+      toast.error('L?i t?o PDF h?p d?ng');
       toast.error('Không thể tạo PDF: ' + (err?.message || 'Lỗi không xác định'));
     } finally {
       setGeneratingPdf(false);
@@ -285,7 +285,7 @@ const TransactionContractPage: React.FC = () => {
       // Điều hướng người dùng tới Escrow Dashboard để xem trạng thái giao dịch
       navigate('/escrow');
     } catch (error: any) {
-      console.error('Failed to sign on-chain from contract page:', error);
+      toast.error('L?i k� h?p d?ng blockchain');
       
       // Detect specific error types
       let errorMessage = t('transaction.errors.signFailed');

@@ -397,7 +397,7 @@ const PostPropertyPage: React.FC = () => {
             throw new Error('Không thể upload ảnh. Vui lòng thử lại.');
           }
         } catch (error: any) {
-          console.error('Error uploading images:', error);
+          toast.error('L?i t?i ?nh l�n');
           toast.error('Lỗi khi upload ảnh: ' + (error.response?.data?.error || error.message));
           setLoading(false);
           return;
@@ -428,7 +428,7 @@ const PostPropertyPage: React.FC = () => {
       toast.success('Đăng tin thành công! 🎉');
       navigate('/profile?tab=properties');
     } catch (error) {
-      console.error('Error posting property:', error);
+      toast.error('L?i dang b?t d?ng s?n');
       toast.error(t('postProperty.postError'));
     } finally {
       setLoading(false);

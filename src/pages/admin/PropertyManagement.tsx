@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { propertyAPI } from '../../api/property';
 import { getImageUrl, getImagePlaceholder } from '../../utils/imageUtils';
+import toast from '../../utils/toast';
 
 const PropertyManagement: React.FC = () => {
   const { t } = useTranslation();
@@ -29,7 +30,7 @@ const PropertyManagement: React.FC = () => {
       setProperties(response.content || []);
       setTotalPages(response.totalPages || 1);
     } catch (error) {
-      console.error('Failed to fetch properties:', error);
+      toast.error('Không thể tải danh sách BĐS');
     } finally {
       setLoading(false);
     }
@@ -50,13 +51,13 @@ const PropertyManagement: React.FC = () => {
   };
 
   const handleDeleteProperty = async (id: string) => {
-    if (window.confirm('Delete this property?')) {
-      try {
-        await propertyAPI.delete(id);
-        fetchProperties();
-      } catch (error) {
-        console.error('Failed to delete property:', error);
-      }
+    if (!window.confirm('Xóa bất động sản này?')) return;
+    try {
+      await propertyAPI.delete(id);
+      toast.success('Đã xóa thành công');
+      fetchProperties();
+    } catch (error) {
+      toast.error('Không thể xóa bất động sản');
     }
   };
 

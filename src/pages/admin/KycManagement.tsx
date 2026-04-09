@@ -51,7 +51,7 @@ const KycManagement: React.FC = () => {
       setKycRecords(filtered);
       setTotalPages(res.totalPages || 1);
     } catch (error) {
-      console.error('Failed to fetch KYC:', error);
+      // toast already shown below
       toast.error('Lỗi khi tải danh sách KYC');
     } finally {
       setLoading(false);

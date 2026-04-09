@@ -5,6 +5,7 @@ import {
   Calendar, User, Tag, TrendingUp
 } from 'lucide-react';
 import { newsAPI } from '../../api/news';
+import toast from '../../utils/toast';
 
 const NewsManagement: React.FC = () => {
   const { t } = useTranslation();
@@ -26,20 +27,20 @@ const NewsManagement: React.FC = () => {
       setNews(response.content || []);
       setTotalPages(response.totalPages || 1);
     } catch (error) {
-      console.error('Failed to fetch news:', error);
+      toast.error('Không thể tải danh sách tin tức');
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('Delete this news article?')) {
-      try {
-        await newsAPI.delete(id);
-        fetchNews();
-      } catch (error) {
-        console.error('Failed to delete news:', error);
-      }
+    if (!window.confirm('Xóa bài viết này?')) return;
+    try {
+      await newsAPI.delete(id);
+      toast.success('Đã xóa bài viết');
+      fetchNews();
+    } catch (error) {
+      toast.error('Không thể xóa bài viết');
     }
   };
 

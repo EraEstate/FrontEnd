@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { propertyInquiryAPI } from '../../api/propertyInquiry';
 import { adminAPI } from '../../api/admin';
+import toast from '../../utils/toast';
 
 const InquiryManagement: React.FC = () => {
   const { t } = useTranslation();
@@ -45,7 +46,7 @@ const InquiryManagement: React.FC = () => {
         closed: breakdown.find(s => s.status === 'Closed')?.count || 0
       });
     } catch (error) {
-      console.error('Failed to fetch inquiry stats:', error);
+      toast.error('Không thể tải thống kê yêu cầu');
     }
   };
 
@@ -74,7 +75,7 @@ const InquiryManagement: React.FC = () => {
       setInquiries(response.content || []);
       setTotalPages(response.totalPages || 1);
     } catch (error) {
-      console.error('Failed to fetch inquiries:', error);
+      toast.error('Không thể tải danh sách yêu cầu');
     } finally {
       setLoading(false);
     }

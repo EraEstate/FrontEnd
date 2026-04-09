@@ -88,7 +88,7 @@ const PropertyDetailPage: React.FC = () => {
         .then(res => {
           if (alive) setSimilarProperties(res);
         })
-        .catch(err => console.error('Failed to load similar properties', err))
+        .catch(err => toast.error('Không th? t?i BÐS tuong t?'))
         .finally(() => {
           if (alive) setSimilarLoading(false);
         });
@@ -314,7 +314,7 @@ const PropertyDetailPage: React.FC = () => {
       setShowContractModal(false);
       navigate(`/transactions/${transaction.id}/contract`);
     } catch (error: any) {
-      console.error('Failed to create transaction:', error);
+      toast.error('Không th? t?o giao d?ch');
       const msg =
         error?.message ||
         error?.response?.data?.error ||

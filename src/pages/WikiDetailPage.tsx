@@ -14,6 +14,7 @@ import {
 import { wikiAPI } from '../api/services';
 import type { WikiArticle } from '../api/types';
 import { useTranslation } from 'react-i18next';
+import toast from '../utils/toast';
 
 interface RelatedArticle {
   id: string;
@@ -66,7 +67,7 @@ const WikiDetailPage: React.FC = () => {
         await wikiAPI.incrementViews(articleResponse.id);
 
       } catch (error) {
-        console.error('Error loading wiki article:', error);
+        toast.error('Không th? t?i bài vi?t Wiki');
         // Could show error message here
       } finally {
         setLoading(false);
