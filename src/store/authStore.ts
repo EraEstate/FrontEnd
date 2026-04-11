@@ -4,7 +4,7 @@ import type { User, LoginForm, RegisterForm } from '../types';
 import { authAPI } from '../api/auth';
 import { logger } from '../utils/logger';
 import { extractErrorMessage } from '../utils/errorParser';
-import { showSuccess } from '../utils/toast';
+import { showSuccess, showError } from '../utils/toast';
 
 interface AuthState {
   user: User | null;
@@ -63,6 +63,7 @@ export const useAuthStore = create<AuthState>()(
             error: errorMessage,
             isLoading: false,
           });
+          showError(errorMessage);
           throw error;
         }
       },
@@ -79,11 +80,14 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: checkIsAuthenticated(user, token),
             isLoading: false,
           });
+          showSuccess('Đăng ký tài khoản thành công!');
         } catch (error: any) {
+          const errorMessage = extractErrorMessage(error, 'Đăng ký thất bại');
           set({
-            error: extractErrorMessage(error, 'Đăng ký thất bại'),
+            error: errorMessage,
             isLoading: false,
           });
+          showError(errorMessage);
           throw error;
         }
       },

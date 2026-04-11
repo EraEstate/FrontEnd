@@ -4,6 +4,7 @@ import { projectAPI } from '../api/services';
 import type { Project } from '../api/types';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../store/authStore';
+import { MapPin } from 'lucide-react';
 import toast from '../utils/toast';
 
 const ProjectsPage: React.FC = () => {
@@ -45,7 +46,7 @@ const ProjectsPage: React.FC = () => {
           setProjects(response.content);
         }
       } catch (error) {
-        toast.error('KhÙng th? t?i danh s·ch d? ·n');
+        toast.error('KhÔøΩng th? t?i danh sÔøΩch d? ÔøΩn');
         // Fallback to mock data if API fails
         setProjects(getMockProjects());
       } finally {
@@ -283,107 +284,94 @@ const ProjectsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Results */}
-        <div className="bg-white rounded-lg shadow-md">
-          <div className="p-6 border-b">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold">{t('projects.resultsCount', { count: filteredProjects.length })}</h2>
-              <div className="flex items-center space-x-4">
-                <select className="px-3 py-2 border border-gray-300 rounded-md text-sm">
-                  <option>{t('projects.sortBy')}</option>
-                  <option>{t('projects.sortNameAZ')}</option>
-                  <option>{t('projects.sortPriceAsc')}</option>
-                  <option>{t('projects.sortPriceDesc')}</option>
-                  <option>{t('projects.sortNewest')}</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
           {loading ? (
-            <div className="p-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="bg-white border border-gray-200 rounded-lg overflow-hidden animate-pulse">
-                    <div className="flex">
-                      <div className="w-1/3 h-48 bg-gray-200"></div>
-                      <div className="w-2/3 p-4">
-                        <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
-                        <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
-                        <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-                        <div className="h-4 bg-gray-200 rounded w-2/3"></div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+            <div className="p-6 text-center">
+              <p className="mt-4 text-gray-500 font-medium animate-pulse">
+                {t('common.loading')}...
+              </p>
             </div>
           ) : (
-            <div className="p-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {filteredProjects.map((project) => (
-                  <button
-                    key={project.id}
-                    type="button"
-                    onClick={() => handleProjectClick(project.id)}
-                    className="group text-left"
-                  >
-                    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
-                      <div className="flex">
-                        <div className="w-1/3">
-                          <img
-                            src={project.featuredImageUrl || "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400"}
-                            alt={project.name}
-                            className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        </div>
-                        <div className="w-2/3 p-4">
-                          <div className="flex justify-between items-start mb-2">
-                            <h3 className="font-bold text-lg text-gray-900 group-hover:text-blue-600 transition-colors">
-                              {project.name}
-                            </h3>
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(project.projectStatus)}`}>
-                              {project.projectStatus}
-                            </span>
+            <>
+              <div className="p-6 border-b">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl font-semibold">{t('projects.resultsCount', { count: filteredProjects.length })}</h2>
+                  <div className="flex items-center space-x-4">
+                    <select className="px-3 py-2 border border-gray-300 rounded-md text-sm">
+                      <option>{t('projects.sortBy')}</option>
+                      <option>{t('projects.sortNameAZ')}</option>
+                      <option>{t('projects.sortPriceAsc')}</option>
+                      <option>{t('projects.sortPriceDesc')}</option>
+                      <option>{t('projects.sortNewest')}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {filteredProjects.map((project) => (
+                    <button
+                      key={project.id}
+                      type="button"
+                      onClick={() => handleProjectClick(project.id)}
+                      className="group text-left"
+                    >
+                      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+                        <div className="flex">
+                          <div className="w-1/3">
+                            <img
+                              src={project.featuredImageUrl || "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400"}
+                              alt={project.name}
+                              className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
                           </div>
+                          <div className="w-2/3 p-4">
+                            <div className="flex justify-between items-start mb-2">
+                              <h3 className="font-bold text-lg text-gray-900 group-hover:text-blue-600 transition-colors">
+                                {project.name}
+                              </h3>
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(project.projectStatus)}`}>
+                                {project.projectStatus}
+                              </span>
+                            </div>
 
-                          <p className="text-gray-600 text-sm mb-2">
-                            {t('projects.developer')}: <span className="font-medium">{project.developer}</span>
-                          </p>
+                            <p className="text-gray-600 text-sm mb-2">
+                              {t('projects.developer')}: <span className="font-medium">{project.developer}</span>
+                            </p>
 
-                          <div className="flex items-center text-gray-600 text-sm mb-2">
-                            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                            </svg>
-                            {project.address}
-                          </div>
+                            <div className="flex items-center text-gray-600 text-sm mb-2">
+                              <MapPin className="w-3 h-3 inline mr-1" />
+                              {project.address}
+                            </div>
 
-                          <p className="text-red-600 font-bold text-lg mb-2">
-                            {formatPrice(project.minPrice)} - {formatPrice(project.maxPrice)}
-                          </p>
+                            <p className="text-red-600 font-bold text-lg mb-2">
+                              {formatPrice(project.minPrice)} - {formatPrice(project.maxPrice)}
+                            </p>
 
-                          <div className="flex justify-between items-center text-sm text-gray-600 mb-3">
-                            <span>{t('projects.scale')}: {project.area} ha</span>
-                            {project.properties && (
-                              <span>{project.properties.length} {t('projects.units')}</span>
-                            )}
-                          </div>
+                            <div className="flex justify-between items-center text-sm text-gray-600 mb-3">
+                              <span>{t('projects.scale')}: {project.area} ha</span>
+                              {project.properties && (
+                                <span>{project.properties.length} {t('projects.units')}</span>
+                              )}
+                            </div>
 
-                          <div className="flex justify-between items-center">
-                            <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                              {project.projectType}
-                            </span>
-                            <span className="text-xs text-gray-500">
-                              üëÅ {project.viewCount}
-                            </span>
+                            <div className="flex justify-between items-center">
+                              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                                {project.projectType}
+                              </span>
+                              <span className="text-xs text-gray-500">
+                                {project.viewCount} {t('projects.views')}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </button>
-                ))}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            </>
           )}
         </div>
       </div>

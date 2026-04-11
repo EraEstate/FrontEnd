@@ -21,7 +21,7 @@ import {
   BLOCKCHAIN_EXPLORER_URL,
   BLOCKCHAIN_NETWORK_NAME,
 } from '../config/blockchain';
-import RealEstateEscrowAbi from '../abi/RealEstateEscrow.json';
+import RealEstateEscrowAbi from '../blockchain/RealEstateEscrow.json';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -112,7 +112,7 @@ const TransactionHistoryPage: React.FC<TransactionHistoryPageProps> = ({ embedde
       setTransactions(response.content || []);
       setTotalPages(response.totalPages || 1);
     } catch (error: any) {
-      toast.error('Kh�ng th? t?i l?ch s? giao d?ch');
+      toast.error('Kh�ng th? t?i l?ch s? giao d?ch');
       toast.error('Không thể tải lịch sử giao dịch');
     } finally {
       setLoading(false);
@@ -160,7 +160,7 @@ const TransactionHistoryPage: React.FC<TransactionHistoryPageProps> = ({ embedde
       await fetchTransactions();
       navigate(`/transactions/${transaction.id}/blockchain`);
     } catch (error: any) {
-      toast.error('L?i k� giao d?ch blockchain');
+      toast.error('L?i k� giao d?ch blockchain');
       const msg =
         error?.message ||
         error?.data?.message ||

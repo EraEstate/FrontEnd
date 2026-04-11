@@ -4,7 +4,6 @@ import { AutorotatePlugin } from '@photo-sphere-viewer/autorotate-plugin';
 import { VirtualTourPlugin } from '@photo-sphere-viewer/virtual-tour-plugin';
 import { GalleryPlugin } from '@photo-sphere-viewer/gallery-plugin';
 import { CompassPlugin } from '@photo-sphere-viewer/compass-plugin';
-import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
 import { Loader2 } from 'lucide-react';
 
 import '@photo-sphere-viewer/core/index.css';
@@ -32,25 +31,43 @@ const VRTour: React.FC<VRTourProps> = ({
   propertyImages,
   propertyTitle,
   propertyAddress,
+  propertyLat,
+  propertyLng,
 }) => {
   // ─── Build scenes from DB images ───
   const scenes: VRScene[] = useMemo(() => {
     if (!propertyImages || propertyImages.length === 0) return [];
-    return propertyImages.map((img, idx) => ({
-      id: String(img.id || idx),
-      name: img.description || `Ảnh ${idx + 1}`,
-      panoramaUrl: getImageUrl(img.imageUrl) || img.imageUrl,
-      description: img.description,
-    }));
+    return propertyImages
+      .map((img, idx) => {
+        const resolvedUrl = (getImageUrl(img.imageUrl) || img.imageUrl || '').trim();
+        if (!resolvedUrl) return null;
+        
+        // Cache busting để tránh lỗi CORS khi ảnh đã được cache bởi thẻ <img> thông thường
+        const cacheBusterUrl = resolvedUrl.includes('?') 
+          ? `${resolvedUrl}&vrtour=${Date.now()}` 
+          : `${resolvedUrl}?vrtour=${Date.now()}`;
+
+        return {
+          id: String(img.id || idx),
+          name: img.description || `Ảnh ${idx + 1}`,
+          panoramaUrl: cacheBusterUrl,
+          description: img.description,
+        };
+      })
+      .filter((scene): scene is VRScene => scene !== null);
   }, [propertyImages]);
+
+  console.log('VR Tour Scenes:', scenes);
 
   // ─── State ───
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [isAutoRotating, setIsAutoRotating] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [showWelcome, setShowWelcome] = useState(true);
   const [currentSceneName, setCurrentSceneName] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [viewerSeed, setViewerSeed] = useState(0);
 
   // Auto-tour state
   const [isAutoTouring, setIsAutoTouring] = useState(false);
@@ -88,9 +105,12 @@ const VRTour: React.FC<VRTourProps> = ({
 
   // ─── Plugins ───
   const plugins = useMemo((): any[] => [
-    [AutorotatePlugin, { autostartDelay: null, autorotateSpeed: '1rpm' }],
+    [AutorotatePlugin, {
+      autostartOnIdle: false,
+      autostartDelay: null,
+      autorotateSpeed: '1rpm',
+    }],
     [CompassPlugin, { size: '80px', position: 'bottom left' }],
-    [MarkersPlugin, { markers: [] }],
     [GalleryPlugin, {
       items: galleryItems,
       visibleOnLoad: scenes.length > 1,
@@ -106,6 +126,7 @@ const VRTour: React.FC<VRTourProps> = ({
   // ─── Viewer ready ───
   const handleReady = useCallback((instance: any) => {
     psvRef.current = instance;
+    setLoadError(null);
     setLoading(false);
 
     // Listen for node changes from virtual-tour plugin
@@ -127,6 +148,44 @@ const VRTour: React.FC<VRTourProps> = ({
       setCurrentIndex(0);
     }
   }, [scenes]);
+
+  // ─── Guard against infinite loading when panorama URL is unreachable ───
+  useEffect(() => {
+    if (!isOpen || !loading) return;
+    const timer = setTimeout(() => {
+      setLoadError('Không thể tải ảnh VR. Vui lòng thử lại hoặc kiểm tra đường dẫn ảnh 360.');
+      setLoading(false);
+    }, 15000);
+    return () => clearTimeout(timer);
+  }, [isOpen, loading, viewerSeed]);
+
+  const retryViewer = useCallback(() => {
+    setLoadError(null);
+    setLoading(true);
+    setViewerSeed((p) => p + 1);
+  }, []);
+
+  const mapQuery = useMemo(() => {
+    if (typeof propertyLat === 'number' && typeof propertyLng === 'number') {
+      return `${propertyLat},${propertyLng}`;
+    }
+    return (propertyAddress || propertyTitle || '').trim();
+  }, [propertyLat, propertyLng, propertyAddress, propertyTitle]);
+
+  const googleMapsUrl = useMemo(() => {
+    if (!mapQuery) return '';
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;
+  }, [mapQuery]);
+
+  const googleStreetViewEmbedUrl = useMemo(() => {
+    if (typeof propertyLat !== 'number' || typeof propertyLng !== 'number') return '';
+    return `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${propertyLat},${propertyLng}`;
+  }, [propertyLat, propertyLng]);
+
+  const googleStreetViewFullUrl = useMemo(() => {
+    if (typeof propertyLat !== 'number' || typeof propertyLng !== 'number') return '';
+    return `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${propertyLat},${propertyLng}`;
+  }, [propertyLat, propertyLng]);
 
   // ─── Auto-rotate ───
   const toggleAutoRotate = useCallback(() => {
@@ -229,6 +288,7 @@ const VRTour: React.FC<VRTourProps> = ({
   useEffect(() => {
     if (isOpen && scenes.length > 0) {
       setLoading(true);
+      setLoadError(null);
       setIsAutoRotating(false);
       setShowHelp(false);
       setShowWelcome(true);
@@ -300,10 +360,67 @@ const VRTour: React.FC<VRTourProps> = ({
         </div>
       )}
 
+      {loadError && (
+        <div className="absolute inset-0 z-[102] flex flex-col items-center justify-center bg-black/85 px-4 py-6 text-center">
+          <p className="text-red-300 font-medium mb-4">{loadError}</p>
+
+          {(googleStreetViewEmbedUrl || googleMapsUrl) && (
+            <div className="w-full max-w-6xl h-[56vh] mb-4 rounded-xl overflow-hidden border border-white/20 bg-black/40">
+              <iframe
+                title="Google Street View 360 fallback"
+                src={googleStreetViewEmbedUrl || googleMapsUrl}
+                className="w-full h-full"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
+          )}
+
+          <p className="text-white/70 text-xs mb-4">
+            Khung trên ưu tiên Street View 360. Nếu Google không có pano gần đó, họ sẽ tự trả về bản đồ vị trí.
+          </p>
+
+          <div className="flex gap-3">
+            {googleStreetViewFullUrl && (
+              <button
+                type="button"
+                onClick={() => window.open(googleStreetViewFullUrl, '_blank', 'noopener,noreferrer')}
+                className="px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
+              >
+                Mở Street View 360
+              </button>
+            )}
+            {googleMapsUrl && (
+              <button
+                type="button"
+                onClick={() => window.open(googleMapsUrl, '_blank', 'noopener,noreferrer')}
+                className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+              >
+                Mở tab Google Maps
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={retryViewer}
+              className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700"
+            >
+              Tải lại VR
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 rounded-lg border border-white/30 text-white hover:bg-white/10"
+            >
+              Đóng
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* 360 Viewer with VirtualTour + Gallery built-in */}
       <div className="flex-1 w-full h-full">
         <ReactPhotoSphereViewer
-          key={`vr-tour-${isOpen}`}
+          key={`vr-tour-${isOpen}-${viewerSeed}`}
           src={scenes[0]?.panoramaUrl || ''}
           height="100vh"
           width="100%"

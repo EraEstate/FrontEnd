@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, Phone, AlertCircle, CheckCircle, KeyRound } from 'lucide-react';
+import { showSuccess, showError } from '../utils/toast';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../store/authStore';
 import type { RegisterForm } from '../types';
@@ -77,6 +78,7 @@ const RegisterPage: React.FC = () => {
       setShowOtpForm(true);
       setOtpCountdown(OTP_DURATION_SECONDS);
       setCanResendOtp(false);
+      showSuccess('Mã OTP đã được gửi đến email của bạn');
     } catch (err: any) {
       setOtpError(err.response?.data?.error || 'Không thể gửi mã OTP');
     } finally {
@@ -94,6 +96,7 @@ const RegisterPage: React.FC = () => {
       await sendOtp(formData.email);
       setOtpCountdown(OTP_DURATION_SECONDS);
       setCanResendOtp(false);
+      showSuccess('Mã OTP mới đã được gửi');
     } catch (err: any) {
       setOtpError(err.response?.data?.error || 'Không thể gửi lại mã OTP');
     } finally {

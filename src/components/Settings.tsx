@@ -15,12 +15,13 @@ import { getImageUrl, getAvatarPlaceholder } from '../utils/imageUtils';
 import type { SettingsResponse, UpdateProfileRequest, ChangePasswordRequest } from '../api/settings';
 import { useAuthStore } from '../store/authStore';
 
+import { showSuccess, showError } from '../utils/toast';
+
 const Settings: React.FC = () => {
   const { user, updateUser } = useAuthStore();
   const [activeTab, setActiveTab] = useState<'profile' | 'password'>('profile');
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // Profile form state
   const [profileData, setProfileData] = useState<UpdateProfileRequest>({
@@ -66,7 +67,7 @@ const Settings: React.FC = () => {
       // Don't set avatarPreview here - let it use profileData.avatarUrl through getImageUrl
       // avatarPreview is only for preview when selecting new file
     } catch (error: any) {
-      showMessage('error', 'Không thể tải thông tin cài đặt: ' + (error.response?.data?.message || error.message));
+      showError('Không thể tải thông tin cài đặt: ' + (error.response?.data?.message || error.message));
     } finally {
       setLoading(false);
     }
@@ -76,11 +77,11 @@ const Settings: React.FC = () => {
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        showMessage('error', 'Kích thước file không được vượt quá 5MB');
+        showError('Kích thước file không được vượt quá 5MB');
         return;
       }
       if (!file.type.startsWith('image/')) {
-        showMessage('error', 'File phải là hình ảnh');
+        showError('File phải là hình ảnh');
         return;
       }
       setAvatarFile(file);
@@ -95,7 +96,6 @@ const Settings: React.FC = () => {
   const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    setMessage(null);
 
     try {
       let updatedSettings: SettingsResponse;
@@ -119,7 +119,7 @@ const Settings: React.FC = () => {
             avatarUrl: avatarUrl,
           });
         } catch (error: any) {
-          showMessage('error', 'Upload avatar thất bại: ' + (error.response?.data?.error || error.message));
+          showError('Upload avatar thất bại: ' + (error.response?.data?.error || error.message));
           setSaving(false);
           return;
         }
@@ -144,9 +144,9 @@ const Settings: React.FC = () => {
       setAvatarPreview(null);
       setAvatarFile(null);
       
-      showMessage('success', 'Cập nhật thông tin thành công');
+      showSuccess('Cập nhật thông tin thành công');
     } catch (error: any) {
-      showMessage('error', 'Cập nhật thất bại: ' + (error.response?.data?.message || error.message));
+      showError('Cập nhật thất bại: ' + (error.response?.data?.message || error.message));
     } finally {
       setSaving(false);
     }
@@ -155,36 +155,30 @@ const Settings: React.FC = () => {
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    setMessage(null);
 
     // Validation
     if (passwordData.newPassword !== confirmPassword) {
-      showMessage('error', 'Mật khẩu mới và xác nhận mật khẩu không khớp');
+      showError('Mật khẩu mới và xác nhận mật khẩu không khớp');
       setSaving(false);
       return;
     }
 
     if (passwordData.newPassword.length < 6) {
-      showMessage('error', 'Mật khẩu mới phải có ít nhất 6 ký tự');
+      showError('Mật khẩu mới phải có ít nhất 6 ký tự');
       setSaving(false);
       return;
     }
 
     try {
       await settingsAPI.changePassword(passwordData);
-      showMessage('success', 'Đổi mật khẩu thành công');
+      showSuccess('Đổi mật khẩu thành công');
       setPasswordData({ oldPassword: '', newPassword: '' });
       setConfirmPassword('');
     } catch (error: any) {
-      showMessage('error', 'Đổi mật khẩu thất bại: ' + (error.response?.data?.message || error.message));
+      showError('Đổi mật khẩu thất bại: ' + (error.response?.data?.message || error.message));
     } finally {
       setSaving(false);
     }
-  };
-
-  const showMessage = (type: 'success' | 'error', text: string) => {
-    setMessage({ type, text });
-    setTimeout(() => setMessage(null), 5000);
   };
 
   if (loading) {
@@ -225,24 +219,6 @@ const Settings: React.FC = () => {
           Đổi mật khẩu
         </button>
       </div>
-
-      {/* Message */}
-      {message && (
-        <div
-          className={`flex items-center space-x-2 p-4 rounded-lg ${
-            message.type === 'success'
-              ? 'bg-green-50 text-green-800 border border-green-200'
-              : 'bg-red-50 text-red-800 border border-red-200'
-          }`}
-        >
-          {message.type === 'success' ? (
-            <CheckCircle2 className="w-5 h-5" />
-          ) : (
-            <AlertCircle className="w-5 h-5" />
-          )}
-          <span>{message.text}</span>
-        </div>
-      )}
 
       {/* Profile Tab */}
       {activeTab === 'profile' && (

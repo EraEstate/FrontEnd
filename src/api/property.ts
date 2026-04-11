@@ -259,22 +259,25 @@ export const propertyAPI = {
   },
 
   getPriceHistory: async (propertyId: string) => {
-    const response = await api.get(`/price-history/${propertyId}`);
+    const response = await api.get(`/properties/${propertyId}/price-history`);
     return response.data;
   },
 
-  createPriceAlert: async (data: { propertyId: string, targetPrice: number }) => {
-    const response = await api.post('/price-history/alerts', data);
+  createPriceAlert: async (data: { propertyId: string, targetPrice: number, alertType?: 'PRICE_DROP' | 'PRICE_BELOW' | 'PRICE_ABOVE' | 'ANY_CHANGE' }) => {
+    const response = await api.post('/price-alerts', {
+      ...data,
+      alertType: data.alertType || 'PRICE_BELOW',
+    });
     return response.data;
   },
 
   getUserPriceAlerts: async () => {
-    const response = await api.get('/price-history/alerts');
+    const response = await api.get('/price-alerts/my');
     return response.data;
   },
 
   deletePriceAlert: async (alertId: string) => {
-    const response = await api.delete(`/price-history/alerts/${alertId}`);
+    const response = await api.delete(`/price-alerts/${alertId}`);
     return response.data;
   },
 };

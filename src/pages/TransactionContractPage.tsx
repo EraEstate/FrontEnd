@@ -28,7 +28,7 @@ import { escrowAPI } from '../api/escrow';
 import { kycAPI, type KycVerification } from '../api/kyc';
 import { REALESTATE_CONTRACT_ADDRESS, BLOCKCHAIN_EXPLORER_URL, BLOCKCHAIN_NETWORK_NAME } from '../config/blockchain';
 import { createVnpayPaymentUrl } from '../config/vnpay';
-import RealEstateEscrowAbi from '../abi/RealEstateEscrow.json';
+import RealEstateEscrowAbi from '../blockchain/RealEstateEscrow.json';
 import { useTranslation } from 'react-i18next';
 import { TransactionStepper } from '../components/TransactionStepper';
 import SignatureCanvas from '../components/SignatureCanvas';
@@ -72,11 +72,11 @@ const TransactionContractPage: React.FC = () => {
           const prop = await propertyAPI.getById(tx.propertyId);
           setProperty(prop);
         } catch (e) {
-          toast.error('Kh�ng th? t?i th�ng tin B�S');
+          toast.error('Kh�ng th? t?i th�ng tin B�S');
         }
       }
     } catch (error: any) {
-      toast.error('Kh�ng th? t?i giao d?ch');
+      toast.error('Kh�ng th? t?i giao d?ch');
       toast.error(t('transaction.errors.notFound'));
       navigate('/profile');
     } finally {
@@ -285,7 +285,7 @@ const TransactionContractPage: React.FC = () => {
       // Điều hướng người dùng tới Escrow Dashboard để xem trạng thái giao dịch
       navigate('/escrow');
     } catch (error: any) {
-      toast.error('L?i k� h?p d?ng blockchain');
+      toast.error('L?i k� h?p d?ng blockchain');
       
       // Detect specific error types
       let errorMessage = t('transaction.errors.signFailed');

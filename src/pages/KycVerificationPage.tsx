@@ -2,7 +2,6 @@ import React, { useState, useRef, useCallback } from 'react';
 import { parseCccdText, validateCccdNumber, type CccdParsedData } from '../utils/cccdParser';
 import { kycAPI } from '../api/kyc';
 import { useAuthStore } from '../store/authStore';
-import { toast } from 'react-toastify';
 import {
   Upload, Camera, Loader2, ShieldCheck, AlertTriangle,
   CheckCircle2, XCircle, User, CreditCard, MapPin,
@@ -104,7 +103,7 @@ const KycVerificationPage: React.FC = () => {
         toast.warning('Không nhận diện được thông tin CCCD. Vui lòng thử lại với ảnh rõ hơn.');
       }
     } catch (error: any) {
-      toast.error('L?i x? l� ?nh CCCD');
+      toast.error('L?i x? l� ?nh CCCD');
       toast.error('Lỗi quét ảnh: ' + (error.message || 'Không xác định'));
       setStep('upload');
     }

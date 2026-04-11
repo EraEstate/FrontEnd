@@ -1025,6 +1025,8 @@ const PropertyDetailPage: React.FC = () => {
         propertyImages={images}
         propertyTitle={property.title}
         propertyAddress={fullAddress}
+        propertyLat={property.location?.latitude}
+        propertyLng={property.location?.longitude}
       />
     </div>
   );

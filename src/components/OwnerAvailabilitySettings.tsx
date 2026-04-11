@@ -3,7 +3,7 @@ import {
   Clock,
   Save,
   Loader2,
-  CalendarCog,
+  CalendarClock,
   ToggleLeft,
   ToggleRight,
 } from 'lucide-react';
@@ -125,7 +125,7 @@ const OwnerAvailabilitySettings: React.FC = () => {
       <div className="p-5 border-b border-gray-100">
         <div className="flex items-center gap-3">
           <div className="p-2.5 bg-purple-100 rounded-xl">
-            <CalendarCog className="w-5 h-5 text-purple-600" />
+            <CalendarClock className="w-5 h-5 text-purple-600" />
           </div>
           <div>
             <h3 className="font-bold text-gray-900">Lịch trình xem nhà</h3>

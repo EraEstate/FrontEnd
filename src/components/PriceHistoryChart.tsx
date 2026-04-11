@@ -55,7 +55,18 @@ const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({ propertyId, curre
           ]);
         }
       })
-      .catch((err) => console.error('Failed to load price history', err))
+      .catch((err: any) => {
+        if (err?.response?.status === 404) {
+          setData([
+            {
+              date: new Date().toLocaleDateString('vi-VN'),
+              price: currentPrice
+            }
+          ]);
+          return;
+        }
+        console.error('Failed to load price history', err);
+      })
       .finally(() => {
         if (alive) setLoading(false);
       });

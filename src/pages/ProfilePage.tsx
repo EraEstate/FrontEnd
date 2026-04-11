@@ -66,7 +66,7 @@ const ProfilePage: React.FC = () => {
           phoneNumber: settings.phone || user?.phoneNumber,
         });
       } catch (error: any) {
-        toast.error('Không th? t?i thông tin cá nhân');
+        toast.error('Khï¿½ng th? t?i thï¿½ng tin cï¿½ nhï¿½n');
         // Fallback to user from auth store
         setUserProfile(user);
       } finally {
@@ -180,9 +180,6 @@ const ProfilePage: React.FC = () => {
                   }
                 }}
               />
-              <button className="absolute -bottom-1 -right-1 bg-red-600 text-white rounded-full p-1.5 hover:bg-red-700">
-                <Camera className="w-3 h-3" />
-              </button>
             </div>
             <div>
               <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
@@ -213,13 +210,6 @@ const ProfilePage: React.FC = () => {
               </div>
             </div>
           </div>
-          <button
-            onClick={() => {}}
-            className="flex items-center px-4 py-2 text-red-600 border border-red-600 rounded-lg hover:bg-red-50"
-          >
-            <Edit3 className="w-4 h-4 mr-2" />
-            {t('profile.edit')}
-          </button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -545,7 +535,7 @@ const ProfilePage: React.FC = () => {
       } catch (error: any) {
         // Chá»‰ log error náº¿u khÃ´ng pháº£i 404 (Ä‘Ã£ Ä‘Æ°á»£c xá»­ lÃ½ á»Ÿ trÃªn)
         if (error.response?.status !== 404) {
-          toast.error('Không th? t?i thông tin gói d?ch v?');
+          toast.error('Khï¿½ng th? t?i thï¿½ng tin gï¿½i d?ch v?');
         }
         // Set empty state on error
         setCurrentSubscription(null);

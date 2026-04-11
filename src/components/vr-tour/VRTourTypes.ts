@@ -24,4 +24,7 @@ export interface VRTourProps {
   propertyTitle?: string;
   /** Property address shown in the header */
   propertyAddress?: string;
+  /** Optional coordinates for map fallback when VR fails */
+  propertyLat?: number;
+  propertyLng?: number;
 }

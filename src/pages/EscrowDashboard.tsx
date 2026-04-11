@@ -8,7 +8,7 @@ import {
   Wallet, TrendingUp, Lock, RefreshCw, ExternalLink, Copy,
   Filter, Clock, ArrowUpRight, Shield, Landmark, AlertTriangle
 } from 'lucide-react';
-import ABI from '../abi/RealEstateEscrow.json';
+import ABI from '../blockchain/RealEstateEscrow.json';
 import { REALESTATE_CONTRACT_ADDRESS, BLOCKCHAIN_EXPLORER_URL, BLOCKCHAIN_NETWORK_NAME } from '../config/blockchain';
 
 const CONTRACT_ADDRESS = REALESTATE_CONTRACT_ADDRESS || import.meta.env.VITE_ESCROW_CONTRACT_ADDRESS || '0x5FbDB2315678afecb367f032d93F642f64180aa3';
