@@ -60,7 +60,7 @@ export default {
   warning: showWarning, 
   info: showInfo, 
   promise: showPromise,
-  // Giữ lại tên cũ để tương thích ngược với code hiện tại đang gọi showSuccess trực tiếp
+
   showSuccess, 
   showError, 
   showWarning, 

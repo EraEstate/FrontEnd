@@ -68,6 +68,10 @@ import KycVerificationPage from './pages/KycVerificationPage';
 import LandlordAnalyticsPage from './pages/LandlordAnalyticsPage';
 import ValuationPage from './pages/ValuationPage';
 import MyViewingsPage from './pages/MyViewingsPage';
+import TransactionHistoryPage from './pages/TransactionHistoryPage';
+import BankAccountManagementPage from './pages/BankAccountManagementPage';
+import ActivityLogPage from './pages/ActivityLogPage';
+import TestimonialsPage from './pages/TestimonialsPage';
 
 function AppContent() {
   const location = useLocation();
@@ -159,6 +163,10 @@ function AppContent() {
           <Route path="/security" element={<SecurityCenterPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/testimonials" element={<TestimonialsPage />} />
+          <Route path="/transaction-history" element={<ProtectedRoute><TransactionHistoryPage /></ProtectedRoute>} />
+          <Route path="/bank-accounts" element={<ProtectedRoute><BankAccountManagementPage /></ProtectedRoute>} />
+          <Route path="/activity-log" element={<ProtectedRoute><ActivityLogPage /></ProtectedRoute>} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>
