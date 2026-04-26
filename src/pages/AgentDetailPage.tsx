@@ -7,6 +7,10 @@ import { useAuthStore } from '../store/authStore';
 import toast from '../utils/toast';
 import { Star, Loader2 } from 'lucide-react';
 import { getImageUrl, getImagePlaceholder } from '../utils/imageUtils';
+import AgentReviewForm from '../components/AgentReviewForm';
+import AgentReviewRadar from '../components/AgentReviewRadar';
+import { agentReviewApi, type AgentReview } from '../api/agentReview';
+import { useEffect } from 'react';
 
 const AgentDetailPage = () => {
   const { t } = useTranslation();
@@ -22,6 +26,15 @@ const AgentDetailPage = () => {
   const { data: agent, loading } = useAgent(id || '');
   const { data: propertiesData } = useAgentProperties(id || '');
   const properties = propertiesData?.content || [];
+  const [reviews, setReviews] = useState<AgentReview[]>([]);
+
+  useEffect(() => {
+    if (id && activeTab === 'reviews') {
+      agentReviewApi.getAgentReviews(id)
+        .then(res => setReviews(res.data))
+        .catch(console.error);
+    }
+  }, [id, activeTab]);
 
   if (loading) {
     return (
@@ -322,73 +335,79 @@ const AgentDetailPage = () => {
       {activeTab === 'reviews' && (
         <div className="bg-white rounded-lg shadow-md p-8">
           <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-            Đánh giá từ khách hàng ({agent.reviewCount})
+            Đánh giá từ khách hàng ({reviews.length || agent.reviewCount})
           </h2>
 
-          <div className="max-w-lg border border-gray-200 rounded-xl p-5 mb-8 bg-gray-50/50">
-            <h3 className="text-sm font-semibold text-gray-900 mb-3">Bạn đã làm việc với môi giới này?</h3>
-            {!isAuthenticated ? (
-              <p className="text-sm text-gray-600">
-                <button type="button" onClick={() => navigate('/login')} className="text-red-600 font-medium hover:underline">
-                  Đăng nhập
-                </button>{' '}
-                để gửi đánh giá.
-              </p>
-            ) : (
-              <form
-                className="space-y-3"
-                onSubmit={async (e) => {
-                  e.preventDefault();
-                  if (!id) return;
-                  setSubmittingReview(true);
-                  try {
-                    await agentAPI.rate(id, ratingScore, reviewText.trim() || undefined);
-                    toast.success('Cảm ơn bạn đã đánh giá.');
-                    setReviewText('');
-                  } catch (err: any) {
-                    toast.error(err.response?.data?.message || err.response?.data?.error || 'Không gửi được đánh giá.');
-                  } finally {
-                    setSubmittingReview(false);
-                  }
-                }}
-              >
-                <div className="flex items-center gap-1">
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <button
-                      key={s}
-                      type="button"
-                      onClick={() => setRatingScore(s)}
-                      className="p-0.5 rounded hover:bg-white"
-                    >
-                      <Star
-                        className={`w-7 h-7 ${s <= ratingScore ? 'fill-amber-400 text-amber-400' : 'text-gray-300'}`}
-                      />
-                    </button>
-                  ))}
-                  <span className="text-sm text-gray-600 ml-2">{ratingScore}/5</span>
-                </div>
-                <textarea
-                  value={reviewText}
-                  onChange={(e) => setReviewText(e.target.value)}
-                  rows={3}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                  placeholder="Chia sẻ trải nghiệm của bạn (tuỳ chọn)"
-                />
-                <button
-                  type="submit"
-                  disabled={submittingReview}
-                  className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 disabled:opacity-50 inline-flex items-center gap-2"
-                >
-                  {submittingReview ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                  Gửi đánh giá
-                </button>
-              </form>
-            )}
-          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-1">
+              <div className="bg-gray-50 rounded-xl p-5 border border-gray-100 h-full">
+                <h3 className="font-semibold text-gray-900 mb-4 text-center">Biểu đồ Kỹ năng</h3>
+                {reviews.length > 0 ? (
+                  <AgentReviewRadar 
+                    professionalRating={reviews.reduce((acc, r) => acc + r.professionalRating, 0) / reviews.length}
+                    responsivenessRating={reviews.reduce((acc, r) => acc + r.responsivenessRating, 0) / reviews.length}
+                    marketKnowledgeRating={reviews.reduce((acc, r) => acc + r.marketKnowledgeRating, 0) / reviews.length}
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-64 text-sm text-gray-400">
+                    Chưa có đủ dữ liệu
+                  </div>
+                )}
+              </div>
+            </div>
 
-          <p className="text-sm text-gray-500 text-center py-6">
-            Danh sách đánh giá chi tiết sẽ hiển thị khi backend trả về danh sách review đầy đủ.
-          </p>
+            <div className="lg:col-span-2 space-y-8">
+              <div className="border border-gray-200 rounded-xl p-5 bg-gray-50/50">
+                <h3 className="text-base font-semibold text-gray-900 mb-4">Bạn đã làm việc với môi giới này?</h3>
+                {!isAuthenticated ? (
+                  <p className="text-sm text-gray-600">
+                    <button type="button" onClick={() => navigate('/login')} className="text-red-600 font-medium hover:underline">
+                      Đăng nhập
+                    </button>{' '}
+                    để gửi đánh giá đa chiều.
+                  </p>
+                ) : (
+                  <AgentReviewForm 
+                    agentId={id!} 
+                    onSuccess={() => {
+                      agentReviewApi.getAgentReviews(id!)
+                        .then(res => setReviews(res.data))
+                        .catch(console.error);
+                    }} 
+                  />
+                )}
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Nhận xét chi tiết</h3>
+                {reviews.length === 0 ? (
+                  <p className="text-sm text-gray-500 py-4 text-center border-2 border-dashed border-gray-200 rounded-lg">
+                    Chưa có bài đánh giá nào. Hãy là người đầu tiên!
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {reviews.map(review => (
+                      <div key={review.id} className="p-4 border border-gray-100 rounded-xl bg-white shadow-sm">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="font-medium text-gray-900">Người dùng ẩn danh</div>
+                          <div className="text-xs text-gray-500">{new Date(review.createdAt).toLocaleDateString('vi-VN')}</div>
+                        </div>
+                        <div className="flex items-center gap-1 text-amber-400 mb-3">
+                          {[1,2,3,4,5].map(s => (
+                            <Star key={s} className={`w-4 h-4 \${s <= review.averageRating ? 'fill-current' : 'text-gray-200'}`} />
+                          ))}
+                          <span className="text-sm text-gray-600 ml-1 font-medium">{review.averageRating.toFixed(1)}/5</span>
+                        </div>
+                        {review.comment && (
+                          <p className="text-gray-700 text-sm mt-2 p-3 bg-gray-50 rounded-lg italic">"{review.comment}"</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
