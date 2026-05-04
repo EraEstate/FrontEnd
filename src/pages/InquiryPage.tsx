@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { 
   MessageSquare, 
@@ -49,7 +50,7 @@ import {
         setResponse('');
       }
     } catch (error) {
-      toast.error('C?p nh?t tr?ng thái th?t b?i');
+      toast.error('C?p nh?t tr?ng thï¿½i th?t b?i');
     }
   };
 
@@ -62,7 +63,7 @@ import {
           setSelectedInquiry(null);
         }
       } catch (error) {
-        toast.error('Xóa yêu c?u th?t b?i');
+        toast.error('Xï¿½a yï¿½u c?u th?t b?i');
       }
     }
   };

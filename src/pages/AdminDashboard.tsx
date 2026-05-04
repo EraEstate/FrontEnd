@@ -52,7 +52,7 @@ const AdminDashboardContent: React.FC = () => {
   // ── Fetch pending moderation for badge ──
   const fetchModerationBadge = useCallback(async () => {
     try {
-      const response = await propertyAPI.getByStatus('PENDING', 0, 1);
+      const response = await propertyAPI.getPropertiesByStatus('PENDING', 0, 1);
       setPendingModeration(response?.totalElements || response?.content?.length || 0);
     } catch {
       setPendingModeration(0);

@@ -12,7 +12,7 @@ export interface PropertyTransaction {
   platformFee: number;
   sellerAmount: number;
   status: 'PENDING' | 'PROCESSING' | 'PAID' | 'COMPLETED' | 'FAILED' | 'CANCELLED' | 'REFUNDED';
-  paymentMethod: 'BANK_TRANSFER' | 'VNPAY' | 'MOMO' | 'ZALOPAY' | 'CASH';
+  paymentMethod: 'BANK_TRANSFER' | 'VNPAY' | 'MOMO' | 'ZALOPAY' | 'CASH' | 'MILESTONE';
   paymentReference?: string;
   bankTransactionId?: string;
   buyerBankAccountId?: string;
@@ -54,7 +54,7 @@ export interface PropertyTransaction {
 export interface CreateTransactionRequest {
   propertyId: string;
   buyerId: string;
-  paymentMethod: 'BANK_TRANSFER' | 'VNPAY' | 'MOMO' | 'ZALOPAY' | 'CASH';
+  paymentMethod: 'BANK_TRANSFER' | 'VNPAY' | 'MOMO' | 'ZALOPAY' | 'CASH' | 'MILESTONE';
   buyerBankAccountId?: string;
   sellerBankAccountId?: string;
 }

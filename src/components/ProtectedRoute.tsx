@@ -53,7 +53,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       return <NotFoundPage />;
     }
     // STAFF trying to access ADMIN (already handled above)
-    if (requireRole === 'ADMIN' && userRole !== 'ADMIN') {
+    if (requireRole === 'ADMIN') {
       return <NotFoundPage />;
     }
   }

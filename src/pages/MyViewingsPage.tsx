@@ -187,7 +187,7 @@ const MyViewingsPage: React.FC = () => {
           <div className="space-y-4">
             {filtered.map((viewing) => {
               const badge = getStatusBadge(viewing.status);
-              const isOwner = viewing.ownerId === user?.id;
+              const isOwner = String(viewing.ownerId) === String(user?.id);
               const otherParty = isOwner ? viewing.viewer : viewing.owner;
 
               return (

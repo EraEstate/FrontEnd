@@ -1,6 +1,9 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { Suspense, lazy } from 'react';
 import { useEffect } from 'react';
 import { Toaster } from 'sonner';
+import PageSkeleton from './components/PageSkeleton';
+import ErrorBoundary from './components/ErrorBoundary';
 import { Header } from './components/Header';
 import Footer from './components/Footer';
 import AccountDisabledBanner from './components/AccountDisabledBanner';
@@ -8,70 +11,71 @@ import FloatingActionHub from './components/FloatingActionHub';
 import ScrollToTop from './components/ScrollToTop';
 import TopProgressBar from './components/TopProgressBar';
 import { useAuthStore } from './store/authStore';
-import HomePage from './components/HomePage';
-import PropertiesPage from './pages/PropertiesPage';
-import PropertyDetailPage from './pages/PropertyDetailPage';
-import NewsPage from './pages/NewsPage';
-import AgentsPage from './pages/AgentsPage';
-import AgenciesPage from './pages/AgenciesPage';
-import AgencyDetailPage from './pages/AgencyDetailPage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import ProfilePage from './pages/ProfilePage';
-import PostPropertyPage from './pages/PostPropertyPage';
-import EditPropertyPage from './pages/EditPropertyPage';
-import ContactPage from './pages/ContactPage';
-import AboutPage from './pages/AboutPage';
-import NotFoundPage from './pages/NotFoundPage';
-import FavoritesPage from './pages/FavoritesPage';
-import MyPropertiesPage from './pages/MyPropertiesPage';
-import NewsDetailPage from './pages/NewsDetailPage';
-import AgentDetailPage from './pages/AgentDetailPage';
-import RentPage from './pages/RentPage';
-import ProjectsPage from './pages/ProjectsPage';
-import ProjectDetailPage from './pages/ProjectDetailPage';
-import CompaniesPage from './pages/CompaniesPage';
-import CompanyDetailPage from './pages/CompanyDetailPage';
-import MarketAnalysisListPage from './pages/MarketAnalysisListPage';
-import MarketAnalysisDetailPage from './pages/MarketAnalysisDetailPage';
-import WikiPage from './pages/WikiPage';
-import UtilitiesPage from './pages/UtilitiesPage';
-import NotificationCenter from './pages/NotificationCenter';
-import PaymentHistoryPage from './pages/PaymentHistoryPage';
-import PaymentSuccessPage from './pages/PaymentSuccessPage';
-import PaymentFailedPage from './pages/PaymentFailedPage';
-import InquiryPage from './pages/InquiryPage';
-import DashboardPage from './pages/DashboardPage';
-import PricingPage from './pages/PricingPage';
-import WikiDetailPage from './pages/WikiDetailPage';
-import AdminDashboard from './pages/AdminDashboard';
-import StaffDashboard from './pages/StaffDashboard';
+const HomePage = lazy(() => import('./components/HomePage'));
+const PropertiesPage = lazy(() => import('./pages/PropertiesPage'));
+const PropertyDetailPage = lazy(() => import('./pages/PropertyDetailPage'));
+const NewsPage = lazy(() => import('./pages/NewsPage'));
+const AgentsPage = lazy(() => import('./pages/AgentsPage'));
+const AgenciesPage = lazy(() => import('./pages/AgenciesPage'));
+const AgencyDetailPage = lazy(() => import('./pages/AgencyDetailPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage'));
+const PostPropertyPage = lazy(() => import('./pages/PostPropertyPage'));
+const EditPropertyPage = lazy(() => import('./pages/EditPropertyPage'));
+const ContactPage = lazy(() => import('./pages/ContactPage'));
+const AboutPage = lazy(() => import('./pages/AboutPage'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
+const FavoritesPage = lazy(() => import('./pages/FavoritesPage'));
+const MyPropertiesPage = lazy(() => import('./pages/MyPropertiesPage'));
+const NewsDetailPage = lazy(() => import('./pages/NewsDetailPage'));
+const AgentDetailPage = lazy(() => import('./pages/AgentDetailPage'));
+const RentPage = lazy(() => import('./pages/RentPage'));
+const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
+const ProjectDetailPage = lazy(() => import('./pages/ProjectDetailPage'));
+const CompaniesPage = lazy(() => import('./pages/CompaniesPage'));
+const CompanyDetailPage = lazy(() => import('./pages/CompanyDetailPage'));
+const MarketAnalysisListPage = lazy(() => import('./pages/MarketAnalysisListPage'));
+const MarketAnalysisDetailPage = lazy(() => import('./pages/MarketAnalysisDetailPage'));
+const WikiPage = lazy(() => import('./pages/WikiPage'));
+const UtilitiesPage = lazy(() => import('./pages/UtilitiesPage'));
+const NotificationCenter = lazy(() => import('./pages/NotificationCenter'));
+const PaymentHistoryPage = lazy(() => import('./pages/PaymentHistoryPage'));
+const PaymentSuccessPage = lazy(() => import('./pages/PaymentSuccessPage'));
+const PaymentFailedPage = lazy(() => import('./pages/PaymentFailedPage'));
+const InquiryPage = lazy(() => import('./pages/InquiryPage'));
+const DashboardPage = lazy(() => import('./pages/DashboardPage'));
+const PricingPage = lazy(() => import('./pages/PricingPage'));
+const WikiDetailPage = lazy(() => import('./pages/WikiDetailPage'));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const StaffDashboard = lazy(() => import('./pages/StaffDashboard'));
 import ProtectedRoute from './components/ProtectedRoute';
-import PublicProfilePage from './pages/PublicProfilePage';
-import TransactionContractPage from './pages/TransactionContractPage';
-import TransactionOverviewPage from './pages/TransactionOverviewPage';
-import TransactionContractReviewPage from './pages/TransactionContractReviewPage';
-import MyTransactionsPage from './pages/MyTransactionsPage';
-import SettingsPage from './pages/SettingsPage';
-import WalletGuidePage from './pages/WalletGuidePage';
-import LegalCenterPage from './pages/LegalCenterPage';
-import SecurityCenterPage from './pages/SecurityCenterPage';
-import ForgotPasswordPage from './pages/ForgotPasswordPage';
-import ResetPasswordPage from './pages/ResetPasswordPage';
-import VerifyEmailPage from './pages/VerifyEmailPage';
-import NotificationSettingsPage from './pages/NotificationSettingsPage';
-import PropertyComparisonPage from './pages/PropertyComparisonPage';
-import MapSearchPage from './pages/MapSearchPage';
+const RentalManagementPage = lazy(() => import('./pages/RentalManagementPage'));
+const PublicProfilePage = lazy(() => import('./pages/PublicProfilePage'));
+const TransactionContractPage = lazy(() => import('./pages/TransactionContractPage'));
+const TransactionOverviewPage = lazy(() => import('./pages/TransactionOverviewPage'));
+const TransactionContractReviewPage = lazy(() => import('./pages/TransactionContractReviewPage'));
+const MyTransactionsPage = lazy(() => import('./pages/MyTransactionsPage'));
+const SettingsPage = lazy(() => import('./pages/SettingsPage'));
+const WalletGuidePage = lazy(() => import('./pages/WalletGuidePage'));
+const LegalCenterPage = lazy(() => import('./pages/LegalCenterPage'));
+const SecurityCenterPage = lazy(() => import('./pages/SecurityCenterPage'));
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
+const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'));
+const VerifyEmailPage = lazy(() => import('./pages/VerifyEmailPage'));
+const NotificationSettingsPage = lazy(() => import('./pages/NotificationSettingsPage'));
+const PropertyComparisonPage = lazy(() => import('./pages/PropertyComparisonPage'));
+const MapSearchPage = lazy(() => import('./pages/MapSearchPage'));
 import CompareFloatingBar from './components/CompareFloatingBar';
-import EscrowDashboard from './pages/EscrowDashboard';
-import KycVerificationPage from './pages/KycVerificationPage';
-import LandlordAnalyticsPage from './pages/LandlordAnalyticsPage';
-import ValuationPage from './pages/ValuationPage';
-import MyViewingsPage from './pages/MyViewingsPage';
-import TransactionHistoryPage from './pages/TransactionHistoryPage';
-import BankAccountManagementPage from './pages/BankAccountManagementPage';
-import ActivityLogPage from './pages/ActivityLogPage';
-import TestimonialsPage from './pages/TestimonialsPage';
+const EscrowDashboard = lazy(() => import('./pages/EscrowDashboard'));
+const KycVerificationPage = lazy(() => import('./pages/KycVerificationPage'));
+const LandlordAnalyticsPage = lazy(() => import('./pages/LandlordAnalyticsPage'));
+const ValuationPage = lazy(() => import('./pages/ValuationPage'));
+const MyViewingsPage = lazy(() => import('./pages/MyViewingsPage'));
+const TransactionHistoryPage = lazy(() => import('./pages/TransactionHistoryPage'));
+const BankAccountManagementPage = lazy(() => import('./pages/BankAccountManagementPage'));
+const ActivityLogPage = lazy(() => import('./pages/ActivityLogPage'));
+const TestimonialsPage = lazy(() => import('./pages/TestimonialsPage'));
 
 function AppContent() {
   const location = useLocation();
@@ -91,7 +95,9 @@ function AppContent() {
       {!isDashboardRoute && <AccountDisabledBanner />}
       
       <main className={`flex-1 w-full ${!isDashboardRoute ? 'pt-16' : ''}`}>
-        <Routes>
+        <ErrorBoundary>
+          <Suspense fallback={<PageSkeleton />}>
+            <Routes>
           {/* Admin Routes - Protected and fullscreen */}
           <Route path="/admin" element={
             <ProtectedRoute requireAdmin>
@@ -169,6 +175,8 @@ function AppContent() {
           <Route path="/activity-log" element={<ProtectedRoute><ActivityLogPage /></ProtectedRoute>} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
+          </Suspense>
+        </ErrorBoundary>
       </main>
       
       {/* Conditionally render Footer - hide on dashboard pages */}

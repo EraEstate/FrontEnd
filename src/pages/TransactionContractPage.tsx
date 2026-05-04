@@ -369,8 +369,8 @@ const TransactionContractPage: React.FC = () => {
     );
   }
 
-  const isBuyer = user && String(transaction.buyerId) === String(user.id);
-  const isSeller = user && String(transaction.sellerId) === String(user.id);
+  const isBuyer = !!user && String(transaction.buyerId) === String(user.id);
+  const isSeller = !!user && String(transaction.sellerId) === String(user.id);
   const isParticipant = isBuyer || isSeller;
 
   const isRent = property?.transactionType === 'RENT';
@@ -1435,7 +1435,7 @@ const TransactionContractPage: React.FC = () => {
                       label={`Bên A (${sellerName})`}
                       onSignatureChange={setSellerSignature}
                       disabled={!isSeller || !!transaction.sellerSigned}
-                      existingSignature={null}
+                      existingSignature={undefined}
                       height={140}
                     />
                     {!isSeller && (
@@ -1449,7 +1449,7 @@ const TransactionContractPage: React.FC = () => {
                       label={`Bên B (${buyerName})`}
                       onSignatureChange={setBuyerSignature}
                       disabled={!isBuyer || !!transaction.buyerSigned}
-                      existingSignature={null}
+                      existingSignature={undefined}
                       height={140}
                     />
                     {!isBuyer && (

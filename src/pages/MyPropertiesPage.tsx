@@ -126,13 +126,22 @@ const MyPropertiesPage = () => {
                 <p className="text-gray-600">{t('myProperties.subtitle')}</p>
               </div>
             </div>
-            <Link
-              to="/post-property"
-              className="mt-4 md:mt-0 inline-flex items-center space-x-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
-            >
-              <Plus className="h-5 w-5" />
-              <span>{t('myProperties.newListing')}</span>
-            </Link>
+            <div className="mt-4 md:mt-0 flex items-center gap-3">
+              <Link
+                to="/rental-management"
+                className="inline-flex items-center space-x-2 bg-white text-emerald-600 border border-emerald-200 hover:bg-emerald-50 px-5 py-3 rounded-xl font-semibold transition-all duration-200 shadow-sm hover:shadow-md"
+              >
+                <DollarSign className="h-5 w-5" />
+                <span>Quản lý dòng tiền</span>
+              </Link>
+              <Link
+                to="/post-property"
+                className="inline-flex items-center space-x-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
+              >
+                <Plus className="h-5 w-5" />
+                <span>{t('myProperties.newListing')}</span>
+              </Link>
+            </div>
           </div>
 
           {/* Stats Cards */}

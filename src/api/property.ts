@@ -23,6 +23,12 @@ export const propertyAPI = {
     return response.data;
   },
 
+  // Parse câu tìm kiếm bằng AI
+  aiSearchParse: async (query: string) => {
+    const response = await api.post('/properties/ai-search-parse', { query });
+    return response.data;
+  },
+
   // Lấy tất cả bất động sản
   getAll: async (params?: {
     page?: number;

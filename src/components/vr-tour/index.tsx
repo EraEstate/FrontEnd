@@ -51,8 +51,8 @@ const VRTour: React.FC<VRTourProps> = ({
           id: String(img.id || idx),
           name: img.description || `Ảnh ${idx + 1}`,
           panoramaUrl: cacheBusterUrl,
-          description: img.description,
-        };
+          description: img.description || '',
+        } as VRScene;
       })
       .filter((scene): scene is VRScene => scene !== null);
   }, [propertyImages]);
