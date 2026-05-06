@@ -158,7 +158,7 @@ const MilestoneManagerModal: React.FC<MilestoneManagerModalProps> = ({
             <div className="w-full bg-gray-200 rounded-full h-2.5">
               <div 
                 className={`h-2.5 rounded-full ${totalAllocated === 100 ? 'bg-green-500' : totalAllocated > 100 ? 'bg-red-500' : 'bg-red-500'}`}
-                style={{ width: \`\${Math.min(totalAllocated, 100)}%\` }}
+                style={{ width: `${Math.min(totalAllocated, 100)}%` }}
               ></div>
             </div>
             {totalAllocated !== 100 && (

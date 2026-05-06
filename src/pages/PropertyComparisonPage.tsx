@@ -289,7 +289,7 @@ const PropertyComparisonPage: React.FC = () => {
                       <PolarAngleAxis dataKey="subject" tick={{ fill: '#4b5563', fontSize: 12, fontWeight: 600 }} />
                       <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
                       <Tooltip 
-                        formatter={(value: number) => [`${Math.round(value)} điểm`, 'Tương đối']}
+                        formatter={(value: any) => [`${Math.round(value)} điểm`, 'Tương đối']}
                         contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                       />
                       <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '20px' }} />

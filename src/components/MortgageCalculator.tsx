@@ -140,7 +140,7 @@ const MortgageCalculator: React.FC<Props> = ({ propertyPrice, isRent }) => {
                 <Pie data={pieData} innerRadius={35} outerRadius={55} paddingAngle={3} dataKey="value" strokeWidth={0}>
                   {pieData.map((_, i) => (<Cell key={i} fill={PIE_COLORS[i]} />))}
                 </Pie>
-                <Tooltip formatter={(val: number) => formatVND(val)} contentStyle={{ borderRadius: '10px', border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,.1)', fontSize: '13px' }} />
+                <Tooltip formatter={(val: any) => formatVND(val)} contentStyle={{ borderRadius: '10px', border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,.1)', fontSize: '13px' }} />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -189,7 +189,7 @@ const MortgageCalculator: React.FC<Props> = ({ propertyPrice, isRent }) => {
                   <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 11 }} tickFormatter={v => `N${v}`} />
                   <YAxis hide />
                   <Tooltip
-                    formatter={(val: number, name: string) => [formatVND(val), name === 'principal' ? 'Gốc' : 'Lãi']}
+                    formatter={(val: any, name: string) => [formatVND(val), name === 'principal' ? 'Gốc' : 'Lãi']}
                     contentStyle={{ borderRadius: '10px', border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,.1)', fontSize: '13px' }}
                   />
                   <Bar dataKey="principal" name="Gốc" stackId="a" fill="#ef4444" radius={[0, 0, 0, 0]} />

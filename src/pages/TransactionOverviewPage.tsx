@@ -7,7 +7,7 @@ import { paymentMilestoneApi, type PaymentMilestone } from '../api/paymentMilest
 import toast from '../utils/toast';
 import { useTranslation } from 'react-i18next';
 import { TransactionStepper } from '../components/TransactionStepper';
-import useAuthStore from '../store/authStore';
+import { useAuthStore } from '../store/authStore';
 import MilestoneManagerModal from '../components/MilestoneManagerModal';
 import { Settings } from 'lucide-react';
 
