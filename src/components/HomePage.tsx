@@ -20,6 +20,7 @@ import { motion } from 'framer-motion';
 import { propertyViewAPI } from '../api/propertyView';
 import { propertyAPI } from '../api/property';
 import { getImageUrl, getImagePlaceholder } from '../utils/imageUtils';
+import LazyImage from './LazyImage';
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -437,11 +438,14 @@ const HomePage: React.FC = () => {
                     <div className="absolute top-2 left-2 z-10 bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded shadow-sm flex items-center gap-1">
                       <Star className="w-3 h-3 fill-current" /> Phù hợp
                     </div>
-                    <div 
-                      className="h-48 bg-cover bg-center bg-no-repeat"
-                      style={{ backgroundImage: `url(${getImageUrl(property.mainImageUrl || property.imageUrl) || getImagePlaceholder(400, 300)})` }}
-                    >
-                      <div className="h-full bg-black bg-opacity-20 hover:bg-opacity-30 transition-all duration-200" />
+                    <div className="h-48 relative">
+                      <LazyImage
+                        src={getImageUrl(property.mainImageUrl || property.imageUrl) || getImagePlaceholder(400, 300)}
+                        alt={property.title}
+                        className="w-full h-full object-cover"
+                        containerClassName="absolute inset-0"
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-20 hover:bg-opacity-30 transition-all duration-200" />
                     </div>
                     <div className="p-4">
                       <h3 className="font-semibold text-gray-900 mb-2 text-sm line-clamp-2">{property.title}</h3>
@@ -476,11 +480,14 @@ const HomePage: React.FC = () => {
                 to={`/properties/${property.id}`}
                 className="bg-white rounded-xl overflow-hidden card-hover border border-gray-100"
               >
-                <div 
-                  className="h-48 bg-cover bg-center bg-no-repeat"
-                  style={{ backgroundImage: `url(${getImageUrl(property.mainImageUrl || property.imageUrl) || getImagePlaceholder(400, 300)})` }}
-                >
-                  <div className="h-full bg-black bg-opacity-20 hover:bg-opacity-30 transition-all duration-200" />
+                <div className="h-48 relative">
+                  <LazyImage
+                    src={getImageUrl(property.mainImageUrl || property.imageUrl) || getImagePlaceholder(400, 300)}
+                    alt={property.title}
+                    className="w-full h-full object-cover"
+                    containerClassName="absolute inset-0"
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-20 hover:bg-opacity-30 transition-all duration-200" />
                 </div>
                 <div className="p-4">
                   <h3 className="font-semibold text-gray-900 mb-2 text-sm line-clamp-2">{property.title}</h3>
@@ -534,19 +541,20 @@ const HomePage: React.FC = () => {
                       to={`/properties/${property.id}`}
                       className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 block h-full"
                     >
-                    <div
-                      className="h-48 bg-cover bg-center bg-no-repeat relative"
-                      style={{
-                        backgroundImage: `url(${getImageUrl(property.mainImageUrl || property.propertyImages?.[0]?.imageUrl) || getImagePlaceholder(400, 300)})`,
-                      }}
-                    >
+                    <div className="h-48 relative">
+                      <LazyImage
+                        src={getImageUrl(property.mainImageUrl || property.propertyImages?.[0]?.imageUrl) || getImagePlaceholder(400, 300)}
+                        alt={property.title}
+                        className="w-full h-full object-cover"
+                        containerClassName="absolute inset-0"
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-10 hover:bg-opacity-20 transition-all duration-200" />
                       {property.weekViews != null && (
-                        <span className="absolute top-2 right-2 bg-black/65 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                        <span className="absolute top-2 right-2 z-10 bg-black/65 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
                           <Eye className="w-3 h-3" />
                           {Number(property.weekViews).toLocaleString('vi-VN')}
                         </span>
                       )}
-                      <div className="h-full bg-black bg-opacity-10 hover:bg-opacity-20 transition-all duration-200" />
                     </div>
                     <div className="p-4">
                       <h3 className="font-semibold text-gray-900 mb-2 text-sm line-clamp-2">{property.title}</h3>
