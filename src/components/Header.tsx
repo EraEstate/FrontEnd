@@ -7,6 +7,11 @@ import {
   Wallet,
   Receipt,
   CalendarCheck,
+  User,
+  Building2,
+  Settings,
+  Shield,
+  LogOut,
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -485,9 +490,10 @@ export const Header: React.FC = () => {
                       )}
                       <Link
                         to="/profile"
-                        className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
                         onClick={() => setIsUserMenuOpen(false)}
                       >
+                        <User className="w-4 h-4 opacity-70" />
                         {t('header.profile')}
                       </Link>
                       <Link
@@ -500,9 +506,10 @@ export const Header: React.FC = () => {
                       </Link>
                       <Link
                         to="/my-properties"
-                        className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
                         onClick={() => setIsUserMenuOpen(false)}
                       >
+                        <Building2 className="w-4 h-4 opacity-70" />
                         {t('header.myProperties')}
                       </Link>
                       <Link
@@ -515,9 +522,10 @@ export const Header: React.FC = () => {
                       </Link>
                       <Link
                         to="/settings"
-                        className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
                         onClick={() => setIsUserMenuOpen(false)}
                       >
+                        <Settings className="w-4 h-4 opacity-70" />
                         {t('header.settings')}
                       </Link>
                       <Link
@@ -530,16 +538,18 @@ export const Header: React.FC = () => {
                       </Link>
                       <Link
                         to="/security"
-                        className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
                         onClick={() => setIsUserMenuOpen(false)}
                       >
+                        <Shield className="w-4 h-4 opacity-70" />
                         {t('header.securityCenter')}
                       </Link>
                       <div className="border-t border-gray-100 my-1"></div>
                       <button
                         onClick={handleLogout}
-                        className="flex items-center w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150"
+                        className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150"
                       >
+                        <LogOut className="w-4 h-4 opacity-70" />
                         {t('header.logout')}
                       </button>
                     </div>
@@ -709,23 +719,26 @@ export const Header: React.FC = () => {
                 </div>
                 <Link
                   to="/profile"
-                  className="flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
                   onClick={() => setIsMenuOpen(false)}
                 >
+                  <User className="w-4 h-4 opacity-70" />
                   {t('header.profile')}
                 </Link>
                 <Link
                   to="/my-transactions"
-                  className="flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
                   onClick={() => setIsMenuOpen(false)}
                 >
+                  <Receipt className="w-4 h-4 opacity-70" />
                   {t('header.myTransactions')}
                 </Link>
                 <Link
                   to="/settings"
-                  className="flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
                   onClick={() => setIsMenuOpen(false)}
                 >
+                  <Settings className="w-4 h-4 opacity-70" />
                   {t('header.settings')}
                 </Link>
                 <Link
@@ -738,16 +751,18 @@ export const Header: React.FC = () => {
                 </Link>
                 <Link
                   to="/help/wallet"
-                  className="flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
                   onClick={() => setIsMenuOpen(false)}
                 >
+                  <Wallet className="w-4 h-4 opacity-70" />
                   {t('header.walletGuide')}
                 </Link>
                 <Link
                   to="/security"
-                  className="flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
                   onClick={() => setIsMenuOpen(false)}
                 >
+                  <Shield className="w-4 h-4 opacity-70" />
                   {t('header.securityCenter')}
                 </Link>
               </div>
