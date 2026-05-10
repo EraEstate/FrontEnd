@@ -88,7 +88,7 @@ const PropertyDetailPage: React.FC = () => {
         .then(res => {
           if (alive) setSimilarProperties(res);
         })
-        .catch(err => toast.error('Kh�ng th? t?i B�S tuong t?'))
+        .catch(err => toast.error('Không thể tải BĐS tương tự'))
         .finally(() => {
           if (alive) setSimilarLoading(false);
         });
@@ -314,7 +314,7 @@ const PropertyDetailPage: React.FC = () => {
       setShowContractModal(false);
       navigate(`/transactions/${transaction.id}/contract`);
     } catch (error: any) {
-      toast.error('Kh�ng th? t?o giao d?ch');
+      toast.error('Không thể tạo giao dịch');
       const msg =
         error?.message ||
         error?.response?.data?.error ||
@@ -596,11 +596,17 @@ const PropertyDetailPage: React.FC = () => {
             ) : (
               <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">{t('propertyDetail.location')}</h2>
-                <div className="aspect-[16/9] bg-gray-200 rounded-lg flex items-center justify-center">
-                  <div className="text-center">
-                    <Navigation className="h-12 w-12 text-gray-400 mx-auto mb-2" />
-                    <p className="text-gray-500">{t('propertyDetail.mapPlaceholder')}</p>
-                  </div>
+                <div className="aspect-[16/9] bg-gray-200 rounded-lg overflow-hidden">
+                  <iframe
+                    title="Bản đồ vị trí"
+                    src={`https://maps.google.com/maps?q=${encodeURIComponent(fullAddress || property.address || property.title)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
                 </div>
               </div>
             )}
@@ -654,7 +660,7 @@ const PropertyDetailPage: React.FC = () => {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-6 sticky top-24 max-h-[calc(100vh-6rem)] overflow-y-auto custom-scrollbar">
             {/* Owner View: Show list of people who messaged */}
             {isOwner ? (
               <PropertyChatList
@@ -664,7 +670,7 @@ const PropertyDetailPage: React.FC = () => {
               />
             ) : (
               /* Client View: Show contact card */
-              <div className="bg-white rounded-2xl shadow-sm p-6 sticky top-24 border border-gray-100">
+              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
                 <div className="text-center mb-6">
                   <Link to={`/users/${owner?.id}`} className="block group">
                     <div className="relative w-20 h-20 mx-auto mb-4">

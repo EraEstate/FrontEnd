@@ -1,442 +1,159 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { ReactPhotoSphereViewer } from 'react-photo-sphere-viewer';
-import { AutorotatePlugin } from '@photo-sphere-viewer/autorotate-plugin';
-import { VirtualTourPlugin } from '@photo-sphere-viewer/virtual-tour-plugin';
-import { GalleryPlugin } from '@photo-sphere-viewer/gallery-plugin';
-import { CompassPlugin } from '@photo-sphere-viewer/compass-plugin';
-import { Loader2 } from 'lucide-react';
-
-import '@photo-sphere-viewer/core/index.css';
-import '@photo-sphere-viewer/virtual-tour-plugin/index.css';
-import '@photo-sphere-viewer/gallery-plugin/index.css';
-import '@photo-sphere-viewer/compass-plugin/index.css';
-import '@photo-sphere-viewer/markers-plugin/index.css';
-
-import type { VRTourProps, VRScene } from './VRTourTypes';
-import VRTourHeader from './VRTourHeader';
-import VRTourControls from './VRTourControls';
-import { HelpOverlay, WelcomeToast, captureScreenshot, AutoTourBadge } from './VRTourExtras';
-import { getImageUrl } from '../../utils/imageUtils';
-
-// ═══════════════════════════════════════════════════════════
-// VR Tour — dùng plugin virtual-tour chính thức
-// Mũi tên 3D chuyển cảnh + Gallery dải ảnh built-in
-// ═══════════════════════════════════════════════════════════
-
-const AUTO_TOUR_INTERVAL = 8; // seconds per scene
+import React, { useMemo, useEffect, useState, useRef } from 'react';
+import { X, MapPin, Maximize, Minimize, Loader2, Info, ExternalLink } from 'lucide-react';
+import type { VRTourProps } from './VRTourTypes';
 
 const VRTour: React.FC<VRTourProps> = ({
   isOpen,
   onClose,
-  propertyImages,
   propertyTitle,
   propertyAddress,
   propertyLat,
   propertyLng,
 }) => {
-  // ─── Build scenes from DB images ───
-  const scenes: VRScene[] = useMemo(() => {
-    if (!propertyImages || propertyImages.length === 0) return [];
-    return propertyImages
-      .map((img, idx) => {
-        const resolvedUrl = (getImageUrl(img.imageUrl) || img.imageUrl || '').trim();
-        if (!resolvedUrl) return null;
-        
-        // Cache busting để tránh lỗi CORS khi ảnh đã được cache bởi thẻ <img> thông thường
-        const cacheBusterUrl = resolvedUrl.includes('?') 
-          ? `${resolvedUrl}&vrtour=${Date.now()}` 
-          : `${resolvedUrl}?vrtour=${Date.now()}`;
-
-        return {
-          id: String(img.id || idx),
-          name: img.description || `Ảnh ${idx + 1}`,
-          panoramaUrl: cacheBusterUrl,
-          description: img.description || '',
-        } as VRScene;
-      })
-      .filter((scene): scene is VRScene => scene !== null);
-  }, [propertyImages]);
-
-  console.log('VR Tour Scenes:', scenes);
-
-  // ─── State ───
-  const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
-  const [isAutoRotating, setIsAutoRotating] = useState(false);
-  const [showHelp, setShowHelp] = useState(false);
-  const [showWelcome, setShowWelcome] = useState(true);
-  const [currentSceneName, setCurrentSceneName] = useState('');
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [viewerSeed, setViewerSeed] = useState(0);
-
-  // Auto-tour state
-  const [isAutoTouring, setIsAutoTouring] = useState(false);
-  const [autoTourCountdown, setAutoTourCountdown] = useState(AUTO_TOUR_INTERVAL);
-
-  const psvRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isIframeLoading, setIsIframeLoading] = useState(true);
 
-  // ─── Build virtual-tour nodes & links ───
-  const tourNodes = useMemo(() => {
-    return scenes.map((scene, idx) => ({
-      id: scene.id,
-      panorama: scene.panoramaUrl,
-      name: scene.name,
-      thumbnail: scene.panoramaUrl,
-      caption: scene.description || scene.name,
-      links: [
-        // Link to previous
-        ...(idx > 0 ? [{ nodeId: scenes[idx - 1].id, position: { yaw: Math.PI, pitch: 0 } }] : []),
-        // Link to next
-        ...(idx < scenes.length - 1 ? [{ nodeId: scenes[idx + 1].id, position: { yaw: 0, pitch: 0 } }] : []),
-      ],
-    }));
-  }, [scenes]);
-
-  // ─── Build gallery items ───
-  const galleryItems = useMemo(() => {
-    return scenes.map((scene) => ({
-      id: scene.id,
-      panorama: scene.panoramaUrl,
-      name: scene.name,
-      thumbnail: scene.panoramaUrl,
-    }));
-  }, [scenes]);
-
-  // ─── Plugins ───
-  const plugins = useMemo((): any[] => [
-    [AutorotatePlugin, {
-      autostartOnIdle: false,
-      autostartDelay: null,
-      autorotateSpeed: '1rpm',
-    }],
-    [CompassPlugin, { size: '80px', position: 'bottom left' }],
-    [GalleryPlugin, {
-      items: galleryItems,
-      visibleOnLoad: scenes.length > 1,
-      hideOnClick: false,
-    }],
-    [VirtualTourPlugin, {
-      renderMode: '3d',
-      nodes: tourNodes,
-      startNodeId: tourNodes[0]?.id,
-    }],
-  ], [tourNodes, galleryItems, scenes.length]);
-
-  // ─── Viewer ready ───
-  const handleReady = useCallback((instance: any) => {
-    psvRef.current = instance;
-    setLoadError(null);
-    setLoading(false);
-
-    // Listen for node changes from virtual-tour plugin
-    const vtPlugin = instance.getPlugin(VirtualTourPlugin);
-    if (vtPlugin) {
-      vtPlugin.addEventListener('node-changed', (e: any) => {
-        const nodeId = e.node?.id;
-        const idx = scenes.findIndex((s) => s.id === nodeId);
-        if (idx >= 0) {
-          setCurrentSceneName(scenes[idx].name);
-          setCurrentIndex(idx);
-        }
-      });
-    }
-
-    // Set initial scene info
-    if (scenes.length > 0) {
-      setCurrentSceneName(scenes[0].name);
-      setCurrentIndex(0);
-    }
-  }, [scenes]);
-
-  // ─── Guard against infinite loading when panorama URL is unreachable ───
-  useEffect(() => {
-    if (!isOpen || !loading) return;
-    const timer = setTimeout(() => {
-      setLoadError('Không thể tải ảnh VR. Vui lòng thử lại hoặc kiểm tra đường dẫn ảnh 360.');
-      setLoading(false);
-    }, 15000);
-    return () => clearTimeout(timer);
-  }, [isOpen, loading, viewerSeed]);
-
-  const retryViewer = useCallback(() => {
-    setLoadError(null);
-    setLoading(true);
-    setViewerSeed((p) => p + 1);
-  }, []);
-
-  const mapQuery = useMemo(() => {
+  // Tạo URL nhúng Google Street View 360 mượt mà
+  const streetViewUrl = useMemo(() => {
     if (typeof propertyLat === 'number' && typeof propertyLng === 'number') {
-      return `${propertyLat},${propertyLng}`;
+      // Ưu tiên dùng toạ độ chính xác (Latitude, Longitude)
+      return `https://maps.google.com/maps?layer=c&cbll=${propertyLat},${propertyLng}&output=svembed`;
     }
-    return (propertyAddress || propertyTitle || '').trim();
+    if (propertyAddress) {
+      // Fallback dùng địa chỉ
+      return `https://maps.google.com/maps?layer=c&q=${encodeURIComponent(propertyAddress)}&output=svembed`;
+    }
+    if (propertyTitle) {
+      // Fallback dùng tên
+      return `https://maps.google.com/maps?layer=c&q=${encodeURIComponent(propertyTitle)}&output=svembed`;
+    }
+    return '';
   }, [propertyLat, propertyLng, propertyAddress, propertyTitle]);
 
-  const googleMapsUrl = useMemo(() => {
-    if (!mapQuery) return '';
-    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;
-  }, [mapQuery]);
-
-  const googleStreetViewEmbedUrl = useMemo(() => {
-    if (typeof propertyLat !== 'number' || typeof propertyLng !== 'number') return '';
-    return `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${propertyLat},${propertyLng}`;
-  }, [propertyLat, propertyLng]);
-
-  const googleStreetViewFullUrl = useMemo(() => {
-    if (typeof propertyLat !== 'number' || typeof propertyLng !== 'number') return '';
-    return `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${propertyLat},${propertyLng}`;
-  }, [propertyLat, propertyLng]);
-
-  // ─── Auto-rotate ───
-  const toggleAutoRotate = useCallback(() => {
-    if (!psvRef.current) return;
-    const plugin = psvRef.current.getPlugin(AutorotatePlugin);
-    if (!plugin) return;
-    if (isAutoRotating) plugin.stop(); else plugin.start();
-    setIsAutoRotating((p) => !p);
-  }, [isAutoRotating]);
-
-  // ─── Zoom ───
-  const zoomIn = useCallback(() => psvRef.current?.zoom(psvRef.current.getZoomLevel() + 20), []);
-  const zoomOut = useCallback(() => psvRef.current?.zoom(psvRef.current.getZoomLevel() - 20), []);
-
-  // ─── Reset view ───
-  const resetView = useCallback(() => {
-    psvRef.current?.animate({ yaw: 0, pitch: 0, zoom: 50, speed: '2rpm' });
-  }, []);
-
-  // ─── Fullscreen ───
-  const toggleFullscreen = useCallback(() => {
-    if (!containerRef.current) return;
-    if (document.fullscreenElement) document.exitFullscreen();
-    else containerRef.current.requestFullscreen();
-  }, []);
-
-  // ─── Screenshot ───
-  const handleScreenshot = useCallback(() => {
-    captureScreenshot(psvRef.current, propertyTitle);
-  }, [propertyTitle]);
-
-  // ─── Prev / Next via VirtualTourPlugin ───
-  const goPrev = useCallback(() => {
-    if (!psvRef.current || currentIndex <= 0) return;
-    const vtPlugin = psvRef.current.getPlugin(VirtualTourPlugin);
-    vtPlugin?.setCurrentNode(scenes[currentIndex - 1].id);
-  }, [currentIndex, scenes]);
-
-  const goNext = useCallback(() => {
-    if (!psvRef.current || currentIndex >= scenes.length - 1) return;
-    const vtPlugin = psvRef.current.getPlugin(VirtualTourPlugin);
-    vtPlugin?.setCurrentNode(scenes[currentIndex + 1].id);
-  }, [currentIndex, scenes]);
-
-  // ─── Auto-tour toggle ───
-  const toggleAutoTour = useCallback(() => {
-    setIsAutoTouring((p) => {
-      if (!p) setAutoTourCountdown(AUTO_TOUR_INTERVAL);
-      return !p;
-    });
-  }, []);
-
-  // ─── Auto-tour timer ───
-  useEffect(() => {
-    if (!isAutoTouring || loading) return;
-
-    const timer = setInterval(() => {
-      setAutoTourCountdown((prev) => {
-        if (prev <= 1) {
-          const nextIndex = currentIndex + 1;
-          if (nextIndex < scenes.length) {
-            goNext();
-          } else {
-            // Loop back to first scene
-            const vtPlugin = psvRef.current?.getPlugin(VirtualTourPlugin);
-            vtPlugin?.setCurrentNode(scenes[0].id);
-          }
-          return AUTO_TOUR_INTERVAL;
-        }
-        return prev - 1;
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      containerRef.current?.requestFullscreen().catch(err => {
+        console.error(`Error attempting to enable fullscreen: ${err.message}`);
       });
-    }, 1000);
+    } else {
+      document.exitFullscreen();
+    }
+  };
 
-    return () => clearInterval(timer);
-  }, [isAutoTouring, loading, currentIndex, scenes, goNext]);
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
 
-  // ─── Keyboard shortcuts ───
   useEffect(() => {
     if (!isOpen) return;
-    const handler = (e: KeyboardEvent) => {
-      if (showHelp && e.key !== 'Escape' && e.key !== 'h' && e.key !== 'H') return;
-      switch (e.key) {
-        case 'Escape': showHelp ? setShowHelp(false) : onClose(); break;
-        case 'ArrowLeft': goPrev(); break;
-        case 'ArrowRight': goNext(); break;
-        case ' ': e.preventDefault(); toggleAutoRotate(); break;
-        case '+': case '=': zoomIn(); break;
-        case '-': zoomOut(); break;
-        case 'f': case 'F': toggleFullscreen(); break;
-        case 'h': case 'H': setShowHelp((p) => !p); break;
-        case 's': case 'S': handleScreenshot(); break;
-        case 't': case 'T': toggleAutoTour(); break;
-      }
+    
+    // Reset loading state khi mở lại
+    setIsIframeLoading(true);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+      if (e.key === 'f' || e.key === 'F') toggleFullscreen();
     };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [isOpen, onClose, goPrev, goNext, toggleAutoRotate, zoomIn, zoomOut, toggleFullscreen, handleScreenshot, showHelp, toggleAutoTour]);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
-  // ─── Reset on open ───
-  useEffect(() => {
-    if (isOpen && scenes.length > 0) {
-      setLoading(true);
-      setLoadError(null);
-      setIsAutoRotating(false);
-      setShowHelp(false);
-      setShowWelcome(true);
-      setIsAutoTouring(false);
-      setCurrentIndex(0);
-      setCurrentSceneName(scenes[0].name);
-    }
-  }, [isOpen, scenes]);
-
-  if (!isOpen || scenes.length === 0) return null;
+  if (!isOpen) return null;
 
   return (
-    <div ref={containerRef} className="fixed inset-0 z-[100] bg-black flex flex-col select-none" style={{ fontFamily: "'Inter', sans-serif" }}>
-      <style>{`
-        .psv-navbar { display: none !important; }
-        .psv-gallery { border-top: 1px solid rgba(255,255,255,0.08) !important; background: rgba(0,0,0,0.7) !important; backdrop-filter: blur(12px) !important; }
-        .psv-gallery-item { border-radius: 8px !important; overflow: hidden !important; }
-        .psv-gallery-item--active { outline: 2px solid #ef4444 !important; outline-offset: 2px; }
-        .psv-gallery-item-title { font-size: 10px !important; background: rgba(0,0,0,0.7) !important; }
-        .psv-compass { opacity: 0.7; }
-        .psv-virtual-tour-link { transition: transform 0.2s; }
-        .psv-virtual-tour-link:hover { transform: scale(1.2); }
-        @keyframes fade-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in { animation: fade-in 0.3s ease-out both; }
-      `}</style>
-
-      {/* Header */}
-      <VRTourHeader
-        propertyTitle={propertyTitle}
-        propertyAddress={propertyAddress}
-        sceneName={currentSceneName || scenes[0]?.name || ''}
-        totalScenes={scenes.length}
-        currentIndex={currentIndex}
-        onClose={onClose}
-      />
-
-      {/* Auto-tour badge */}
-      <AutoTourBadge
-        isRunning={isAutoTouring}
-        onToggle={toggleAutoTour}
-        countdown={autoTourCountdown}
-        totalScenes={scenes.length}
-        currentIndex={currentIndex}
-      />
-
-      {/* Right-side Controls */}
-      <VRTourControls
-        isAutoRotating={isAutoRotating}
-        onToggleAutoRotate={toggleAutoRotate}
-        onPrevScene={goPrev}
-        onNextScene={goNext}
-        onZoomIn={zoomIn}
-        onZoomOut={zoomOut}
-        onResetView={resetView}
-        onFullscreen={toggleFullscreen}
-        onScreenshot={handleScreenshot}
-        onToggleHelp={() => setShowHelp((p) => !p)}
-        onToggleAutoTour={toggleAutoTour}
-        isAutoTouring={isAutoTouring}
-        hasPrev={currentIndex > 0}
-        hasNext={currentIndex < scenes.length - 1}
-      />
-
-      {/* Loading overlay */}
-      {loading && (
-        <div className="absolute inset-0 z-[101] flex flex-col items-center justify-center bg-black/80">
-          <Loader2 className="w-10 h-10 text-red-500 animate-spin mb-3" />
-          <p className="text-white/70 text-sm">Đang tải VR Tour…</p>
-        </div>
-      )}
-
-      {loadError && (
-        <div className="absolute inset-0 z-[102] flex flex-col items-center justify-center bg-black/85 px-4 py-6 text-center">
-          <p className="text-red-300 font-medium mb-4">{loadError}</p>
-
-          {(googleStreetViewEmbedUrl || googleMapsUrl) && (
-            <div className="w-full max-w-6xl h-[56vh] mb-4 rounded-xl overflow-hidden border border-white/20 bg-black/40">
-              <iframe
-                title="Google Street View 360 fallback"
-                src={googleStreetViewEmbedUrl || googleMapsUrl}
-                className="w-full h-full"
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              />
-            </div>
-          )}
-
-          <p className="text-white/70 text-xs mb-4">
-            Khung trên ưu tiên Street View 360. Nếu Google không có pano gần đó, họ sẽ tự trả về bản đồ vị trí.
-          </p>
-
-          <div className="flex gap-3">
-            {googleStreetViewFullUrl && (
-              <button
-                type="button"
-                onClick={() => window.open(googleStreetViewFullUrl, '_blank', 'noopener,noreferrer')}
-                className="px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
-              >
-                Mở Street View 360
-              </button>
-            )}
-            {googleMapsUrl && (
-              <button
-                type="button"
-                onClick={() => window.open(googleMapsUrl, '_blank', 'noopener,noreferrer')}
-                className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
-              >
-                Mở tab Google Maps
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={retryViewer}
-              className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700"
-            >
-              Tải lại VR
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 rounded-lg border border-white/30 text-white hover:bg-white/10"
-            >
-              Đóng
-            </button>
+    <div ref={containerRef} className="fixed inset-0 z-[9999] bg-[#0a0a0a] flex flex-col select-none" style={{ fontFamily: "'Inter', sans-serif" }}>
+      
+      {/* Header mờ mờ sang trọng */}
+      <div className="absolute top-0 left-0 right-0 p-4 md:p-6 flex items-start justify-between z-20 pointer-events-none bg-gradient-to-b from-black/80 via-black/40 to-transparent">
+        <div className="flex flex-col gap-1 pointer-events-auto max-w-[70%]">
+          <h2 className="text-white text-lg md:text-xl font-semibold drop-shadow-md truncate">
+            {propertyTitle || 'VR Tour 360'}
+          </h2>
+          <div className="flex items-center text-white/80 text-xs md:text-sm drop-shadow-md truncate">
+            <MapPin className="w-3.5 h-3.5 mr-1" />
+            <span className="truncate">{propertyAddress || 'Đang tải vị trí...'}</span>
+          </div>
+          <div className="mt-2">
+            <span className="inline-block px-2.5 py-1 bg-red-600/90 backdrop-blur-md text-white text-[10px] font-medium rounded-full uppercase tracking-wider shadow-lg">
+              Google Street View 360
+            </span>
           </div>
         </div>
-      )}
 
-      {/* 360 Viewer with VirtualTour + Gallery built-in */}
-      <div className="flex-1 w-full h-full">
-        <ReactPhotoSphereViewer
-          key={`vr-tour-${isOpen}-${viewerSeed}`}
-          src={scenes[0]?.panoramaUrl || ''}
-          height="100vh"
-          width="100%"
-          onReady={handleReady}
-          plugins={plugins}
-          littlePlanet={false}
-          defaultYaw={0}
-          defaultPitch={0}
-        />
+        <div className="flex items-center gap-3 pointer-events-auto">
+          <button
+            onClick={() => window.open(`https://www.google.com/maps?q=${propertyLat || ''},${propertyLng || ''}`, '_blank')}
+            className="p-2.5 md:p-3 bg-blue-600 hover:bg-blue-700 backdrop-blur-md text-white rounded-full transition-all duration-200 shadow-lg border border-white/20"
+            title="Mở Google Maps (Có đầy đủ 360 độ)"
+          >
+            <ExternalLink className="w-5 h-5" />
+          </button>
+          <button
+            onClick={toggleFullscreen}
+            className="p-2.5 md:p-3 bg-black/40 hover:bg-black/60 backdrop-blur-md text-white rounded-full transition-all duration-200 border border-white/10 hover:border-white/30"
+            title="Toàn màn hình (F)"
+          >
+            {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
+          </button>
+          <button
+            onClick={onClose}
+            className="p-2.5 md:p-3 bg-black/40 hover:bg-red-600/90 backdrop-blur-md text-white rounded-full transition-all duration-200 border border-white/10 hover:border-white/30 group"
+            title="Đóng (Esc)"
+          >
+            <X className="w-5 h-5 group-hover:scale-110 transition-transform" />
+          </button>
+        </div>
       </div>
 
-      {/* Welcome toast */}
-      <WelcomeToast visible={showWelcome && !loading} onDismiss={() => setShowWelcome(false)} />
+      {/* Vùng hiển thị nội dung chính */}
+      <div className="flex-1 w-full h-full relative flex items-center justify-center">
+        
+        {/* Loading Spinner sang trọng hiển thị khi iframe chưa load xong */}
+        {streetViewUrl && isIframeLoading && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#0a0a0a]">
+            <div className="relative flex items-center justify-center mb-6">
+              <div className="absolute w-24 h-24 border-t-2 border-r-2 border-red-500 rounded-full animate-spin"></div>
+              <div className="absolute w-20 h-20 border-b-2 border-l-2 border-red-500/50 rounded-full animate-[spin_1.5s_linear_reverse]"></div>
+              <Loader2 className="w-8 h-8 text-white animate-spin" />
+            </div>
+            <h3 className="text-white text-lg font-medium tracking-wide">Đang kết nối VR Tour</h3>
+            <p className="text-gray-500 text-sm mt-2">Vui lòng chờ trong giây lát...</p>
+          </div>
+        )}
 
-      {/* Help overlay */}
-      <HelpOverlay isOpen={showHelp} onClose={() => setShowHelp(false)} />
+        {/* Iframe hiển thị VR Tour từ Google Maps */}
+        {streetViewUrl ? (
+          <iframe
+            title="Google Street View 360 VR"
+            src={streetViewUrl}
+            onLoad={() => setIsIframeLoading(false)}
+            className={`w-full h-full border-0 transition-opacity duration-1000 ease-in-out ${isIframeLoading ? 'opacity-0' : 'opacity-100'}`}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
+        ) : (
+          <div className="text-white/60 flex flex-col items-center z-10">
+            <MapPin className="w-12 h-12 mb-3 opacity-50" />
+            <p>Không tìm thấy dữ liệu vị trí để tải VR Tour.</p>
+          </div>
+        )}
+      </div>
+
+      {/* Hướng dẫn sử dụng VR/2D */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 pointer-events-none w-[90%] max-w-lg transition-opacity duration-1000 ease-in-out">
+        <div className="bg-black/80 backdrop-blur-md border border-white/10 px-5 py-3 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.5)] flex items-start sm:items-center gap-3">
+          <Info className="w-5 h-5 text-blue-400 shrink-0 mt-0.5 sm:mt-0" />
+          <p className="text-white/90 text-[13px] sm:text-sm font-medium leading-relaxed">
+            Khu vực này chưa có ảnh 360 độ. Vui lòng bấm vào nút màu xanh dương (🔗) ở góc trên cùng bên phải để mở vị trí này trên trang chủ Google Maps.
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
