@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { staffDashboardAPI } from '../api/staffDashboard';
 import toast from '../utils/toast';
+import { AdminThemeProvider, useAdminTheme } from '../contexts/AdminThemeContext';
 
 import type { StaffView, StaffStats } from './staff/types';
 import StaffSidebar, { buildMenuSections } from './staff/components/StaffSidebar';
 import StaffContentRouter from './staff/StaffContentRouter';
 
-const StaffDashboard: React.FC = () => {
+const StaffDashboardContent: React.FC = () => {
+  const { theme, resetTheme } = useAdminTheme();
   const { logout } = useAuthStore();
   const navigate = useNavigate();
   const [currentView, setCurrentView] = useState<StaffView>('dashboard');
@@ -40,7 +42,11 @@ const StaffDashboard: React.FC = () => {
     }
   }, [currentView, fetchStats]);
 
-  const handleLogout = () => { logout(); navigate('/login'); };
+  const handleLogout = () => {
+    resetTheme();
+    logout();
+    navigate('/login');
+  };
 
   const handleMenuClick = (view: StaffView) => {
     setCurrentView(view);
@@ -50,7 +56,7 @@ const StaffDashboard: React.FC = () => {
   const menuSections = buildMenuSections(stats);
 
   return (
-    <div className="h-screen bg-gray-50 flex overflow-hidden">
+    <div className={`h-screen flex overflow-hidden ${theme === 'dark' ? 'bg-slate-900' : 'bg-gray-50'}`}>
       <StaffSidebar
         currentView={currentView}
         sidebarOpen={sidebarOpen}
@@ -76,5 +82,11 @@ const StaffDashboard: React.FC = () => {
     </div>
   );
 };
+
+const StaffDashboard: React.FC = () => (
+  <AdminThemeProvider>
+    <StaffDashboardContent />
+  </AdminThemeProvider>
+);
 
 export default StaffDashboard;

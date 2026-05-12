@@ -56,7 +56,7 @@ const FloatingActionHub: React.FC = () => {
                 {t('aiChat.buttonTitle') || 'Chat với AI'}
               </span>
               <div className="bg-red-100 p-2 rounded-full text-red-600">
-                <Bot className="w-5 h-5" />
+                <Sparkles className="w-5 h-5" />
               </div>
             </button>
           </div>
@@ -74,14 +74,26 @@ const FloatingActionHub: React.FC = () => {
                 toggleAIChat();
               }
             }}
-            className="relative bg-gradient-to-r from-red-500 to-red-600 text-white p-4 rounded-full shadow-[0_8px_30px_rgb(220,38,38,0.3)] hover:shadow-[0_8px_30px_rgb(220,38,38,0.5)] transition-all hover:scale-105 flex items-center justify-center z-50"
+            className="group relative flex items-center justify-center z-50"
           >
-            {isMenuOpen ? (
-              <X className="w-6 h-6 animate-in spin-in-180" />
-            ) : ownerChatConfig ? (
-              <Sparkles className="w-6 h-6 animate-pulse" />
+            {/* Glowing aura background */}
+            <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-rose-500 rounded-full blur-md opacity-40 group-hover:opacity-70 transition-opacity duration-300" />
+            
+            {ownerChatConfig ? (
+              // Circular button for menu
+              <div className="relative bg-white text-red-600 p-4 rounded-full shadow-xl flex items-center justify-center hover:scale-105 transition-transform duration-300 border border-red-50">
+                {isMenuOpen ? (
+                  <X className="w-6 h-6 animate-in spin-in-180" />
+                ) : (
+                  <MessageCircle className="w-6 h-6" />
+                )}
+              </div>
             ) : (
-              <Bot className="w-6 h-6" />
+              // Premium Red Pill button for AI
+              <div className="relative bg-gradient-to-r from-red-600 to-red-500 text-white px-5 py-3 rounded-full shadow-xl flex items-center gap-2.5 hover:scale-105 transition-transform duration-300 border border-red-400/50">
+                <Sparkles className="w-5 h-5 animate-pulse" />
+                <span className="font-semibold text-sm tracking-wide">Trợ lý AI</span>
+              </div>
             )}
           </button>
         )}

@@ -27,7 +27,7 @@ const PropertyModerationPage = React.lazy(() => import('../staff/PropertyModerat
 const PageLoader: React.FC = () => (
   <div className="flex items-center justify-center h-64">
     <div className="text-center">
-      <div className="w-10 h-10 border-3 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+      <div className="w-10 h-10 border-3 border-red-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
       <p className="text-sm text-gray-400">Đang tải...</p>
     </div>
   </div>

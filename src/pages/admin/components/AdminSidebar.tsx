@@ -22,12 +22,12 @@ const MenuItem: React.FC<{
         collapsed ? 'justify-center p-3' : 'gap-3 px-4 py-2.5'
       } ${
         active
-          ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-200/50'
+          ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-md shadow-red-200/50'
           : theme === 'dark'
           ? 'text-slate-300 hover:bg-slate-700/60'
           : 'text-gray-600 hover:bg-gray-50'
       }`}>
-      <span className={`relative flex items-center justify-center ${active ? 'text-white' : theme === 'dark' ? 'text-slate-400 group-hover:text-blue-400' : 'text-gray-500 group-hover:text-blue-600'}`}>
+      <span className={`relative flex items-center justify-center ${active ? 'text-white' : theme === 'dark' ? 'text-slate-400 group-hover:text-red-400' : 'text-gray-500 group-hover:text-red-600'}`}>
         {icon}
         {badge !== undefined && badge > 0 && collapsed && (
           <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
@@ -164,7 +164,7 @@ const SidebarContent: React.FC<{
         {!collapsed && (
           <div className={`px-3 pt-3`}>
             <div className={`flex items-center gap-3 px-3 py-2 rounded-xl ${theme === 'dark' ? 'bg-slate-700' : 'bg-gray-50'}`}>
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                 {user?.fullName?.charAt(0)?.toUpperCase() || 'A'}
               </div>
               <div className="min-w-0 flex-1">
@@ -253,7 +253,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
           }`}>
             <div className={`p-4 flex items-center justify-between border-b ${theme === 'dark' ? 'border-slate-700' : 'border-gray-100'}`}>
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-gradient-to-br from-red-600 to-red-700 rounded-lg flex items-center justify-center">
                   <Shield className="w-4 h-4 text-white" />
                 </div>
                 <span className={`text-base font-bold ${theme === 'dark' ? 'text-slate-100' : 'text-gray-900'}`}>Admin Panel</span>
@@ -276,7 +276,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
           theme === 'dark' ? 'border-slate-700' : 'border-gray-100'
         } ${sidebarOpen ? 'p-4 justify-between' : 'p-3 justify-center'}`}>
           <div className={`flex items-center ${sidebarOpen ? 'gap-2.5' : 'justify-center w-full'}`}>
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 bg-gradient-to-br from-red-600 to-red-700 rounded-lg flex items-center justify-center flex-shrink-0">
               <Shield className="w-4 h-4 text-white" />
             </div>
             {sidebarOpen && <span className={`text-base font-bold ${theme === 'dark' ? 'text-slate-100' : 'text-gray-900'}`}>Admin</span>}

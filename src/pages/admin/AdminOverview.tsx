@@ -92,7 +92,7 @@ const AdminOverview: React.FC<AdminOverviewProps> = ({
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { view: 'moderation' as AdminView, icon: <ClipboardCheck className="w-5 h-5" />, label: 'Duyệt tin đăng', desc: 'Giám sát Staff', color: 'from-rose-500 to-rose-600' },
-          { view: 'users' as AdminView, icon: <Users className="w-5 h-5" />, label: 'Quản lý User', desc: 'Full quyền', color: 'from-blue-500 to-blue-600' },
+          { view: 'users' as AdminView, icon: <Users className="w-5 h-5" />, label: 'Quản lý User', desc: 'Full quyền', color: 'from-red-500 to-red-600' },
           { view: 'analytics' as AdminView, icon: <TrendingUp className="w-5 h-5" />, label: 'Phân tích', desc: 'Biểu đồ', color: 'from-purple-500 to-purple-600' },
           { view: 'payments' as AdminView, icon: <DollarSign className="w-5 h-5" />, label: 'Thanh toán', desc: 'Doanh thu', color: 'from-emerald-500 to-emerald-600' },
         ].map(item => (
@@ -107,7 +107,7 @@ const AdminOverview: React.FC<AdminOverviewProps> = ({
 
       {/* Highlight Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl p-5 text-white">
+        <div className="bg-gradient-to-br from-red-500 to-red-700 rounded-2xl p-5 text-white">
           <div className="flex items-center justify-between mb-3">
             <Clock className="w-6 h-6 opacity-80" />
             <span className="text-xs font-medium opacity-80">Tháng này</span>
@@ -159,7 +159,7 @@ const AdminOverview: React.FC<AdminOverviewProps> = ({
           <div className={`divide-y ${isDark ? 'divide-slate-700' : 'divide-gray-50'}`}>
             {recentActivities.map((activity) => (
               <div key={activity.id} className={`p-4 transition-colors flex items-center gap-4 ${isDark ? 'hover:bg-slate-700/50' : 'hover:bg-gray-50'}`}>
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                   {(activity.title || 'U').substring(0, 2).toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -173,7 +173,7 @@ const AdminOverview: React.FC<AdminOverviewProps> = ({
                 {activity.propertyId && (
                   <button onClick={() => navigate(`/properties/${activity.propertyId}`)}
                     className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
-                      isDark ? 'text-blue-400 hover:bg-slate-700' : 'text-blue-600 hover:bg-blue-50'
+                      isDark ? 'text-red-400 hover:bg-slate-700' : 'text-red-600 hover:bg-red-50'
                     }`}>
                     Xem <ChevronRight className="w-3 h-3 inline" />
                   </button>
