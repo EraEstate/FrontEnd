@@ -1,13 +1,22 @@
 import { api } from './index';
 
+export type PriceAlertType = 'PRICE_DROP' | 'PRICE_BELOW' | 'PRICE_ABOVE' | 'ANY_CHANGE';
+
 export interface PriceAlert {
   id: string;
   userId: string;
-  propertyId: string;
-  targetPrice: number;
-  alertType: 'PRICE_DROP' | 'PRICE_BELOW' | 'PRICE_ABOVE' | 'ANY_CHANGE';
+  propertyId?: string;
+  targetPrice?: number;
+  alertType: PriceAlertType;
+  propertyType?: string;
+  listingType?: string;
+  minArea?: number;
+  maxArea?: number;
+  provinceId?: string;
+  districtId?: string;
   isActive: boolean;
   isTriggered: boolean;
+  triggerCount?: number;
   triggeredAt?: string;
   createdAt: string;
   property?: {
@@ -17,13 +26,29 @@ export interface PriceAlert {
   };
 }
 
+export interface CreatePriceAlertPayload {
+  propertyId?: string;
+  targetPrice?: number;
+  alertType: PriceAlertType;
+  propertyType?: string;
+  listingType?: string;
+  minArea?: number;
+  maxArea?: number;
+  provinceId?: string;
+  districtId?: string;
+  isActive?: boolean;
+}
+
 export const priceAlertAPI = {
-  create: (propertyId: string, targetPrice: number, alertType: string) =>
-    api.post<PriceAlert>('/price-alerts', { propertyId, targetPrice, alertType }).then(res => res.data),
+  create: (payload: CreatePriceAlertPayload) =>
+    api.post<PriceAlert>('/price-alerts', payload).then((res) => res.data),
 
   getMyAlerts: () =>
-    api.get<PriceAlert[]>('/price-alerts/my').then(res => res.data),
+    api.get<PriceAlert[]>('/price-alerts/my').then((res) => res.data),
 
   deleteAlert: (id: string) =>
-    api.delete(`/price-alerts/${id}`).then(res => res.data),
+    api.delete(`/price-alerts/${id}`).then((res) => res.data),
+
+  updateActive: (id: string, active: boolean) =>
+    api.put<PriceAlert>(`/price-alerts/${id}/active`, null, { params: { active } }).then((res) => res.data),
 };

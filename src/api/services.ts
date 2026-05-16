@@ -24,6 +24,15 @@ export {
 } from './misc';
 export { bankAccountAPI } from './bankAccount';
 export { propertyTransactionAPI } from './propertyTransaction';
+export { priceAlertAPI } from './priceAlert';
+export { investmentAPI } from './investment';
+export { rentalContractAPI } from './rentalContract';
+export { revenueAPI } from './revenue';
+export { maintenanceAPI } from './maintenance';
+export { documentAPI } from './document';
+export { badgeAPI } from './badge';
+export { calendarAPI } from './calendar';
+export { forumAPI } from './forum';
 
 // Export combined misc API
 export { miscAPI } from './misc';

@@ -1,17 +1,45 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import PersonalizedRecommendations from '../components/PersonalizedRecommendations';
 import { useTranslation } from 'react-i18next';
 import {
   BarChart3,
+  CalendarDays,
   Eye,
   Heart,
   MessageSquare,
   DollarSign,
-  MapPin
+  MapPin,
+  TrendingUp
 } from 'lucide-react';
+import { revenueAPI } from '../api/revenue';
 
 const DashboardPage: React.FC = () => {
   const { t } = useTranslation();
+  const [revenueTotal, setRevenueTotal] = useState<number>(0);
+  const [revenueLoading, setRevenueLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadRevenue = async () => {
+      try {
+        const summary = await revenueAPI.getSummary();
+        if (mounted) {
+          setRevenueTotal(Number(summary.totalRevenue || 0));
+        }
+      } catch {
+        // keep fallback
+      } finally {
+        if (mounted) {
+          setRevenueLoading(false);
+        }
+      }
+    };
+    void loadRevenue();
+    return () => {
+      mounted = false;
+    };
+  }, []);
   // Mock data - thay thế bằng API calls thực tế
   const stats = {
     totalProperties: 12,
@@ -134,6 +162,21 @@ const DashboardPage: React.FC = () => {
               <MessageSquare className="h-8 w-8 text-purple-600" />
             </div>
           </div>
+
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Doanh thu cho thuê</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {revenueLoading ? '...' : `${revenueTotal.toLocaleString()} VND`}
+                </p>
+                <Link to="/revenue" className="text-sm text-red-600 hover:text-red-700">
+                  Xem dashboard doanh thu
+                </Link>
+              </div>
+              <DollarSign className="h-8 w-8 text-emerald-600" />
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -245,6 +288,20 @@ const DashboardPage: React.FC = () => {
               <DollarSign className="h-8 w-8 text-green-600 mb-2" />
               <span className="text-sm font-medium text-gray-900">Thanh toán</span>
             </a>
+            <a
+              href="/calendar"
+              className="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <CalendarDays className="h-8 w-8 text-indigo-600 mb-2" />
+              <span className="text-sm font-medium text-gray-900">Lich hen</span>
+            </a>
+            <a
+              href="/revenue"
+              className="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <TrendingUp className="h-8 w-8 text-emerald-600 mb-2" />
+              <span className="text-sm font-medium text-gray-900">Doanh thu</span>
+            </a>
           </div>
         </div>
 
@@ -258,3 +315,4 @@ const DashboardPage: React.FC = () => {
 };
 
 export default DashboardPage;
+

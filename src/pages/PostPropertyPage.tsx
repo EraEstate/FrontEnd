@@ -41,7 +41,9 @@ import AddressAutocomplete from '../components/AddressAutocomplete';
 import type { AddressDetails } from '../components/AddressAutocomplete';
 import { subscriptionAPI } from '../api/subscription';
 import { aiListingAPI } from '../api/aiListing';
+import { documentAPI } from '../api/document';
 import type { UserSubscription } from '../types';
+import DocumentUploader, { type PendingPropertyDocument } from '../components/DocumentUploader';
 
 interface PropertyForm {
   title: string;
@@ -89,6 +91,7 @@ const PostPropertyPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [subscription, setSubscription] = useState<UserSubscription | null>(null);
   const [quotaExceeded, setQuotaExceeded] = useState(false);
+  const [documents, setDocuments] = useState<PendingPropertyDocument[]>([]);
 
   // === AI Listing Content States ===
   const [aiEnabled, setAiEnabled] = useState(true);
@@ -422,7 +425,23 @@ const PostPropertyPage: React.FC = () => {
       };
 
       // Submit property
-      await propertyAPI.create(propertyData);
+      const createdProperty = await propertyAPI.create(propertyData);
+
+      if (createdProperty?.id && documents.length > 0) {
+        const uploadResults = await Promise.allSettled(
+          documents.map((document) =>
+            documentAPI.upload(createdProperty.id, document.file, {
+              documentType: document.documentType,
+              description: document.description || undefined,
+            })
+          )
+        );
+
+        const failedCount = uploadResults.filter((result) => result.status === 'rejected').length;
+        if (failedCount > 0) {
+          toast.error(`${failedCount} tai lieu phap ly chua tai len duoc`);
+        }
+      }
       
       // Success
       toast.success('Đăng tin thành công! 🎉');
@@ -999,6 +1018,14 @@ const PostPropertyPage: React.FC = () => {
           </label>
         </div>
       )}
+
+      <div className="mt-8">
+        <DocumentUploader
+          value={documents}
+          onChange={setDocuments}
+          title="Tai lieu phap ly (tuy chon)"
+        />
+      </div>
     </div>
   );
 
@@ -1247,3 +1274,5 @@ const PostPropertyPage: React.FC = () => {
 };
 
 export default PostPropertyPage;
+
+

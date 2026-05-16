@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { 
   Home, 
   Building2, 
@@ -23,6 +24,7 @@ interface UtilityTool {
   category: string;
   icon: React.ComponentType<{ className?: string }>;
   isPopular?: boolean;
+  path?: string;
 }
 
 const UtilitiesPage: React.FC = () => {
@@ -81,7 +83,8 @@ const UtilitiesPage: React.FC = () => {
       name: "Đánh giá tiềm năng đầu tư",
       description: "Phân tích tiềm năng sinh lời của bất động sản",
       category: "investment",
-      icon: TrendingUp
+      icon: TrendingUp,
+      path: '/investment-calculator'
     },
     {
       id: 7,
@@ -109,7 +112,8 @@ const UtilitiesPage: React.FC = () => {
       name: "Tính lợi nhuận cho thuê",
       description: "Tính toán lợi nhuận khi đầu tư bất động sản cho thuê",
       category: "investment",
-      icon: Wallet
+      icon: Wallet,
+      path: '/investment-calculator'
     },
     {
       id: 11,
@@ -151,9 +155,18 @@ const UtilitiesPage: React.FC = () => {
               )}
             </div>
             <p className="text-sm text-gray-600 mb-4 leading-relaxed">{utility.description}</p>
-            <button className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium">
-              Sử dụng ngay
-            </button>
+            {utility.path ? (
+              <Link
+                to={utility.path}
+                className="inline-block bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+              >
+                Sử dụng ngay
+              </Link>
+            ) : (
+              <button className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium">
+                Sử dụng ngay
+              </button>
+            )}
           </div>
         </div>
       </div>

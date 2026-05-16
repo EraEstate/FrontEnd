@@ -31,6 +31,7 @@ import type { UserSubscription } from '../types';
 import { getImageUrl, getAvatarPlaceholder, getImagePlaceholder } from '../utils/imageUtils';
 import Settings from '../components/Settings';
 import ActivityTab from '../components/ActivityTab';
+import BadgeDisplay from '../components/BadgeDisplay';
 import BankAccountManagementPage from './BankAccountManagementPage';
 import TransactionHistoryPage from './TransactionHistoryPage';
 import toast from '../utils/toast';
@@ -289,6 +290,18 @@ const ProfilePage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* User Badges */}
+      {userProfile?.id && (
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <BadgeDisplay userId={userProfile.id} title="Huy hiệu của bạn" />
+          <div className="mt-3">
+            <Link to="/badges" className="text-sm font-medium text-red-600 hover:underline">
+              Xem tất cả huy hiệu
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Recent Activity */}
       <div className="bg-white rounded-lg shadow-sm p-6">
