@@ -4,6 +4,7 @@ export type StaffView =
   | 'dashboard' | 'property-moderation' | 'inquiry-management'
   | 'user-management' | 'kyc-management'
   | 'news-management' | 'project-management'
+  | 'report-management' | 'activity-log' | 'rental-contracts'
   | 'notifications' | 'profile';
 
 export interface StaffStats {

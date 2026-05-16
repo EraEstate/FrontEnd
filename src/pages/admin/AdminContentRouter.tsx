@@ -23,6 +23,11 @@ const ProfilePage = React.lazy(() => import('../ProfilePage'));
 // ─── Staff pages Admin can access (override) ───
 const PropertyModerationPage = React.lazy(() => import('../staff/PropertyModerationPage'));
 
+// ─── New Admin pages ───
+const AdminReportCenter = React.lazy(() => import('./AdminReportCenter'));
+const AdminSystemConfig = React.lazy(() => import('./AdminSystemConfig'));
+const AdminAuditTrail = React.lazy(() => import('./AdminAuditTrail'));
+
 // ─── Loading fallback ───
 const PageLoader: React.FC = () => (
   <div className="flex items-center justify-center h-64">
@@ -69,6 +74,11 @@ const AdminContentRouter: React.FC<AdminContentRouterProps> = ({
       // Hệ thống
       case 'notifications': return <NotificationCenter />;
       case 'settings': return <ProfilePage />;
+      // Giám sát
+      case 'reports': return <AdminReportCenter />;
+      case 'audit-trail': return <AdminAuditTrail />;
+      // Cấu hình
+      case 'system-config': return <AdminSystemConfig />;
       default: return null;
     }
   };

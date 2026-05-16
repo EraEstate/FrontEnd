@@ -4,7 +4,8 @@ import {
   Settings, Bell, DollarSign, Eye,
   Briefcase, BarChart3, BookOpen, Newspaper,
   LogOut, ExternalLink, Menu, X, Sun, Moon,
-  Users, UserCog, Shield, TrendingUp, Package
+  Users, UserCog, Shield, TrendingUp, Package,
+  Flag, Activity
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../../store/authStore';
@@ -84,6 +85,8 @@ export const buildMenuSections = (stats: StaffStats | null): MenuSection[] => [
     title: 'Quản lý hệ thống',
     items: [
       { id: 'user-management', icon: <Users className="w-5 h-5" />, label: 'Quản lý User' },
+      { id: 'report-management', icon: <Flag className="w-5 h-5" />, label: 'Quản lý Báo cáo' },
+      { id: 'rental-contracts', icon: <FileText className="w-5 h-5" />, label: 'Hợp đồng thuê' },
     ],
   },
   {
@@ -96,6 +99,7 @@ export const buildMenuSections = (stats: StaffStats | null): MenuSection[] => [
   {
     title: 'Hệ thống',
     items: [
+      { id: 'activity-log', icon: <Activity className="w-5 h-5" />, label: 'Nhật ký HĐ' },
       { id: 'notifications', icon: <Bell className="w-5 h-5" />, label: 'Thông báo' },
       { id: 'profile', icon: <Settings className="w-5 h-5" />, label: 'Hồ sơ' },
     ],

@@ -83,6 +83,8 @@ const TransactionHistoryPage = lazy(() => import('./pages/TransactionHistoryPage
 const BankAccountManagementPage = lazy(() => import('./pages/BankAccountManagementPage'));
 const ActivityLogPage = lazy(() => import('./pages/ActivityLogPage'));
 const TestimonialsPage = lazy(() => import('./pages/TestimonialsPage'));
+const RentalManagementPage = lazy(() => import('./pages/RentalManagementPage'));
+const UserDashboardLayout = lazy(() => import('./pages/user/UserDashboardLayout'));
 
 function AppContent() {
   return (
@@ -104,6 +106,18 @@ function AppContent() {
                 element={
                   <ProtectedRoute requireRole="STAFF">
                     <StaffDashboard />
+                  </ProtectedRoute>
+                }
+              />
+            </Route>
+
+            {/* User Dashboard with Sidebar */}
+            <Route element={<DashboardLayout />}>
+              <Route
+                path="/user-dashboard"
+                element={
+                  <ProtectedRoute>
+                    <UserDashboardLayout />
                   </ProtectedRoute>
                 }
               />
@@ -246,6 +260,14 @@ function AppContent() {
                 element={
                   <ProtectedRoute>
                     <SettingsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/rental-management"
+                element={
+                  <ProtectedRoute>
+                    <RentalManagementPage />
                   </ProtectedRoute>
                 }
               />

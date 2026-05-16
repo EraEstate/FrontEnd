@@ -6,6 +6,9 @@ import PropertyModerationPage from './PropertyModerationPage';
 import InquiryManagementPage from './InquiryManagementPage';
 import StaffUserManagementPage from './StaffUserManagementPage';
 import StaffDashboardHome from './StaffDashboardHome';
+import StaffReportDashboard from './StaffReportDashboard';
+import StaffActivityLog from './StaffActivityLog';
+import StaffRentalContractReview from './StaffRentalContractReview';
 
 // ─── Reused user pages ───
 import NotificationCenter from '../NotificationCenter';
@@ -34,9 +37,12 @@ const StaffContentRouter: React.FC<StaffContentRouterProps> = ({ currentView, st
     case 'inquiry-management': return <InquiryManagementPage />;
     // Quản lý hệ thống
     case 'user-management': return <StaffUserManagementPage />;
+    case 'report-management': return <StaffReportDashboard />;
+    case 'rental-contracts': return <StaffRentalContractReview />;
     // Nội dung
     case 'news-management': return <NewsManagement />;
     case 'project-management': return <ProjectManagement />;
+    case 'activity-log': return <StaffActivityLog />;
     // Cá nhân
     case 'notifications': return <NotificationCenter />;
     case 'profile': return <ProfilePage />;

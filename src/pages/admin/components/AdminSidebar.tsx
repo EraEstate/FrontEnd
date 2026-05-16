@@ -4,7 +4,7 @@ import {
   Settings, Bell, DollarSign, Eye,
   Home, Briefcase, Shield, BarChart3, List,
   ChevronRight, LogOut, Menu, X, Moon, Sun, Package,
-  ExternalLink, ClipboardCheck
+  ExternalLink, ClipboardCheck, Flag, ScrollText, Cog
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../../store/authStore';
@@ -109,9 +109,17 @@ export const buildAdminMenuSections = (pendingInquiries: number, pendingModerati
     ],
   },
   {
+    title: 'Giám sát',
+    items: [
+      { id: 'reports', icon: <Flag className="w-5 h-5" />, label: 'Trung tâm Báo cáo' },
+      { id: 'audit-trail', icon: <ScrollText className="w-5 h-5" />, label: 'Audit Trail' },
+    ],
+  },
+  {
     title: 'Hệ thống',
     items: [
       { id: 'notifications', icon: <Bell className="w-5 h-5" />, label: 'Thông báo' },
+      { id: 'system-config', icon: <Cog className="w-5 h-5" />, label: 'Cấu hình' },
       { id: 'settings', icon: <Settings className="w-5 h-5" />, label: 'Cài đặt' },
     ],
   },

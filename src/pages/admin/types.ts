@@ -13,7 +13,9 @@ export type AdminView =
   // Tài chính
   | 'payments'
   // Hệ thống
-  | 'notifications' | 'settings';
+  | 'notifications' | 'settings'
+  // Mới
+  | 'reports' | 'system-config' | 'audit-trail';
 
 
 export interface AdminStats {
