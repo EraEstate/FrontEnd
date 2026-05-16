@@ -58,6 +58,14 @@ const HomePage: React.FC = () => {
   const [mostViewedLoading, setMostViewedLoading] = useState(true);
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [recommendationsLoading, setRecommendationsLoading] = useState(false);
+  const featuredPropertyItems = Array.isArray(featuredProperties)
+    ? featuredProperties
+    : ((featuredProperties as any)?.content || []);
+  const featuredRecommendationFallback = featuredPropertyItems.slice(0, 4);
+  const recommendationItems =
+    recommendations.length > 0 ? recommendations : featuredRecommendationFallback;
+  const showRecommendationSection =
+    (isAuthenticated && recommendationsLoading) || recommendationItems.length > 0;
 
   useEffect(() => {
     let alive = true;
@@ -410,18 +418,22 @@ const HomePage: React.FC = () => {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 lg:px-12 py-8">
-        {/* AI Recommendations (Gợi ý cho bạn) - Only visible when authenticated */}
-        {isAuthenticated && (recommendationsLoading || recommendations.length > 0) && (
+        {/* AI Recommendations (Gợi ý cho bạn) */}
+        {showRecommendationSection && (
           <section className="mb-12">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
                 <Star className="w-8 h-8 text-yellow-500" />
                 <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">Gợi ý cho bạn</h2>
               </div>
-              <span className="text-sm text-gray-500 italic">Dựa trên hoạt động của bạn</span>
+              <span className="text-sm text-gray-500 italic">
+                {isAuthenticated
+                  ? 'Dựa trên hoạt động của bạn'
+                  : 'Gợi ý chung. Đăng nhập để cá nhân hóa'}
+              </span>
             </div>
             
-            {recommendationsLoading ? (
+            {isAuthenticated && recommendationsLoading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {[...Array(4)].map((_, i) => (
                   <div key={i} className="h-56 bg-gray-200 rounded-lg animate-pulse" />
@@ -429,14 +441,14 @@ const HomePage: React.FC = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {recommendations.map((property: any) => (
+                {recommendationItems.map((property: any) => (
                   <Link
                     key={property.id}
                     to={`/properties/${property.id}`}
                     className="bg-white rounded-xl overflow-hidden card-hover border border-yellow-100/60 relative"
                   >
                     <div className="absolute top-2 left-2 z-10 bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded shadow-sm flex items-center gap-1">
-                      <Star className="w-3 h-3 fill-current" /> Phù hợp
+                      <Star className="w-3 h-3 fill-current" /> {isAuthenticated ? 'Phù hợp' : 'Đề xuất'}
                     </div>
                     <div className="h-48 relative">
                       <LazyImage
@@ -474,7 +486,7 @@ const HomePage: React.FC = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Featured Properties từ API */}
-            {(featuredProperties?.content || []).slice(0, 4).map((property: any) => (
+            {featuredPropertyItems.slice(0, 4).map((property: any) => (
               <Link
                 key={property.id}
                 to={`/properties/${property.id}`}

@@ -22,6 +22,7 @@ import { propertyAPI } from '../api/property';
 import { kycAPI } from '../api/kyc';
 import { getImageUrl, getAvatarPlaceholder, getImagePlaceholder } from '../utils/imageUtils';
 import { useAuthStore } from '../store/authStore';
+import BadgeDisplay from '../components/BadgeDisplay';
 import toast from '../utils/toast';
 
 const PublicProfilePage: React.FC = () => {
@@ -288,6 +289,12 @@ const PublicProfilePage: React.FC = () => {
           </div>
         </div>
 
+        {profile?.id && (
+          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+            <BadgeDisplay userId={profile.id} title="Huy hieu nguoi dung" />
+          </div>
+        )}
+
         {/* Properties Section */}
         <div className="bg-white rounded-lg shadow-md p-8">
           <div className="flex items-center justify-between mb-6">
@@ -409,4 +416,5 @@ const PublicProfilePage: React.FC = () => {
 };
 
 export default PublicProfilePage;
+
 

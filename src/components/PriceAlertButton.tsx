@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Bell, BellOff, Loader2, X, Trash2, TrendingDown, ArrowDownCircle, ArrowUpCircle, RefreshCw, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { priceAlertAPI, type PriceAlert } from '../api/priceAlert';
+import { priceAlertAPI, type PriceAlert, type PriceAlertType } from '../api/priceAlert';
 import { useAuthStore } from '../store/authStore';
 import { showSuccess, showError } from '../utils/toast';
 
@@ -33,6 +33,12 @@ const PriceAlertButton: React.FC<Props> = ({ propertyId, currentPrice }) => {
   // Form
   const [alertType, setAlertType] = useState('PRICE_DROP');
   const [targetPrice, setTargetPrice] = useState('');
+  const [propertyType, setPropertyType] = useState('');
+  const [listingType, setListingType] = useState('');
+  const [minArea, setMinArea] = useState('');
+  const [maxArea, setMaxArea] = useState('');
+  const [provinceId, setProvinceId] = useState('');
+  const [districtId, setDistrictId] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -62,9 +68,25 @@ const PriceAlertButton: React.FC<Props> = ({ propertyId, currentPrice }) => {
     setSubmitting(true);
     try {
       const price = targetPrice ? parseFloat(targetPrice) : currentPrice;
-      await priceAlertAPI.create(propertyId, price, alertType);
+      await priceAlertAPI.create({
+        propertyId,
+        targetPrice: price,
+        alertType: alertType as PriceAlertType,
+        propertyType: propertyType || undefined,
+        listingType: listingType || undefined,
+        minArea: minArea ? parseFloat(minArea) : undefined,
+        maxArea: maxArea ? parseFloat(maxArea) : undefined,
+        provinceId: provinceId || undefined,
+        districtId: districtId || undefined,
+      });
       showSuccess('Đã tạo cảnh báo giá!');
       setTargetPrice('');
+      setPropertyType('');
+      setListingType('');
+      setMinArea('');
+      setMaxArea('');
+      setProvinceId('');
+      setDistrictId('');
       loadAlerts();
     } catch (err: any) {
       showError(err.response?.data?.error || err.response?.data?.message || 'Không thể tạo cảnh báo');
@@ -170,6 +192,63 @@ const PriceAlertButton: React.FC<Props> = ({ propertyId, currentPrice }) => {
                   />
                 </div>
               )}
+
+              {/* Smart criteria filters */}
+              <div className="grid grid-cols-2 gap-2">
+                <select
+                  value={propertyType}
+                  onChange={(e) => setPropertyType(e.target.value)}
+                  className="w-full px-2.5 py-2 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-red-100 focus:border-red-400 outline-none"
+                >
+                  <option value="">Loại BĐS (tất cả)</option>
+                  <option value="APARTMENT">Căn hộ</option>
+                  <option value="HOUSE">Nhà phố</option>
+                  <option value="VILLA">Biệt thự</option>
+                  <option value="OFFICE">Văn phòng</option>
+                  <option value="LAND">Đất</option>
+                </select>
+                <select
+                  value={listingType}
+                  onChange={(e) => setListingType(e.target.value)}
+                  className="w-full px-2.5 py-2 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-red-100 focus:border-red-400 outline-none"
+                >
+                  <option value="">Nhu cầu (tất cả)</option>
+                  <option value="SALE">Mua</option>
+                  <option value="RENT">Thuê</option>
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  type="number"
+                  value={minArea}
+                  onChange={(e) => setMinArea(e.target.value)}
+                  placeholder="Diện tích min (m²)"
+                  className="w-full px-2.5 py-2 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-red-100 focus:border-red-400 outline-none"
+                />
+                <input
+                  type="number"
+                  value={maxArea}
+                  onChange={(e) => setMaxArea(e.target.value)}
+                  placeholder="Diện tích max (m²)"
+                  className="w-full px-2.5 py-2 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-red-100 focus:border-red-400 outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  value={provinceId}
+                  onChange={(e) => setProvinceId(e.target.value)}
+                  placeholder="Province ID"
+                  className="w-full px-2.5 py-2 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-red-100 focus:border-red-400 outline-none"
+                />
+                <input
+                  value={districtId}
+                  onChange={(e) => setDistrictId(e.target.value)}
+                  placeholder="District ID"
+                  className="w-full px-2.5 py-2 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-red-100 focus:border-red-400 outline-none"
+                />
+              </div>
 
               {/* Create Button */}
               <button

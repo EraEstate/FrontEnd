@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
 import {
   MapPin,
   Heart,
   Share2,
+  QrCode,
   Eye,
   Phone,
   Mail,
@@ -48,6 +49,9 @@ import VRTour from '../components/vr-tour';
 import MortgageCalculator from '../components/MortgageCalculator';
 import PoiMap from '../components/PoiMap';
 import ViewingScheduler from '../components/ViewingScheduler';
+import QrCodeModal from '../components/QrCodeModal';
+import DocumentUploader from '../components/DocumentUploader';
+import DocumentList from '../components/DocumentList';
 import type { Conversation } from '../api/chat';
 import toast from '../utils/toast';
 import { showSuccess, showWarning, showError } from '../utils/toast';
@@ -58,6 +62,7 @@ const PropertyDetailPage: React.FC = () => {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { isAuthenticated, user } = useAuthStore();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showContactForm, setShowContactForm] = useState(false);
@@ -67,13 +72,20 @@ const PropertyDetailPage: React.FC = () => {
   const [creatingContract, setCreatingContract] = useState(false);
   const [showContractModal, setShowContractModal] = useState(false);
   const [showVRModal, setShowVRModal] = useState(false);
+  const [showQrModal, setShowQrModal] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
+  const [documentRefreshToken, setDocumentRefreshToken] = useState(0);
   const [reportReason, setReportReason] = useState('INACCURATE');
   const [reportDescription, setReportDescription] = useState('');
   const [reportSubmitting, setReportSubmitting] = useState(false);
   const [similarProperties, setSimilarProperties] = useState<any[]>([]);
   const [similarLoading, setSimilarLoading] = useState(false);
   const { registerOwnerChat, unregisterOwnerChat } = useUIStore();
+  const rawViewSource = (searchParams.get('source') || 'DIRECT').toUpperCase();
+  const viewSource: 'DIRECT' | 'QR' | 'SHARE' | 'AD' =
+    rawViewSource === 'QR' || rawViewSource === 'SHARE' || rawViewSource === 'AD'
+      ? rawViewSource
+      : 'DIRECT';
   
   // API Hooks
   const { data: property, loading, error, refetch } = useProperty(id || '');
@@ -95,6 +107,13 @@ const PropertyDetailPage: React.FC = () => {
     }
     return () => { alive = false; };
   }, [id]);
+
+  useEffect(() => {
+    if (!id) return;
+    propertyAPI.incrementViews(id, viewSource).catch(() => {
+      // Ignore view tracking failures on detail page load.
+    });
+  }, [id, viewSource]);
 
   // Owner chat registration — must stay above loading/error returns (Rules of Hooks).
   useEffect(() => {
@@ -252,6 +271,9 @@ const PropertyDetailPage: React.FC = () => {
   // Check if current user is the property owner
   const isOwner = isAuthenticated && owner && user?.id === owner.id;
   const isRentListing = (property.listingType || property.transactionType) === 'RENT';
+  const canManageDocuments = Boolean(
+    isAuthenticated && (isOwner || user?.role === 'ADMIN' || user?.role === 'STAFF')
+  );
 
   const nextImage = () => {
     if (images.length > 0) {
@@ -397,13 +419,23 @@ const PropertyDetailPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => {
-                    void navigator.clipboard?.writeText(window.location.href);
+                    const shareUrl = new URL(window.location.href);
+                    shareUrl.searchParams.set('source', 'share');
+                    void navigator.clipboard?.writeText(shareUrl.toString());
                     toast.info('Đã sao chép liên kết tin đăng.');
                   }}
                   className="p-3 glass text-gray-700 rounded-full hover:bg-white hover:scale-110 transition-all duration-200 shadow-sm"
                   title="Chia sẻ / sao chép link"
                 >
                   <Share2 className="h-5 w-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowQrModal(true)}
+                  className="p-3 glass text-gray-700 rounded-full hover:bg-white hover:text-red-600 hover:scale-110 transition-all duration-200 shadow-sm"
+                  title="Mã QR chia sẻ"
+                >
+                  <QrCode className="h-5 w-5" />
                 </button>
                 {!isOwner && (
                   <button
@@ -585,6 +617,22 @@ const PropertyDetailPage: React.FC = () => {
 
             {/* Reviews Section */}
             <PropertyReviewSection propertyId={property.id} />
+
+            {/* Property Documents */}
+            <div className="space-y-4">
+              {canManageDocuments && (
+                <DocumentUploader
+                  propertyId={property.id}
+                  onUploaded={() => setDocumentRefreshToken((prev) => prev + 1)}
+                  title="Tải lên hồ sơ pháp lý"
+                />
+              )}
+              <DocumentList
+                propertyId={property.id}
+                canManage={canManageDocuments}
+                refreshToken={documentRefreshToken}
+              />
+            </div>
 
             {/* Map & POI */}
             {property.location?.latitude && property.location?.longitude ? (
@@ -1033,6 +1081,13 @@ const PropertyDetailPage: React.FC = () => {
         propertyAddress={fullAddress}
         propertyLat={property.location?.latitude}
         propertyLng={property.location?.longitude}
+      />
+
+      <QrCodeModal
+        isOpen={showQrModal}
+        onClose={() => setShowQrModal(false)}
+        propertyId={property.id}
+        propertyTitle={property.title}
       />
     </div>
   );

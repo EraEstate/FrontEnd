@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import {
   Search,
   Heart,
@@ -15,7 +15,7 @@ import { useProperties } from '../api/hooks';
 import { propertyFavoriteAPI } from '../api';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams, useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import type { Property } from '../types';
 import { useAuthStore } from '../store/authStore';
 import { useCompareStore } from '../store/compareStore';
@@ -23,61 +23,24 @@ import { getImageUrl, getImagePlaceholder } from '../utils/imageUtils';
 import { showSuccess, showWarning, showError } from '../utils/toast';
 import { logger } from '../utils/logger';
 import EmptyState from '../components/EmptyState';
+import { usePropertySearch } from '../hooks/usePropertySearch';
 
 const PropertiesPage: React.FC = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const [searchParamsFromURL, setSearchParamsFromURL] = useSearchParams();
-  const [searchTerm, setSearchTerm] = useState(t('properties.search.placeholder'));
-  const [showFilters, setShowFilters] = useState(false);
-  const [selectedFilters, setSelectedFilters] = useState({
-    verified: false,
-    propertyType: '',
-    priceRange: '',
-    bedrooms: '',
-    bathrooms: '',
-    minPrice: '',
-    maxPrice: '',
-    minArea: '',
-    maxArea: '',
-  });
-  const [currentPage, setCurrentPage] = useState(0);
-  const [searchParams, setSearchParams] = useState<any>({});
-
-  // Read search params from URL on mount
-  useEffect(() => {
-    const params: any = {};
-    
-    // Read all search params from URL
-    const query = searchParamsFromURL.get('query');
-    const provinceId = searchParamsFromURL.get('provinceId');
-    const districtId = searchParamsFromURL.get('districtId');
-    const wardId = searchParamsFromURL.get('wardId');
-    const propertyType = searchParamsFromURL.get('propertyType');
-    const listingType = searchParamsFromURL.get('listingType');
-    const minPrice = searchParamsFromURL.get('minPrice');
-    const maxPrice = searchParamsFromURL.get('maxPrice');
-    const minArea = searchParamsFromURL.get('minArea');
-    const maxArea = searchParamsFromURL.get('maxArea');
-
-    if (query) params.query = query;
-    if (provinceId) params.provinceId = provinceId;
-    if (districtId) params.districtId = districtId;
-    if (wardId) params.wardId = wardId;
-    if (propertyType) params.propertyType = propertyType;
-    if (listingType) params.listingType = listingType;
-    if (minPrice) params.minPrice = parseFloat(minPrice);
-    if (maxPrice) params.maxPrice = parseFloat(maxPrice);
-    if (minArea) params.minArea = parseFloat(minArea);
-    if (maxArea) params.maxArea = parseFloat(maxArea);
-
-    if (Object.keys(params).length > 0) {
-      setSearchParams(params);
-      if (query) {
-        setSearchTerm(query);
-      }
-    }
-  }, [searchParamsFromURL]);
+  const {
+    searchTerm,
+    setSearchTerm,
+    showFilters,
+    setShowFilters,
+    selectedFilters,
+    setSelectedFilters,
+    currentPage,
+    setCurrentPage,
+    searchParams,
+    setSearchParams,
+    handleSearch,
+    resetFilters,
+  } = usePropertySearch(t('properties.search.placeholder'));
 
   // API Hooks
   const { data: properties, loading: propertiesLoading, error: propertiesError, refetch: refetchProperties } = useProperties({
@@ -88,42 +51,6 @@ const PropertiesPage: React.FC = () => {
   
   // const { data: featuredProperties, loading: featuredLoading } = useFeaturedProperties(0, 8);
   // const { data: provinces } = useProvinces();
-
-  // Xử lý search
-  const handleSearch = () => {
-    const newParams: any = {
-      query: searchTerm !== t('properties.search.placeholder') ? searchTerm : '',
-    };
-    
-    if (selectedFilters.propertyType) {
-      newParams.propertyType = selectedFilters.propertyType;
-    }
-    
-    if (selectedFilters.minPrice) {
-      newParams.minPrice = parseFloat(selectedFilters.minPrice);
-    }
-    if (selectedFilters.maxPrice) {
-      newParams.maxPrice = parseFloat(selectedFilters.maxPrice);
-    }
-    
-    if (selectedFilters.minArea) {
-      newParams.minArea = parseFloat(selectedFilters.minArea);
-    }
-    if (selectedFilters.maxArea) {
-      newParams.maxArea = parseFloat(selectedFilters.maxArea);
-    }
-    
-    if (selectedFilters.bedrooms) {
-      newParams.bedrooms = parseInt(selectedFilters.bedrooms);
-    }
-    if (selectedFilters.bathrooms) {
-      newParams.bathrooms = parseInt(selectedFilters.bathrooms);
-    }
-    
-    setSearchParams(newParams);
-    setCurrentPage(0);
-    setShowFilters(false);
-  };
 
   // Xử lý thêm/xóa yêu thích
   const handleToggleFavorite = async (propertyId: string, event?: React.MouseEvent) => {
@@ -359,21 +286,7 @@ const PropertiesPage: React.FC = () => {
               {/* Action Buttons */}
               <div className="flex items-center justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
                 <button
-                  onClick={() => {
-                    setSelectedFilters({
-                      verified: false,
-                      propertyType: '',
-                      priceRange: '',
-                      bedrooms: '',
-                      bathrooms: '',
-                      minPrice: '',
-                      maxPrice: '',
-                      minArea: '',
-                      maxArea: '',
-                    });
-                    setSearchParams({});
-                    setCurrentPage(0);
-                  }}
+                  onClick={resetFilters}
                   className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm"
                 >
                   Xóa bộ lọc
@@ -899,4 +812,4 @@ const FilterDropdown: React.FC<{
   );
 };
 
-export default PropertiesPage;
+export default PropertiesPage;

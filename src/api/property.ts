@@ -174,8 +174,10 @@ export const propertyAPI = {
   },
 
   // Tăng lượt xem
-  incrementViews: async (id: string) => {
-    const response = await api.post(`/properties/${id}/view`);
+  incrementViews: async (id: string, source: 'DIRECT' | 'QR' | 'SHARE' | 'AD' = 'DIRECT') => {
+    const response = await api.post(`/properties/${id}/view`, null, {
+      params: { source },
+    });
     return response.data;
   },
 
@@ -285,5 +287,17 @@ export const propertyAPI = {
   deletePriceAlert: async (alertId: string) => {
     const response = await api.delete(`/price-alerts/${alertId}`);
     return response.data;
+  },
+
+  getPropertyQr: async (propertyId: string) => {
+    const response = await api.get(`/properties/${propertyId}/qr`, {
+      responseType: 'blob',
+    });
+    return response.data as Blob;
+  },
+
+  getPropertyQrUrl: (propertyId: string) => {
+    const base = api.defaults.baseURL || '';
+    return `${base}/properties/${propertyId}/qr`;
   },
 };
