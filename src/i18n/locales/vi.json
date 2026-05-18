@@ -484,6 +484,16 @@
         "description": "Era Estate là một website uy tín được Bộ Công Thương trao tặng giải thưởng trong suốt hơn 10 năm, cho thấy sự chuyên nghiệp và ổn định của một trong những trang web hàng đầu trong lĩnh vực bất động sản."
       }
     },
+    "neighborhoods": {
+      "title": "Khám phá khu vực nổi bật",
+      "subtitle": "Những điểm nóng giao dịch bất động sản trong tháng qua"
+    },
+    "newsletter": {
+      "title": "Không bỏ lỡ bất động sản tốt",
+      "subtitle": "Đăng ký để nhận email thông báo ngay khi có căn hộ phù hợp với tiêu chí của bạn.",
+      "placeholder": "Nhập địa chỉ email của bạn",
+      "button": "Đăng ký ngay"
+    },
     "studioFullFurniture": "Cho thuê căn hộ studio full nội thất"
   },
   "auth": {

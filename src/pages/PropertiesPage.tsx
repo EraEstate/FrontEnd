@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Search,
   Heart,
@@ -10,6 +10,7 @@ import {
   User,
   Loader2,
   Scale,
+  Phone,
 } from 'lucide-react';
 import { useProperties } from '../api/hooks';
 import { propertyFavoriteAPI } from '../api';
@@ -43,6 +44,22 @@ const PropertiesPage: React.FC = () => {
   } = usePropertySearch(t('properties.search.placeholder'));
 
   // API Hooks
+  const { isAuthenticated } = useAuthStore();
+  const [favoritedIds, setFavoritedIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      propertyFavoriteAPI.getMyFavorites(0, 500)
+        .then(res => {
+          if (res?.data?.content) {
+            const ids = new Set(res.data.content.map((f: any) => f.propertyId || f.property?.id).filter(Boolean));
+            setFavoritedIds(ids as Set<string>);
+          }
+        })
+        .catch(err => logger.error('Error fetching favorites:', err));
+    }
+  }, [isAuthenticated]);
+
   const { data: properties, loading: propertiesLoading, error: propertiesError, refetch: refetchProperties } = useProperties({
     page: currentPage,
     size: 12,
@@ -75,44 +92,47 @@ const PropertiesPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 mt-10">
-      {/* Search Bar - giống batdongsan.com.vn */}
-      <div className="bg-white shadow-sm">
-        <div className="w-full px-6 lg:px-12 py-4">
-          <div className="flex items-center space-x-4">
+      {/* Search Bar - Modern Floating Style */}
+      <div className="bg-white shadow-sm sticky top-16 z-40 border-b border-gray-100">
+        <div className="w-full px-6 lg:px-12 py-4 max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center gap-4">
             {/* Search Input */}
-            <div className="flex-1 relative">
-              <div className="flex items-center bg-gray-100 rounded-lg">
+            <div className="flex-1 w-full relative">
+              <div className="flex items-center bg-gray-50 border border-gray-200 rounded-full hover:shadow-md hover:border-red-200 transition-all duration-300">
+                <div className="pl-6 pr-2 text-red-600">
+                  <Search className="h-5 w-5" />
+                </div>
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder={t('properties.search.placeholder')}
-                  className="flex-1 px-4 py-3 bg-transparent border-none focus:outline-none text-sm"
+                  className="flex-1 px-4 py-3.5 bg-transparent border-none focus:outline-none text-gray-900 font-medium placeholder-gray-400"
                 />
                 <button 
                   onClick={handleSearch}
-                  className="px-6 py-3 bg-red-600 text-white rounded-r-lg hover:bg-red-700 transition-colors flex items-center"
+                  className="mr-2 px-6 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors flex items-center font-semibold shadow-sm hover:shadow-md"
                 >
-                  <Search className="h-4 w-4 mr-2" />
                   {t('properties.search.button')}
                 </button>
               </div>
             </div>
 
             {/* Map Icon */}
-            <Link to="/map-search" className="p-3 text-gray-600 hover:text-red-600 transition-colors" title="Tìm kiếm trên bản đồ">
+            <Link to="/map-search" className="flex items-center gap-2 p-3 text-gray-600 hover:text-red-600 bg-white border border-gray-200 rounded-full hover:border-red-200 hover:shadow-md transition-all whitespace-nowrap" title="Tìm kiếm trên bản đồ">
               <Map className="h-5 w-5" />
+              <span className="font-medium hidden md:inline">{t('properties.viewMap')}</span>
             </Link>
           </div>
 
-          {/* Filter Bar - giống batdongsan.com.vn */}
-          <div className="flex items-center space-x-4 mt-4 pb-2">
+          {/* Filter Bar - Pill style */}
+          <div className="flex items-center space-x-3 mt-4 pb-2 overflow-x-auto hide-scrollbar">
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center space-x-2 px-4 py-2 border rounded-lg transition-colors text-sm ${
+              className={`flex-shrink-0 flex items-center space-x-2 px-5 py-2 border rounded-full transition-all duration-300 text-sm font-medium ${
                 showFilters 
-                  ? 'border-red-600 bg-red-50 text-red-600' 
-                  : 'border-gray-300 hover:border-red-300'
+                  ? 'border-red-600 bg-red-600 text-white shadow-md' 
+                  : 'border-gray-200 bg-white text-gray-700 hover:border-red-200 hover:bg-red-50 hover:text-red-600'
               }`}
             >
               <SlidersHorizontal className="h-4 w-4" />
@@ -122,10 +142,10 @@ const PropertiesPage: React.FC = () => {
             {/* Tin xác thực */}
             <button
               onClick={() => setSelectedFilters({ ...selectedFilters, verified: !selectedFilters.verified })}
-              className={`flex items-center space-x-2 px-4 py-2 border rounded-lg transition-colors text-sm ${
+              className={`flex-shrink-0 flex items-center space-x-2 px-5 py-2 border rounded-full transition-all duration-300 text-sm font-medium ${
                 selectedFilters.verified
-                  ? 'border-red-600 bg-red-50 text-red-600'
-                  : 'border-gray-300 hover:border-red-300'
+                  ? 'border-red-600 bg-red-50 text-red-600 shadow-sm'
+                  : 'border-gray-200 bg-white text-gray-700 hover:border-red-200 hover:bg-red-50 hover:text-red-600'
               }`}
             >
               <span>{t('properties.filters.verified')}</span>
@@ -362,6 +382,7 @@ const PropertiesPage: React.FC = () => {
                 property={property}
                 t={t}
                 onToggleFavorite={handleToggleFavorite}
+                isInitiallyFavorited={favoritedIds.has(property.id?.toString())}
               />
             )) || (
               <EmptyState
@@ -445,71 +466,111 @@ const PropertiesPage: React.FC = () => {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* CTA Banner Nhỏ */}
+            <div className="bg-gradient-to-br from-red-600 to-red-800 rounded-2xl p-6 text-white shadow-md relative overflow-hidden">
+              <div className="absolute -right-6 -top-6 w-24 h-24 bg-white opacity-10 rounded-full blur-xl"></div>
+              <div className="absolute -left-6 -bottom-6 w-32 h-32 bg-red-400 opacity-20 rounded-full blur-2xl"></div>
+              <h3 className="font-bold text-lg mb-2 relative z-10">Bạn muốn bán nhà?</h3>
+              <p className="text-red-100 text-sm mb-4 relative z-10">Đăng tin ngay hôm nay để tiếp cận hàng triệu khách hàng tiềm năng.</p>
+              <Link to="/upload" className="inline-block bg-white text-red-600 font-semibold px-4 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors shadow-sm relative z-10">
+                Đăng tin miễn phí
+              </Link>
+            </div>
+
             {/* Mua bán nhà đất by Province */}
-            <div className="bg-white rounded-xl p-6 border border-gray-100" style={{ boxShadow: 'var(--shadow-sm)' }}>
-              <h3 className="font-bold text-gray-900 mb-4">{t('properties.sidebar.byProvince')}</h3>
+            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+              <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <Map className="h-5 w-5 text-red-600" />
+                {t('properties.sidebar.byProvince')}
+              </h3>
               <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">{t('properties.sidebar.provinces.hcm')}</span>
-                  <span className="text-sm text-gray-500">(77.902)</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">{t('properties.sidebar.provinces.hanoi')}</span>
-                  <span className="text-sm text-gray-500">(58.349)</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">{t('properties.sidebar.provinces.danang')}</span>
-                  <span className="text-sm text-gray-500">(9.968)</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">{t('properties.sidebar.provinces.binhduong')}</span>
-                  <span className="text-sm text-gray-500">(8.674)</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">{t('properties.sidebar.provinces.khanhhoa')}</span>
-                  <span className="text-sm text-gray-500">(5.498)</span>
-                </div>
+                {[
+                  { name: t('properties.sidebar.provinces.hcm'), count: '77.902' },
+                  { name: t('properties.sidebar.provinces.hanoi'), count: '58.349' },
+                  { name: t('properties.sidebar.provinces.danang'), count: '9.968' },
+                  { name: t('properties.sidebar.provinces.binhduong'), count: '8.674' },
+                  { name: t('properties.sidebar.provinces.khanhhoa'), count: '5.498' },
+                ].map((prov, i) => (
+                  <Link to={`/properties?province=${prov.name}`} key={i} className="flex items-center justify-between group">
+                    <span className="text-sm text-gray-600 group-hover:text-red-600 transition-colors font-medium">{prov.name}</span>
+                    <span className="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded-md">{prov.count}</span>
+                  </Link>
+                ))}
               </div>
             </div>
 
             {/* Bài viết được quan tâm */}
-            <div className="bg-white rounded-xl p-6 border border-gray-100" style={{ boxShadow: 'var(--shadow-sm)' }}>
-              <h3 className="font-bold text-gray-900 mb-4">{t('properties.sidebar.popularArticles')}</h3>
+            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+              <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <span className="w-1.5 h-5 bg-red-600 rounded-full"></span>
+                {t('properties.sidebar.popularArticles')}
+              </h3>
               <div className="space-y-4">
-                <div className="flex space-x-3">
-                  <span className="flex-shrink-0 w-6 h-6 bg-red-600 text-white text-xs rounded-full flex items-center justify-center font-medium">1</span>
-                  <a href="#" className="text-sm text-blue-600 hover:text-blue-800 line-clamp-2">
-                    Trọn Bộ Lãi Suất Vay Mua Nhà Mới Nhất Tháng 9/2025
-                  </a>
-                </div>
-                <div className="flex space-x-3">
-                  <span className="flex-shrink-0 w-6 h-6 bg-red-600 text-white text-xs rounded-full flex items-center justify-center font-medium">2</span>
-                  <a href="#" className="text-sm text-blue-600 hover:text-blue-800 line-clamp-2">
-                    Chung Cư Hưng Yên, Khu Vực Thái Bình Cũ Giảm Tốc
-                  </a>
-                </div>
-                <div className="flex space-x-3">
-                  <span className="flex-shrink-0 w-6 h-6 bg-red-600 text-white text-xs rounded-full flex items-center justify-center font-medium">3</span>
-                  <a href="#" className="text-sm text-blue-600 hover:text-blue-800 line-clamp-2">
-                    Thị Trường Đất Nền Tây Ninh Tiếp Tục Tăng Giá Mạnh
-                  </a>
-                </div>
-                <div className="flex space-x-3">
-                  <span className="flex-shrink-0 w-6 h-6 bg-red-600 text-white text-xs rounded-full flex items-center justify-center font-medium">4</span>
-                  <a href="#" className="text-sm text-blue-600 hover:text-blue-800 line-clamp-2">
-                    Đất Nền Hưng Yên Tiếp Tục Tăng Giá
-                  </a>
-                </div>
-                <div className="flex space-x-3">
-                  <span className="flex-shrink-0 w-6 h-6 bg-red-600 text-white text-xs rounded-full flex items-center justify-center font-medium">5</span>
-                  <a href="#" className="text-sm text-blue-600 hover:text-blue-800 line-clamp-2">
-                    Thị Trường Đất Nền Đà Nẵng Nóng Sốt
-                  </a>
-                </div>
+                {[
+                  "Trọn Bộ Lãi Suất Vay Mua Nhà Mới Nhất Tháng 9/2025",
+                  "Chung Cư Hưng Yên, Khu Vực Thái Bình Cũ Giảm Tốc",
+                  "Thị Trường Đất Nền Tây Ninh Tiếp Tục Tăng Giá Mạnh",
+                  "Đất Nền Hưng Yên Tiếp Tục Tăng Giá",
+                  "Thị Trường Đất Nền Đà Nẵng Nóng Sốt"
+                ].map((article, i) => (
+                  <div key={i} className="flex space-x-3 group cursor-pointer">
+                    <span className="flex-shrink-0 w-6 h-6 bg-red-50 text-red-600 text-xs rounded-full flex items-center justify-center font-bold group-hover:bg-red-600 group-hover:text-white transition-colors">{i + 1}</span>
+                    <a className="text-sm text-gray-700 group-hover:text-red-600 line-clamp-2 font-medium transition-colors">
+                      {article}
+                    </a>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
+
+        {/* Khám phá khu vực nổi bật */}
+        <div className="mt-16 pt-12 border-t border-gray-200">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-extrabold text-gray-900 mb-4">{t('properties.neighborhoods.title')}</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">{t('properties.neighborhoods.subtitle')}</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { title: 'Quận 1, TP.HCM', count: '1.240', img: 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&q=80&w=800' },
+              { title: 'Quận Cầu Giấy, HN', count: '985', img: 'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?auto=format&fit=crop&q=80&w=800' },
+              { title: 'TP. Thủ Đức', count: '2.100', img: 'https://images.unsplash.com/photo-1555580399-5ee4148b26dd?auto=format&fit=crop&q=80&w=800' },
+              { title: 'Quận Hải Châu, ĐN', count: '450', img: 'https://images.unsplash.com/photo-1559592413-7ce4f1a26084?auto=format&fit=crop&q=80&w=800' }
+            ].map((area, i) => (
+              <Link to={`/properties?search=${area.title}`} key={i} className="group relative h-64 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 block">
+                <img src={area.img} alt={area.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                <div className="absolute bottom-0 left-0 w-full p-6">
+                  <h3 className="text-xl font-bold text-white mb-1">{area.title}</h3>
+                  <p className="text-red-100 text-sm font-medium">{area.count} bất động sản</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* Newsletter Banner */}
+        <div className="mt-16 bg-white rounded-3xl p-8 md:p-12 shadow-sm border border-red-100 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 mb-8">
+          <div className="absolute -right-20 -top-20 w-64 h-64 bg-red-50 rounded-full blur-3xl"></div>
+          <div className="relative z-10 md:max-w-xl">
+            <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-3">{t('properties.newsletter.title')}</h2>
+            <p className="text-gray-600 leading-relaxed">{t('properties.newsletter.subtitle')}</p>
+          </div>
+          <div className="relative z-10 w-full md:w-auto flex-1 max-w-md">
+            <div className="flex bg-gray-50 border border-gray-200 rounded-full p-1.5 focus-within:ring-2 focus-within:ring-red-500 focus-within:border-transparent transition-all">
+              <input 
+                type="email" 
+                placeholder={t('properties.newsletter.placeholder')} 
+                className="flex-1 bg-transparent px-4 py-3 outline-none text-gray-700 placeholder-gray-400"
+              />
+              <button className="bg-red-600 text-white font-semibold px-6 py-3 rounded-full hover:bg-red-700 transition-colors whitespace-nowrap shadow-sm">
+                {t('properties.newsletter.button')}
+              </button>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   );
@@ -520,34 +581,18 @@ const PropertyListItem: React.FC<{
   property: Property; 
   t: any;
   onToggleFavorite: (propertyId: string, event?: React.MouseEvent) => void;
-}> = ({ property, t, onToggleFavorite }) => {
-  const [isFavorited, setIsFavorited] = useState(false);
-  const [checkingFavorite, setCheckingFavorite] = useState(true);
+  isInitiallyFavorited?: boolean;
+}> = ({ property, t, onToggleFavorite, isInitiallyFavorited = false }) => {
+  const [isFavorited, setIsFavorited] = useState(isInitiallyFavorited);
+  const [checkingFavorite, setCheckingFavorite] = useState(false);
   const { isAuthenticated } = useAuthStore();
   const { compareList, addProperty, removeProperty } = useCompareStore();
 
   const isComparing = compareList.some(p => p.id === property.id?.toString());
 
-  // Check favorite status when component mounts
   useEffect(() => {
-    const checkFavoriteStatus = async () => {
-      if (!isAuthenticated || !property.id) {
-        setCheckingFavorite(false);
-        return;
-      }
-      
-      try {
-        const favorited = await propertyFavoriteAPI.isFavorited(property.id.toString());
-        setIsFavorited(favorited);
-      } catch {
-        logger.debug('Error checking favorite status for', property.id);
-      } finally {
-        setCheckingFavorite(false);
-      }
-    };
-
-    checkFavoriteStatus();
-  }, [property.id, isAuthenticated]);
+    setIsFavorited(isInitiallyFavorited);
+  }, [isInitiallyFavorited]);
 
   const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -634,115 +679,142 @@ const PropertyListItem: React.FC<{
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -5 }}
+      whileHover={{ y: -4 }}
       transition={{ duration: 0.3 }}
-      className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100"
+      className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col md:flex-row group"
     >
-      <div className="flex">
-        {/* Image Section */}
-        <Link to={`/properties/${property.id}`} className="relative w-80 h-48 flex-shrink-0 bg-gray-100 block">
-          <img
-            src={primaryImage}
-            alt={property.title}
-            className="w-full h-full object-cover"
-            loading="lazy"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              const placeholder = getImagePlaceholder(400, 300);
-              if (target.src !== placeholder && !target.src.includes('data:image/svg+xml')) {
-                logger.debug('Failed to load image:', rawImagePath);
-                target.src = placeholder;
+      {/* Image Section */}
+      <Link to={`/properties/${property.id}`} className="relative w-full md:w-[320px] h-64 md:h-auto flex-shrink-0 bg-gray-100 block overflow-hidden">
+        <img
+          src={primaryImage}
+          alt={property.title}
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          loading="lazy"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            const placeholder = getImagePlaceholder(400, 300);
+            if (target.src !== placeholder && !target.src.includes('data:image/svg+xml')) {
+              logger.debug('Failed to load image:', rawImagePath);
+              target.src = placeholder;
+            }
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-60"></div>
+        
+        <div className="absolute top-3 left-3 flex gap-2">
+          {property.isVerified && (
+            <span className="bg-green-500 text-white px-2 py-1 text-xs font-semibold rounded-md shadow-sm flex items-center gap-1">
+              <span className="w-1.5 h-1.5 bg-white rounded-full"></span> Xác thực
+            </span>
+          )}
+          <span className="bg-white/90 backdrop-blur-md text-gray-900 px-2 py-1 text-xs font-bold rounded-md shadow-sm">
+            {property.propertyDetails?.[0]?.images?.length || 5} <span className="opacity-70">Ảnh</span>
+          </span>
+        </div>
+
+        <div className="absolute top-3 right-3 flex flex-col gap-2">
+          <button 
+            onClick={handleFavoriteClick}
+            disabled={checkingFavorite || !isAuthenticated}
+            className={`p-2.5 backdrop-blur-md rounded-full transition-all duration-300 shadow-sm ${
+              isFavorited 
+                ? 'bg-red-50 text-red-600 border border-red-100' 
+                : 'bg-white/80 text-gray-600 hover:bg-white hover:text-red-500'
+            } ${!isAuthenticated ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:scale-110'}`}
+            title={isFavorited ? 'Xóa khỏi danh sách yêu thích' : 'Thêm vào danh sách yêu thích'}
+          >
+            <Heart className={`h-4 w-4 ${isFavorited ? 'fill-current' : ''}`} />
+          </button>
+          
+          <button 
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (isComparing) {
+                removeProperty(property.id.toString());
+              } else {
+                addProperty({
+                  id: property.id.toString(),
+                  title: property.title,
+                  price: property.price,
+                  imageUrl: rawImagePath || undefined
+                });
               }
             }}
-          />
-          <div className="absolute top-2 left-2">
-            <span className="bg-red-600 text-white px-2 py-1 text-xs font-medium rounded">10</span>
-          </div>
-          <div className="absolute top-2 right-2">
-            <button 
-              onClick={handleFavoriteClick}
-              disabled={checkingFavorite || !isAuthenticated}
-              className={`p-2 bg-white/90 backdrop-blur-sm rounded-lg hover:bg-white transition-all duration-200 ${
-                isFavorited ? 'text-red-600' : 'text-gray-600'
-              } ${!isAuthenticated ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:scale-110'}`}
-              title={isFavorited ? 'Xóa khỏi danh sách yêu thích' : 'Thêm vào danh sách yêu thích'}
-            >
-              <Heart className={`h-4 w-4 ${isFavorited ? 'fill-current' : ''}`} />
-            </button>
-          </div>
-          <div className="absolute bottom-2 left-2">
-            <button 
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (isComparing) {
-                  removeProperty(property.id.toString());
-                } else {
-                  addProperty({
-                    id: property.id.toString(),
-                    title: property.title,
-                    price: property.price,
-                    imageUrl: rawImagePath || undefined
-                  });
-                }
-              }}
-              className={`p-2 bg-white/90 backdrop-blur-sm rounded-lg hover:bg-white transition-all duration-200 hover:scale-110 ${
-                isComparing ? 'text-blue-600' : 'text-gray-600'
-              }`}
-              title={isComparing ? 'Huỷ so sánh' : 'Thêm vào so sánh'}
-            >
-              <Scale className={`h-4 w-4`} />
-            </button>
-          </div>
-        </Link>
+            className={`p-2.5 backdrop-blur-md rounded-full transition-all duration-300 shadow-sm hover:scale-110 ${
+              isComparing 
+                ? 'bg-blue-50 text-blue-600 border border-blue-100' 
+                : 'bg-white/80 text-gray-600 hover:bg-white hover:text-blue-500'
+            }`}
+            title={isComparing ? 'Huỷ so sánh' : 'Thêm vào so sánh'}
+          >
+            <Scale className={`h-4 w-4`} />
+          </button>
+        </div>
+      </Link>
 
-        {/* Content Section */}
-        <div className="flex-1 p-4">
-          <div className="flex justify-between items-start mb-2">
-            <Link to={`/properties/${property.id}`} className="font-semibold text-lg text-gray-900 line-clamp-2 flex-1 mr-4 hover:text-red-600 transition-colors duration-200">
+      {/* Content Section */}
+      <div className="flex-1 p-5 md:p-6 flex flex-col justify-between">
+        <div>
+          <div className="flex justify-between items-start mb-3 gap-4">
+            <Link to={`/properties/${property.id}`} className="font-bold text-lg md:text-xl text-gray-900 line-clamp-2 hover:text-red-600 transition-colors duration-200 flex-1">
               {property.title}
             </Link>
-            <div className="text-right">
-              <div className="text-xl font-bold text-red-600">
+            <div className="text-right flex-shrink-0">
+              <div className="text-xl md:text-2xl font-extrabold text-red-600">
                 {property.price ? formatPrice(property.price) : t('properties.status.negotiable')}
               </div>
-              <div className="text-sm text-gray-500">
-                {property.area}m² · {property.propertyDetails?.[0]?.bedrooms || 0} {t('properties.details.bedrooms')} · {property.propertyDetails?.[0]?.bathrooms || 0} {t('properties.details.bathrooms')}
-              </div>
-              <div className="text-sm text-gray-500">
-                {property.address}
-              </div>
+              {property.price && property.area && (
+                <div className="text-sm text-gray-500 font-medium">
+                  ~ {Math.round(property.price / property.area / 1000000)} triệu/m²
+                </div>
+              )}
             </div>
           </div>
 
-          <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+          <div className="flex items-center text-sm text-gray-600 mb-4 font-medium">
+            <Map className="h-4 w-4 mr-1.5 text-gray-400" />
+            <span className="truncate">{property.address}</span>
+          </div>
+
+          <div className="flex items-center gap-6 text-sm text-gray-700 mb-4 bg-gray-50/50 p-3 rounded-xl border border-gray-100 w-max">
+            <div className="flex items-center gap-2" title="Diện tích">
+              <span className="font-bold">{property.area}</span> <span className="text-gray-500">m²</span>
+            </div>
+            <div className="w-px h-4 bg-gray-300"></div>
+            <div className="flex items-center gap-2" title="Phòng ngủ">
+              <span className="font-bold">{property.propertyDetails?.[0]?.bedrooms || 0}</span> <span className="text-gray-500">PN</span>
+            </div>
+            <div className="w-px h-4 bg-gray-300"></div>
+            <div className="flex items-center gap-2" title="Phòng tắm">
+              <span className="font-bold">{property.propertyDetails?.[0]?.bathrooms || 0}</span> <span className="text-gray-500">PT</span>
+            </div>
+          </div>
+
+          <p className="text-gray-600 text-sm mb-4 line-clamp-2 md:line-clamp-3 leading-relaxed">
             {property.description}
           </p>
+        </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mr-2">
-                <User className="h-4 w-4 text-gray-600" />
-              </div>
-              <div>
-                <div className="text-sm font-medium text-gray-900">
-                  {property.agent?.user?.fullName || property.user?.fullName}
-                </div>
-                <div className="text-xs text-gray-500">
-                  {new Date(property.createdAt).toLocaleDateString('vi-VN')}
-                </div>
-              </div>
+        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+          <div className="flex items-center">
+            <div className="w-9 h-9 bg-gradient-to-br from-red-100 to-red-50 rounded-full flex items-center justify-center mr-3 border border-red-100">
+              <User className="h-4 w-4 text-red-600" />
             </div>
-            
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center text-gray-500 text-sm">
-                <Eye className="h-4 w-4 mr-1" />
-                <span>{t('properties.actions.showPhone')}</span>
-              </div>
-              <button className="text-red-600 text-sm font-medium hover:text-red-700 transition-colors">
-                {t('properties.actions.saveListing')}
-              </button>
+            <div>
+              <span className="text-sm font-semibold text-gray-900 block">{property.agent?.user?.fullName || property.user?.fullName || t('properties.details.owner')}</span>
+              <span className="text-xs text-gray-500 font-medium">Đăng {property.createdAt ? new Date(property.createdAt).toLocaleDateString('vi-VN') : new Date().toLocaleDateString('vi-VN')}</span>
             </div>
+          </div>
+          
+          <div className="flex gap-2">
+            <button className="flex items-center gap-1.5 px-4 py-2 bg-red-50 text-red-600 text-sm font-semibold rounded-lg hover:bg-red-100 transition-colors">
+              <Phone className="h-4 w-4" />
+              <span className="hidden sm:inline">Gọi điện</span>
+            </button>
+            <button className="flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 text-gray-700 text-sm font-semibold rounded-lg hover:border-gray-300 hover:bg-gray-50 transition-colors">
+              Nhắn tin
+            </button>
           </div>
         </div>
       </div>
@@ -776,17 +848,17 @@ const FilterDropdown: React.FC<{
     <div className="relative" ref={ref}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center space-x-2 px-4 py-2 border rounded-lg transition-colors text-sm ${
+        className={`flex-shrink-0 flex items-center space-x-2 px-5 py-2 border rounded-full transition-all duration-300 text-sm font-medium ${
           value
-            ? 'border-red-600 bg-red-50 text-red-600'
-            : 'border-gray-300 hover:border-red-300'
+            ? 'border-red-600 bg-red-50 text-red-600 shadow-sm'
+            : 'border-gray-200 bg-white text-gray-700 hover:border-red-200 hover:bg-red-50 hover:text-red-600'
         }`}
       >
         <span>{selectedLabel || label}</span>
         <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 bg-white border border-gray-100 rounded-xl shadow-xl z-50 min-w-[180px] py-1 anim-fade-in-down">
+        <div className="absolute top-full left-0 mt-2 bg-white border border-gray-100 rounded-xl shadow-xl z-50 min-w-[180px] py-1 anim-fade-in-down">
           <button
             onClick={() => { onChange(''); setIsOpen(false); }}
             className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
