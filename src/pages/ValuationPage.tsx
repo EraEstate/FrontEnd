@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { propertyAPI } from '../api/property';
 import { useAuthStore } from '../store/authStore';
 import {
@@ -21,6 +22,7 @@ const PROPERTY_TYPES = [
 const ValuationPage: React.FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
+  const { t } = useTranslation();
 
   // Form state
   const [provinces, setProvinces] = useState<any[]>([]);
@@ -143,7 +145,7 @@ const ValuationPage: React.FC = () => {
           <div className="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center mx-auto mb-4">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Định giá bất động sản</h1>
+          <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 tracking-tight">Định giá bất động sản</h1>
           <p className="text-sm text-gray-500 mt-2 max-w-lg mx-auto">
             Ước tính giá trị thị trường dựa trên dữ liệu {provinces.length > 0 ? `hơn ${provinces.length} tỉnh thành` : 'toàn quốc'}
           </p>
@@ -165,40 +167,40 @@ const ValuationPage: React.FC = () => {
         {step === 1 && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-6">
-              <h2 className="text-base font-bold text-gray-900 mb-1">Thông tin bất động sản</h2>
+              <h2 className="text-base font-semibold text-gray-900 mb-1">Thông tin bất động sản</h2>
               <p className="text-xs text-gray-400 mb-5">Điền càng chính xác, kết quả định giá càng sát thực tế</p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wider">Tỉnh / Thành phố *</label>
-                  <select value={provinceId} onChange={e => setProvinceId(e.target.value)} className={inputClass}>
+                  <label htmlFor="valuation-province" className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wider">Province / City *</label>
+                  <select id="valuation-province" value={provinceId} onChange={e => setProvinceId(e.target.value)} className={inputClass}>
                     <option value="">Chọn tỉnh/thành</option>
                     {provinces.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wider">Quận / Huyện</label>
-                  <select value={districtId} onChange={e => setDistrictId(e.target.value)} className={inputClass} disabled={!provinceId}>
+                  <label htmlFor="valuation-district" className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wider">District</label>
+                  <select id="valuation-district" value={districtId} onChange={e => setDistrictId(e.target.value)} className={inputClass} disabled={!provinceId}>
                     <option value="">Tất cả quận/huyện</option>
                     {districts.map((d: any) => <option key={d.id} value={d.id}>{d.name}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wider">Loại hình BĐS</label>
-                  <select value={propertyType} onChange={e => setPropertyType(e.target.value)} className={inputClass}>
+                  <label htmlFor="valuation-property-type" className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wider">Property Type</label>
+                  <select id="valuation-property-type" value={propertyType} onChange={e => setPropertyType(e.target.value)} className={inputClass}>
                     {PROPERTY_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wider">Năm xây dựng</label>
-                  <input type="number" value={yearBuilt} onChange={e => setYearBuilt(Number(e.target.value))} min={1970} max={2026} className={inputClass} />
+                  <label htmlFor="valuation-year-built" className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wider">Year Built</label>
+                  <input id="valuation-year-built" type="number" value={yearBuilt} onChange={e => setYearBuilt(Number(e.target.value))} min={1970} max={2026} className={inputClass} />
                 </div>
               </div>
 
               {/* Bedrooms / Bathrooms */}
               <div className="grid grid-cols-2 gap-4 mb-5">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wider">Phòng ngủ</label>
+                  <p className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wider">Bedrooms</p>
                   <div className="flex gap-1.5">
                     {[1, 2, 3, 4, 5].map(n => (
                       <button key={n} onClick={() => setBedrooms(n)}
@@ -209,7 +211,7 @@ const ValuationPage: React.FC = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wider">Phòng tắm</label>
+                  <p className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wider">Bathrooms</p>
                   <div className="flex gap-1.5">
                     {[1, 2, 3, 4].map(n => (
                       <button key={n} onClick={() => setBathrooms(n)}
@@ -224,10 +226,10 @@ const ValuationPage: React.FC = () => {
               {/* Area Slider */}
               <div className="mb-6">
                 <div className="flex justify-between items-baseline mb-2">
-                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Diện tích</label>
+                  <label htmlFor="valuation-area" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Area</label>
                   <span className="text-lg font-bold text-gray-900">{area} <span className="text-sm font-normal text-gray-400">m²</span></span>
                 </div>
-                <input type="range" min={20} max={500} step={5} value={area} onChange={e => setArea(Number(e.target.value))}
+                <input id="valuation-area" type="range" min={20} max={500} step={5} value={area} onChange={e => setArea(Number(e.target.value))}
                   className="w-full h-1.5 bg-gray-200 rounded-full appearance-none cursor-pointer accent-red-600" />
                 <div className="flex justify-between text-[10px] text-gray-300 mt-1"><span>20</span><span>100</span><span>250</span><span>500</span></div>
               </div>
@@ -238,7 +240,7 @@ const ValuationPage: React.FC = () => {
               <button onClick={handleValuate} disabled={loading || !provinceId}
                 className="w-full py-3.5 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm">
                 {loading ? (
-                  <><svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>Đang phân tích dữ liệu...</>
+                  <><svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>Đang phân tích dữ liệu…</>
                 ) : (
                   <><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>Phân tích & Định giá</>
                 )}
@@ -265,7 +267,7 @@ const ValuationPage: React.FC = () => {
                   <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-1">Đăng nhập để xem báo cáo</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">Đăng nhập để xem báo cáo</h3>
                   <p className="text-sm text-gray-500 max-w-xs mb-5">Tạo tài khoản miễn phí để xem đầy đủ kết quả định giá và BĐS tham chiếu</p>
                   <button onClick={() => navigate('/login')}
                     className="px-8 py-3 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition-colors text-sm">
@@ -279,7 +281,7 @@ const ValuationPage: React.FC = () => {
                 <div className="p-6 pb-5 text-center bg-gradient-to-b from-red-50/50 to-white">
                   <p className="text-[10px] font-bold text-red-600 uppercase tracking-widest mb-3">Giá trị ước tính</p>
                   <p className="text-4xl font-bold text-gray-900 mb-2">{formatVND(result.estimatedMid)}</p>
-                  <p className="text-sm text-gray-500">Khoảng: <span className="font-semibold text-gray-700">{formatVND(result.estimatedLow)} — {formatVND(result.estimatedHigh)}</span></p>
+                  <p className="text-sm text-gray-500">Khoảng: <span className="font-semibold text-gray-700">{formatVND(result.estimatedLow)} đến {formatVND(result.estimatedHigh)}</span></p>
                 </div>
 
                 {/* Confidence + Stats */}
@@ -308,7 +310,7 @@ const ValuationPage: React.FC = () => {
                 {/* Distribution Chart */}
                 {result.chartData?.length > 0 && (
                   <div className="p-6">
-                    <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Phân bố giá BĐS khu vực</h3>
+                    <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">Phân bố giá BĐS khu vực</h3>
                     <div className="h-52">
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={result.chartData} margin={{ top: 5, right: 0, left: 0, bottom: 5 }}>
@@ -317,8 +319,8 @@ const ValuationPage: React.FC = () => {
                           <YAxis hide />
                           <Tooltip contentStyle={{ borderRadius: '10px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,.08)', fontSize: '12px' }} />
                           <Bar dataKey="count" name="Số lượng BĐS" radius={[5, 5, 0, 0]} barSize={24}>
-                            {result.chartData.map((_: any, i: number) => (
-                              <Cell key={i} fill={i % 2 === 0 ? '#ef4444' : '#fca5a5'} />
+                            {result.chartData.map((entry: any, i: number) => (
+                              <Cell key={`bar-cell-${entry.name}`} fill={i % 2 === 0 ? '#ef4444' : '#fca5a5'} />
                             ))}
                           </Bar>
                         </BarChart>
@@ -330,7 +332,7 @@ const ValuationPage: React.FC = () => {
                 {/* Comparable Properties */}
                 {result.topComparables?.length > 0 && (
                   <div className="p-6 pt-0">
-                    <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">BĐS tham chiếu gần nhất</h3>
+                    <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">BĐS tham chiếu gần nhất</h3>
                     <div className="space-y-2">
                       {result.topComparables.map((p: any) => (
                         <Link key={p.id} to={`/properties/${p.id}`}
