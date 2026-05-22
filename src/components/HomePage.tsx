@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
   Search,
   ChevronDown,
@@ -35,7 +35,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { useAuthStore } from "../store/authStore";
 import MapPicker from "./MapPicker";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { propertyViewAPI } from "../api/propertyView";
 import { propertyAPI } from "../api/property";
 import { getImageUrl, getImagePlaceholder } from "../utils/imageUtils";
@@ -43,7 +43,7 @@ import LazyImage from "./LazyImage";
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
-  const [searchLocation, setSearchLocation] = useState("");
+  const searchLocationRef = useRef("");
   const [activeTab, setActiveTab] = useState("sale");
   const [currentSlide, setCurrentSlide] = useState(0);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
@@ -61,7 +61,7 @@ const HomePage: React.FC = () => {
   const [isAreaOpen, setIsAreaOpen] = useState(false);
 
   // Selected values
-  const [selectedLocation, setSelectedLocation] = useState("");
+  const selectedLocationRef = useRef("");
   const [selectedPropertyType, setSelectedPropertyType] = useState("");
   const [selectedPrice, setSelectedPrice] = useState("");
   const [selectedArea, setSelectedArea] = useState("");
@@ -82,7 +82,7 @@ const HomePage: React.FC = () => {
   const featuredPropertyItems = Array.isArray(featuredProperties)
     ? featuredProperties
     : (featuredProperties as any)?.content || [];
-  const featuredRecommendationFallback = featuredPropertyItems.slice(0, 4);
+  const featuredRecommendationFallback = featuredPropertyItems.slice(0, 2);
   const recommendationItems =
     recommendations.length > 0
       ? recommendations
@@ -90,6 +90,85 @@ const HomePage: React.FC = () => {
   const showRecommendationSection =
     (isAuthenticated && recommendationsLoading) ||
     recommendationItems.length > 0;
+
+  const formatPropertyPrice = (price?: number) => {
+    if (!price) return t("home.recommendation.priceNegotiable", { defaultValue: "Giá thỏa thuận" });
+    if (price >= 1000000000) return `${(price / 1000000000).toFixed(1)} ${t("common.billion")}`;
+    if (price >= 1000000) return `${(price / 1000000).toFixed(0)} ${t("common.million")}`;
+    return `${price.toLocaleString()} VND`;
+  };
+
+  const renderPropertyCard = (
+    property: any,
+    cardKey: string,
+    options?: { badgeLabel?: string; badgeTone?: "yellow" | "red" },
+  ) => {
+    const propertyId = property?.id ?? property?.propertyId;
+    const propertyTitle =
+      property?.title ||
+      property?.name ||
+      t("home.recommendation.updating", { defaultValue: "Đang cập nhật" });
+    const propertyArea =
+      property?.area ?? property?.propertyDetail?.area ?? property?.propertyDetails?.[0]?.area;
+    const propertyAddress =
+      property?.address ||
+      property?.fullAddress ||
+      property?.location ||
+      t("home.recommendation.updating", { defaultValue: "Đang cập nhật" });
+    const propertyImage =
+      property?.mainImageUrl ||
+      property?.imageUrl ||
+      property?.propertyImages?.[0]?.imageUrl;
+
+    const badgeToneClass =
+      options?.badgeTone === "red"
+        ? "bg-red-600 text-white"
+        : "bg-yellow-400 text-gray-900";
+
+    return (
+      <Link
+        key={cardKey}
+        to={propertyId ? `/properties/${propertyId}` : "/properties"}
+        className="group bg-white rounded-2xl overflow-hidden border border-gray-200/80 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-200 flex flex-col h-full"
+      >
+        <div className="relative h-52 shrink-0 bg-gray-100">
+          <LazyImage
+            src={
+              getImageUrl(propertyImage) ||
+              getImagePlaceholder(400, 300)
+            }
+            alt={propertyTitle || t("home.recommendation.imageAlt", { defaultValue: "Hình ảnh bất động sản" })}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            containerClassName="absolute inset-0"
+          />
+          {options?.badgeLabel && (
+            <span
+              className={`absolute top-3 left-3 z-10 text-xs font-semibold px-2.5 py-1 rounded-full shadow-sm ${badgeToneClass}`}
+            >
+              {options.badgeLabel}
+            </span>
+          )}
+        </div>
+
+        <div className="p-4 flex flex-col flex-1 bg-white">
+          <h3 className="font-semibold text-gray-900 text-[15px] leading-5 line-clamp-2 min-h-[40px]">
+            {propertyTitle}
+          </h3>
+          <div className="flex items-center justify-between mt-3">
+            <span className="text-red-600 font-bold text-lg">
+              {formatPropertyPrice(property.price)}
+            </span>
+            <span className="text-gray-600 text-sm">
+              {propertyArea ? `${propertyArea}m²` : "-- m²"}
+            </span>
+          </div>
+          <p className="text-sm text-gray-500 mt-2 truncate">
+            {propertyAddress}
+          </p>
+        </div>
+      </Link>
+    );
+  };
 
   useEffect(() => {
     let alive = true;
@@ -133,7 +212,7 @@ const HomePage: React.FC = () => {
     if (isAuthenticated) {
       setRecommendationsLoading(true);
       propertyAPI
-        .getRecommendationsForYou(4)
+        .getRecommendationsForYou(2)
         .then((res) => {
           if (alive) setRecommendations(res);
         })
@@ -152,13 +231,13 @@ const HomePage: React.FC = () => {
     (recentNews as any)?.content ??
     (Array.isArray(recentNews) ? (recentNews as any[]) : []);
 
-  const bannerSlides = [
+  const bannerSlides = useMemo(() => [
     {
       id: 1,
       title: t("home.banner.slide1.title"),
       subtitle: t("home.banner.slide1.subtitle"),
       image:
-        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
       alt: t("home.banner.slide1.alt"),
     },
     {
@@ -166,7 +245,7 @@ const HomePage: React.FC = () => {
       title: t("home.banner.slide2.title"),
       subtitle: t("home.banner.slide2.subtitle"),
       image:
-        "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+        "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
       alt: t("home.banner.slide2.alt"),
     },
     {
@@ -174,7 +253,7 @@ const HomePage: React.FC = () => {
       title: t("home.banner.slide3.title"),
       subtitle: t("home.banner.slide3.subtitle"),
       image:
-        "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+        "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
       alt: t("home.banner.slide3.alt"),
     },
     {
@@ -182,7 +261,7 @@ const HomePage: React.FC = () => {
       title: t("home.banner.slide4.title"),
       subtitle: t("home.banner.slide4.subtitle"),
       image:
-        "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+        "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
       alt: t("home.banner.slide4.alt"),
     },
     {
@@ -190,7 +269,7 @@ const HomePage: React.FC = () => {
       title: t("home.banner.slide5.title"),
       subtitle: t("home.banner.slide5.subtitle"),
       image:
-        "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+        "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
       alt: t("home.banner.slide5.alt"),
     },
     {
@@ -198,7 +277,7 @@ const HomePage: React.FC = () => {
       title: t("home.banner.slide6.title"),
       subtitle: t("home.banner.slide6.subtitle"),
       image:
-        "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+        "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
       alt: t("home.banner.slide6.alt"),
     },
     {
@@ -206,10 +285,159 @@ const HomePage: React.FC = () => {
       title: t("home.banner.slide7.title"),
       subtitle: t("home.banner.slide7.subtitle"),
       image:
-        "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+        "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
       alt: t("home.banner.slide7.alt"),
     },
-  ];
+  ], [t]);
+
+  // Static configs wrapped in useMemo to prevent re-creation on every render
+  const staticData = useMemo(() => ({
+    featuredNews: [
+      {
+        title: t("home.featuredNews.hanoi.title"),
+        subtitle: t("home.featuredNews.hanoi.subtitle"),
+        image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60",
+      },
+      {
+        title: t("home.featuredNews.hcm.title"),
+        subtitle: t("home.featuredNews.hcm.subtitle"),
+        image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60",
+      },
+      {
+        title: t("home.featuredNews.wiki.title"),
+        subtitle: t("home.featuredNews.wiki.subtitle"),
+        image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60",
+      },
+    ],
+    projects: [
+      {
+        name: t("home.projects.libera.name"),
+        area: "1,83 ha",
+        location: t("home.projects.libera.location"),
+        status: t("home.projects.status.opening"),
+        rating: 6,
+        image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60",
+      },
+      {
+        name: t("home.projects.lumiere.name"),
+        area: "3,23 ha",
+        location: t("home.projects.lumiere.location"),
+        status: t("home.projects.status.opening"),
+        rating: 7,
+        image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60",
+      },
+      {
+        name: t("home.projects.jade.name"),
+        area: "2,5 ha",
+        location: t("home.projects.jade.location"),
+        status: t("home.projects.status.comingSoon"),
+        rating: 8,
+        image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60",
+      },
+      {
+        name: t("home.projects.masteri.name"),
+        area: "4,2 ha",
+        location: t("home.projects.masteri.location"),
+        status: t("home.projects.status.completed"),
+        rating: 16,
+        image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60",
+      },
+      {
+        name: t("home.projects.verosa.name"),
+        area: "8,1 ha",
+        location: t("home.projects.verosa.location"),
+        status: t("home.projects.status.completed"),
+        rating: 16,
+        image: "https://images.unsplash.com/photo-1570129477492-45c003edd2be?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60",
+      },
+      {
+        name: t("home.projects.vinhomes.name"),
+        area: "271 ha",
+        location: t("home.projects.vinhomes.location"),
+        status: t("home.projects.status.selling"),
+        rating: 20,
+        image: "https://images.unsplash.com/photo-1555636222-cae831e670b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60",
+      },
+    ],
+    locations: [
+      {
+        name: t("home.locations.hcm.name"),
+        listings: t("home.locations.hcm.listings"),
+        image: "https://images.unsplash.com/photo-1583417319070-4a69db38a482?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60",
+      },
+      {
+        name: t("home.locations.hanoi.name"),
+        listings: t("home.locations.hanoi.listings"),
+        image: "https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60",
+      },
+      {
+        name: t("home.locations.danang.name"),
+        listings: t("home.locations.danang.listings"),
+        image: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60",
+      },
+      {
+        name: t("home.locations.binhduong.name"),
+        listings: t("home.locations.binhduong.listings"),
+        image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60",
+      },
+    ],
+    otherProjects: [
+      t("home.featuredProjects.vinhomesCentral"),
+      t("home.featuredProjects.vinhomesGrand"),
+      t("home.featuredProjects.vinhomesSmart"),
+      t("home.featuredProjects.vinhomesOcean"),
+      t("home.featuredProjects.vungTau"),
+      t("home.featuredProjects.bcons"),
+      t("home.featuredProjects.grandeur"),
+      t("home.featuredProjects.diamond"),
+      t("home.featuredProjects.haDo"),
+      t("home.featuredProjects.sunAvenue"),
+    ],
+    fallbackNews: [
+      { number: "01", title: t("home.news.article1.title"), subtitle: t("home.news.article1.subtitle") },
+      { number: "02", title: t("home.news.article2.title"), subtitle: t("home.news.article2.subtitle") },
+      { number: "03", title: t("home.news.article3.title"), subtitle: t("home.news.article3.subtitle") },
+      { number: "04", title: t("home.news.article4.title"), subtitle: t("home.news.article4.subtitle") },
+      { number: "05", title: t("home.news.article5.title"), subtitle: t("home.news.article5.subtitle") },
+      { number: "06", title: t("home.news.article6.title"), subtitle: t("home.news.article6.subtitle") },
+    ],
+    utilities: [
+      { title: t("home.utilities.ageCalculator.title"), desc: t("home.utilities.ageCalculator.desc"), image: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60" },
+      { title: t("home.utilities.constructionCost.title"), desc: t("home.utilities.constructionCost.desc"), image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60" },
+      { title: t("home.utilities.interestCalculator.title"), desc: t("home.utilities.interestCalculator.desc"), image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60" },
+      { title: t("home.utilities.fengshui.title"), desc: t("home.utilities.fengshui.desc"), image: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60" },
+    ],
+    companies: [
+      { name: t("home.companies.catTuong"), image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=60" },
+      { name: t("home.companies.spHome"), image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=60" },
+      { name: t("home.companies.kimOanh"), image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=60" },
+      { name: t("home.companies.seaholdings"), image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=60" },
+      { name: t("home.companies.gamuda"), image: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=60" },
+      { name: t("home.companies.ttRealty"), image: "https://images.unsplash.com/photo-1570129477492-45c003edd2be?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=60" },
+    ],
+    mediaArticles: [
+      { title: t("home.media.article1.title"), source: t("home.media.article1.source"), image: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60" },
+      { title: t("home.media.article2.title"), source: t("home.media.article2.source"), image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60" },
+      { title: t("home.media.article3.title"), source: t("home.media.article3.source"), image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60" },
+      { title: t("home.media.article4.title"), source: t("home.media.article4.source"), image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60" },
+      { title: t("home.media.article5.title"), source: t("home.media.article5.source"), image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60" },
+      { title: t("home.media.article6.title"), source: t("home.media.article6.source"), image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60" },
+    ],
+    whyChooseUs: [
+      { icon: CheckCircle2, key: "verified" },
+      { icon: Brain, key: "ai" },
+      { icon: ShieldCheck, key: "secure" },
+      { icon: HeadphonesIcon, key: "support" },
+      { icon: MapPin, key: "map" },
+      { icon: BarChart3, key: "analytics" },
+    ],
+    buyingGuideSteps: [
+      { icon: Search, key: 0 },
+      { icon: Scale, key: 1 },
+      { icon: PhoneCall, key: 2 },
+      { icon: KeyRound, key: 3 },
+    ]
+  }), [t]);
 
   // Auto slide effect
   useEffect(() => {
@@ -229,13 +457,14 @@ const HomePage: React.FC = () => {
     const searchParams = new URLSearchParams();
 
     // Map location name to provinceId
-    if (selectedLocation && provinces) {
+    const locationVal = selectedLocationRef.current;
+    if (locationVal && provinces) {
       const province = provinces.find(
         (p: any) =>
-          p.name.includes(selectedLocation) ||
-          selectedLocation.includes(p.name) ||
+          p.name.includes(locationVal) ||
+          locationVal.includes(p.name) ||
           p.name.replace(/Thành phố|Tỉnh|TP\.?/g, "").trim() ===
-            selectedLocation.replace(/Thành phố|Tỉnh|TP\.?/g, "").trim(),
+            locationVal.replace(/Thành phố|Tỉnh|TP\.?/g, "").trim(),
       );
       if (province) {
         searchParams.set("provinceId", province.id.toString());
@@ -297,8 +526,8 @@ const HomePage: React.FC = () => {
     }
 
     // Add keyword search
-    if (searchLocation.trim()) {
-      searchParams.set("query", searchLocation.trim());
+    if (searchLocationRef.current.trim()) {
+      searchParams.set("query", searchLocationRef.current.trim());
     }
 
     // Navigate to properties page with search params
@@ -319,36 +548,34 @@ const HomePage: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section với Banner Background và Search Bar */}
       <section className="relative h-96 md:h-[500px] lg:h-[600px] overflow-hidden">
-        {/* Background Banner Slider */}
-        <div className="absolute inset-0">
-          {bannerSlides.map((slide, index) => (
-            <div
-              key={slide.id}
-              className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
-                index === currentSlide
-                  ? "opacity-100 scale-100"
-                  : "opacity-0 scale-105"
-              }`}
+        {/* Background Banner Slider Optimized */}
+        <div className="absolute inset-0 bg-gray-900">
+          <AnimatePresence initial={false}>
+            <motion.div
+              key={currentSlide}
+              initial={{ opacity: 0, scale: 1.05 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1, ease: "easeInOut" }}
+              className="absolute inset-0"
             >
-              {/* Real estate background image */}
               <div
                 className="w-full h-full bg-cover bg-center bg-no-repeat"
                 style={{
-                  backgroundImage: `url(${slide.image})`,
+                  backgroundImage: `url(${bannerSlides[currentSlide]?.image})`,
                 }}
               >
-                {/* Dark overlay for readability */}
-                <div className="absolute inset-0 bg-black bg-opacity-50" />
+                <div className="absolute inset-0 bg-gray-950 bg-opacity-50" />
               </div>
-            </div>
-          ))}
+            </motion.div>
+          </AnimatePresence>
         </div>
 
         {/* Navigation Controls for Banner */}
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
-          {bannerSlides.map((_, index) => (
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-x-2 z-10">
+          {bannerSlides.map((slide, index) => (
             <button
-              key={index}
+              key={slide.id}
               onClick={() => setCurrentSlide(index)}
               className={`w-2 h-2 rounded-full transition-all duration-300 ${
                 index === currentSlide
@@ -361,13 +588,13 @@ const HomePage: React.FC = () => {
 
         <button
           onClick={prevSlide}
-          className="absolute left-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-black bg-opacity-20 hover:bg-opacity-40 rounded-full flex items-center justify-center text-white transition-all duration-200 z-10"
+          className="absolute left-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-gray-950 bg-opacity-20 hover:bg-opacity-40 rounded-full flex items-center justify-center text-white transition-all duration-200 z-10"
         >
           <ChevronDown className="h-5 w-5 rotate-90" />
         </button>
         <button
           onClick={nextSlide}
-          className="absolute right-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-black bg-opacity-20 hover:bg-opacity-40 rounded-full flex items-center justify-center text-white transition-all duration-200 z-10"
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-gray-950 bg-opacity-20 hover:bg-opacity-40 rounded-full flex items-center justify-center text-white transition-all duration-200 z-10"
         >
           <ChevronDown className="h-5 w-5 -rotate-90" />
         </button>
@@ -377,7 +604,7 @@ const HomePage: React.FC = () => {
           <div className="max-w-7xl mx-auto px-6 lg:px-12 w-full">
             {/* Hero Title */}
             <div className="text-center text-white mb-8">
-              <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-semibold mb-4 leading-tight">
                 {t("home.hero.title")}
               </h1>
               <p className="text-lg md:text-xl opacity-90 max-w-2xl mx-auto">
@@ -386,13 +613,13 @@ const HomePage: React.FC = () => {
             </div>
 
             {/* Tab Navigation */}
-            <div className="flex justify-center space-x-1 mb-6">
+            <div className="flex justify-center gap-x-1 mb-6">
               <button
                 onClick={() => setActiveTab("sale")}
                 className={`px-6 py-3 rounded-t-lg font-bold transition-all duration-200 shadow-lg ${
                   activeTab === "sale"
                     ? "bg-white text-red-600 shadow-xl"
-                    : "bg-black bg-opacity-30 text-white hover:bg-opacity-40 hover:shadow-lg"
+                    : "bg-gray-950 bg-opacity-30 text-white hover:bg-opacity-40 hover:shadow-lg"
                 }`}
               >
                 {t("home.tabs.sale")}
@@ -402,7 +629,7 @@ const HomePage: React.FC = () => {
                 className={`px-6 py-3 rounded-t-lg font-bold transition-all duration-200 shadow-lg ${
                   activeTab === "rent"
                     ? "bg-white text-red-600 shadow-xl"
-                    : "bg-black bg-opacity-30 text-white hover:bg-opacity-40 hover:shadow-lg"
+                    : "bg-gray-950 bg-opacity-30 text-white hover:bg-opacity-40 hover:shadow-lg"
                 }`}
               >
                 {t("home.tabs.rent")}
@@ -412,7 +639,7 @@ const HomePage: React.FC = () => {
                 className={`px-6 py-3 rounded-t-lg font-bold transition-all duration-200 shadow-lg ${
                   activeTab === "project"
                     ? "bg-white text-red-600 shadow-xl"
-                    : "bg-black bg-opacity-30 text-white hover:bg-opacity-40 hover:shadow-lg"
+                    : "bg-gray-950 bg-opacity-30 text-white hover:bg-opacity-40 hover:shadow-lg"
                 }`}
               >
                 {t("home.tabs.project")}
@@ -429,12 +656,12 @@ const HomePage: React.FC = () => {
                   className="group relative bg-white rounded-2xl p-8 card-hover border border-gray-100 hover:border-blue-200"
                   style={{ boxShadow: "var(--shadow-lg)" }}
                 >
-                  <div className="flex flex-col items-center space-y-4">
+                  <div className="flex flex-col items-center gap-y-4">
                     <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-full p-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
                       <Map className="h-10 w-10 text-white" />
                     </div>
                     <div className="text-center">
-                      <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                      <h3 className="text-2xl font-semibold text-gray-900 mb-2">
                         {t("home.search.viewMap")}
                       </h3>
                       <p className="text-sm text-gray-500">
@@ -452,12 +679,12 @@ const HomePage: React.FC = () => {
                   className="group relative bg-white rounded-2xl p-8 card-hover border border-gray-100 hover:border-red-200"
                   style={{ boxShadow: "var(--shadow-lg)" }}
                 >
-                  <div className="flex flex-col items-center space-y-4">
+                  <div className="flex flex-col items-center gap-y-4">
                     <div className="bg-gradient-to-br from-red-500 to-red-600 rounded-full p-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
                       <Search className="h-10 w-10 text-white" />
                     </div>
                     <div className="text-center">
-                      <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                      <h3 className="text-2xl font-semibold text-gray-900 mb-2">
                         {t("home.search.searchTitle")}
                       </h3>
                       <p className="text-sm text-gray-500">
@@ -478,8 +705,8 @@ const HomePage: React.FC = () => {
         isOpen={isMapPickerOpen}
         onClose={() => setIsMapPickerOpen(false)}
         onSelectLocation={(location) => {
-          setSelectedLocation(location.address);
-          setSearchLocation(location.address);
+          selectedLocationRef.current = location.address;
+          searchLocationRef.current = location.address;
         }}
       />
 
@@ -491,72 +718,40 @@ const HomePage: React.FC = () => {
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
                 <Star className="w-8 h-8 text-yellow-500" />
-                <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
-                  Gợi ý cho bạn
+                <h2 className="text-3xl font-semibold text-gray-900 tracking-tight">
+                  {t("home.recommendation.title", { defaultValue: "Gợi ý cho bạn" })}
                 </h2>
               </div>
               <span className="text-sm text-gray-500 italic">
                 {isAuthenticated
-                  ? "Dựa trên hoạt động của bạn"
-                  : "Gợi ý chung. Đăng nhập để cá nhân hóa"}
+                  ? t("home.recommendation.personalized", { defaultValue: "Dựa trên hoạt động của bạn" })
+                  : t("home.recommendation.generic", { defaultValue: "Gợi ý chung. Đăng nhập để cá nhân hóa" })}
               </span>
             </div>
 
             {isAuthenticated && recommendationsLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[...Array(4)].map((_, i) => (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {Array.from({ length: 2 }, (_, slot) => slot + 1).map((slot) => (
                   <div
-                    key={i}
-                    className="h-56 bg-gray-200 rounded-lg animate-pulse"
+                    key={`recommendation-skeleton-${slot}`}
+                    className="h-56 bg-gray-200 rounded-xl animate-pulse"
                   />
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {recommendationItems.map((property: any) => (
-                  <Link
-                    key={property.id}
-                    to={`/properties/${property.id}`}
-                    className="bg-white rounded-xl overflow-hidden card-hover border border-yellow-100/60 relative"
-                  >
-                    <div className="absolute top-2 left-2 z-10 bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded shadow-sm flex items-center gap-1">
-                      <Star className="w-3 h-3 fill-current" />{" "}
-                      {isAuthenticated ? "Phù hợp" : "Đề xuất"}
-                    </div>
-                    <div className="h-48 relative">
-                      <LazyImage
-                        src={
-                          getImageUrl(
-                            property.mainImageUrl || property.imageUrl,
-                          ) || getImagePlaceholder(400, 300)
-                        }
-                        alt={property.title}
-                        className="w-full h-full object-cover"
-                        containerClassName="absolute inset-0"
-                      />
-                      <div className="absolute inset-0 bg-black bg-opacity-20 hover:bg-opacity-30 transition-all duration-200" />
-                    </div>
-                    <div className="p-4">
-                      <h3 className="font-semibold text-gray-900 mb-2 text-sm line-clamp-2">
-                        {property.title}
-                      </h3>
-                      <div className="flex items-center justify-between text-sm mb-2">
-                        <span className="text-red-600 font-bold">
-                          {property.price >= 1000000000
-                            ? `${(property.price / 1000000000).toFixed(1)} tỷ`
-                            : property.price >= 1000000
-                              ? `${(property.price / 1000000).toFixed(0)} triệu`
-                              : property.price?.toLocaleString("vi-VN")}{" "}
-                          VND
-                        </span>
-                        <span className="text-gray-600">{property.area}m²</span>
-                      </div>
-                      <p className="text-xs text-gray-500 truncate">
-                        {property.address}
-                      </p>
-                    </div>
-                  </Link>
-                ))}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {recommendationItems.map((property: any, idx: number) =>
+                  renderPropertyCard(
+                    property,
+                    `rec-${property?.id ?? property?.propertyId ?? idx}`,
+                    {
+                      badgeLabel: isAuthenticated
+                        ? t("home.recommendation.match", { defaultValue: "Phù hợp" })
+                        : t("home.recommendation.suggested", { defaultValue: "Đề xuất" }),
+                      badgeTone: "yellow",
+                    },
+                  ),
+                )}
               </div>
             )}
           </section>
@@ -565,52 +760,21 @@ const HomePage: React.FC = () => {
         {/* Bất động sản nổi bật Section */}
         <section className="mb-12">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+            <h2 className="text-3xl font-semibold text-gray-900 tracking-tight">
               {t("home.sections.featuredProperties")}
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Featured Properties từ API */}
-            {featuredPropertyItems.slice(0, 4).map((property: any) => (
-              <Link
-                key={property.id}
-                to={`/properties/${property.id}`}
-                className="bg-white rounded-xl overflow-hidden card-hover border border-gray-100"
-              >
-                <div className="h-48 relative">
-                  <LazyImage
-                    src={
-                      getImageUrl(property.mainImageUrl || property.imageUrl) ||
-                      getImagePlaceholder(400, 300)
-                    }
-                    alt={property.title}
-                    className="w-full h-full object-cover"
-                    containerClassName="absolute inset-0"
-                  />
-                  <div className="absolute inset-0 bg-black bg-opacity-20 hover:bg-opacity-30 transition-all duration-200" />
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 mb-2 text-sm line-clamp-2">
-                    {property.title}
-                  </h3>
-                  <div className="flex items-center justify-between text-sm mb-2">
-                    <span className="text-red-600 font-bold">
-                      {property.price >= 1000000000
-                        ? `${(property.price / 1000000000).toFixed(1)} tỷ`
-                        : property.price >= 1000000
-                          ? `${(property.price / 1000000).toFixed(0)} triệu`
-                          : property.price?.toLocaleString("vi-VN")}{" "}
-                      VND
-                    </span>
-                    <span className="text-gray-600">{property.area}m²</span>
-                  </div>
-                  <p className="text-xs text-gray-500 truncate">
-                    {property.address}
-                  </p>
-                </div>
-              </Link>
-            ))}
+            {featuredPropertyItems
+              .slice(0, 2)
+              .map((property: any, idx: number) =>
+                renderPropertyCard(
+                  property,
+                  `featured-${property?.id ?? property?.propertyId ?? idx}`,
+                ),
+              )}
           </div>
         </section>
 
@@ -620,8 +784,8 @@ const HomePage: React.FC = () => {
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-8 h-8 text-red-600" />
-                <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
-                  Bất động sản xem nhiều
+                <h2 className="text-3xl font-semibold text-gray-900 tracking-tight">
+                  {t("home.sections.mostViewed", { defaultValue: "Bất động sản xem nhiều" })}
                 </h2>
               </div>
               <Link
@@ -633,9 +797,9 @@ const HomePage: React.FC = () => {
             </div>
             {mostViewedLoading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[...Array(4)].map((_, i) => (
+                {Array.from({ length: 4 }, (_, slot) => slot + 1).map((slot) => (
                   <div
-                    key={i}
+                    key={`most-viewed-skeleton-${slot}`}
                     className="h-56 bg-gray-200 rounded-lg animate-pulse"
                   />
                 ))}
@@ -652,9 +816,9 @@ const HomePage: React.FC = () => {
                   >
                     <Link
                       to={`/properties/${property.id}`}
-                      className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 block h-full"
+                      className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col h-full"
                     >
-                      <div className="h-48 relative">
+                      <div className="h-48 relative shrink-0">
                         <LazyImage
                           src={
                             getImageUrl(
@@ -662,43 +826,39 @@ const HomePage: React.FC = () => {
                                 property.propertyImages?.[0]?.imageUrl,
                             ) || getImagePlaceholder(400, 300)
                           }
-                          alt={property.title}
+                          alt={property.title || t("home.recommendation.imageAlt", { defaultValue: "Hình ảnh bất động sản" })}
                           className="w-full h-full object-cover"
                           containerClassName="absolute inset-0"
                         />
-                        <div className="absolute inset-0 bg-black bg-opacity-10 hover:bg-opacity-20 transition-all duration-200" />
+                        <div className="absolute inset-0 bg-gray-950 bg-opacity-10 hover:bg-opacity-20 transition-all duration-200" />
                         {property.weekViews != null && (
-                          <span className="absolute top-2 right-2 z-10 bg-black/65 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                          <span className="absolute top-2 right-2 z-10 bg-gray-950/65 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
                             <Eye className="w-3 h-3" />
                             {Number(property.weekViews).toLocaleString("vi-VN")}
                           </span>
                         )}
                       </div>
-                      <div className="p-4">
-                        <h3 className="font-semibold text-gray-900 mb-2 text-sm line-clamp-2">
-                          {property.title}
+                      <div className="p-4 flex flex-col flex-1">
+                        <h3 className="font-semibold text-gray-900 mb-2 text-sm line-clamp-2 min-h-[40px]">
+                          {property.title || t("home.recommendation.updating", { defaultValue: "Đang cập nhật" })}
                         </h3>
-                        <div className="flex items-center justify-between text-sm mb-2">
+                        <div className="flex items-center justify-between text-sm mb-2 mt-auto">
                           <span className="text-red-600 font-bold">
-                            {property.price >= 1000000000
-                              ? `${(property.price / 1000000000).toFixed(1)} tỷ`
-                              : property.price >= 1000000
-                                ? `${(property.price / 1000000).toFixed(0)} triệu`
-                                : property.price?.toLocaleString("vi-VN")}{" "}
-                            VND
+                            {formatPropertyPrice(property.price)}
                           </span>
                           <span className="text-gray-600">
-                            {property.area}m²
+                            {property.area ? `${property.area}m²` : "-- m²"}
                           </span>
                         </div>
-                        <p className="text-xs text-gray-500 truncate">
-                          {property.address}
+                        <p className="text-xs text-gray-500 truncate mt-1">
+                          {property.address || t("home.recommendation.updating", { defaultValue: "Đang cập nhật" })}
                         </p>
                       </div>
                     </Link>
                   </motion.div>
                 ))}
               </div>
+            
             )}
           </section>
         )}
@@ -706,35 +866,16 @@ const HomePage: React.FC = () => {
         {/* Tin nổi bật Section */}
         <section className="mb-12">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+            <h2 className="text-3xl font-semibold text-gray-900 tracking-tight">
               {t("home.sections.featuredNews")}
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Featured News Cards với style giống batdongsan.com.vn */}
-            {[
-              {
-                title: t("home.featuredNews.hanoi.title"),
-                subtitle: t("home.featuredNews.hanoi.subtitle"),
-                image:
-                  "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-              },
-              {
-                title: t("home.featuredNews.hcm.title"),
-                subtitle: t("home.featuredNews.hcm.subtitle"),
-                image:
-                  "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-              },
-              {
-                title: t("home.featuredNews.wiki.title"),
-                subtitle: t("home.featuredNews.wiki.subtitle"),
-                image:
-                  "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-              },
-            ].map((item, index) => (
+            {staticData.featuredNews.map((item) => (
               <Link
-                key={index}
+                key={item.title}
                 to="/news"
                 className="bg-white rounded-xl border border-gray-100 overflow-hidden card-hover"
               >
@@ -742,9 +883,9 @@ const HomePage: React.FC = () => {
                   className="h-32 bg-cover bg-center bg-no-repeat"
                   style={{ backgroundImage: `url(${item.image})` }}
                 >
-                  <div className="h-full bg-black bg-opacity-40 flex items-center justify-center">
+                  <div className="h-full bg-gray-950 bg-opacity-40 flex items-center justify-center">
                     <div className="text-center text-white">
-                      <h3 className="font-bold text-lg mb-1">{item.title}</h3>
+                      <h3 className="font-semibold text-lg mb-1">{item.title}</h3>
                     </div>
                   </div>
                 </div>
@@ -761,7 +902,7 @@ const HomePage: React.FC = () => {
         {/* Tin tức Section */}
         <section className="mb-12">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+            <h2 className="text-3xl font-semibold text-gray-900 tracking-tight">
               {t("home.sections.news")}
             </h2>
             <Link
@@ -786,7 +927,7 @@ const HomePage: React.FC = () => {
                     backgroundImage: `url(${article.imageUrl || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"})`,
                   }}
                 >
-                  <div className="h-full bg-black bg-opacity-30 flex items-end p-4">
+                  <div className="h-full bg-gray-950 bg-opacity-30 flex items-end p-4">
                     <span className="text-xs text-white bg-red-600 px-2 py-1 rounded font-medium">
                       {article.category}
                     </span>
@@ -798,7 +939,7 @@ const HomePage: React.FC = () => {
                   </h3>
                   <div className="flex items-center text-xs text-gray-500">
                     <Clock className="h-3 w-3 mr-1" />
-                    {new Date(article.createdAt).toLocaleDateString("vi-VN")}
+                    <span suppressHydrationWarning>{new Date(article.createdAt).toLocaleDateString("vi-VN")}</span>
                   </div>
                 </div>
               </Link>
@@ -808,8 +949,8 @@ const HomePage: React.FC = () => {
 
         {/* Dự án bất động sản nổi bật */}
         <section className="mb-12">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+          <div className="flex items-center justify-between mb-6" suppressHydrationWarning>
+            <h2 className="text-3xl font-semibold text-gray-900 tracking-tight">
               {t("home.sections.featuredProjects")}
             </h2>
             <Link
@@ -822,64 +963,9 @@ const HomePage: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Project Cards */}
-            {[
-              {
-                name: t("home.projects.libera.name"),
-                area: "1,83 ha",
-                location: t("home.projects.libera.location"),
-                status: t("home.projects.status.opening"),
-                rating: 6,
-                image:
-                  "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-              },
-              {
-                name: t("home.projects.lumiere.name"),
-                area: "3,23 ha",
-                location: t("home.projects.lumiere.location"),
-                status: t("home.projects.status.opening"),
-                rating: 7,
-                image:
-                  "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-              },
-              {
-                name: t("home.projects.jade.name"),
-                area: "2,5 ha",
-                location: t("home.projects.jade.location"),
-                status: t("home.projects.status.comingSoon"),
-                rating: 8,
-                image:
-                  "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-              },
-              {
-                name: t("home.projects.masteri.name"),
-                area: "4,2 ha",
-                location: t("home.projects.masteri.location"),
-                status: t("home.projects.status.completed"),
-                rating: 16,
-                image:
-                  "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-              },
-              {
-                name: t("home.projects.verosa.name"),
-                area: "8,1 ha",
-                location: t("home.projects.verosa.location"),
-                status: t("home.projects.status.completed"),
-                rating: 16,
-                image:
-                  "https://images.unsplash.com/photo-1570129477492-45c003edd2be?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-              },
-              {
-                name: t("home.projects.vinhomes.name"),
-                area: "271 ha",
-                location: t("home.projects.vinhomes.location"),
-                status: t("home.projects.status.selling"),
-                rating: 20,
-                image:
-                  "https://images.unsplash.com/photo-1555636222-cae831e670b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-              },
-            ].map((project, index) => (
+            {staticData.projects.map((project) => (
               <Link
-                key={index}
+                key={project.name}
                 to="/projects"
                 className="bg-white rounded-xl overflow-hidden card-hover border border-gray-100"
               >
@@ -888,13 +974,13 @@ const HomePage: React.FC = () => {
                     className="w-full h-full bg-cover bg-center bg-no-repeat"
                     style={{ backgroundImage: `url(${project.image})` }}
                   >
-                    <div className="absolute inset-0 bg-black bg-opacity-20" />
+                    <div className="absolute inset-0 bg-gray-950 bg-opacity-20" />
                   </div>
                   <div className="absolute top-3 right-3 bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
                     {project.rating}
                   </div>
                   <div className="absolute bottom-3 left-3 text-white">
-                    <div className="bg-black bg-opacity-50 px-2 py-1 rounded text-xs font-medium">
+                    <div className="bg-gray-950 bg-opacity-50 px-2 py-1 rounded text-xs font-medium">
                       {project.area}
                     </div>
                   </div>
@@ -907,9 +993,9 @@ const HomePage: React.FC = () => {
                     <span className="text-gray-600">{project.area}</span>
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        project.status === "Đang mở bán"
+                        project.status === t("home.projects.status.opening")
                           ? "bg-green-100 text-green-700"
-                          : project.status === "Đã bàn giao"
+                          : project.status === t("home.projects.status.completed")
                             ? "bg-blue-100 text-blue-700"
                             : "bg-orange-100 text-orange-700"
                       }`}
@@ -929,41 +1015,16 @@ const HomePage: React.FC = () => {
         {/* Bất động sản theo địa điểm */}
         <section className="mb-12">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+            <h2 className="text-3xl font-semibold text-gray-900 tracking-tight">
               {t("home.sections.propertiesByLocation")}
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {/* Location Cards */}
-            {[
-              {
-                name: t("home.locations.hcm.name"),
-                listings: t("home.locations.hcm.listings"),
-                image:
-                  "https://images.unsplash.com/photo-1583417319070-4a69db38a482?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-              },
-              {
-                name: t("home.locations.hanoi.name"),
-                listings: t("home.locations.hanoi.listings"),
-                image:
-                  "https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-              },
-              {
-                name: t("home.locations.danang.name"),
-                listings: t("home.locations.danang.listings"),
-                image:
-                  "https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-              },
-              {
-                name: t("home.locations.binhduong.name"),
-                listings: t("home.locations.binhduong.listings"),
-                image:
-                  "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-              },
-            ].map((location, index) => (
+            {staticData.locations.map((location) => (
               <Link
-                key={index}
+                key={location.name}
                 to="/properties"
                 className="bg-white rounded-xl overflow-hidden card-hover border border-gray-100"
               >
@@ -972,7 +1033,7 @@ const HomePage: React.FC = () => {
                     className="w-full h-full bg-cover bg-center bg-no-repeat"
                     style={{ backgroundImage: `url(${location.image})` }}
                   >
-                    <div className="absolute inset-0 bg-black bg-opacity-30" />
+                    <div className="absolute inset-0 bg-gray-950 bg-opacity-30" />
                   </div>
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center text-white">
@@ -993,20 +1054,9 @@ const HomePage: React.FC = () => {
 
           {/* Dự án nổi bật khác */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-            {[
-              t("home.featuredProjects.vinhomesCentral"),
-              t("home.featuredProjects.vinhomesGrand"),
-              t("home.featuredProjects.vinhomesSmart"),
-              t("home.featuredProjects.vinhomesOcean"),
-              t("home.featuredProjects.vungTau"),
-              t("home.featuredProjects.bcons"),
-              t("home.featuredProjects.grandeur"),
-              t("home.featuredProjects.diamond"),
-              t("home.featuredProjects.haDo"),
-              t("home.featuredProjects.sunAvenue"),
-            ].map((project, index) => (
+            {staticData.otherProjects.map((project) => (
               <Link
-                key={index}
+                key={project}
                 to="/projects"
                 className="bg-white border border-gray-100 rounded-xl p-4 card-hover text-center"
               >
@@ -1021,7 +1071,7 @@ const HomePage: React.FC = () => {
         {/* Tin tức bất động sản */}
         <section className="mb-12">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+            <h2 className="text-3xl font-semibold text-gray-900 tracking-tight">
               {t("home.sections.realEstateNews")}
             </h2>
           </div>
@@ -1035,16 +1085,16 @@ const HomePage: React.FC = () => {
                     <Link
                       key={article.id ?? index}
                       to={`/news/${article.id}`}
-                      className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 border-l-4 border-red-600"
+                      className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 border-l-2 border-red-600"
                     >
-                      <div className="flex items-start space-x-4">
+                      <div className="flex items-start gap-x-4">
                         <div className="flex-shrink-0">
                           <div className="w-10 h-10 bg-red-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
                             {String(index + 1).padStart(2, "0")}
                           </div>
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-bold text-gray-900 mb-2 line-clamp-2 text-sm leading-tight">
+                          <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 text-sm leading-tight">
                             {article.title}
                           </h3>
                           <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
@@ -1054,51 +1104,20 @@ const HomePage: React.FC = () => {
                       </div>
                     </Link>
                   ))
-              : [
-                  {
-                    number: "01",
-                    title: t("home.news.article1.title"),
-                    subtitle: t("home.news.article1.subtitle"),
-                  },
-                  {
-                    number: "02",
-                    title: t("home.news.article2.title"),
-                    subtitle: t("home.news.article2.subtitle"),
-                  },
-                  {
-                    number: "03",
-                    title: t("home.news.article3.title"),
-                    subtitle: t("home.news.article3.subtitle"),
-                  },
-                  {
-                    number: "04",
-                    title: t("home.news.article4.title"),
-                    subtitle: t("home.news.article4.subtitle"),
-                  },
-                  {
-                    number: "05",
-                    title: t("home.news.article5.title"),
-                    subtitle: t("home.news.article5.subtitle"),
-                  },
-                  {
-                    number: "06",
-                    title: t("home.news.article6.title"),
-                    subtitle: t("home.news.article6.subtitle"),
-                  },
-                ].map((article, index) => (
+              : staticData.fallbackNews.map((article) => (
                   <Link
-                    key={index}
+                    key={article.number}
                     to="/news"
-                    className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 border-l-4 border-red-600"
+                    className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 border-l-2 border-red-600"
                   >
-                    <div className="flex items-start space-x-4">
+                    <div className="flex items-start gap-x-4">
                       <div className="flex-shrink-0">
                         <div className="w-10 h-10 bg-red-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
                           {article.number}
                         </div>
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-bold text-gray-900 mb-2 line-clamp-2 text-sm leading-tight">
+                        <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 text-sm leading-tight">
                           {article.title}
                         </h3>
                         <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
@@ -1114,41 +1133,16 @@ const HomePage: React.FC = () => {
         {/* Hỗ trợ tiện ích */}
         <section className="mb-12">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+            <h2 className="text-3xl font-semibold text-gray-900 tracking-tight">
               {t("home.sections.utilitySupport")}
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Utility Cards */}
-            {[
-              {
-                title: t("home.utilities.ageCalculator.title"),
-                desc: t("home.utilities.ageCalculator.desc"),
-                image:
-                  "https://images.unsplash.com/photo-1503387762-592deb58ef4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
-              },
-              {
-                title: t("home.utilities.constructionCost.title"),
-                desc: t("home.utilities.constructionCost.desc"),
-                image:
-                  "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
-              },
-              {
-                title: t("home.utilities.interestCalculator.title"),
-                desc: t("home.utilities.interestCalculator.desc"),
-                image:
-                  "https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
-              },
-              {
-                title: t("home.utilities.fengshui.title"),
-                desc: t("home.utilities.fengshui.desc"),
-                image:
-                  "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
-              },
-            ].map((utility, index) => (
+            {staticData.utilities.map((utility) => (
               <Link
-                key={index}
+                key={utility.title}
                 to="/utilities"
                 className="bg-white rounded-xl overflow-hidden card-hover border border-gray-100"
               >
@@ -1156,8 +1150,8 @@ const HomePage: React.FC = () => {
                   className="h-32 bg-cover bg-center bg-no-repeat"
                   style={{ backgroundImage: `url(${utility.image})` }}
                 >
-                  <div className="h-full bg-black bg-opacity-40 flex items-center justify-center">
-                    <h3 className="font-bold text-white text-center">
+                  <div className="h-full bg-gray-950 bg-opacity-40 flex items-center justify-center">
+                    <h3 className="font-semibold text-white text-center">
                       {utility.title}
                     </h3>
                   </div>
@@ -1175,55 +1169,24 @@ const HomePage: React.FC = () => {
         {/* Doanh nghiệp tiêu biểu */}
         <section className="mb-12">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+            <h2 className="text-3xl font-semibold text-gray-900 tracking-tight">
               {t("home.sections.featuredCompanies")}
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              {
-                name: t("home.companies.catTuong"),
-                image:
-                  "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
-              },
-              {
-                name: t("home.companies.spHome"),
-                image:
-                  "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
-              },
-              {
-                name: t("home.companies.kimOanh"),
-                image:
-                  "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
-              },
-              {
-                name: t("home.companies.seaholdings"),
-                image:
-                  "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
-              },
-              {
-                name: t("home.companies.gamuda"),
-                image:
-                  "https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
-              },
-              {
-                name: t("home.companies.ttRealty"),
-                image:
-                  "https://images.unsplash.com/photo-1570129477492-45c003edd2be?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
-              },
-            ].map((company, index) => (
+            {staticData.companies.map((company) => (
               <Link
-                key={index}
+                key={company.name}
                 to="/companies"
                 className="bg-white border border-gray-100 rounded-xl p-4 card-hover"
               >
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center gap-x-3">
                   <div
                     className="w-12 h-12 rounded-lg bg-cover bg-center bg-no-repeat flex-shrink-0"
                     style={{ backgroundImage: `url(${company.image})` }}
                   >
-                    <div className="w-full h-full bg-black bg-opacity-20 rounded-lg" />
+                    <div className="w-full h-full bg-gray-950 bg-opacity-20 rounded-lg" />
                   </div>
                   <div className="flex-1">
                     <h4 className="font-medium text-gray-900 text-sm line-clamp-2">
@@ -1239,52 +1202,15 @@ const HomePage: React.FC = () => {
         {/* Báo chí nói về Batdongsan.com.vn */}
         <section className="mb-12">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+            <h2 className="text-3xl font-semibold text-gray-900 tracking-tight">
               {t("home.sections.mediaCoverage")}
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              {
-                title: t("home.media.article1.title"),
-                source: t("home.media.article1.source"),
-                image:
-                  "https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-              },
-              {
-                title: t("home.media.article2.title"),
-                source: t("home.media.article2.source"),
-                image:
-                  "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-              },
-              {
-                title: t("home.media.article3.title"),
-                source: t("home.media.article3.source"),
-                image:
-                  "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-              },
-              {
-                title: t("home.media.article4.title"),
-                source: t("home.media.article4.source"),
-                image:
-                  "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-              },
-              {
-                title: t("home.media.article5.title"),
-                source: t("home.media.article5.source"),
-                image:
-                  "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-              },
-              {
-                title: t("home.media.article6.title"),
-                source: t("home.media.article6.source"),
-                image:
-                  "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-              },
-            ].map((article, index) => (
+            {staticData.mediaArticles.map((article) => (
               <Link
-                key={index}
+                key={article.title}
                 to="/news"
                 className="bg-white rounded-xl card-hover border border-gray-100 overflow-hidden"
               >
@@ -1293,11 +1219,11 @@ const HomePage: React.FC = () => {
                     className="w-full h-full bg-cover bg-center bg-no-repeat"
                     style={{ backgroundImage: `url(${article.image})` }}
                   >
-                    <div className="absolute inset-0 bg-black bg-opacity-40" />
+                    <div className="absolute inset-0 bg-gray-950 bg-opacity-40" />
                   </div>
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center text-white">
-                      <div className="bg-black bg-opacity-50 px-3 py-1 rounded font-medium text-sm">
+                      <div className="bg-gray-950 bg-opacity-50 px-3 py-1 rounded font-medium text-sm">
                         {article.source}
                       </div>
                     </div>
@@ -1347,24 +1273,17 @@ const HomePage: React.FC = () => {
         <section className="mb-20">
           <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between border-b border-gray-200 pb-6">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 tracking-tight mb-2">
+              <h2 className="text-3xl font-semibold text-gray-900 tracking-tight mb-2">
                 {t("home.whyChooseUs.title")}
               </h2>
               <p className="text-gray-500">{t("home.whyChooseUs.subtitle")}</p>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-x-12 gap-y-10">
-            {[
-              { icon: CheckCircle2, key: "verified" },
-              { icon: Brain, key: "ai" },
-              { icon: ShieldCheck, key: "secure" },
-              { icon: HeadphonesIcon, key: "support" },
-              { icon: MapPin, key: "map" },
-              { icon: BarChart3, key: "analytics" },
-            ].map((feature, idx) => {
+            {staticData.whyChooseUs.map((feature, idx) => {
               const Icon = feature.icon;
               return (
-                <div key={idx} className="group">
+                <div key={feature.key} className="group">
                   <Icon
                     className="w-8 h-8 text-red-600 mb-4 opacity-90 group-hover:opacity-100 transition-opacity"
                     strokeWidth={1.5}
@@ -1384,20 +1303,15 @@ const HomePage: React.FC = () => {
         {/* Hướng dẫn mua bán (Simple Layout) */}
         <section className="mb-20 bg-gray-50 rounded-2xl p-8 md:p-12">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 tracking-tight mb-3">
+            <h2 className="text-3xl font-semibold text-gray-900 tracking-tight mb-3">
               {t("home.buyingGuide.title")}
             </h2>
             <p className="text-gray-500">{t("home.buyingGuide.subtitle")}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {[
-              { icon: Search, key: 0 },
-              { icon: Scale, key: 1 },
-              { icon: PhoneCall, key: 2 },
-              { icon: KeyRound, key: 3 },
-            ].map((step, idx) => {
+            {staticData.buyingGuideSteps.map((step, idx) => {
               return (
-                <div key={idx} className="relative">
+                <div key={step.key} className="relative">
                   <div className="text-5xl font-light text-gray-300 mb-4">
                     0{idx + 1}
                   </div>
@@ -1417,7 +1331,7 @@ const HomePage: React.FC = () => {
         <section className="mb-20">
           <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between border-b border-gray-200 pb-6">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 tracking-tight mb-2">
+              <h2 className="text-3xl font-semibold text-gray-900 tracking-tight mb-2">
                 {t("home.testimonials.title")}
               </h2>
               <p className="text-gray-500">{t("home.testimonials.subtitle")}</p>
@@ -1426,12 +1340,12 @@ const HomePage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[0, 1, 2, 3].map((idx) => (
               <div
-                key={idx}
+                key={t(`home.testimonials.reviews.${idx}.name`)}
                 className="bg-white p-8 border border-gray-100 rounded-xl hover:shadow-md transition-shadow"
               >
-                <div className="flex text-gray-900 mb-6 space-x-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-current" />
+                <div className="flex text-gray-900 mb-6 gap-x-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star key={star} className="w-4 h-4 fill-current" />
                   ))}
                 </div>
                 <p className="text-gray-600 text-sm mb-8 leading-relaxed">
@@ -1466,7 +1380,7 @@ const HomePage: React.FC = () => {
 
             <div className="relative p-10 md:p-16 lg:flex items-center justify-between">
               <div className="lg:w-2/3 mb-10 lg:mb-0">
-                <h2 className="text-3xl md:text-4xl font-bold mb-4 tracking-tight text-gray-900">
+                <h2 className="text-3xl md:text-4xl font-semibold mb-4 tracking-tight text-gray-900">
                   {t("home.ctaBanner.title")}
                 </h2>
                 <p className="text-gray-500 text-lg mb-8 max-w-xl leading-relaxed">
@@ -1513,7 +1427,7 @@ const HomePage: React.FC = () => {
         <section className="mb-16">
           <div className="flex flex-col md:flex-row gap-12">
             <div className="md:w-1/3">
-              <h2 className="text-3xl font-bold text-gray-900 tracking-tight mb-4">
+              <h2 className="text-3xl font-semibold text-gray-900 tracking-tight mb-4">
                 {t("home.faq.title")}
               </h2>
               <p className="text-gray-500">{t("home.faq.subtitle")}</p>
@@ -1521,7 +1435,7 @@ const HomePage: React.FC = () => {
             <div className="md:w-2/3 space-y-2">
               {[0, 1, 2, 3, 4].map((idx) => (
                 <div
-                  key={idx}
+                  key={t(`home.faq.items.${idx}.question`)}
                   className="border-b border-gray-100 last:border-0"
                 >
                   <button
@@ -1559,3 +1473,12 @@ const HomePage: React.FC = () => {
 };
 
 export default HomePage;
+
+
+
+
+
+
+
+
+

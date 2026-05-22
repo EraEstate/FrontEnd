@@ -12,6 +12,8 @@ import {
   Settings,
   Shield,
   LogOut,
+  FileText,
+  Folder,
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +24,9 @@ import { useWebSocketNotification } from '../hooks/useWebSocketNotification';
 import LanguageSwitcher from './LanguageSwitcher';
 import eraLogo from '../assets/ERA_Real_Estate_logo-244x300.png';
 import { Bell } from 'lucide-react';
+const formatDate = (dateString: string | number): string => {
+  return new Date(dateString).toLocaleString('vi-VN');
+};
 
 export const Header: React.FC = () => {
   const { t } = useTranslation();
@@ -137,7 +142,7 @@ export const Header: React.FC = () => {
                 className={`mr-3 transition-all duration-200 ${isScrolled ? 'h-10 w-auto' : 'h-12 w-auto'} group-hover:scale-105 group-hover:shadow-lg rounded-md`}
               />
               <div>
-                <div className="font-extrabold tracking-tight text-l lg:text-xl text-red-600">
+                <div className="font-semibold tracking-tight text-l lg:text-xl text-red-600">
                   ERA Estate
                 </div>
               
@@ -146,7 +151,7 @@ export const Header: React.FC = () => {
           </div>
 
           {/* Navigation Menu - Compact with Dropdowns */}
-          <nav className="hidden lg:flex items-center space-x-1">
+          <nav className="hidden lg:flex items-center gap-x-1">
             {/* Mua bán & Cho thuê Dropdown */}
             <div 
               className="relative properties-dropdown"
@@ -184,21 +189,21 @@ export const Header: React.FC = () => {
                   <div className="bg-white rounded-xl shadow-xl py-2 border border-gray-100 anim-fade-in-down">
                     <Link
                       to="/properties"
-                      className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                      className="flex items-center px-4 py-2.5 text-sm text-[#374151] hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
                       onClick={() => setIsPropertiesMenuOpen(false)}
                     >
                       {t('header.properties')}
                     </Link>
                     <Link
                       to="/rent"
-                      className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                      className="flex items-center px-4 py-2.5 text-sm text-[#374151] hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
                       onClick={() => setIsPropertiesMenuOpen(false)}
                     >
                       {t('header.rent')}
                     </Link>
                     <Link
                       to="/projects"
-                      className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                      className="flex items-center px-4 py-2.5 text-sm text-[#374151] hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
                       onClick={() => setIsPropertiesMenuOpen(false)}
                     >
                       {t('header.projects')}
@@ -245,21 +250,21 @@ export const Header: React.FC = () => {
                   <div className="bg-white rounded-xl shadow-xl py-2 border border-gray-100 anim-fade-in-down">
                     <Link
                       to="/news"
-                      className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                      className="flex items-center px-4 py-2.5 text-sm text-[#374151] hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
                       onClick={() => setIsNewsMenuOpen(false)}
                     >
                       {t('header.news')}
                     </Link>
                     <Link
                       to="/market-analysis"
-                      className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                      className="flex items-center px-4 py-2.5 text-sm text-[#374151] hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
                       onClick={() => setIsNewsMenuOpen(false)}
                     >
                       {t('header.marketAnalysis')}
                     </Link>
                     <Link
                       to="/wiki"
-                      className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                      className="flex items-center px-4 py-2.5 text-sm text-[#374151] hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
                       onClick={() => setIsNewsMenuOpen(false)}
                     >
                       {t('header.wiki')}
@@ -306,35 +311,35 @@ export const Header: React.FC = () => {
                   <div className="bg-white rounded-xl shadow-xl py-2 border border-gray-100 anim-fade-in-down">
                     <Link
                       to="/agents"
-                      className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                      className="flex items-center px-4 py-2.5 text-sm text-[#374151] hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
                       onClick={() => setIsServicesMenuOpen(false)}
                     >
                       {t('header.agents')}
                     </Link>
                     <Link
                       to="/agencies"
-                      className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                      className="flex items-center px-4 py-2.5 text-sm text-[#374151] hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
                       onClick={() => setIsServicesMenuOpen(false)}
                     >
                       {t('header.agencies')}
                     </Link>
                     <Link
                       to="/companies"
-                      className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                      className="flex items-center px-4 py-2.5 text-sm text-[#374151] hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
                       onClick={() => setIsServicesMenuOpen(false)}
                     >
                       {t('header.companies')}
                     </Link>
                     <Link
                       to="/utilities"
-                      className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                      className="flex items-center px-4 py-2.5 text-sm text-[#374151] hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
                       onClick={() => setIsServicesMenuOpen(false)}
                     >
                       {t('header.utilities')}
                     </Link>
                     <Link
                       to="/pricing"
-                      className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                      className="flex items-center px-4 py-2.5 text-sm text-[#374151] hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
                       onClick={() => setIsServicesMenuOpen(false)}
                     >
                       {t('header.pricing')}
@@ -346,7 +351,7 @@ export const Header: React.FC = () => {
           </nav>
 
           {/* Right Side Actions - Modern & Clean */}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center gap-x-2">
             {/* Language Switcher */}
             <div className="hidden md:block">
               <LanguageSwitcher />
@@ -355,7 +360,7 @@ export const Header: React.FC = () => {
             {/* Favorites Icon */}
             <Link
               to="/favorites"
-              className="hidden md:flex items-center justify-center w-10 h-10 text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+              className="hidden md:flex items-center justify-center w-10 h-10 text-[#374151] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
               title={t('header.favorites')}
             >
               <Heart className="h-5 w-5" />
@@ -376,7 +381,7 @@ export const Header: React.FC = () => {
                         setUnreadCount(0); // Reset unread count when opening
                       }
                     }}
-                    className="relative hidden md:flex items-center justify-center w-10 h-10 text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                    className="relative hidden md:flex items-center justify-center w-10 h-10 text-red-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
                     title={t('header.notifications')}
                   >
                     <Bell className="h-5 w-5" />
@@ -395,12 +400,12 @@ export const Header: React.FC = () => {
                       </div>
                       <div className="max-h-[300px] overflow-y-auto">
                         {notifications.length > 0 ? (
-                          notifications.map((notif, index) => (
-                            <div key={notif.id || index} className="px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                          notifications.map((notif) => (
+                            <div key={notif.id || notif.timestamp || notif.message} className="px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition-colors">
                               <p className="text-sm font-medium text-gray-900">{notif.title}</p>
                               <p className="text-xs text-gray-500 mt-1">{notif.message}</p>
                               <span className="text-[10px] text-gray-400 mt-1 block">
-                                {new Date(notif.timestamp).toLocaleString('vi-VN')}
+                                <span suppressHydrationWarning>{formatDate(notif.timestamp)}</span>
                               </span>
                             </div>
                           ))
@@ -423,7 +428,7 @@ export const Header: React.FC = () => {
                       setIsNewsMenuOpen(false);
                       setIsServicesMenuOpen(false);
                     }}
-                    className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                    className="flex items-center gap-x-2 px-3 py-2 text-sm font-medium text-[#374151] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
                   >
                     <div className="relative w-8 h-8">
                       {/* Fallback div - luôn hiển thị */}
@@ -450,7 +455,7 @@ export const Header: React.FC = () => {
                     <div className="absolute right-0 mt-1 w-64 bg-white rounded-xl shadow-xl py-2 z-50 border border-gray-100 anim-fade-in-down">
                       {/* User Info Header */}
                       <div className="px-4 py-3 border-b border-gray-100">
-                        <div className="flex items-center space-x-3">
+                        <div className="flex items-center gap-x-3">
                           <div className="relative w-12 h-12">
                             {/* Fallback div - luôn hiển thị */}
                             <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
@@ -490,15 +495,39 @@ export const Header: React.FC = () => {
                       )}
                       <Link
                         to="/profile"
-                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-[#374151] hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
                         onClick={() => setIsUserMenuOpen(false)}
                       >
                         <User className="w-4 h-4 opacity-70" />
                         {t('header.profile')}
                       </Link>
                       <Link
+                        to="/saved-searches"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-[#374151] hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                        onClick={() => setIsUserMenuOpen(false)}
+                      >
+                        <Bell className="w-4 h-4 opacity-70" />
+                        {t('header.savedSearches', 'Tìm kiếm đã lưu')}
+                      </Link>
+                      <Link
+                        to="/my-notes"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-[#374151] hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                        onClick={() => setIsUserMenuOpen(false)}
+                      >
+                        <FileText className="w-4 h-4 opacity-70" />
+                        {t('header.myNotes', 'Ghi chú xem nhà')}
+                      </Link>
+                      <Link
+                        to="/collections"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-[#374151] hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                        onClick={() => setIsUserMenuOpen(false)}
+                      >
+                        <Folder className="w-4 h-4 opacity-70" />
+                        {t('header.collections', 'Bộ sưu tập của tôi')}
+                      </Link>
+                      <Link
                         to="/my-transactions"
-                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-[#374151] hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
                         onClick={() => setIsUserMenuOpen(false)}
                       >
                         <Receipt className="w-4 h-4 opacity-70" />
@@ -506,7 +535,7 @@ export const Header: React.FC = () => {
                       </Link>
                       <Link
                         to="/my-properties"
-                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-[#374151] hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
                         onClick={() => setIsUserMenuOpen(false)}
                       >
                         <Building2 className="w-4 h-4 opacity-70" />
@@ -514,7 +543,7 @@ export const Header: React.FC = () => {
                       </Link>
                       <Link
                         to="/my-viewings"
-                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-[#374151] hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
                         onClick={() => setIsUserMenuOpen(false)}
                       >
                         <CalendarCheck className="w-4 h-4 opacity-70" />
@@ -522,7 +551,7 @@ export const Header: React.FC = () => {
                       </Link>
                       <Link
                         to="/settings"
-                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-[#374151] hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
                         onClick={() => setIsUserMenuOpen(false)}
                       >
                         <Settings className="w-4 h-4 opacity-70" />
@@ -530,7 +559,7 @@ export const Header: React.FC = () => {
                       </Link>
                       <Link
                         to="/help/wallet"
-                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-[#374151] hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
                         onClick={() => setIsUserMenuOpen(false)}
                       >
                         <Wallet className="w-4 h-4 opacity-70" />
@@ -538,7 +567,7 @@ export const Header: React.FC = () => {
                       </Link>
                       <Link
                         to="/security"
-                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-[#374151] hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
                         onClick={() => setIsUserMenuOpen(false)}
                       >
                         <Shield className="w-4 h-4 opacity-70" />
@@ -560,13 +589,13 @@ export const Header: React.FC = () => {
               <>
                 <Link
                   to="/login"
-                  className="hidden md:inline-flex whitespace-nowrap px-4 py-2 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                  className="hidden md:inline-flex whitespace-nowrap px-4 py-2 text-sm font-medium text-[#374151] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
                 >
                   {t('header.login')}
                 </Link>
                 <Link
                   to="/register"
-                  className="hidden md:inline-flex whitespace-nowrap px-4 py-2 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                  className="hidden md:inline-flex whitespace-nowrap px-4 py-2 text-sm font-medium text-[#374151] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
                 >
                   {t('header.register')}
                 </Link>
@@ -582,7 +611,7 @@ export const Header: React.FC = () => {
 
             {/* Mobile menu button */}
             <button
-              className="lg:hidden inline-flex items-center justify-center w-10 h-10 rounded-lg text-gray-700 hover:text-red-600 hover:bg-red-50 focus:outline-none transition-colors duration-200"
+              className="lg:hidden inline-flex items-center justify-center w-10 h-10 rounded-lg text-[#374151] hover:text-red-600 hover:bg-red-50 focus:outline-none transition-colors duration-200"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               {isMenuOpen ? (
@@ -602,28 +631,28 @@ export const Header: React.FC = () => {
             {/* Main Links */}
             <Link
               to="/properties"
-              className="flex items-center px-4 py-3 text-base font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+              className="flex items-center px-4 py-3 text-base font-medium text-[#374151] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
               onClick={() => setIsMenuOpen(false)}
             >
               {t('header.properties')}
             </Link>
             <Link
               to="/rent"
-              className="flex items-center px-4 py-3 text-base font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+              className="flex items-center px-4 py-3 text-base font-medium text-[#374151] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
               onClick={() => setIsMenuOpen(false)}
             >
               {t('header.rent')}
             </Link>
             <Link
               to="/projects"
-              className="flex items-center px-4 py-3 text-base font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+              className="flex items-center px-4 py-3 text-base font-medium text-[#374151] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
               onClick={() => setIsMenuOpen(false)}
             >
               {t('header.projects')}
             </Link>
             <Link
               to="/news"
-              className="flex items-center px-4 py-3 text-base font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+              className="flex items-center px-4 py-3 text-base font-medium text-[#374151] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
               onClick={() => setIsMenuOpen(false)}
             >
               {t('header.news')}
@@ -636,28 +665,28 @@ export const Header: React.FC = () => {
               </div>
               <Link
                 to="/companies"
-                className="flex items-center px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                className="flex items-center px-4 py-2.5 text-sm font-medium text-[#4b5563] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('header.companies')}
               </Link>
               <Link
                 to="/market-analysis"
-                className="flex items-center px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                className="flex items-center px-4 py-2.5 text-sm font-medium text-[#4b5563] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('header.marketAnalysis')}
               </Link>
               <Link
                 to="/wiki"
-                className="flex items-center px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                className="flex items-center px-4 py-2.5 text-sm font-medium text-[#4b5563] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('header.wiki')}
               </Link>
               <Link
                 to="/utilities"
-                className="flex items-center px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                className="flex items-center px-4 py-2.5 text-sm font-medium text-[#4b5563] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('header.utilities')}
@@ -671,21 +700,21 @@ export const Header: React.FC = () => {
               </div>
               <Link
                 to="/agents"
-                className="flex items-center px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                className="flex items-center px-4 py-2.5 text-sm font-medium text-[#4b5563] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('header.agents')}
               </Link>
               <Link
                 to="/agencies"
-                className="flex items-center px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                className="flex items-center px-4 py-2.5 text-sm font-medium text-[#4b5563] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('header.agencies')}
               </Link>
               <Link
                 to="/pricing"
-                className="flex items-center px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                className="flex items-center px-4 py-2.5 text-sm font-medium text-[#4b5563] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('header.pricing')}
@@ -719,15 +748,39 @@ export const Header: React.FC = () => {
                 </div>
                 <Link
                   to="/profile"
-                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-[#374151] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <User className="w-4 h-4 opacity-70" />
                   {t('header.profile')}
                 </Link>
                 <Link
+                  to="/saved-searches"
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-[#374151] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <Bell className="w-4 h-4 opacity-70" />
+                  {t('header.savedSearches', 'Tìm kiếm đã lưu')}
+                </Link>
+                <Link
+                  to="/my-notes"
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-[#374151] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <FileText className="w-4 h-4 opacity-70" />
+                  {t('header.myNotes', 'Ghi chú xem nhà')}
+                </Link>
+                <Link
+                  to="/collections"
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-[#374151] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <Folder className="w-4 h-4 opacity-70" />
+                  {t('header.collections', 'Bộ sưu tập của tôi')}
+                </Link>
+                <Link
                   to="/my-transactions"
-                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-[#374151] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <Receipt className="w-4 h-4 opacity-70" />
@@ -735,7 +788,7 @@ export const Header: React.FC = () => {
                 </Link>
                 <Link
                   to="/settings"
-                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-[#374151] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <Settings className="w-4 h-4 opacity-70" />
@@ -743,7 +796,7 @@ export const Header: React.FC = () => {
                 </Link>
                 <Link
                   to="/my-viewings"
-                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-[#374151] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <CalendarCheck className="w-4 h-4 opacity-70" />
@@ -751,7 +804,7 @@ export const Header: React.FC = () => {
                 </Link>
                 <Link
                   to="/help/wallet"
-                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-[#374151] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <Wallet className="w-4 h-4 opacity-70" />
@@ -759,7 +812,7 @@ export const Header: React.FC = () => {
                 </Link>
                 <Link
                   to="/security"
-                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-[#374151] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <Shield className="w-4 h-4 opacity-70" />
@@ -778,4 +831,3 @@ export const Header: React.FC = () => {
     </header>
   );
 };
-

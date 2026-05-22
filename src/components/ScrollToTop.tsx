@@ -21,7 +21,7 @@ const ScrollToTop: React.FC = () => {
       onClick={scrollToTop}
       aria-label="Cuộn lên đầu trang"
       className={`
-        fixed bottom-20 right-6 z-40
+        fixed bottom-40 right-6 z-40
         w-11 h-11 rounded-full
         bg-gradient-to-br from-red-500 to-red-600
         text-white

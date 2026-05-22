@@ -47,7 +47,7 @@ const Footer: React.FC = () => {
             </Link>
             
             <div className="space-y-3 text-sm text-gray-600">
-              <div className="flex items-start space-x-2">
+              <div className="flex items-start gap-x-2">
                 <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0 text-gray-400" />
                 <div>
                   <div className="text-gray-900 font-medium mb-1">{t('footer.office')}</div>
@@ -57,7 +57,7 @@ const Footer: React.FC = () => {
                 </div>
               </div>
               
-              <div className="flex items-center space-x-2 pt-2">
+              <div className="flex items-center gap-x-2 pt-2">
                 <Phone className="h-4 w-4 text-gray-400" />
                 <a href="tel:19001234" className="text-gray-900 font-medium hover:text-red-600 transition-colors">
                   {t('footer.phone')}
@@ -151,7 +151,7 @@ const Footer: React.FC = () => {
             <h3 className="font-semibold text-gray-900 mb-4 text-base">{t('footer.followUs')}</h3>
             
             {/* Social Media */}
-            <div className="flex items-center space-x-3 mb-6">
+            <div className="flex items-center gap-x-3 mb-6">
               <a 
                 href="https://facebook.com" 
                 target="_blank" 
@@ -207,7 +207,7 @@ const Footer: React.FC = () => {
 
         {/* Divider */}
         <div className="border-t border-gray-100 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-y-4 md:gap-y-0">
             {/* Copyright */}
             <p className="text-sm text-gray-500">
               © {currentYear} Era Estate. {t('footer.allRightsReserved')}
