@@ -35,10 +35,10 @@ const Btn: React.FC<{
     title={title}
     className={`p-2.5 rounded-xl transition-all border ${
       disabled
-        ? 'opacity-20 cursor-not-allowed border-white/5 bg-black/20 text-white/20'
+        ? 'opacity-20 cursor-not-allowed border-white/5 bg-gray-950/20 text-white/20'
         : active
           ? 'bg-red-600 border-red-500 text-white shadow-lg shadow-red-600/30'
-          : 'bg-black/50 backdrop-blur-sm border-white/10 text-white/70 hover:bg-white/15 hover:text-white'
+          : 'bg-gray-950/50 backdrop-blur-sm border-white/10 text-white/70 hover:bg-white/15 hover:text-white'
     }`}
   >
     {children}

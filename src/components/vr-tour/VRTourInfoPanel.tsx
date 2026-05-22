@@ -13,7 +13,7 @@ interface Props {
 const VRTourInfoPanel: React.FC<Props> = ({ scene, totalScenes, currentIndex, isExpanded, onToggle }) => {
   return (
     <div className="absolute bottom-20 left-4 z-[102] w-72 max-w-[calc(100vw-7rem)] pointer-events-none">
-      <div className="pointer-events-auto bg-black/60 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden transition-all duration-300">
+      <div className="pointer-events-auto bg-gray-950/60 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden transition-all duration-300">
         {/* Collapsed bar */}
         <button
           onClick={onToggle}

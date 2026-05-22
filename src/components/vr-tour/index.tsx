@@ -65,7 +65,7 @@ const VRTour: React.FC<VRTourProps> = ({
   if (!propertyImages || propertyImages.length === 0) {
     return (
       <div className="fixed inset-0 z-[9999] bg-[#0a0a0a] flex flex-col items-center justify-center p-4">
-        <div className="text-white text-center max-w-sm w-full bg-black/60 p-8 rounded-2xl border border-white/10 backdrop-blur-md">
+        <div className="text-white text-center max-w-sm w-full bg-gray-950/60 p-8 rounded-2xl border border-white/10 backdrop-blur-md">
           <EyeOff className="w-12 h-12 text-gray-500 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-white mb-2">Chưa có ảnh 360 độ</h3>
           <p className="text-gray-400 text-sm mb-6">Bất động sản này hiện tại chưa được cung cấp hình ảnh 360 độ để trải nghiệm VR Tour.</p>
@@ -112,14 +112,14 @@ const VRTour: React.FC<VRTourProps> = ({
         <div className="flex items-center gap-3 pointer-events-auto">
           <button
             onClick={toggleFullscreen}
-            className="p-2.5 md:p-3 bg-black/40 hover:bg-black/60 backdrop-blur-md text-white rounded-full transition-all duration-200 border border-white/10 hover:border-white/30 shadow-lg"
+            className="p-2.5 md:p-3 bg-gray-950/40 hover:bg-gray-950/60 backdrop-blur-md text-white rounded-full transition-all duration-200 border border-white/10 hover:border-white/30 shadow-lg"
             title="Toàn màn hình (F)"
           >
             {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
           </button>
           <button
             onClick={onClose}
-            className="p-2.5 md:p-3 bg-black/40 hover:bg-red-600/90 backdrop-blur-md text-white rounded-full transition-all duration-200 border border-white/10 hover:border-white/30 group shadow-lg"
+            className="p-2.5 md:p-3 bg-gray-950/40 hover:bg-red-600/90 backdrop-blur-md text-white rounded-full transition-all duration-200 border border-white/10 hover:border-white/30 group shadow-lg"
             title="Đóng (Esc)"
           >
             <X className="w-5 h-5 group-hover:scale-110 transition-transform" />
@@ -154,19 +154,19 @@ const VRTour: React.FC<VRTourProps> = ({
         <>
           <button
             onClick={prevImage}
-            className="absolute left-6 top-1/2 -translate-y-1/2 p-4 bg-black/50 hover:bg-red-600/90 backdrop-blur-md text-white rounded-full transition-all duration-200 border border-white/10 hover:border-white/30 z-20 shadow-[0_0_20px_rgba(0,0,0,0.5)] group"
+            className="absolute left-6 top-1/2 -translate-y-1/2 p-4 bg-gray-950/50 hover:bg-red-600/90 backdrop-blur-md text-white rounded-full transition-all duration-200 border border-white/10 hover:border-white/30 z-20 shadow-[0_0_20px_rgba(0,0,0,0.5)] group"
           >
             <ChevronLeft className="w-7 h-7 group-hover:-translate-x-1 transition-transform" />
           </button>
           <button
             onClick={nextImage}
-            className="absolute right-6 top-1/2 -translate-y-1/2 p-4 bg-black/50 hover:bg-red-600/90 backdrop-blur-md text-white rounded-full transition-all duration-200 border border-white/10 hover:border-white/30 z-20 shadow-[0_0_20px_rgba(0,0,0,0.5)] group"
+            className="absolute right-6 top-1/2 -translate-y-1/2 p-4 bg-gray-950/50 hover:bg-red-600/90 backdrop-blur-md text-white rounded-full transition-all duration-200 border border-white/10 hover:border-white/30 z-20 shadow-[0_0_20px_rgba(0,0,0,0.5)] group"
           >
             <ChevronRight className="w-7 h-7 group-hover:translate-x-1 transition-transform" />
           </button>
           
           {/* Thumbnails Navigator */}
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 bg-black/50 backdrop-blur-md p-2 rounded-2xl border border-white/10 flex gap-2 max-w-[90vw] overflow-x-auto shadow-2xl">
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 bg-gray-950/50 backdrop-blur-md p-2 rounded-2xl border border-white/10 flex gap-2 max-w-[90vw] overflow-x-auto shadow-2xl">
             {propertyImages.map((img, idx) => (
               <button
                 key={img.id || idx}

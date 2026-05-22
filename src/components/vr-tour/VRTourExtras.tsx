@@ -23,7 +23,7 @@ export const AutoTourBadge: React.FC<AutoTourProps> = ({
 
   return (
     <div className="absolute top-16 left-1/2 -translate-x-1/2 z-[102]">
-      <div className="flex items-center gap-3 bg-black/60 backdrop-blur-xl border border-white/10 rounded-full px-4 py-2 shadow-2xl">
+      <div className="flex items-center gap-3 bg-gray-950/60 backdrop-blur-xl border border-white/10 rounded-full px-4 py-2 shadow-2xl">
         <button onClick={onToggle} className="text-red-400 hover:text-red-300 transition-colors">
           <PauseCircle className="w-5 h-5" />
         </button>
@@ -68,10 +68,15 @@ export const HelpOverlay: React.FC<HelpOverlayProps> = ({ isOpen, onClose }) => 
   if (!isOpen) return null;
 
   return (
-    <div className="absolute inset-0 z-[105] flex items-center justify-center bg-black/70 backdrop-blur-sm" onClick={onClose}>
+    <div className="absolute inset-0 z-[105] flex items-center justify-center">
+      <button
+        type="button"
+        aria-label="Close help overlay"
+        className="absolute inset-0 bg-gray-950/70 backdrop-blur-sm"
+        onClick={onClose}
+      />
       <div
-        className="bg-gray-900/95 border border-white/10 rounded-2xl p-6 w-80 max-w-[90vw] shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
+        className="relative bg-gray-900/95 border border-white/10 rounded-2xl p-6 w-80 max-w-[90vw] shadow-2xl"
       >
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2 text-white font-semibold text-sm">
@@ -151,7 +156,7 @@ export const WelcomeToast: React.FC<WelcomeToastProps> = ({ visible, onDismiss }
 
   return (
     <div className="absolute bottom-28 left-1/2 -translate-x-1/2 z-[103] animate-fade-in">
-      <div className="bg-black/70 backdrop-blur-xl border border-white/10 rounded-xl px-4 py-3 text-center shadow-2xl max-w-sm">
+      <div className="bg-gray-950/70 backdrop-blur-xl border border-white/10 rounded-xl px-4 py-3 text-center shadow-2xl max-w-sm">
         <p className="text-white/80 text-xs leading-relaxed">
           Kéo chuột để quan sát xung quanh • Cuộn để zoom • Bấm <kbd className="bg-white/10 px-1.5 py-0.5 rounded text-[10px] font-mono mx-0.5">H</kbd> để xem phím tắt
         </p>
