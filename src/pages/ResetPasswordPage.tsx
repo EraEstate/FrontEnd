@@ -44,7 +44,7 @@ const ResetPasswordPage: React.FC = () => {
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 pt-24">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <img src={eraLogo} alt="" className="h-14 mx-auto mb-4" />
-        <h1 className="text-center text-2xl font-bold text-gray-900">Đặt lại mật khẩu</h1>
+        <h1 className="text-center text-2xl font-semibold text-gray-900">Đặt lại mật khẩu</h1>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
@@ -60,9 +60,11 @@ const ResetPasswordPage: React.FC = () => {
           )}
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Mật khẩu mới</label>
+              <label htmlFor="reset-password-new" className="block text-sm font-medium text-gray-700">Mật khẩu mới</label>
               <div className="mt-1 relative">
                 <input
+                  id="reset-password-new"
+
                   type={show ? 'text' : 'password'}
                   required
                   minLength={6}
@@ -81,8 +83,10 @@ const ResetPasswordPage: React.FC = () => {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Xác nhận mật khẩu</label>
+              <label htmlFor="reset-password-confirm" className="block text-sm font-medium text-gray-700">Xác nhận mật khẩu</label>
               <input
+                id="reset-password-confirm"
+
                 type="password"
                 required
                 value={confirm}
