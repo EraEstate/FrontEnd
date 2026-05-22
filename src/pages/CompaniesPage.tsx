@@ -32,7 +32,7 @@ const CompaniesPage: React.FC = () => {
           setCompanies(response.content);
         }
       } catch (error) {
-        toast.error('Kh�ng th? t?i danh s�ch c�ng ty');
+        toast.error('Kh�ng th? t?i danh s�ch c�ng ty');
         // Fallback to mock data if API fails
         setCompanies(getMockCompanies());
       } finally {
@@ -136,7 +136,7 @@ const CompaniesPage: React.FC = () => {
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Công ty bất động sản</h1>
+          <h1 className="text-3xl font-semibold text-gray-900 mb-2">Công ty bất động sản</h1>
           <p className="text-gray-600">Khám phá các công ty phát triển và đầu tư bất động sản uy tín</p>
         </div>
       </div>
@@ -170,11 +170,14 @@ const CompaniesPage: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Khu vực</label>
+              <label htmlFor="companies-location" className="block text-sm font-medium text-gray-700 mb-2">Khu vực</label>
               <select
+                id="companies-location"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={filters.location}
-                onChange={(e) => setFilters({...filters, location: e.target.value})}
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, location: e.target.value }))
+                }
               >
                 <option value="">Chọn khu vực</option>
                 <option value="hcm">TP. Hồ Chí Minh</option>
@@ -184,11 +187,14 @@ const CompaniesPage: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Loại hình</label>
+              <label htmlFor="companies-type" className="block text-sm font-medium text-gray-700 mb-2">Loại hình</label>
               <select
+                id="companies-type"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={filters.type}
-                onChange={(e) => setFilters({...filters, type: e.target.value})}
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, type: e.target.value }))
+                }
               >
                 <option value="">Chọn loại hình</option>
                 <option value="developer">Chủ đầu tư</option>
@@ -204,7 +210,7 @@ const CompaniesPage: React.FC = () => {
           <div className="p-6 border-b">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-semibold">Có {filteredCompanies.length} công ty bất động sản</h2>
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center gap-x-4">
                 <select className="px-3 py-2 border border-gray-300 rounded-md text-sm">
                   <option>Sắp xếp theo</option>
                   <option>Tên A-Z</option>
@@ -219,8 +225,8 @@ const CompaniesPage: React.FC = () => {
           {loading ? (
             <div className="p-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="bg-white border border-gray-200 rounded-lg overflow-hidden animate-pulse">
+                {[1, 2, 3, 4].map((slot) => (
+                  <div key={`company-skeleton-${slot}`} className="bg-white border border-gray-200 rounded-lg overflow-hidden animate-pulse">
                     <div className="p-6">
                       <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
                       <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
@@ -244,7 +250,7 @@ const CompaniesPage: React.FC = () => {
                       <div className="p-6">
                         <div className="flex justify-between items-start mb-4">
                           <div>
-                            <h3 className="font-bold text-xl text-gray-900 group-hover:text-blue-600 transition-colors mb-2">
+                            <h3 className="font-semibold text-xl text-gray-900 group-hover:text-blue-600 transition-colors mb-2">
                               {company.name}
                             </h3>
                             <span className={`px-3 py-1 rounded-full text-sm font-medium ${getTypeColor(company.companyType)}`}>

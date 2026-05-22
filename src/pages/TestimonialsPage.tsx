@@ -45,8 +45,8 @@ const TestimonialsPage: React.FC = () => {
 
   const renderStars = (rating: number) => (
     <div className="flex gap-0.5">
-      {[1, 2, 3, 4, 5].map(i => (
-        <Star key={i} className={`w-4 h-4 ${i <= rating ? 'text-amber-400 fill-amber-400' : 'text-gray-200'}`} />
+      {[1, 2, 3, 4, 5].map(star => (
+        <Star key={`star-${star}`} className={`w-4 h-4 ${star <= rating ? 'text-amber-400 fill-amber-400' : 'text-gray-200'}`} />
       ))}
     </div>
   );
@@ -56,7 +56,7 @@ const TestimonialsPage: React.FC = () => {
       {/* Hero */}
       <div className="bg-gradient-to-br from-red-600 via-red-700 to-rose-800 text-white">
         <div className="max-w-6xl mx-auto px-4 pt-28 pb-16 text-center">
-          <h1 className="text-3xl sm:text-4xl font-bold mb-3">Câu chuyện thành công</h1>
+          <h1 className="text-3xl sm:text-4xl font-semibold mb-3">Câu chuyện thành công</h1>
           <p className="text-red-100 text-lg max-w-2xl mx-auto">
             Khám phá những trải nghiệm thực tế từ khách hàng đã tin tưởng sử dụng EraEstate
           </p>

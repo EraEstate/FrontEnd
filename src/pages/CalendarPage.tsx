@@ -104,7 +104,7 @@ const CalendarPage: React.FC = () => {
     <div className="min-h-screen bg-gray-50 pt-24">
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="mb-6 rounded-2xl bg-white p-6 shadow-sm">
-          <h1 className="flex items-center gap-2 text-2xl font-bold text-gray-900">
+          <h1 className="flex items-center gap-2 text-2xl font-semibold text-gray-900">
             <CalendarDays className="h-6 w-6 text-red-600" />
             Lịch hẹn
           </h1>
@@ -241,15 +241,15 @@ const CalendarPage: React.FC = () => {
                     <div>
                       <p className="text-sm font-semibold text-gray-900">{event.title}</p>
                       <p className="text-xs text-gray-600">
-                        {new Date(event.startTime).toLocaleString('vi-VN')} -{' '}
-                        {new Date(event.endTime).toLocaleString('vi-VN')}
+                        <span suppressHydrationWarning>{new Date(event.startTime).toLocaleString('vi-VN')}</span> -{' '}
+                        <span suppressHydrationWarning>{new Date(event.endTime).toLocaleString('vi-VN')}</span>
                       </p>
-                      <p className="mt-1 text-xs text-gray-600">
+                      <p className="mt-1 text-xs text-gray-600" suppressHydrationWarning>
                         {event.eventType} • {event.status}
                         {event.location ? ` • ${event.location}` : ''}
                       </p>
                       {event.propertyTitle && (
-                        <p className="mt-1 text-xs text-emerald-700">BĐS: {event.propertyTitle}</p>
+                        <p className="mt-1 text-xs text-emerald-700" suppressHydrationWarning>BĐS: {event.propertyTitle}</p>
                       )}
                     </div>
                     {!event.sourceViewingId && (

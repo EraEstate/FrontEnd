@@ -115,7 +115,7 @@ const PropertyComparisonPage: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 pt-24 pb-12 flex items-center justify-center">
-        <div className="animate-pulse text-gray-500 font-medium">Đang tải dữ liệu so sánh...</div>
+        <div className="animate-pulse text-gray-500 font-medium">Đang tải dữ liệu so sánh…</div>
       </div>
     );
   }
@@ -125,7 +125,7 @@ const PropertyComparisonPage: React.FC = () => {
       <div className="min-h-screen bg-gray-50 pt-24 pb-12">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <Scale className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Chưa có bất động sản nào để so sánh</h2>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Chưa có bất động sản nào để so sánh</h2>
           <p className="text-gray-500 mb-6">Hãy thêm ít nhất 2 bất động sản vào danh sách so sánh.</p>
           <button 
             onClick={() => navigate('/properties')}
@@ -150,7 +150,7 @@ const PropertyComparisonPage: React.FC = () => {
             <ChevronLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
+            <h1 className="text-3xl font-semibold text-gray-900 flex items-center gap-2">
               <Scale className="w-8 h-8 text-red-600" />
               So sánh bất động sản
             </h1>
@@ -171,7 +171,7 @@ const PropertyComparisonPage: React.FC = () => {
                       <th key={p.id} className="p-4 border-b border-gray-200 w-64 align-top relative">
                         <button 
                           onClick={() => removeProperty(p.id)}
-                          className="absolute top-2 right-2 p-1.5 bg-gray-100 text-gray-500 hover:bg-red-100 hover:text-red-600 rounded-full transition-colors"
+                          className="absolute top-2 right-2 p-1.5 bg-gray-100 text-[#6b7280] hover:bg-red-100 hover:text-red-600 rounded-full transition-colors"
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -191,8 +191,8 @@ const PropertyComparisonPage: React.FC = () => {
                       </th>
                     ))}
                     {/* Empty Slots */}
-                    {[...Array(4 - properties.length)].map((_, i) => (
-                      <th key={`empty-${i}`} className="p-4 border-b border-gray-200 w-64 align-top">
+                    {Array.from({ length: 4 - properties.length }, (_, slot) => slot + 1).map((slot) => (
+                      <th key={`empty-${slot}`} className="p-4 border-b border-gray-200 w-64 align-top">
                         <div className="h-32 rounded-lg border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 bg-gray-50">
                           <span className="text-sm font-medium">Chỗ trống</span>
                           <span className="text-xs mt-1">Thêm BDS để so sánh</span>
@@ -208,14 +208,14 @@ const PropertyComparisonPage: React.FC = () => {
                     {properties.map(p => (
                       <td key={p.id} className="p-4 border-b border-gray-100 font-bold text-red-600">{formatPrice(p.price)}</td>
                     ))}
-                    {[...Array(4 - properties.length)].map((_, i) => <td key={`empty-p-${i}`} className="p-4 border-b border-gray-100 bg-gray-50/30"></td>)}
+                    {Array.from({ length: 4 - properties.length }, (_, slot) => slot + 1).map((slot) => <td key={`empty-p-${slot}`} className="p-4 border-b border-gray-100 bg-gray-50/30"></td>)}
                   </tr>
                   <tr className="hover:bg-gray-50">
                     <td className="p-4 border-b border-gray-100 font-medium text-gray-900 bg-gray-50/50">Diện tích</td>
                     {properties.map(p => (
                       <td key={p.id} className="p-4 border-b border-gray-100 font-medium">{p.area ? `${p.area} m²` : <Minus className="w-4 h-4 text-gray-300" />}</td>
                     ))}
-                    {[...Array(4 - properties.length)].map((_, i) => <td key={`empty-a-${i}`} className="p-4 border-b border-gray-100 bg-gray-50/30"></td>)}
+                    {Array.from({ length: 4 - properties.length }, (_, slot) => slot + 1).map((slot) => <td key={`empty-a-${slot}`} className="p-4 border-b border-gray-100 bg-gray-50/30"></td>)}
                   </tr>
                   <tr className="hover:bg-gray-50">
                     <td className="p-4 border-b border-gray-100 font-medium text-gray-900 bg-gray-50/50">Đơn giá / m²</td>
@@ -223,7 +223,7 @@ const PropertyComparisonPage: React.FC = () => {
                       const pricePerSqm = p.price && p.area ? Math.round(p.price / p.area) : 0;
                       return <td key={p.id} className="p-4 border-b border-gray-100 text-gray-600">{pricePerSqm ? `${formatPrice(pricePerSqm)}/m²` : <Minus className="w-4 h-4 text-gray-300" />}</td>;
                     })}
-                    {[...Array(4 - properties.length)].map((_, i) => <td key={`empty-pp-${i}`} className="p-4 border-b border-gray-100 bg-gray-50/30"></td>)}
+                    {Array.from({ length: 4 - properties.length }, (_, slot) => slot + 1).map((slot) => <td key={`empty-pp-${slot}`} className="p-4 border-b border-gray-100 bg-gray-50/30"></td>)}
                   </tr>
                   
                   {/* Layout */}
@@ -233,7 +233,7 @@ const PropertyComparisonPage: React.FC = () => {
                       const val = p.bedrooms || p.propertyDetails?.[0]?.bedrooms;
                       return <td key={p.id} className="p-4 border-b border-gray-100 font-medium">{val ? `${val} PN` : <Minus className="w-4 h-4 text-gray-300" />}</td>;
                     })}
-                    {[...Array(4 - properties.length)].map((_, i) => <td key={`empty-bed-${i}`} className="p-4 border-b border-gray-100 bg-gray-50/30"></td>)}
+                    {Array.from({ length: 4 - properties.length }, (_, slot) => slot + 1).map((slot) => <td key={`empty-bed-${slot}`} className="p-4 border-b border-gray-100 bg-gray-50/30"></td>)}
                   </tr>
                   <tr className="hover:bg-gray-50">
                     <td className="p-4 border-b border-gray-100 font-medium text-gray-900 bg-gray-50/50">Phòng tắm</td>
@@ -241,7 +241,7 @@ const PropertyComparisonPage: React.FC = () => {
                       const val = p.bathrooms || p.propertyDetails?.[0]?.bathrooms;
                       return <td key={p.id} className="p-4 border-b border-gray-100 font-medium">{val ? `${val} PT` : <Minus className="w-4 h-4 text-gray-300" />}</td>;
                     })}
-                    {[...Array(4 - properties.length)].map((_, i) => <td key={`empty-bath-${i}`} className="p-4 border-b border-gray-100 bg-gray-50/30"></td>)}
+                    {Array.from({ length: 4 - properties.length }, (_, slot) => slot + 1).map((slot) => <td key={`empty-bath-${slot}`} className="p-4 border-b border-gray-100 bg-gray-50/30"></td>)}
                   </tr>
                   
                   {/* Features */}
@@ -251,7 +251,7 @@ const PropertyComparisonPage: React.FC = () => {
                       const val = p.propertyDetails?.[0]?.parking;
                       return <td key={p.id} className="p-4 border-b border-gray-100">{val ? <Check className="w-5 h-5 text-green-500" /> : <Minus className="w-4 h-4 text-gray-300" />}</td>;
                     })}
-                    {[...Array(4 - properties.length)].map((_, i) => <td key={`empty-f1-${i}`} className="p-4 border-b border-gray-100 bg-gray-50/30"></td>)}
+                    {Array.from({ length: 4 - properties.length }, (_, slot) => slot + 1).map((slot) => <td key={`empty-f1-${slot}`} className="p-4 border-b border-gray-100 bg-gray-50/30"></td>)}
                   </tr>
                   <tr className="hover:bg-gray-50">
                     <td className="p-4 border-b border-gray-100 font-medium text-gray-900 bg-gray-50/50">Sân vườn</td>
@@ -259,14 +259,14 @@ const PropertyComparisonPage: React.FC = () => {
                       const val = p.propertyDetails?.[0]?.garden;
                       return <td key={p.id} className="p-4 border-b border-gray-100">{val ? <Check className="w-5 h-5 text-green-500" /> : <Minus className="w-4 h-4 text-gray-300" />}</td>;
                     })}
-                    {[...Array(4 - properties.length)].map((_, i) => <td key={`empty-f2-${i}`} className="p-4 border-b border-gray-100 bg-gray-50/30"></td>)}
+                    {Array.from({ length: 4 - properties.length }, (_, slot) => slot + 1).map((slot) => <td key={`empty-f2-${slot}`} className="p-4 border-b border-gray-100 bg-gray-50/30"></td>)}
                   </tr>
                   <tr className="hover:bg-gray-50">
                     <td className="p-4 font-medium text-gray-900 bg-gray-50/50">Vị trí</td>
                     {properties.map(p => (
                       <td key={p.id} className="p-4 text-xs text-gray-600 leading-tight">{p.address}</td>
                     ))}
-                    {[...Array(4 - properties.length)].map((_, i) => <td key={`empty-loc-${i}`} className="p-4 bg-gray-50/30"></td>)}
+                    {Array.from({ length: 4 - properties.length }, (_, slot) => slot + 1).map((slot) => <td key={`empty-loc-${slot}`} className="p-4 bg-gray-50/30"></td>)}
                   </tr>
                 </tbody>
               </table>
@@ -276,7 +276,7 @@ const PropertyComparisonPage: React.FC = () => {
           {/* Radar Chart Panel */}
           <div className="xl:w-1/3">
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sticky top-24">
-              <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-blue-600" />
                 Biểu đồ tương quan (Chuẩn hoá)
               </h3>
@@ -294,9 +294,9 @@ const PropertyComparisonPage: React.FC = () => {
                       />
                       <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '20px' }} />
                       
-                      {properties.map((_, index) => (
+                      {properties.map((property, index) => (
                         <Radar
-                          key={index}
+                          key={property.id}
                           name={`BDS ${index + 1}`}
                           dataKey={`BDS ${index + 1}`}
                           stroke={COLORS[index]}
@@ -317,7 +317,7 @@ const PropertyComparisonPage: React.FC = () => {
               )}
 
               <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                <h4 className="text-sm font-bold text-blue-900 mb-1">Hướng dẫn đọc biểu đồ</h4>
+                <h4 className="text-sm font-semibold text-blue-900 mb-1">Hướng dẫn đọc biểu đồ</h4>
                 <p className="text-xs text-blue-800 leading-relaxed">
                   Các chỉ số được chuẩn hoá theo thang 100 dựa trên giá trị lớn nhất trong nhóm. 
                   Hình đa giác càng rộng về phía một tiêu chí chứng tỏ bất động sản đó càng có lợi thế (lớn hơn) ở tiêu chí đó.

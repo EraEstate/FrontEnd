@@ -219,7 +219,12 @@ const StaffSidebar: React.FC<StaffSidebarProps> = ({
       {/* Mobile overlay sidebar */}
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={onCloseMobile} />
+          <button
+            type="button"
+            aria-label="Close staff mobile menu"
+            className="absolute inset-0 bg-gray-950/60 backdrop-blur-sm transition-opacity"
+            onClick={onCloseMobile}
+          />
           <aside className={`relative w-72 h-full shadow-2xl flex flex-col transition-transform transform ${
             theme === 'dark' ? 'bg-slate-800' : 'bg-white'
           }`}>

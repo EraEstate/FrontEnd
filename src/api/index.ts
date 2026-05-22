@@ -17,10 +17,15 @@ export const api = axios.create({
 });
 
 // ============ Token helpers ============
+const AUTH_STORAGE_KEY = 'auth-storage:v1';
+const LEGACY_AUTH_STORAGE_KEY = 'auth-storage';
+
+const getAuthStorageRaw = (): string | null =>
+  localStorage.getItem(AUTH_STORAGE_KEY) ?? localStorage.getItem(LEGACY_AUTH_STORAGE_KEY);
 
 const getAccessToken = (): string | null => {
   try {
-    const authStorage = localStorage.getItem('auth-storage');
+    const authStorage = getAuthStorageRaw();
     if (authStorage) {
       const parsed = JSON.parse(authStorage);
       return parsed.state?.token ?? null;
@@ -33,7 +38,7 @@ const getAccessToken = (): string | null => {
 
 const getRefreshToken = (): string | null => {
   try {
-    const authStorage = localStorage.getItem('auth-storage');
+    const authStorage = getAuthStorageRaw();
     if (authStorage) {
       const parsed = JSON.parse(authStorage);
       return parsed.state?.refreshToken ?? null;
@@ -51,12 +56,12 @@ const getRefreshToken = (): string | null => {
  */
 const updateTokensInStorage = (token: string, refreshToken: string) => {
   try {
-    const raw = localStorage.getItem('auth-storage');
+    const raw = getAuthStorageRaw();
     if (raw) {
       const data = JSON.parse(raw);
       data.state.token = token;
       data.state.refreshToken = refreshToken;
-      localStorage.setItem('auth-storage', JSON.stringify(data));
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(data));
     }
     localStorage.setItem('jwt', token);
   } catch {
@@ -66,7 +71,8 @@ const updateTokensInStorage = (token: string, refreshToken: string) => {
 };
 
 const clearAuthAndRedirect = () => {
-  localStorage.removeItem('auth-storage');
+  localStorage.removeItem(AUTH_STORAGE_KEY);
+  localStorage.removeItem(LEGACY_AUTH_STORAGE_KEY);
   localStorage.removeItem('jwt');
   localStorage.removeItem('token');
   showWarning('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
@@ -190,8 +196,12 @@ api.interceptors.response.use(
       
       try {
         const res = await axios.post(`${API_BASE_URL}/auth/refresh`, { refreshToken });
-        const newToken = res.data.token;
+        const newToken = res.data.accessToken ?? res.data.token;
         const newRefreshToken = res.data.refreshToken;
+        
+        if (!newToken || !newRefreshToken) {
+          throw new Error('Invalid refresh response payload');
+        }
         
         updateTokensInStorage(newToken, newRefreshToken);
         processQueue(null, newToken);

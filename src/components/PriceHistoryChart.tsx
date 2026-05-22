@@ -18,6 +18,30 @@ interface PriceHistoryChartProps {
   currentPrice: number;
 }
 
+const formatPriceYAxis = (tickItem: number) => {
+  if (tickItem >= 1000000000) {
+    return `${(tickItem / 1000000000).toFixed(1)} tỷ`;
+  }
+  if (tickItem >= 1000000) {
+    return `${(tickItem / 1000000).toFixed(0)} tr`;
+  }
+  return tickItem.toLocaleString();
+};
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white p-3 border border-gray-200 rounded shadow-md">
+        <p className="text-sm text-gray-500 mb-1">{label}</p>
+        <p className="font-bold text-red-600">
+          {formatPriceYAxis(payload[0].value)}
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
+
 const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({ propertyId, currentPrice }) => {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -95,29 +119,7 @@ const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({ propertyId, curre
     }
   };
 
-  const formatPriceYAxis = (tickItem: number) => {
-    if (tickItem >= 1000000000) {
-      return `${(tickItem / 1000000000).toFixed(1)} tỷ`;
-    }
-    if (tickItem >= 1000000) {
-      return `${(tickItem / 1000000).toFixed(0)} tr`;
-    }
-    return tickItem.toLocaleString();
-  };
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white p-3 border border-gray-200 rounded shadow-md">
-          <p className="text-sm text-gray-500 mb-1">{label}</p>
-          <p className="font-bold text-red-600">
-            {formatPriceYAxis(payload[0].value)}
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
 
   if (loading) {
     return <div className="h-64 bg-gray-100 rounded-lg animate-pulse flex items-center justify-center">Đang tải biểu đồ...</div>;
@@ -128,7 +130,7 @@ const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({ propertyId, curre
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <TrendingUp className="w-6 h-6 text-blue-600" />
-          <h2 className="text-xl font-bold text-gray-900">Lịch sử giá</h2>
+          <h2 className="text-xl font-semibold text-gray-900">Lịch sử giá</h2>
         </div>
         <button
           onClick={() => setShowModal(true)}
@@ -175,17 +177,19 @@ const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({ propertyId, curre
 
       {/* Alert Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-950/40">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 relative">
-            <h2 className="text-lg font-bold text-gray-900">Nhận thông báo khi giá thay đổi</h2>
+            <h2 className="text-lg font-semibold text-gray-900">Nhận thông báo khi giá thay đổi</h2>
             <p className="text-sm text-gray-600 mt-1 mb-4">
               Chúng tôi sẽ gửi thông báo cho bạn ngay khi chủ nhà cập nhật giá bán.
             </p>
             <form onSubmit={handleCreateAlert} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Mức giá mục tiêu của bạn (Tuỳ chọn)</label>
+                <label htmlFor="price-history-alert-target" className="block text-sm font-medium text-gray-700 mb-1">Mức giá mục tiêu của bạn (Tuỳ chọn)</label>
                 <div className="relative">
                   <input
+                    id="price-history-alert-target"
+
                     type="number"
                     value={targetPrice}
                     onChange={(e) => setTargetPrice(Number(e.target.value))}

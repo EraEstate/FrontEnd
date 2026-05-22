@@ -182,8 +182,10 @@ const PriceAlertButton: React.FC<Props> = ({ propertyId, currentPrice }) => {
               {/* Target Price Input (conditional) */}
               {(alertType === 'PRICE_BELOW' || alertType === 'PRICE_ABOVE') && (
                 <div>
-                  <label className="text-xs text-gray-500 mb-1 block">Mức giá mục tiêu (VND)</label>
+                  <label htmlFor="price-alert-target-price" className="text-xs text-gray-500 mb-1 block">Mức giá mục tiêu (VND)</label>
                   <input
+                    id="price-alert-target-price"
+
                     type="number"
                     value={targetPrice}
                     onChange={(e) => setTargetPrice(e.target.value)}
@@ -289,7 +291,7 @@ const PriceAlertButton: React.FC<Props> = ({ propertyId, currentPrice }) => {
                         </div>
                         <button
                           onClick={() => handleDelete(alert.id)}
-                          className="p-1 hover:bg-red-100 rounded transition-colors text-gray-400 hover:text-red-600"
+                          className="p-1 hover:bg-red-100 rounded transition-colors text-[#9ca3af] hover:text-red-600"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>

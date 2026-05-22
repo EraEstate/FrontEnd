@@ -101,7 +101,7 @@ const RentalManagementPage: React.FC = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+            <h1 className="text-3xl font-semibold text-gray-900 flex items-center gap-3">
               <DollarSign className="w-8 h-8 text-green-600 p-1.5 bg-green-100 rounded-lg" />
               Quản lý dòng tiền cho thuê
             </h1>
@@ -119,25 +119,25 @@ const RentalManagementPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
             <p className="text-gray-500 text-sm font-medium mb-1">Tổng doanh thu</p>
-            <h3 className="text-2xl font-bold text-gray-900">
+            <h3 className="text-2xl font-semibold text-gray-900">
               {payments.filter(p => p.status === 'PAID').reduce((acc, curr) => acc + curr.amount, 0).toLocaleString()} VNĐ
             </h3>
           </div>
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
             <p className="text-amber-600 text-sm font-medium mb-1 flex items-center gap-1"><Clock className="w-4 h-4"/> Chờ thu</p>
-            <h3 className="text-2xl font-bold text-amber-600">
+            <h3 className="text-2xl font-semibold text-amber-600">
               {payments.filter(p => p.status === 'PENDING').reduce((acc, curr) => acc + curr.amount, 0).toLocaleString()} VNĐ
             </h3>
           </div>
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
             <p className="text-red-600 text-sm font-medium mb-1 flex items-center gap-1"><AlertCircle className="w-4 h-4"/> Quá hạn</p>
-            <h3 className="text-2xl font-bold text-red-600">
+            <h3 className="text-2xl font-semibold text-red-600">
               {payments.filter(p => p.status === 'OVERDUE').reduce((acc, curr) => acc + curr.amount, 0).toLocaleString()} VNĐ
             </h3>
           </div>
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-center">
             <p className="text-gray-500 text-sm font-medium mb-1">Tỷ lệ thu hồi</p>
-            <h3 className="text-2xl font-bold text-green-600">
+            <h3 className="text-2xl font-semibold text-green-600">
               {payments.length > 0 ? Math.round((payments.filter(p => p.status === 'PAID').length / payments.length) * 100) : 0}%
             </h3>
           </div>
@@ -174,7 +174,7 @@ const RentalManagementPage: React.FC = () => {
           ) : filteredPayments.length === 0 ? (
             <div className="p-12 text-center">
               <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Không có hóa đơn nào</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Không có hóa đơn nào</h3>
               <p className="text-gray-500">Chưa có dữ liệu cho mục này.</p>
             </div>
           ) : (
@@ -206,10 +206,10 @@ const RentalManagementPage: React.FC = () => {
                       <td className="p-4">
                         <span className="text-sm text-gray-600 flex items-center gap-1">
                           <Calendar className="w-3.5 h-3.5" /> 
-                          {new Date(payment.dueDate).toLocaleDateString('vi-VN')}
+                          <span suppressHydrationWarning>{new Date(payment.dueDate).toLocaleDateString('vi-VN')}</span>
                         </span>
                       </td>
-                      <td className="p-4">
+                      <td className="p-4" suppressHydrationWarning>
                         {getStatusBadge(payment.status)}
                       </td>
                       <td className="p-4 text-right">
@@ -243,10 +243,10 @@ const RentalManagementPage: React.FC = () => {
 
       {/* Modal Tạo Hóa Đơn */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-gray-950/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-fade-in-up">
             <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-              <h2 className="text-xl font-bold text-gray-900">Tạo hóa đơn thu tiền</h2>
+              <h2 className="text-xl font-semibold text-gray-900">Tạo hóa đơn thu tiền</h2>
               <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600">
                 <X className="w-6 h-6" />
               </button>
@@ -254,50 +254,52 @@ const RentalManagementPage: React.FC = () => {
             
             <form onSubmit={handleCreatePayment} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Bất động sản <span className="text-red-500">*</span></label>
-                <select 
+                <label htmlFor="rental-payment-property" className="block text-sm font-medium text-gray-700 mb-1">Bất động sản <span className="text-red-500">*</span></label>
+                <select id="rental-payment-property" 
                   required
                   value={formData.propertyId}
-                  onChange={e => setFormData({...formData, propertyId: e.target.value})}
+                  onChange={e => setFormData((prev) => ({ ...prev, propertyId: e.target.value }))}
                   className="w-full border-gray-300 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500"
                 >
-                  <option value="">Chọn bất động sản...</option>
-                  {propertiesData?.content?.filter((p: any) => p.status === 'RENTED' || p.listingType === 'RENT').map((p: any) => (
-                    <option key={p.id} value={p.id}>{p.title}</option>
-                  ))}
+                  <option value="">Chọn bất động sản…</option>
+                  {propertiesData?.content?.flatMap((p: any) =>
+                    p.status === 'RENTED' || p.listingType === 'RENT'
+                      ? [<option key={p.id} value={p.id}>{p.title}</option>]
+                      : []
+                  )}
                 </select>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Số tiền (VNĐ) <span className="text-red-500">*</span></label>
-                <input 
+                <label htmlFor="rental-payment-amount" className="block text-sm font-medium text-gray-700 mb-1">Số tiền (VNĐ) <span className="text-red-500">*</span></label>
+                <input id="rental-payment-amount" 
                   type="number" 
                   required
                   min="0"
                   value={formData.amount}
-                  onChange={e => setFormData({...formData, amount: Number(e.target.value)})}
+                  onChange={e => setFormData((prev) => ({ ...prev, amount: Number(e.target.value) }))}
                   className="w-full border-gray-300 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500"
                   placeholder="Nhập số tiền..."
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Hạn thanh toán <span className="text-red-500">*</span></label>
-                <input 
+                <label htmlFor="rental-payment-due-date" className="block text-sm font-medium text-gray-700 mb-1">Hạn thanh toán <span className="text-red-500">*</span></label>
+                <input id="rental-payment-due-date" 
                   type="date" 
                   required
                   value={formData.dueDate}
-                  onChange={e => setFormData({...formData, dueDate: e.target.value})}
+                  onChange={e => setFormData((prev) => ({ ...prev, dueDate: e.target.value }))}
                   className="w-full border-gray-300 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nội dung / Ghi chú</label>
-                <textarea 
+                <label htmlFor="rental-payment-description" className="block text-sm font-medium text-gray-700 mb-1">Nội dung / Ghi chú</label>
+                <textarea id="rental-payment-description" 
                   rows={3}
                   value={formData.description}
-                  onChange={e => setFormData({...formData, description: e.target.value})}
+                  onChange={e => setFormData((prev) => ({ ...prev, description: e.target.value }))}
                   className="w-full border-gray-300 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500"
                   placeholder="Tiền nhà tháng 10/2025 + Điện nước..."
                 />

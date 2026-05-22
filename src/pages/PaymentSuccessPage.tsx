@@ -26,7 +26,7 @@ const PaymentSuccessPage: React.FC = () => {
         </div>
 
         {/* Title */}
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+        <h1 className="text-2xl font-semibold text-gray-900 mb-2">
           Thanh toán thành công!
         </h1>
 

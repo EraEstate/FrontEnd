@@ -17,6 +17,12 @@ interface PurchaseModalProps {
   onSuccess: () => void;
 }
 
+const priceFormatter = new Intl.NumberFormat('vi-VN', {
+  style: 'currency',
+  currency: 'VND',
+  minimumFractionDigits: 0,
+});
+
 const PurchaseModal: React.FC<PurchaseModalProps> = ({
   isOpen,
   onClose,
@@ -103,7 +109,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
         // VNPay/MoMo - redirect đến gateway
         const paymentUrl = result.paymentUrl || result.payment?.paymentUrl;
         if (paymentUrl) {
-          toast.info('Đang chuyển hướng đến cổng thanh toán...');
+          toast.info('Đang chuyển hướng đến cổng thanh toán…');
           // Redirect đến payment gateway
           window.location.href = paymentUrl;
         } else {
@@ -147,11 +153,11 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-gray-950 bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-gray-900">
+          <h2 className="text-xl font-semibold text-gray-900">
             {step === 'payment' ? 'Thanh toán gói dịch vụ' : 'Xác nhận thanh toán'}
           </h2>
           <button
@@ -171,11 +177,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
                 <h3 className="font-semibold text-gray-900 mb-2">{packageData.name}</h3>
                 <div className="flex items-baseline gap-2">
                   <span className="text-2xl font-bold text-red-600">
-                    {new Intl.NumberFormat('vi-VN', {
-                      style: 'currency',
-                      currency: 'VND',
-                      minimumFractionDigits: 0,
-                    }).format(calculatePrice())}
+                    {priceFormatter.format(calculatePrice())}
                   </span>
                   <span className="text-gray-600 text-sm">
                     /{billingPeriod === 'yearly' ? 'năm' : 'tháng'}
@@ -183,11 +185,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
                 </div>
                 {billingPeriod === 'yearly' && (
                   <p className="text-xs text-red-600 mt-1">
-                    Tiết kiệm {new Intl.NumberFormat('vi-VN', {
-                      style: 'currency',
-                      currency: 'VND',
-                      minimumFractionDigits: 0,
-                    }).format(packageData.price * 12 * 0.2)} mỗi năm
+                    Tiết kiệm {priceFormatter.format(packageData.price * 12 * 0.2)} mỗi năm
                   </p>
                 )}
               </div>
@@ -196,7 +194,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
               {loadingAccounts ? (
                 <div className="flex items-center justify-center p-4 border border-gray-200 rounded-lg">
                   <Loader2 className="h-5 w-5 animate-spin text-gray-400 mr-2" />
-                  <span className="text-sm text-gray-600">Đang kiểm tra tài khoản ngân hàng...</span>
+                  <span className="text-sm text-gray-600">Đang kiểm tra tài khoản ngân hàng…</span>
                 </div>
               ) : bankAccounts.length === 0 ? (
                 <div className="border-2 border-red-200 bg-red-50 rounded-lg p-5">
@@ -227,10 +225,12 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
                 <>
                   {/* Bank Account Selection */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="purchase-bank-account" className="block text-sm font-medium text-gray-700 mb-2">
                       Chọn tài khoản ngân hàng để thanh toán
                     </label>
                     <select
+                      id="purchase-bank-account"
+
                       value={selectedBankAccountId}
                       onChange={(e) => setSelectedBankAccountId(e.target.value)}
                       className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-600 focus:border-red-600"
@@ -252,9 +252,9 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
               {/* Payment Method - Chỉ hiển thị nếu đã có bank account */}
               {bankAccounts.length > 0 && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                  <p className="block text-sm font-medium text-gray-700 mb-3">
                     Phương thức thanh toán
-                  </label>
+                  </p>
                   <div className="space-y-2">
                     <button
                       onClick={() => setPaymentMethod('BANK_TRANSFER')}
@@ -327,7 +327,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
                     {loading ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        Đang xử lý...
+                        Đang xử lý…
                       </>
                     ) : (
                       'Thanh toán'
@@ -360,10 +360,11 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="purchase-bank-transaction-id" className="block text-sm font-medium text-gray-700 mb-2">
                   Mã giao dịch ngân hàng
                 </label>
                 <input
+                  id="purchase-bank-transaction-id"
                   type="text"
                   value={bankTransactionId}
                   onChange={(e) => setBankTransactionId(e.target.value)}
@@ -393,7 +394,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
                   {loading ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      Đang xác nhận...
+                      Đang xác nhận…
                     </>
                   ) : (
                     'Xác nhận thanh toán'
@@ -409,4 +410,5 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
 };
 
 export default PurchaseModal;
+
 

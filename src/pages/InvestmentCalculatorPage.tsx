@@ -16,18 +16,14 @@ const defaultForm: InvestmentCalculationRequest = {
   discountRate: 9,
 };
 
+const money = new Intl.NumberFormat('vi-VN', {
+  maximumFractionDigits: 0,
+});
+
 const InvestmentCalculatorPage: React.FC = () => {
   const [form, setForm] = useState<InvestmentCalculationRequest>(defaultForm);
   const [result, setResult] = useState<InvestmentCalculationResponse | null>(null);
   const [loading, setLoading] = useState(false);
-
-  const money = useMemo(
-    () =>
-      new Intl.NumberFormat('vi-VN', {
-        maximumFractionDigits: 0,
-      }),
-    []
-  );
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -53,7 +49,7 @@ const InvestmentCalculatorPage: React.FC = () => {
           <div className="flex items-center gap-3">
             <BarChart3 className="h-7 w-7 text-red-600" />
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Investment ROI Calculator</h1>
+              <h1 className="text-2xl font-semibold text-gray-900">Investment ROI Calculator</h1>
               <p className="text-sm text-gray-600">Tính ROI, IRR, NPV và thời gian hoàn vốn cho khoản đầu tư BĐS.</p>
             </div>
           </div>

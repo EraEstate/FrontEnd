@@ -24,7 +24,7 @@ const AgencyDetailPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 mt-10 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Không tìm thấy công ty</h2>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Không tìm thấy công ty</h2>
           <p className="text-gray-600">Công ty bất động sản này không tồn tại hoặc đã bị xóa.</p>
         </div>
       </div>
@@ -36,7 +36,7 @@ const AgencyDetailPage: React.FC = () => {
       {/* Header Section */}
       <div className="bg-white shadow-sm">
         <div className="w-full px-6 lg:px-12 py-8">
-          <div className="flex items-center space-x-6">
+          <div className="flex items-center gap-x-6">
             {/* Logo */}
             <div className="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center">
               {agency.logo ? (
@@ -50,8 +50,8 @@ const AgencyDetailPage: React.FC = () => {
 
             {/* Agency Info */}
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{agency.name}</h1>
-              <div className="flex items-center space-x-4 mb-3">
+              <h1 className="text-3xl font-semibold text-gray-900 mb-2">{agency.name}</h1>
+              <div className="flex items-center gap-x-4 mb-3">
                 <div className="flex items-center">
                   <Star className="h-5 w-5 text-yellow-400 mr-1" />
                   <span className="font-medium">4.5</span>
@@ -79,7 +79,7 @@ const AgencyDetailPage: React.FC = () => {
           <div className="lg:col-span-2 space-y-6">
             {/* About Section */}
             <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Giới thiệu</h2>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Giới thiệu</h2>
               <div className="prose max-w-none text-gray-600">
                 <p className="mb-4">{agency.description}</p>
                 <p>
@@ -92,7 +92,7 @@ const AgencyDetailPage: React.FC = () => {
 
             {/* Contact Information */}
             <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Thông tin liên hệ</h2>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Thông tin liên hệ</h2>
               <div className="space-y-4">
                 {agency.address && (
                   <div className="flex items-start">
@@ -137,7 +137,7 @@ const AgencyDetailPage: React.FC = () => {
 
             {/* Agents Section */}
             <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Đội ngũ môi giới</h2>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Đội ngũ môi giới</h2>
               {agentsLoading ? (
                 <div className="text-center py-8">
                   <div className="animate-spin h-6 w-6 text-red-600 mx-auto"></div>
@@ -178,7 +178,7 @@ const AgencyDetailPage: React.FC = () => {
           <div className="space-y-6">
             {/* Quick Stats */}
             <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h3 className="font-bold text-gray-900 mb-4">Thống kê</h3>
+              <h3 className="font-semibold text-gray-900 mb-4">Thống kê</h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Tổng số môi giới</span>
@@ -204,18 +204,18 @@ const AgencyDetailPage: React.FC = () => {
 
             {/* Similar Agencies */}
             <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h3 className="font-bold text-gray-900 mb-4">Công ty tương tự</h3>
+              <h3 className="font-semibold text-gray-900 mb-4">Công ty tương tự</h3>
               <div className="space-y-3">
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center gap-x-3">
                   <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
-                    <span className="text-gray-600 font-bold">S</span>
+                    <span className="text-gray-600 font-semibold">S</span>
                   </div>
                   <div>
                     <p className="font-medium text-gray-900">Savills Vietnam</p>
                     <p className="text-sm text-gray-600">45 môi giới</p>
                   </div>
                 </div>
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center gap-x-3">
                   <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
                     <span className="text-gray-600 font-bold">C</span>
                   </div>

@@ -42,7 +42,7 @@ const RentPage: React.FC = () => {
       const rentProperties: RentProperty[] = propertiesData.content.map((property: any) => ({
         id: property.id,
         title: property.title,
-        price: `${property.price?.toLocaleString()} VNĐ/tháng`,
+        price: `${property.price?.toLocaleString()} ${t('rent.priceUnit')}`,
         location: `${property.ward?.name || ''}, ${property.district?.name || ''}, ${property.province?.name || ''}`.trim(),
         area: `${property.area}m²`,
         bedrooms: property.bedrooms || 0,
@@ -133,8 +133,8 @@ const RentPage: React.FC = () => {
       {/* Header Section */}
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Nhà đất cho thuê</h1>
-          <p className="text-gray-600">Tìm kiếm nhà đất cho thuê tại Việt Nam</p>
+          <h1 className="text-3xl font-semibold text-gray-900 mb-2">{t('rent.title')}</h1>
+          <p className="text-gray-600">{t('rent.subtitle')}</p>
         </div>
       </div>
 
@@ -143,67 +143,67 @@ const RentPage: React.FC = () => {
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Khu vực</label>
-              <select 
+              <label htmlFor="rent-filter-location" className="block text-sm font-medium text-gray-700 mb-2">{t('rent.location')}</label>
+              <select id="rent-filter-location" 
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={filters.location}
-                onChange={(e) => setFilters({...filters, location: e.target.value})}
+                onChange={(e) => setFilters((prev) => ({ ...prev, location: e.target.value }))}
               >
-                <option value="">Chọn khu vực</option>
-                <option value="hcm">TP. Hồ Chí Minh</option>
-                <option value="hn">Hà Nội</option>
-                <option value="dn">Đà Nẵng</option>
-                <option value="bd">Bình Dương</option>
+                <option value="">{t('rent.selectLocation')}</option>
+                <option value="hcm">{t('projects.areas.hcm')}</option>
+                <option value="hn">{t('projects.areas.hn')}</option>
+                <option value="dn">{t('projects.areas.dn')}</option>
+                <option value="bd">{t('projects.areas.bd')}</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Mức giá</label>
-              <select 
+              <label htmlFor="rent-filter-price" className="block text-sm font-medium text-gray-700 mb-2">{t('rent.priceRange')}</label>
+              <select id="rent-filter-price" 
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={filters.priceRange}
-                onChange={(e) => setFilters({...filters, priceRange: e.target.value})}
+                onChange={(e) => setFilters((prev) => ({ ...prev, priceRange: e.target.value }))}
               >
-                <option value="">Chọn mức giá</option>
-                <option value="under-10">Dưới 10 triệu</option>
-                <option value="10-20">10 - 20 triệu</option>
-                <option value="20-30">20 - 30 triệu</option>
-                <option value="30-50">30 - 50 triệu</option>
-                <option value="over-50">Trên 50 triệu</option>
+                <option value="">{t('rent.selectPrice')}</option>
+                <option value="under-10">{t('rent.priceUnder10')}</option>
+                <option value="10-20">{t('rent.price10to20')}</option>
+                <option value="20-30">{t('rent.price20to30')}</option>
+                <option value="30-50">{t('rent.price30to50')}</option>
+                <option value="over-50">{t('rent.priceOver50')}</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Loại hình</label>
-              <select 
+              <label htmlFor="rent-filter-type" className="block text-sm font-medium text-gray-700 mb-2">{t('rent.type')}</label>
+              <select id="rent-filter-type" 
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={filters.propertyType}
-                onChange={(e) => setFilters({...filters, propertyType: e.target.value})}
+                onChange={(e) => setFilters((prev) => ({ ...prev, propertyType: e.target.value }))}
               >
-                <option value="">Chọn loại hình</option>
-                <option value="apartment">Căn hộ chung cư</option>
-                <option value="house">Nhà riêng</option>
-                <option value="villa">Biệt thự</option>
-                <option value="room">Phòng trọ</option>
-                <option value="office">Văn phòng</option>
+                <option value="">{t('rent.selectType')}</option>
+                <option value="apartment">{t('postProperty.apartment')}</option>
+                <option value="house">{t('rent.house')}</option>
+                <option value="villa">{t('postProperty.villa')}</option>
+                <option value="room">{t('rent.room')}</option>
+                <option value="office">{t('rent.office')}</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Phòng ngủ</label>
-              <select 
+              <label htmlFor="rent-filter-bedrooms" className="block text-sm font-medium text-gray-700 mb-2">{t('rent.bedrooms')}</label>
+              <select id="rent-filter-bedrooms" 
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={filters.bedrooms}
-                onChange={(e) => setFilters({...filters, bedrooms: e.target.value})}
+                onChange={(e) => setFilters((prev) => ({ ...prev, bedrooms: e.target.value }))}
               >
-                <option value="">Chọn số phòng</option>
-                <option value="1">1 phòng</option>
-                <option value="2">2 phòng</option>
-                <option value="3">3 phòng</option>
-                <option value="4+">4+ phòng</option>
+                <option value="">{t('rent.selectBedrooms')}</option>
+                <option value="1">{t('rent.1bed')}</option>
+                <option value="2">{t('rent.2bed')}</option>
+                <option value="3">{t('rent.3bed')}</option>
+                <option value="4+">{t('rent.4bedPlus')}</option>
               </select>
             </div>
           </div>
           <div className="mt-4 flex justify-center">
             <button className="bg-blue-600 text-white px-8 py-2 rounded-md hover:bg-blue-700 transition-colors">
-              Tìm kiếm
+              {t('rent.search')}
             </button>
           </div>
         </div>
@@ -212,14 +212,14 @@ const RentPage: React.FC = () => {
         <div className="bg-white rounded-lg shadow-md">
           <div className="p-6 border-b">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold">Có {properties.length} bất động sản cho thuê</h2>
-              <div className="flex items-center space-x-4">
+              <h2 className="text-xl font-semibold">{t('rent.resultsCount', { count: properties.length })}</h2>
+              <div className="flex items-center gap-x-4">
                 <select className="px-3 py-2 border border-gray-300 rounded-md text-sm">
-                  <option>Sắp xếp theo</option>
-                  <option>Giá tăng dần</option>
-                  <option>Giá giảm dần</option>
-                  <option>Diện tích tăng dần</option>
-                  <option>Mới nhất</option>
+                  <option>{t('rent.sortBy')}</option>
+                  <option>{t('rent.sortPriceAsc')}</option>
+                  <option>{t('rent.sortPriceDesc')}</option>
+                  <option>{t('rent.sortAreaAsc')}</option>
+                  <option>{t('rent.sortNewest')}</option>
                 </select>
               </div>
             </div>
@@ -259,7 +259,7 @@ const RentPage: React.FC = () => {
                       </div>
                       <div className="flex justify-between text-sm text-gray-600">
                         <span>{property.area}</span>
-                        <span>{property.bedrooms} PN, {property.bathrooms} WC</span>
+                        <span>{t('rent.bed', { count: property.bedrooms })}, {t('rent.bath', { count: property.bathrooms })}</span>
                       </div>
                       <div className="mt-2 text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
                         {property.type}

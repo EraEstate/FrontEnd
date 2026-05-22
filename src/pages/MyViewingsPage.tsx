@@ -137,7 +137,7 @@ const MyViewingsPage: React.FC = () => {
             <CalendarCheck className="w-7 h-7 text-blue-600" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Lịch xem nhà</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Lịch xem nhà</h1>
             <p className="text-sm text-gray-500">Quản lý tất cả lịch hẹn xem nhà của bạn</p>
           </div>
         </div>
@@ -172,7 +172,7 @@ const MyViewingsPage: React.FC = () => {
         ) : filtered.length === 0 ? (
           <div className="bg-white rounded-2xl shadow-sm p-12 text-center border border-gray-100">
             <AlertCircle className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-            <h3 className="text-lg font-bold text-gray-900 mb-2">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
               {activeTab === 'upcoming'
                 ? 'Không có lịch sắp tới'
                 : activeTab === 'past'

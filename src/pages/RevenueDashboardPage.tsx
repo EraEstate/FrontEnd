@@ -4,20 +4,16 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxi
 import { revenueAPI, type MonthlyRevenueChartItem, type PropertyRevenueBreakdown, type RevenueSummary } from '../api/revenue';
 import { showError } from '../utils/toast';
 
+const money = new Intl.NumberFormat('vi-VN', {
+  maximumFractionDigits: 0,
+});
+
 const RevenueDashboardPage: React.FC = () => {
   const [summary, setSummary] = useState<RevenueSummary | null>(null);
   const [chart, setChart] = useState<MonthlyRevenueChartItem[]>([]);
   const [byProperty, setByProperty] = useState<PropertyRevenueBreakdown[]>([]);
   const [months, setMonths] = useState(12);
   const [loading, setLoading] = useState(true);
-
-  const money = useMemo(
-    () =>
-      new Intl.NumberFormat('vi-VN', {
-        maximumFractionDigits: 0,
-      }),
-    []
-  );
 
   const loadRevenue = async () => {
     setLoading(true);
@@ -63,7 +59,7 @@ const RevenueDashboardPage: React.FC = () => {
             <div className="flex items-center gap-3">
               <TrendingUp className="h-7 w-7 text-emerald-600" />
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Revenue Dashboard</h1>
+                <h1 className="text-2xl font-semibold text-gray-900">Revenue Dashboard</h1>
                 <p className="text-sm text-gray-600">Theo dõi doanh thu cho thuê, nợ quá hạn và hiệu suất từng BĐS.</p>
               </div>
             </div>
@@ -81,7 +77,7 @@ const RevenueDashboardPage: React.FC = () => {
               <button
                 type="button"
                 onClick={downloadCsv}
-                className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-black"
+                className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-950"
               >
                 <Download className="h-4 w-4" />
                 Export CSV
@@ -140,21 +136,21 @@ const RevenueDashboardPage: React.FC = () => {
                 <table className="w-full min-w-[700px] text-sm">
                   <thead>
                     <tr className="border-b border-gray-200 text-left text-xs uppercase text-gray-500">
-                      <th className="px-3 py-3">Bất động sản</th>
-                      <th className="px-3 py-3">Doanh thu</th>
-                      <th className="px-3 py-3">Đã thu</th>
-                      <th className="px-3 py-3">Quá hạn</th>
-                      <th className="px-3 py-3">Pending</th>
+                      <th className="p-3">Bất động sản</th>
+                      <th className="p-3">Doanh thu</th>
+                      <th className="p-3">Đã thu</th>
+                      <th className="p-3">Quá hạn</th>
+                      <th className="p-3">Pending</th>
                     </tr>
                   </thead>
                   <tbody>
                     {byProperty.map((item) => (
                       <tr key={item.propertyId} className="border-b border-gray-100">
-                        <td className="px-3 py-3 font-medium text-gray-900">{item.propertyTitle}</td>
-                        <td className="px-3 py-3">{money.format(item.revenue)} VND</td>
-                        <td className="px-3 py-3">{item.paidInvoices}</td>
-                        <td className="px-3 py-3">{item.overdueInvoices}</td>
-                        <td className="px-3 py-3">{item.pendingInvoices}</td>
+                        <td className="p-3 font-medium text-gray-900">{item.propertyTitle}</td>
+                        <td className="p-3">{money.format(item.revenue)} VND</td>
+                        <td className="p-3">{item.paidInvoices}</td>
+                        <td className="p-3">{item.overdueInvoices}</td>
+                        <td className="p-3">{item.pendingInvoices}</td>
                       </tr>
                     ))}
                     {byProperty.length === 0 ? (

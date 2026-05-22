@@ -103,7 +103,7 @@ const KycManagement: React.FC = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-2">
             <Shield className="w-6 h-6 text-blue-600" />
             Quản lý duyệt KYC
           </h1>
@@ -145,7 +145,7 @@ const KycManagement: React.FC = () => {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {loading ? (
-                <tr><td colSpan={5} className="px-6 py-12 text-center text-gray-500">Đang tải...</td></tr>
+                <tr><td colSpan={5} className="px-6 py-12 text-center text-gray-500">Đang tải…</td></tr>
               ) : kycRecords.length === 0 ? (
                 <tr><td colSpan={5} className="px-6 py-12 text-center text-gray-500">Không có hồ sơ nào</td></tr>
               ) : (
@@ -174,11 +174,11 @@ const KycManagement: React.FC = () => {
 
       {/* Modal View */}
       {viewModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-gray-950 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold text-gray-900">Chi tiết hồ sơ KYC</h2>
+                <h2 className="text-2xl font-semibold text-gray-900">Chi tiết hồ sơ KYC</h2>
                 <button onClick={() => setViewModal(null)} className="text-gray-400 hover:text-gray-600">
                   <XCircle className="w-6 h-6" />
                 </button>

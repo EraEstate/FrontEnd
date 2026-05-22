@@ -195,7 +195,7 @@ const ViewingScheduler: React.FC<ViewingSchedulerProps> = ({ propertyId, ownerId
             <CalendarCheck className="w-5 h-5 text-emerald-600" />
           </div>
           <div>
-            <h3 className="font-bold text-gray-900">Lịch xem nhà sắp tới</h3>
+            <h3 className="font-semibold text-gray-900">Lịch xem nhà sắp tới</h3>
             <p className="text-xs text-gray-500">Khách hàng đã đặt lịch xem BĐS này</p>
           </div>
         </div>
@@ -288,7 +288,7 @@ const ViewingScheduler: React.FC<ViewingSchedulerProps> = ({ propertyId, ownerId
             <CalendarCheck className="w-5 h-5 text-blue-600" />
           </div>
           <div>
-            <h3 className="font-bold text-gray-900">Đặt lịch xem nhà</h3>
+            <h3 className="font-semibold text-gray-900">Đặt lịch xem nhà</h3>
             <p className="text-xs text-gray-500">Chọn ngày và giờ phù hợp</p>
           </div>
         </div>
@@ -316,15 +316,15 @@ const ViewingScheduler: React.FC<ViewingSchedulerProps> = ({ propertyId, ownerId
 
         {/* Day buttons */}
         <div className="grid grid-cols-7 gap-1">
-          {weekDays.map((day, idx) => {
+          {weekDays.map((day) => {
             const dateStr = formatDate(day);
             const isToday = formatDate(day) === formatDate(new Date());
             const isPast = day < today;
             const isSelected = selectedDate === dateStr;
 
             return (
-              <button
-                key={idx}
+              <button suppressHydrationWarning
+                key={dateStr}
                 onClick={() => !isPast && setSelectedDate(dateStr)}
                 disabled={isPast}
                 className={`flex flex-col items-center py-2 px-1 rounded-xl text-xs font-medium transition-all duration-200 ${
@@ -355,7 +355,7 @@ const ViewingScheduler: React.FC<ViewingSchedulerProps> = ({ propertyId, ownerId
         ) : slotsLoading ? (
           <div className="flex items-center justify-center py-8">
             <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
-            <span className="ml-2 text-sm text-gray-500">Đang tải...</span>
+            <span className="ml-2 text-sm text-gray-500">Đang tải…</span>
           </div>
         ) : slots.length === 0 ? (
           <div className="text-center py-6">
@@ -377,9 +377,9 @@ const ViewingScheduler: React.FC<ViewingSchedulerProps> = ({ propertyId, ownerId
               })}
             </p>
             <div className="grid grid-cols-3 gap-2">
-              {slots.map((slot, idx) => (
+              {slots.map((slot) => (
                 <button
-                  key={idx}
+                  key={`${slot.startTime}-${slot.endTime}`}
                   onClick={() => {
                     if (!isAuthenticated) {
                       toast.warning('Vui lòng đăng nhập để đặt lịch xem nhà');
@@ -401,7 +401,7 @@ const ViewingScheduler: React.FC<ViewingSchedulerProps> = ({ propertyId, ownerId
 
       {/* Booking Confirmation Modal */}
       {showBookingModal && selectedSlot && selectedDate && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-gray-950/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden">
             {/* Modal Header */}
             <div className="p-5 border-b border-gray-100 flex items-center justify-between">
@@ -409,7 +409,7 @@ const ViewingScheduler: React.FC<ViewingSchedulerProps> = ({ propertyId, ownerId
                 <div className="p-2 bg-blue-100 rounded-xl">
                   <CalendarCheck className="w-5 h-5 text-blue-600" />
                 </div>
-                <h3 className="font-bold text-gray-900">Xác nhận đặt lịch</h3>
+                <h3 className="font-semibold text-gray-900">Xác nhận đặt lịch</h3>
               </div>
               <button
                 onClick={() => setShowBookingModal(false)}
@@ -442,10 +442,12 @@ const ViewingScheduler: React.FC<ViewingSchedulerProps> = ({ propertyId, ownerId
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label htmlFor="viewing-booking-note" className="block text-sm font-medium text-gray-700 mb-1.5">
                   Ghi chú cho chủ nhà (tuỳ chọn)
                 </label>
                 <textarea
+                  id="viewing-booking-note"
+
                   value={bookingNote}
                   onChange={(e) => setBookingNote(e.target.value)}
                   placeholder="VD: Tôi muốn xem tầng trệt và sân thượng..."

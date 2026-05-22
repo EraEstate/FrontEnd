@@ -9,6 +9,25 @@ import {
 import { analyticsAPI, type LandlordAnalyticsResponse } from '../api/analytics';
 import { useNavigate } from 'react-router-dom';
 
+interface StatCardProps {
+  title: string;
+  value: string | number;
+  icon: React.ReactNode;
+  gradient: string;
+}
+
+const StatCard = ({ title, value, icon, gradient }: StatCardProps) => (
+  <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex items-center gap-4 hover:shadow-md transition-shadow">
+    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white shadow-inner`}>
+      {icon}
+    </div>
+    <div>
+      <p className="text-sm font-medium text-slate-500 mb-1">{title}</p>
+      <h3 className="text-2xl font-semibold text-slate-900">{value}</h3>
+    </div>
+  </div>
+);
+
 const LandlordAnalyticsPage: React.FC = () => {
   const navigate = useNavigate();
   const [data, setData] = useState<LandlordAnalyticsResponse | null>(null);
@@ -33,18 +52,6 @@ const LandlordAnalyticsPage: React.FC = () => {
     fetchAnalytics();
   }, [range]);
 
-  const StatCard = ({ title, value, icon, gradient }: { title: string, value: string | number, icon: React.ReactNode, gradient: string }) => (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex items-center gap-4 hover:shadow-md transition-shadow">
-      <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white shadow-inner`}>
-        {icon}
-      </div>
-      <div>
-        <p className="text-sm font-medium text-slate-500 mb-1">{title}</p>
-        <h3 className="text-2xl font-bold text-slate-900">{value}</h3>
-      </div>
-    </div>
-  );
-
   return (
     <div className="min-h-screen bg-slate-50/50 pt-20 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -58,7 +65,7 @@ const LandlordAnalyticsPage: React.FC = () => {
             >
               <ArrowLeft className="w-4 h-4 mr-1" /> Quay lại
             </button>
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Thống kê hiệu quả</h1>
+            <h1 className="text-2xl sm:text-3xl font-semibold text-slate-900 tracking-tight">Thống kê hiệu quả</h1>
             <p className="text-sm text-slate-500 mt-1">Theo dõi lượt tiếp cận và tương tác các bất động sản của bạn</p>
           </div>
 
@@ -87,7 +94,7 @@ const LandlordAnalyticsPage: React.FC = () => {
         ) : loading ? (
           <div className="flex flex-col items-center justify-center h-64 text-slate-400">
             <Loader2 className="w-8 h-8 animate-spin mb-4 text-red-500" />
-            <p>Đang tải dữ liệu...</p>
+            <p>Đang tải dữ liệu…</p>
           </div>
         ) : data ? (
           <div className="space-y-6">
@@ -124,7 +131,7 @@ const LandlordAnalyticsPage: React.FC = () => {
               
               {/* Line Chart */}
               <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 lg:col-span-2">
-                <h3 className="text-lg font-bold text-slate-900 mb-6">Lưu lượng truy cập ({range} ngày qua)</h3>
+                <h3 className="text-lg font-semibold text-slate-900 mb-6">Lưu lượng truy cập ({range} ngày qua)</h3>
                 <div className="h-80">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={data.dailyStats} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
@@ -158,7 +165,7 @@ const LandlordAnalyticsPage: React.FC = () => {
 
               {/* Bar Chart (Top Properties) */}
               <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
-                <h3 className="text-lg font-bold text-slate-900 mb-6">Top BĐS hiệu quả nhất</h3>
+                <h3 className="text-lg font-semibold text-slate-900 mb-6">Top BĐS hiệu quả nhất</h3>
                 {data.topProperties.length > 0 ? (
                   <div className="h-80">
                     <ResponsiveContainer width="100%" height="100%">
@@ -195,7 +202,7 @@ const LandlordAnalyticsPage: React.FC = () => {
             {data.topProperties.length > 0 && (
               <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
                 <div className="px-6 py-5 border-b border-slate-100">
-                  <h3 className="text-lg font-bold text-slate-900">Chi tiết hiệu suất từng BĐS</h3>
+                  <h3 className="text-lg font-semibold text-slate-900">Chi tiết hiệu suất từng BĐS</h3>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm text-left">
@@ -209,8 +216,8 @@ const LandlordAnalyticsPage: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
-                      {data.topProperties.map((prop, idx) => (
-                        <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
+                      {data.topProperties.map((prop) => (
+                        <tr key={prop.propertyId || prop.title} className="hover:bg-slate-50/50 transition-colors">
                           <td className="px-6 py-4 font-medium text-slate-900">
                             {prop.title}
                           </td>

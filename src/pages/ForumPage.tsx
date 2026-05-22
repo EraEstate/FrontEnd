@@ -69,7 +69,7 @@ const ForumPage: React.FC = () => {
         <div className="mb-6 rounded-2xl bg-white p-6 shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Cong dong Forum</h1>
+              <h1 className="text-2xl font-semibold text-gray-900">Cong dong Forum</h1>
               <p className="mt-1 text-sm text-gray-600">
                 Thao luan ve khu vuc, du an va kinh nghiem mua ban bat dong san.
               </p>
@@ -91,10 +91,12 @@ const ForumPage: React.FC = () => {
             <div className="rounded-2xl bg-white p-5 shadow-sm">
               <form className="grid gap-3 md:grid-cols-4" onSubmit={handleSearch}>
                 <div className="md:col-span-2">
-                  <label className="text-xs font-medium uppercase text-gray-500">Tim kiem</label>
+                  <label htmlFor="forum-search-keyword" className="text-xs font-medium uppercase text-gray-500">Tim kiem</label>
                   <div className="mt-1 flex items-center rounded-lg border border-gray-300 px-3">
                     <Search className="h-4 w-4 text-gray-500" />
                     <input
+                      id="forum-search-keyword"
+
                       value={keywordInput}
                       onChange={(event) => setKeywordInput(event.target.value)}
                       placeholder="Tieu de, noi dung..."
@@ -103,8 +105,10 @@ const ForumPage: React.FC = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="text-xs font-medium uppercase text-gray-500">Danh muc</label>
+                  <label htmlFor="forum-search-category" className="text-xs font-medium uppercase text-gray-500">Danh muc</label>
                   <select
+                    id="forum-search-category"
+
                     value={categoryInput}
                     onChange={(event) => setCategoryInput(event.target.value as ForumPost['category'] | '')}
                     className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm"
@@ -119,7 +123,7 @@ const ForumPage: React.FC = () => {
                 <div className="flex items-end">
                   <button
                     type="submit"
-                    className="w-full rounded-lg bg-gray-900 px-3 py-2.5 text-sm font-medium text-white hover:bg-black"
+                    className="w-full rounded-lg bg-gray-900 px-3 py-2.5 text-sm font-medium text-white hover:bg-gray-950"
                   >
                     Loc bai viet
                   </button>
@@ -150,13 +154,13 @@ const ForumPage: React.FC = () => {
                         <span className="rounded-full bg-red-50 px-2 py-0.5 text-red-700">
                           {CATEGORY_LABELS[post.category]}
                         </span>
-                        <span>{new Date(post.createdAt).toLocaleString('vi-VN')}</span>
+                        <span suppressHydrationWarning>{new Date(post.createdAt).toLocaleString('vi-VN')}</span>
                       </div>
 
                       <Link to={`/forum/${post.id}`} className="text-lg font-semibold text-gray-900 hover:text-red-700">
                         {post.title}
                       </Link>
-                      <p className="mt-2 text-sm text-gray-700">{truncate(post.content)}</p>
+                      <p className="mt-2 text-sm text-gray-700" suppressHydrationWarning>{truncate(post.content)}</p>
 
                       {post.tags?.length ? (
                         <div className="mt-3 flex flex-wrap gap-2">

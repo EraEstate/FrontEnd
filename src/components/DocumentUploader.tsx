@@ -74,12 +74,24 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({
   const documents = value ?? internalDocuments;
   const isControlled = value !== undefined;
 
-  const setDocuments = (nextDocuments: PendingPropertyDocument[]) => {
+  const setDocuments = (
+    nextDocumentsOrFn:
+      | PendingPropertyDocument[]
+      | ((prev: PendingPropertyDocument[]) => PendingPropertyDocument[])
+  ) => {
     if (!isControlled) {
-      setInternalDocuments(nextDocuments);
-    }
-    if (onChange) {
-      onChange(nextDocuments);
+      setInternalDocuments((prev) => {
+        const next = typeof nextDocumentsOrFn === 'function' ? nextDocumentsOrFn(prev) : nextDocumentsOrFn;
+        if (onChange) {
+          onChange(next);
+        }
+        return next;
+      });
+    } else {
+      const next = typeof nextDocumentsOrFn === 'function' ? nextDocumentsOrFn(value || []) : nextDocumentsOrFn;
+      if (onChange) {
+        onChange(next);
+      }
     }
   };
 
@@ -102,20 +114,25 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({
     const files = Array.from(event.target.files || []);
     if (files.length === 0) return;
 
-    const accepted = files.filter(validateFile).map(createPendingDocument);
+    const accepted = files.reduce<PendingPropertyDocument[]>((acc, file) => {
+      if (validateFile(file)) {
+        acc.push(createPendingDocument(file));
+      }
+      return acc;
+    }, []);
     if (accepted.length === 0) return;
 
-    setDocuments([...documents, ...accepted]);
+    setDocuments((prev) => [...prev, ...accepted]);
     event.target.value = '';
   };
 
   const removeDocument = (id: string) => {
-    setDocuments(documents.filter((document) => document.id !== id));
+    setDocuments((prev) => prev.filter((document) => document.id !== id));
   };
 
   const updateDocument = (id: string, patch: Partial<PendingPropertyDocument>) => {
-    setDocuments(
-      documents.map((document) => (document.id === id ? { ...document, ...patch } : document))
+    setDocuments((prev) =>
+      prev.map((document) => (document.id === id ? { ...document, ...patch } : document))
     );
   };
 
@@ -126,17 +143,22 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({
     const failed: PendingPropertyDocument[] = [];
 
     try {
-      for (const document of documents) {
-        try {
-          const result = await documentAPI.upload(propertyId, document.file, {
+      const results = await Promise.allSettled(
+        documents.map((document) =>
+          documentAPI.upload(propertyId, document.file, {
             documentType: document.documentType,
             description: document.description || undefined,
-          });
-          uploaded.push(result);
-        } catch {
-          failed.push(document);
+          })
+        )
+      );
+
+      results.forEach((result, index) => {
+        if (result.status === 'fulfilled') {
+          uploaded.push(result.value);
+        } else {
+          failed.push(documents[index]);
         }
-      }
+      });
 
       setDocuments(failed);
       if (uploaded.length > 0) {
@@ -174,7 +196,7 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({
       </div>
 
       <div className="mt-4">
-        <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-300 px-4 py-5 text-sm text-gray-700 transition-colors hover:border-red-400 hover:bg-red-50">
+        <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-300 px-4 py-5 text-sm text-[#374151] transition-colors hover:border-red-400 hover:bg-red-50">
           <Upload className="h-4 w-4" />
           Chọn tài liệu
           <input

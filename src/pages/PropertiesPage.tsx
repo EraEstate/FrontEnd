@@ -25,6 +25,7 @@ import { showSuccess, showWarning, showError } from '../utils/toast';
 import { logger } from '../utils/logger';
 import EmptyState from '../components/EmptyState';
 import { usePropertySearch } from '../hooks/usePropertySearch';
+import { SaveSearchButton } from '../components/SaveSearchButton';
 
 const PropertiesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -334,10 +335,7 @@ const PropertiesPage: React.FC = () => {
             <span className="text-sm text-gray-600">
               {t('properties.propertiesCount', { count: properties?.totalElements || properties?.content?.length || '0' })}
             </span>
-            <button className="flex items-center space-x-1 text-sm text-red-600 hover:text-red-700 transition-colors">
-              <Bell className="h-4 w-4" />
-              <span>{t('properties.emailNotifications')}</span>
-            </button>
+            <SaveSearchButton searchParams={searchParams} searchTerm={searchTerm} />
           </div>
         </div>
 

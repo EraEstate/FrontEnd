@@ -205,7 +205,7 @@ const EscrowDashboard: React.FC = () => {
               <div className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30 mb-6">
                 <Shield className="w-10 h-10 text-white" />
               </div>
-              <h1 className="text-2xl font-bold text-slate-900 mb-2">Escrow Dashboard</h1>
+              <h1 className="text-2xl font-semibold text-slate-900 mb-2">Escrow Dashboard</h1>
               <p className="text-slate-500 mb-8 text-sm leading-relaxed">
                 Quản lý giao dịch đặt cọc an toàn qua Smart Contract.<br />
                 Kết nối ví MetaMask để bắt đầu.
@@ -217,7 +217,7 @@ const EscrowDashboard: React.FC = () => {
                 className="w-full inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 text-white font-semibold text-sm shadow-lg shadow-orange-500/25 hover:shadow-xl hover:shadow-orange-500/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {connectingWallet ? (
-                  <><Loader2 className="w-5 h-5 animate-spin" /> Đang kết nối...</>
+                  <><Loader2 className="w-5 h-5 animate-spin" /> Đang kết nối…</>
                 ) : (
                   <><Wallet className="w-5 h-5" /> Kết nối MetaMask</>
                 )}
@@ -252,7 +252,7 @@ const EscrowDashboard: React.FC = () => {
         {/* ── HEADER ── */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2.5">
+            <h1 className="text-2xl font-semibold text-slate-900 flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md shadow-blue-500/20">
                 <ShieldCheck className="w-5 h-5 text-white" />
               </div>
@@ -327,7 +327,7 @@ const EscrowDashboard: React.FC = () => {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <Loader2 className="w-8 h-8 text-blue-500 animate-spin mb-3" />
-            <p className="text-sm text-slate-500">Đang tải giao dịch...</p>
+            <p className="text-sm text-slate-500">Đang tải giao dịch…</p>
           </div>
         ) : filteredTx.length === 0 ? (
           <div className="text-center py-20 bg-white/60 backdrop-blur rounded-2xl border border-slate-100 shadow-sm">

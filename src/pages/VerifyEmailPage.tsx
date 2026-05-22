@@ -20,6 +20,7 @@ const VerifyEmailPage: React.FC = () => {
     (async () => {
       setStatus('loading');
       try {
+        if (cancelled) return;
         const data = await authAPI.verifyEmail(token);
         if (cancelled) return;
         setStatus('ok');
@@ -49,7 +50,7 @@ const VerifyEmailPage: React.FC = () => {
           {status === 'ok' && (
             <>
               <CheckCircle2 className="w-12 h-12 text-green-600 mx-auto mb-4" />
-              <h1 className="text-xl font-bold text-gray-900 mb-2">Thành công</h1>
+              <h1 className="text-xl font-semibold text-gray-900 mb-2">Thành công</h1>
               <p className="text-gray-600 text-sm mb-6">{message}</p>
               <Link
                 to="/login"
@@ -62,7 +63,7 @@ const VerifyEmailPage: React.FC = () => {
           {status === 'err' && (
             <>
               <XCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-              <h1 className="text-xl font-bold text-gray-900 mb-2">Không xác thực được</h1>
+              <h1 className="text-xl font-semibold text-gray-900 mb-2">Không xác thực được</h1>
               <p className="text-gray-600 text-sm mb-6">{message}</p>
               <Link to="/contact" className="text-red-600 font-medium hover:underline">
                 Liên hệ hỗ trợ

@@ -109,7 +109,7 @@ const MapSearchPage: React.FC = () => {
           </button>
           <div className="flex items-center gap-2">
             <MapPin className="w-5 h-5 text-red-600" />
-            <h1 className="text-lg font-bold text-gray-900">Tìm kiếm trên bản đồ</h1>
+            <h1 className="text-lg font-semibold text-gray-900">Tìm kiếm trên bản đồ</h1>
           </div>
         </div>
         
@@ -134,7 +134,7 @@ const MapSearchPage: React.FC = () => {
         {/* Sidebar */}
         <div className={`w-full md:w-[380px] flex flex-col bg-white border-r border-gray-200 z-10 shadow-lg ${properties.length === 0 && !loading ? 'hidden md:flex' : 'flex'} absolute md:relative h-[calc(100vh-64px)] md:h-auto`}>
           <div className="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center sticky top-0 z-20">
-            <h2 className="font-bold text-gray-900 text-sm">Kết quả tìm kiếm</h2>
+            <h2 className="font-semibold text-gray-900 text-sm">Kết quả tìm kiếm</h2>
             <span className="bg-red-100 text-red-800 text-xs px-2 py-0.5 rounded-full font-semibold">{properties.length}</span>
             {properties.length > 0 && (
               <button className="md:hidden p-1 text-gray-500 hover:bg-gray-200 rounded" onClick={() => setProperties([])}><X className="w-4 h-4" /></button>
@@ -142,9 +142,9 @@ const MapSearchPage: React.FC = () => {
           </div>
           <div className="flex-1 overflow-y-auto p-3 space-y-2">
             {loading ? (
-              <div className="flex flex-col items-center justify-center h-full text-gray-500 space-y-3">
+              <div className="flex flex-col items-center justify-center h-full text-gray-500 gap-y-3">
                 <Loader2 className="w-7 h-7 animate-spin text-red-600" />
-                <p className="text-sm">Đang tìm kiếm...</p>
+                <p className="text-sm">Đang tìm kiếm…</p>
               </div>
             ) : properties.length > 0 ? (
               properties.map(p => (
@@ -158,7 +158,7 @@ const MapSearchPage: React.FC = () => {
                 </Link>
               ))
             ) : (
-              <div className="flex flex-col items-center justify-center h-full text-center text-gray-400 space-y-3">
+              <div className="flex flex-col items-center justify-center h-full text-center text-gray-400 gap-y-3">
                 <MapPin className="w-10 h-10 opacity-30" />
                 <div>
                   <p className="font-medium text-gray-600 text-sm">Chưa có kết quả</p>
@@ -255,7 +255,7 @@ const MapSearchPage: React.FC = () => {
                 </div>
               </div>
 
-              {heatLoading && <p className="text-[10px] text-gray-400 mt-2 flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" /> Đang tải dữ liệu...</p>}
+              {heatLoading && <p className="text-[10px] text-gray-400 mt-2 flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" /> Đang tải dữ liệu…</p>}
             </div>
           )}
         </div>

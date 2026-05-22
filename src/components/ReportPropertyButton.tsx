@@ -69,8 +69,16 @@ const ReportPropertyButton: React.FC<ReportPropertyButtonProps> = ({ propertyId,
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            className="absolute inset-0 bg-gray-950/40 backdrop-blur-sm cursor-pointer"
             onClick={() => !submitting && setIsOpen(false)}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {
+                if (!submitting) setIsOpen(false);
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label="Đóng báo cáo"
           />
 
           {/* Modal */}
@@ -112,6 +120,8 @@ const ReportPropertyButton: React.FC<ReportPropertyButtonProps> = ({ propertyId,
                   {REASONS.map((r) => (
                     <label
                       key={r.value}
+                      htmlFor={`report-reason-${r.value}`}
+                      aria-label={r.label}
                       className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
                         selectedReason === r.value
                           ? 'border-red-300 bg-red-50/60'
@@ -119,6 +129,8 @@ const ReportPropertyButton: React.FC<ReportPropertyButtonProps> = ({ propertyId,
                       }`}
                     >
                       <input
+                        id={`report-reason-${r.value}`}
+
                         type="radio"
                         name="report-reason"
                         value={r.value}
@@ -127,6 +139,7 @@ const ReportPropertyButton: React.FC<ReportPropertyButtonProps> = ({ propertyId,
                         className="mt-0.5 accent-red-600"
                       />
                       <div>
+                        <span className="sr-only">{r.label}</span>
                         <p className="text-sm font-medium text-gray-900">{r.label}</p>
                         <p className="text-xs text-gray-500">{r.desc}</p>
                       </div>

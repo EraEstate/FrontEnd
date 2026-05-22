@@ -70,13 +70,14 @@ const TitleInput = memo<{
   value: string;
   onChange: (value: string) => void;
 }>(({ value, onChange }) => {
+  const { t } = useTranslation();
   return (
     <input
       id="title"
       type="text"
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      placeholder="VD: Căn hộ cao cấp 2PN2WC view sông tại Vinhomes Central Park"
+      placeholder={t('postPropertyExtra.titlePlaceholder')}
       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
     />
   );
@@ -213,10 +214,10 @@ const PostPropertyPage: React.FC = () => {
         setAiKeywords(result.seoKeywords || []);
         setAiPreviewOpen(true);
       } else {
-        setAiError('Không thể tạo nội dung. Vui lòng thử lại.');
+        setAiError(t('postPropertyExtra.ai.generateError'));
       }
     } catch (err: any) {
-      const errMsg = err?.response?.data?.error || 'Có lỗi xảy ra khi tạo nội dung AI.';
+      const errMsg = err?.response?.data?.error || t('postPropertyExtra.ai.generateUnexpectedError');
       setAiError(errMsg);
       toast.error(errMsg);
     } finally {
@@ -380,12 +381,12 @@ const PostPropertyPage: React.FC = () => {
 
     // Validation
     if (!formData.provinceId || !formData.districtId || !formData.wardId) {
-      toast.error('Vui lòng chọn đầy đủ Tỉnh/Thành phố, Quận/Huyện và Phường/Xã');
+      toast.error(t('postPropertyExtra.validation.missingLocation'));
       return;
     }
 
     if (!formData.transactionType) {
-      toast.error('Vui lòng chọn hình thức giao dịch (Bán hoặc Cho thuê)');
+      toast.error(t('postPropertyExtra.validation.missingTransactionType'));
       return;
     }
 
@@ -397,11 +398,11 @@ const PostPropertyPage: React.FC = () => {
         try {
           imageUrls = await uploadAPI.uploadPropertyImages(formData.images);
           if (imageUrls.length === 0) {
-            throw new Error('Không thể upload ảnh. Vui lòng thử lại.');
+            throw new Error(t('postPropertyExtra.error.uploadFailed'));
           }
         } catch (error: any) {
-          toast.error('L?i t?i ?nh l�n');
-          toast.error('Lỗi khi upload ảnh: ' + (error.response?.data?.error || error.message));
+          toast.error(t('postPropertyExtra.error.uploadError'));
+          toast.error(t('postPropertyExtra.error.uploadErrorDetail') + (error.response?.data?.error || error.message));
           setLoading(false);
           return;
         }
@@ -439,15 +440,15 @@ const PostPropertyPage: React.FC = () => {
 
         const failedCount = uploadResults.filter((result) => result.status === 'rejected').length;
         if (failedCount > 0) {
-          toast.error(`${failedCount} tai lieu phap ly chua tai len duoc`);
+          toast.error(t('postPropertyExtra.error.documentsFailed', { count: failedCount }));
         }
       }
       
       // Success
-      toast.success('Đăng tin thành công! 🎉');
+      toast.success(t('postPropertyExtra.success.posted'));
       navigate('/profile?tab=properties');
     } catch (error) {
-      toast.error('L?i dang b?t d?ng s?n');
+      toast.error(t('postPropertyExtra.error.postErrorTitle'));
       toast.error(t('postProperty.postError'));
     } finally {
       setLoading(false);
@@ -472,13 +473,13 @@ const PostPropertyPage: React.FC = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <Building2 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Vui lòng đăng nhập</h2>
-          <p className="text-gray-600 mb-6">Bạn cần đăng nhập để đăng tin bất động sản</p>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-4">{t('postPropertyExtra.auth.loginRequired')}</h2>
+          <p className="text-gray-600 mb-6">{t('postPropertyExtra.auth.loginDesc')}</p>
           <button
             onClick={() => navigate('/login')}
             className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700"
           >
-            Đăng nhập ngay
+            {t('postPropertyExtra.auth.loginBtn')}
           </button>
         </div>
       </div>
@@ -490,22 +491,22 @@ const PostPropertyPage: React.FC = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="text-center p-8 bg-white rounded-xl shadow-sm border border-red-200 max-w-md w-full">
           <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Đã hết hạn mức đăng tin</h2>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-4">{t('postPropertyExtra.quota.exceededTitle')}</h2>
           <p className="text-gray-600 mb-6 text-sm">
-            Bạn đã sử dụng hết <span className="font-bold text-red-600">{subscription?.listingPackage?.maxProperties}</span> lượt đăng tin trong gói <b>{subscription?.listingPackage?.name}</b> hiện tại.<br/><br/>
-            Vui lòng nâng cấp gói để tiếp tục đăng tin bất động sản.
+            {t('postPropertyExtra.quota.exceededDesc1')} <span className="font-semibold text-red-600">{subscription?.listingPackage?.maxProperties}</span> {t('postPropertyExtra.quota.exceededDesc2')} <b>{subscription?.listingPackage?.name}</b> {t('postPropertyExtra.quota.exceededDesc3')}<br/><br/>
+            {t('postPropertyExtra.quota.upgradeDesc')}
           </p>
           <button
             onClick={() => navigate('/pricing')}
             className="w-full bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 font-medium shadow-sm transition-colors"
           >
-            Xem các gói dịch vụ
+            {t('postPropertyExtra.quota.viewPackages')}
           </button>
           <button
             onClick={() => navigate('/profile?tab=subscription')}
             className="w-full mt-3 bg-white text-gray-600 border border-gray-300 px-6 py-3 rounded-lg hover:bg-gray-50 font-medium transition-colors"
           >
-            Quản lý gói hiện tại
+            {t('postPropertyExtra.quota.managePackage')}
           </button>
         </div>
       </div>
@@ -549,7 +550,7 @@ const PostPropertyPage: React.FC = () => {
 
   const renderStep1 = () => (
     <div className="bg-white rounded-lg shadow-sm p-6">
-      <h3 className="text-xl font-bold text-gray-900 mb-6">Chọn loại hình bất động sản</h3>
+      <h3 className="text-xl font-semibold text-gray-900 mb-6">{t('postPropertyExtra.step1.selectPropertyType')}</h3>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         {propertyTypes.map((type) => {
@@ -571,7 +572,7 @@ const PostPropertyPage: React.FC = () => {
         })}
       </div>
 
-      <h3 className="text-xl font-bold text-gray-900 mb-6">Hình thức giao dịch</h3>
+      <h3 className="text-xl font-semibold text-gray-900 mb-6">{t('postPropertyExtra.step1.transactionType')}</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {transactionTypes.map((type) => (
           <button
@@ -599,8 +600,8 @@ const PostPropertyPage: React.FC = () => {
     <div className="bg-white rounded-lg shadow-sm p-6 space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Giá {formData.transactionType === 'RENT' ? t('postProperty.rent') : t('common.sell')} <span className="text-red-500">*</span>
+          <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">
+            {t('postPropertyExtra.step2.price')} <span className="text-red-500">*</span>
           </label>
           <div className="relative">
             <DollarSign className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
@@ -609,7 +610,7 @@ const PostPropertyPage: React.FC = () => {
               type="number"
               value={formData.price}
               onChange={(e) => handleInputChange('price', e.target.value)}
-              placeholder="VD: 5500000000"
+              placeholder={t('postPropertyExtra.step2.pricePlaceholder')}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
             />
           </div>
@@ -621,16 +622,17 @@ const PostPropertyPage: React.FC = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Diện tích <span className="text-red-500">*</span>
+          <label htmlFor="area" className="block text-sm font-medium text-gray-700 mb-2">
+            {t('postPropertyExtra.step2.area')} <span className="text-red-500">*</span>
           </label>
           <div className="relative">
             <Ruler className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
             <input
+              id="area"
               type="number"
               value={formData.area}
               onChange={(e) => handleInputChange('area', e.target.value)}
-              placeholder="VD: 85"
+              placeholder={t('postPropertyExtra.step2.areaPlaceholder')}
               className="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
             />
             <span className="absolute right-3 top-2.5 text-gray-400">m²</span>
@@ -640,15 +642,16 @@ const PostPropertyPage: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Tỉnh/Thành phố <span className="text-red-500">*</span>
+          <label htmlFor="province-id" className="block text-sm font-medium text-gray-700 mb-2">
+            {t('postPropertyExtra.step2.province')} <span className="text-red-500">*</span>
           </label>
           <select
+            id="province-id"
             value={formData.provinceId}
             onChange={(e) => handleInputChange('provinceId', e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
           >
-            <option value="">Chọn tỉnh/thành phố</option>
+            <option value="">{t('postPropertyExtra.step2.selectProvince')}</option>
             {provinces?.map((province: Province) => (
               <option key={province.id} value={province.id}>
                 {province.name}
@@ -658,16 +661,17 @@ const PostPropertyPage: React.FC = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Quận/Huyện <span className="text-red-500">*</span>
+          <label htmlFor="district-id" className="block text-sm font-medium text-gray-700 mb-2">
+            {t('postPropertyExtra.step2.district')} <span className="text-red-500">*</span>
           </label>
           <select
+            id="district-id"
             value={formData.districtId}
             onChange={(e) => handleInputChange('districtId', e.target.value)}
             disabled={!formData.provinceId}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:bg-gray-100"
           >
-            <option value="">Chọn quận/huyện</option>
+            <option value="">{t('postPropertyExtra.step2.selectDistrict')}</option>
             {districts?.map((district: District) => (
               <option key={district.id} value={district.id}>
                 {district.name}
@@ -677,16 +681,17 @@ const PostPropertyPage: React.FC = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Phường/Xã
+          <label htmlFor="ward-id" className="block text-sm font-medium text-gray-700 mb-2">
+            {t('postPropertyExtra.step2.ward')}
           </label>
           <select
+            id="ward-id"
             value={formData.wardId}
             onChange={(e) => handleInputChange('wardId', e.target.value)}
             disabled={!formData.districtId}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:bg-gray-100"
           >
-            <option value="">Chọn phường/xã</option>
+            <option value="">{t('postPropertyExtra.step2.selectWard')}</option>
             {wards?.map((ward: Ward) => (
               <option key={ward.id} value={ward.id}>
                 {ward.name}
@@ -697,28 +702,29 @@ const PostPropertyPage: React.FC = () => {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Địa chỉ cụ thể <span className="text-gray-500 text-xs">(Tìm kiếm tự động)</span>
-        </label>
+        <p className="block text-sm font-medium text-gray-700 mb-2">
+          {t('postPropertyExtra.step2.specificAddress')} <span className="text-gray-500 text-xs">{t('postPropertyExtra.step2.autoSearch')}</span>
+        </p>
         <AddressAutocomplete
           value={formData.address}
           onChange={handleAddressChange}
-          placeholder="VD: Số 123, Đường Nguyễn Huệ, Quận 1, TP.HCM"
+          placeholder={t('postPropertyExtra.step2.addressPlaceholder')}
         />
         <p className="text-xs text-gray-500 mt-1">
-          💡 Nhập địa chỉ (tối thiểu 3 ký tự) và chọn từ gợi ý để tự động điền Tỉnh/Quận/Huyện
+          {t('postPropertyExtra.step2.addressHint')}
         </p>
       </div>
 
       {formData.propertyType && ['APARTMENT', 'HOUSE', 'VILLA'].includes(formData.propertyType) && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Phòng ngủ
+            <label htmlFor="bedrooms" className="block text-sm font-medium text-gray-700 mb-2">
+              {t('postPropertyExtra.step2.bedrooms')}
             </label>
             <div className="relative">
               <Bed className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
               <input
+                id="bedrooms"
                 type="number"
                 value={formData.bedrooms}
                 onChange={(e) => handleInputChange('bedrooms', e.target.value)}
@@ -729,12 +735,13 @@ const PostPropertyPage: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Phòng tắm
+            <label htmlFor="bathrooms" className="block text-sm font-medium text-gray-700 mb-2">
+              {t('postPropertyExtra.step2.bathrooms')}
             </label>
             <div className="relative">
               <Bath className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
               <input
+                id="bathrooms"
                 type="number"
                 value={formData.bathrooms}
                 onChange={(e) => handleInputChange('bathrooms', e.target.value)}
@@ -745,10 +752,11 @@ const PostPropertyPage: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Số tầng
+            <label htmlFor="floors" className="block text-sm font-medium text-gray-700 mb-2">
+              {t('postPropertyExtra.step2.floors')}
             </label>
             <input
+              id="floors"
               type="number"
               value={formData.floors}
               onChange={(e) => handleInputChange('floors', e.target.value)}
@@ -758,10 +766,11 @@ const PostPropertyPage: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Năm xây dựng
+            <label htmlFor="year-built" className="block text-sm font-medium text-gray-700 mb-2">
+              {t('postPropertyExtra.step2.yearBuilt')}
             </label>
             <input
+              id="year-built"
               type="number"
               value={formData.yearBuilt}
               onChange={(e) => handleInputChange('yearBuilt', e.target.value)}
@@ -784,8 +793,8 @@ const PostPropertyPage: React.FC = () => {
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-gray-900">Trợ lý AI viết nội dung</h3>
-              <p className="text-xs text-gray-500">AI sẽ biến ghi chú của bạn thành bài đăng chuyên nghiệp, chuẩn SEO</p>
+              <h3 className="text-base font-semibold text-gray-900">{t('postPropertyExtra.ai.assistantTitle')}</h3>
+              <p className="text-xs text-gray-500">{t('postPropertyExtra.ai.assistantDesc')}</p>
             </div>
           </div>
           <button
@@ -805,19 +814,20 @@ const PostPropertyPage: React.FC = () => {
           <div className="space-y-4 mt-4">
             {/* Raw Notes Input */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="ai-raw-notes" className="block text-sm font-medium text-gray-700 mb-2">
                 <FileText className="w-4 h-4 inline mr-1.5 text-purple-500" />
-                Ghi chú nhanh cho AI <span className="text-gray-400 font-normal">(tuỳ chọn)</span>
+                {t('postPropertyExtra.ai.rawNotes')} <span className="text-gray-400 font-normal">{t('postPropertyExtra.ai.optional')}</span>
               </label>
               <textarea
+                id="ai-raw-notes"
                 value={aiRawNotes}
                 onChange={(e) => setAiRawNotes(e.target.value)}
                 rows={3}
-                placeholder={"VD: Nhà 50m2, 2 lầu, gần chợ Bà Chiểu, hẻm xe hơi 6m\nCó sân thượng, mới sơn sửa\nPhù hợp ở hoặc kinh doanh nhỏ..."}
+                placeholder={t('postPropertyExtra.ai.notesPlaceholder')}
                 className="w-full px-4 py-3 border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white placeholder-gray-400 text-sm"
               />
               <p className="text-xs text-gray-500 mt-1.5">
-                💡 Viết bất kỳ gạch đầu dòng, từ khóa, ưu điểm nào — AI sẽ tự chải chuốt thành bài viết hấp dẫn
+                {t('postPropertyExtra.ai.notesHint')}
               </p>
             </div>
 
@@ -831,12 +841,12 @@ const PostPropertyPage: React.FC = () => {
               {aiGenerating ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>AI đang sáng tạo nội dung...</span>
+                  <span>{t('postPropertyExtra.ai.generating')}</span>
                 </>
               ) : (
                 <>
                   <Wand2 className="w-5 h-5" />
-                  <span>🪄 Tạo Tiêu đề & Mô tả bằng AI</span>
+                  <span>{t('postPropertyExtra.ai.generateBtn')}</span>
                 </>
               )}
             </button>
@@ -844,7 +854,7 @@ const PostPropertyPage: React.FC = () => {
             {!formData.propertyType && (
               <p className="text-xs text-amber-600 flex items-center gap-1">
                 <AlertCircle className="w-3.5 h-3.5" />
-                Vui lòng chọn loại hình BĐS ở Bước 1 trước khi dùng AI
+                {t('postPropertyExtra.ai.requirePropertyType')}
               </p>
             )}
 
@@ -859,7 +869,7 @@ const PostPropertyPage: React.FC = () => {
             {formData.title && formData.description && (
               <div className="flex items-center gap-2 text-xs text-green-600 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
                 <CheckCircle className="w-4 h-4" />
-                <span>Nội dung AI đã được áp dụng. Bạn có thể chỉnh sửa bên dưới hoặc tạo lại.</span>
+                <span>{t('postPropertyExtra.ai.appliedSuccess')}</span>
               </div>
             )}
           </div>
@@ -870,11 +880,11 @@ const PostPropertyPage: React.FC = () => {
       <div className="bg-white rounded-lg shadow-sm p-6 space-y-6">
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Tiêu đề tin đăng <span className="text-red-500">*</span>
+            <label htmlFor="title-step3" className="block text-sm font-medium text-gray-700">
+              {t('postPropertyExtra.step3.title')} <span className="text-red-500">*</span>
             </label>
             {formData.title && (
-              <span className="text-xs text-gray-400">{formData.title.length} ký tự</span>
+              <span className="text-xs text-gray-400">{formData.title.length} {t('postPropertyExtra.step3.chars')}</span>
             )}
           </div>
           <input
@@ -888,26 +898,27 @@ const PostPropertyPage: React.FC = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Mô tả chi tiết <span className="text-red-500">*</span>
+          <label htmlFor="description-step3" className="block text-sm font-medium text-gray-700 mb-2">
+            {t('postPropertyExtra.step3.description')} <span className="text-red-500">*</span>
           </label>
           <textarea
+            id="description-step3"
             value={formData.description}
             onChange={(e) => handleInputChange('description', e.target.value)}
             rows={8}
-            placeholder="Mô tả chi tiết về bất động sản: vị trí, thiết kế, tiện ích xung quanh..."
+            placeholder={t('postPropertyExtra.step3.descriptionPlaceholder')}
             className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
           />
           <p className="text-sm text-gray-500 mt-1">
-            {formData.description.length}/2000 ký tự
+            {formData.description.length}/2000 {t('postPropertyExtra.step3.chars')}
           </p>
         </div>
 
         {formData.propertyType && ['APARTMENT', 'HOUSE', 'VILLA'].includes(formData.propertyType) && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-4">
-              Tình trạng nội thất
-            </label>
+            <p className="block text-sm font-medium text-gray-700 mb-4">
+              {t('postPropertyExtra.step3.furnishing')}
+            </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {furnishingOptions.map((option) => (
                 <button
@@ -927,9 +938,9 @@ const PostPropertyPage: React.FC = () => {
         )}
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-4">
-            Tiện ích và đặc điểm
-          </label>
+          <p className="block text-sm font-medium text-gray-700 mb-4">
+            {t('postPropertyExtra.step3.features')}
+          </p>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {availableFeatures.map((feature) => {
               const Icon = feature.icon;
@@ -958,30 +969,30 @@ const PostPropertyPage: React.FC = () => {
     <div className="bg-white rounded-lg shadow-sm p-6">
       <div className="mb-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-2">
-          Hình ảnh bất động sản <span className="text-red-500">*</span>
+          {t('postPropertyExtra.step4.imagesTitle')} <span className="text-red-500">*</span>
         </h3>
         <p className="text-gray-600">
-          Tải lên tối đa 10 hình ảnh. Hình ảnh đầu tiên sẽ là hình đại diện.
+          {t('postPropertyExtra.step4.imagesDesc')}
         </p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
-        {formData.images.map((image, index) => (
-          <div key={index} className="relative group">
+        {formData.images.map((image, imageIndex) => (
+          <div key={`${image.name}-${image.size}-${image.lastModified}`} className="relative group">
             <img
               src={URL.createObjectURL(image)}
-              alt={`Preview ${index + 1}`}
+              alt={`Preview ${imageIndex + 1}`}
               className="w-full h-32 object-cover rounded-lg"
             />
             <button
-              onClick={() => removeImage(index)}
+              onClick={() => removeImage(imageIndex)}
               className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
             >
               <X className="w-4 h-4" />
             </button>
-            {index === 0 && (
+            {imageIndex === 0 && (
               <div className="absolute bottom-2 left-2 bg-red-600 text-white px-2 py-1 rounded text-xs font-medium">
-                Ảnh đại diện
+                {t('postPropertyExtra.step4.thumbnail')}
               </div>
             )}
           </div>
@@ -990,7 +1001,7 @@ const PostPropertyPage: React.FC = () => {
         {formData.images.length < 10 && (
           <label className="border-2 border-dashed border-gray-300 rounded-lg h-32 flex flex-col items-center justify-center cursor-pointer hover:border-red-500 hover:bg-red-50 transition-colors">
             <Upload className="w-8 h-8 text-gray-400 mb-2" />
-            <span className="text-sm text-gray-600">Tải ảnh lên</span>
+            <span className="text-sm text-gray-600">{t('postPropertyExtra.step4.uploadImages')}</span>
             <input
               type="file"
               multiple
@@ -1005,9 +1016,9 @@ const PostPropertyPage: React.FC = () => {
       {formData.images.length === 0 && (
         <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
           <Camera className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-600 mb-4">Chưa có hình ảnh nào được tải lên</p>
+          <p className="text-gray-600 mb-4">{t('postPropertyExtra.step4.noImages')}</p>
           <label className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 cursor-pointer">
-            Chọn ảnh từ máy tính
+            {t('postPropertyExtra.step4.selectImages')}
             <input
               type="file"
               multiple
@@ -1023,7 +1034,7 @@ const PostPropertyPage: React.FC = () => {
         <DocumentUploader
           value={documents}
           onChange={setDocuments}
-          title="Tai lieu phap ly (tuy chon)"
+          title={t('postPropertyExtra.step4.documents')}
         />
       </div>
     </div>
@@ -1032,16 +1043,16 @@ const PostPropertyPage: React.FC = () => {
   const renderStep5 = () => (
     <div className="space-y-6">
       <div className="bg-white rounded-lg shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Xem trước tin đăng</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('postPropertyExtra.step5.previewTitle')}</h3>
         
         <div className="border rounded-lg p-4">
           <div className="flex justify-between items-start mb-4">
             <div className="flex-1">
-              <h4 className="text-xl font-bold text-gray-900 mb-2">{formData.title}</h4>
-              <div className="text-2xl font-bold text-red-600 mb-2">
+              <h4 className="text-xl font-semibold text-gray-900 mb-2">{formData.title}</h4>
+              <div className="text-2xl font-semibold text-red-600 mb-2">
                 {formatPrice(formData.price)} VND
               </div>
-              <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
+              <div className="flex items-center gap-x-4 text-sm text-gray-600 mb-2">
                 <span>{formData.area} m²</span>
                 {formData.bedrooms && <span>• {formData.bedrooms} PN</span>}
                 {formData.bathrooms && <span>• {formData.bathrooms} WC</span>}
@@ -1051,7 +1062,7 @@ const PostPropertyPage: React.FC = () => {
                 <span>{formData.address}</span>
               </div>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-x-2">
               <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                 formData.transactionType === 'SALE' 
                   ? 'bg-green-100 text-green-800' 
@@ -1096,12 +1107,12 @@ const PostPropertyPage: React.FC = () => {
         <div className="flex items-start">
           <AlertCircle className="w-5 h-5 text-yellow-600 mr-3 mt-0.5" />
           <div>
-            <h4 className="font-medium text-yellow-800">Lưu ý quan trọng</h4>
+            <h4 className="font-medium text-yellow-800">{t('postPropertyExtra.step5.importantNotes')}</h4>
             <ul className="text-sm text-yellow-700 mt-2 space-y-1">
-              <li>• Tin đăng sẽ được kiểm duyệt trong vòng 24 giờ</li>
-              <li>• Đảm bảo thông tin chính xác và hình ảnh rõ nét</li>
-              <li>• Tuân thủ quy định đăng tin của BDSPortal</li>
-              <li>• Tin đăng miễn phí sẽ hiển thị trong 30 ngày</li>
+              <li>{t('postPropertyExtra.step5.note1')}</li>
+              <li>{t('postPropertyExtra.step5.note2')}</li>
+              <li>{t('postPropertyExtra.step5.note3')}</li>
+              <li>{t('postPropertyExtra.step5.note4')}</li>
             </ul>
           </div>
         </div>
@@ -1122,8 +1133,8 @@ const PostPropertyPage: React.FC = () => {
                   <Sparkles className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white">Nội dung AI đã tạo</h3>
-                  <p className="text-xs text-purple-200">Xem trước, chỉnh sửa rồi áp dụng vào tin đăng</p>
+                  <h3 className="text-lg font-semibold text-white">{t('postPropertyExtra.ai.previewTitle')}</h3>
+                  <p className="text-xs text-purple-200">{t('postPropertyExtra.ai.previewDesc')}</p>
                 </div>
               </div>
               <button
@@ -1138,11 +1149,12 @@ const PostPropertyPage: React.FC = () => {
             <div className="flex-1 overflow-y-auto p-6 space-y-5">
               {/* AI Title */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
+                <label htmlFor="ai-title-input" className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
                   <Pencil className="w-4 h-4 text-purple-500" />
-                  Tiêu đề
+                  {t('postPropertyExtra.ai.previewTitleLabel')}
                 </label>
                 <input
+                  id="ai-title-input"
                   type="text"
                   value={aiTitle}
                   onChange={(e) => setAiTitle(e.target.value)}
@@ -1152,11 +1164,12 @@ const PostPropertyPage: React.FC = () => {
 
               {/* AI Description */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
+                <label htmlFor="ai-description-input" className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
                   <FileText className="w-4 h-4 text-purple-500" />
-                  Mô tả chi tiết
+                  {t('postPropertyExtra.ai.previewDescLabel')}
                 </label>
                 <textarea
+                  id="ai-description-input"
                   value={aiDescription}
                   onChange={(e) => setAiDescription(e.target.value)}
                   rows={12}
@@ -1168,12 +1181,12 @@ const PostPropertyPage: React.FC = () => {
               {/* SEO Keywords */}
               {aiKeywords.length > 0 && (
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    🔍 Từ khóa SEO gợi ý
-                  </label>
+                  <p className="block text-sm font-semibold text-gray-700 mb-2">
+                    {t('postPropertyExtra.ai.seoKeywords')}
+                  </p>
                   <div className="flex flex-wrap gap-2">
-                    {aiKeywords.map((kw, i) => (
-                      <span key={i} className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200">
+                    {aiKeywords.map((kw) => (
+                      <span key={`keyword-${kw}`} className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200">
                         {kw}
                       </span>
                     ))}
@@ -1193,21 +1206,21 @@ const PostPropertyPage: React.FC = () => {
                 className="flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-xl text-gray-700 hover:bg-white transition-colors text-sm font-medium"
               >
                 <RotateCcw className="w-4 h-4" />
-                Tạo lại
+                {t('postPropertyExtra.ai.regenerateBtn')}
               </button>
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setAiPreviewOpen(false)}
                   className="px-5 py-2.5 border border-gray-300 rounded-xl text-gray-600 hover:bg-white transition-colors text-sm"
                 >
-                  Huỷ
+                  {t('postPropertyExtra.ai.cancelBtn')}
                 </button>
                 <button
                   onClick={handleApplyAIContent}
                   className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-xl hover:from-violet-700 hover:to-purple-700 transition-all shadow-lg shadow-purple-200 text-sm font-semibold"
                 >
                   <Check className="w-4 h-4" />
-                  Áp dụng nội dung AI
+                  {t('postPropertyExtra.ai.applyBtn')}
                 </button>
               </div>
             </div>
@@ -1219,11 +1232,11 @@ const PostPropertyPage: React.FC = () => {
         
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Đăng Tin <span className="text-red-600">Bất Động Sản</span>
+            <h1 className="text-3xl font-semibold text-gray-900 mb-2">
+              {t('postPropertyExtra.header.title1')} <span className="text-red-600">{t('postPropertyExtra.header.title2')}</span>
             </h1>
             <p className="text-gray-600">
-              Đăng tin miễn phí, tiếp cận hàng nghìn khách hàng tiềm năng
+              {t('postPropertyExtra.header.desc')}
             </p>
           </div>
 
@@ -1244,7 +1257,7 @@ const PostPropertyPage: React.FC = () => {
               disabled={currentStep === 1}
               className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Quay lại
+              {t('postPropertyExtra.nav.back')}
             </button>
 
             <div className="space-x-4">
@@ -1254,7 +1267,7 @@ const PostPropertyPage: React.FC = () => {
                   disabled={!validateStep(currentStep)}
                   className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Tiếp tục
+                  {t('postPropertyExtra.nav.next')}
                 </button>
               ) : (
                 <button
@@ -1274,5 +1287,7 @@ const PostPropertyPage: React.FC = () => {
 };
 
 export default PostPropertyPage;
+
+
 
 

@@ -34,7 +34,7 @@ const Skeleton: React.FC<SkeletonProps> = ({
     <div className={`space-y-2.5 ${className}`}>
       {Array.from({ length: lines }).map((_, i) => (
         <div
-          key={i}
+          key={`skel-line-${i}`}
           className={`h-4 rounded-md animate-shimmer ${
             i === lines - 1 && lines > 1 ? 'w-3/4' : 'w-full'
           }`}
@@ -84,7 +84,7 @@ export const SkeletonList: React.FC<{
   return (
     <div className={`grid ${gridClass[columns]} gap-6`}>
       {Array.from({ length: count }).map((_, i) => (
-        <SkeletonCard key={i} />
+        <SkeletonCard key={`skel-card-${i}`} />
       ))}
     </div>
   );

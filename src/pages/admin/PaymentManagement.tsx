@@ -7,6 +7,12 @@ import {
 import { paymentAPI } from '../../api/payment';
 import toast from '../../utils/toast';
 
+const priceFormatter = new Intl.NumberFormat('vi-VN', {
+  style: 'currency',
+  currency: 'VND',
+  maximumFractionDigits: 0
+});
+
 const PaymentManagement: React.FC = () => {
   const { t } = useTranslation();
   const [payments, setPayments] = useState<any[]>([]);
@@ -32,6 +38,7 @@ const PaymentManagement: React.FC = () => {
     let alive = true;
     (async () => {
       try {
+        if (!alive) return;
         const [revenueRaw, completed, pending, failed, totalCount] = await Promise.all([
           paymentAPI.getTotalRevenue().catch(() => 0),
           paymentAPI.getPaymentsByStatus('COMPLETED', 0, 1).then((p: any) => p.totalElements ?? 0).catch(() => 0),
@@ -90,10 +97,7 @@ const PaymentManagement: React.FC = () => {
     return badges[status] || badges.PENDING;
   };
 
-  const formatVnd = (amount: number) =>
-    new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(
-      amount || 0
-    );
+  const formatVnd = (amount: number) => priceFormatter.format(amount);
 
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString('en-US', { 
@@ -110,7 +114,7 @@ const PaymentManagement: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('admin.menu.payments')}</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">{t('admin.menu.payments')}</h1>
           <p className="text-sm text-gray-500 mt-1">Manage payment transactions</p>
         </div>
         <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">

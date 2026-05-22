@@ -146,7 +146,7 @@ const PropertyReviewSection: React.FC<Props> = ({ propertyId }) => {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
-      <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+      <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
         <Star className="w-6 h-6 text-yellow-500" />
         Đánh giá & Nhận xét
       </h2>
@@ -207,22 +207,22 @@ const PropertyReviewSection: React.FC<Props> = ({ propertyId }) => {
             
             {/* Overall Rating */}
             <div>
-              <label className="text-sm text-gray-600 block mb-1">Đánh giá tổng thể *</label>
+              <p className="text-sm text-gray-600 block mb-1">Đánh giá tổng thể *</p>
               <StarRating value={formData.rating} onChange={(v) => setFormData(p => ({ ...p, rating: v }))} size="lg" />
             </div>
 
             {/* Sub ratings row */}
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="text-xs text-gray-500">Vị trí</label>
+                <p className="text-xs text-gray-500">Vị trí</p>
                 <StarRating value={formData.locationRating || 0} onChange={(v) => setFormData(p => ({ ...p, locationRating: v }))} size="sm" />
               </div>
               <div>
-                <label className="text-xs text-gray-500">Giá trị</label>
+                <p className="text-xs text-gray-500">Giá trị</p>
                 <StarRating value={formData.valueRating || 0} onChange={(v) => setFormData(p => ({ ...p, valueRating: v }))} size="sm" />
               </div>
               <div>
-                <label className="text-xs text-gray-500">Tình trạng</label>
+                <p className="text-xs text-gray-500">Tình trạng</p>
                 <StarRating value={formData.conditionRating || 0} onChange={(v) => setFormData(p => ({ ...p, conditionRating: v }))} size="sm" />
               </div>
             </div>
@@ -341,7 +341,7 @@ const PropertyReviewSection: React.FC<Props> = ({ propertyId }) => {
       {page + 1 < totalPages && (
         <button
           onClick={() => setPage(p => p + 1)}
-          className="w-full mt-4 py-2.5 text-sm text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors flex items-center justify-center gap-1 font-medium"
+          className="w-full mt-4 py-2.5 text-sm text-[#4b5563] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors flex items-center justify-center gap-1 font-medium"
         >
           <ChevronDown className="w-4 h-4" />
           Xem thêm đánh giá

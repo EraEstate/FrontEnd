@@ -264,8 +264,8 @@ const EditPropertyPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 mt-10 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Không tìm thấy bất động sản</h2>
-          <p className="text-gray-600">Bất động sản này không tồn tại hoặc đã bị xóa.</p>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">{t('editProperty.notFound')}</h2>
+          <p className="text-gray-600">{t('editProperty.notFoundDesc')}</p>
         </div>
       </div>
     );
@@ -274,104 +274,109 @@ const EditPropertyPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 mt-10">
       <div className="w-full max-w-4xl mx-auto px-6 lg:px-12 py-8">
-        <div className="bg-white rounded-lg shadow-sm p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">Chỉnh sửa bất động sản</h1>
+        <h1 className="text-3xl font-semibold text-gray-900 mb-8">{t('editProperty.title')}</h1>
 
-          <form onSubmit={handleSubmit} className="space-y-8">
+        <form onSubmit={handleSubmit} className="space-y-8">
             {/* Basic Information */}
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-gray-900">Thông tin cơ bản</h2>
+              <h2 className="text-xl font-semibold text-gray-900">{t('editProperty.basicInfo')}</h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Tiêu đề *
+                  <label htmlFor="property-title" className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('editProperty.propertyTitle')}
                   </label>
                   <input
                     type="text"
+                    id="property-title"
                     name="title"
                     value={formData.title}
                     onChange={handleInputChange}
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    placeholder="Nhập tiêu đề bất động sản"
+                    placeholder={t('editProperty.titlePlaceholder')}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Loại bất động sản *
+                  <label htmlFor="property-type" className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('editProperty.propertyType')}
                   </label>
                   <select
+                    id="property-type"
                     name="propertyType"
                     value={formData.propertyType}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   >
-                    <option value="APARTMENT">Căn hộ</option>
-                    <option value="HOUSE">Nhà riêng</option>
-                    <option value="VILLA">Biệt thự</option>
-                    <option value="OFFICE">Văn phòng</option>
-                    <option value="LAND">Đất nền</option>
-                    <option value="OTHER">Khác</option>
+                    <option value="APARTMENT">{t('postProperty.apartment')}</option>
+                    <option value="HOUSE">{t('postProperty.house')}</option>
+                    <option value="VILLA">{t('postProperty.villa')}</option>
+                    <option value="OFFICE">{t('postProperty.office')}</option>
+                    <option value="LAND">{t('postProperty.land')}</option>
+                    <option value="OTHER">{t('common.unknown')}</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Loại giao dịch *
+                  <label htmlFor="listing-type" className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('editProperty.transactionType')}
                   </label>
                   <select
+                    id="listing-type"
                     name="listingType"
                     value={formData.listingType}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   >
-                    <option value="SALE">Bán</option>
-                    <option value="RENT">Cho thuê</option>
+                    <option value="SALE">{t('editProperty.sale')}</option>
+                    <option value="RENT">{t('editProperty.rent')}</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="property-price" className="block text-sm font-medium text-gray-700 mb-2">
                     <DollarSign className="h-4 w-4 inline mr-1" />
-                    Giá (VNĐ) *
+                    {t('editProperty.price')}
                   </label>
                   <input
                     type="number"
+                    id="property-price"
                     name="price"
                     value={formData.price}
                     onChange={handleInputChange}
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    placeholder="Nhập giá"
+                    placeholder={t('editProperty.pricePlaceholder')}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="property-area" className="block text-sm font-medium text-gray-700 mb-2">
                     <Ruler className="h-4 w-4 inline mr-1" />
-                    Diện tích (m²) *
+                    {t('editProperty.area')}
                   </label>
                   <input
                     type="number"
+                    id="property-area"
                     name="area"
                     value={formData.area}
                     onChange={handleInputChange}
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    placeholder="Nhập diện tích"
+                    placeholder={t('editProperty.areaPlaceholder')}
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="property-bedrooms" className="block text-sm font-medium text-gray-700 mb-2">
                       <Bed className="h-4 w-4 inline mr-1" />
                       Phòng ngủ
                     </label>
                     <input
                       type="number"
+                      id="property-bedrooms"
                       name="bedrooms"
                       value={formData.bedrooms}
                       onChange={handleInputChange}
@@ -381,12 +386,13 @@ const EditPropertyPage: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="property-bathrooms" className="block text-sm font-medium text-gray-700 mb-2">
                       <Bath className="h-4 w-4 inline mr-1" />
                       Phòng tắm
                     </label>
                     <input
                       type="number"
+                      id="property-bathrooms"
                       name="bathrooms"
                       value={formData.bathrooms}
                       onChange={handleInputChange}
@@ -398,10 +404,11 @@ const EditPropertyPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Mô tả
+                <label htmlFor="property-description" className="block text-sm font-medium text-gray-700 mb-2">
+                  {t('editProperty.description')}
                 </label>
                 <textarea
+                  id="property-description"
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
@@ -414,19 +421,20 @@ const EditPropertyPage: React.FC = () => {
 
             {/* Location Information */}
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-gray-900">Địa chỉ</h2>
+              <h2 className="text-xl font-semibold text-gray-900">{t('editProperty.location')}</h2>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Tỉnh/Thành phố *
+                  <label htmlFor="property-province" className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('editProperty.province')}
                   </label>
                   <select
+                    id="property-province"
                     value={selectedProvince}
                     onChange={(e) => handleProvinceChange(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   >
-                    <option value="">Chọn tỉnh/thành phố</option>
+                    <option value="">{t('editProperty.selectProvince')}</option>
                     {provinces?.map((province: any) => (
                       <option key={province.id} value={province.id}>
                         {province.name}
@@ -436,16 +444,17 @@ const EditPropertyPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Quận/Huyện
+                  <label htmlFor="property-district" className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('editProperty.district')}
                   </label>
                   <select
+                    id="property-district"
                     value={selectedDistrict}
                     onChange={(e) => handleDistrictChange(e.target.value)}
                     disabled={!selectedProvince}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:bg-gray-100"
                   >
-                    <option value="">Chọn quận/huyện</option>
+                    <option value="">{t('editProperty.selectDistrict')}</option>
                     {districts?.map((district: any) => (
                       <option key={district.id} value={district.id}>
                         {district.name}
@@ -455,16 +464,17 @@ const EditPropertyPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Phường/Xã
+                  <label htmlFor="property-ward" className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('editProperty.ward')}
                   </label>
                   <select
+                    id="property-ward"
                     value={selectedWard}
                     onChange={(e) => handleWardChange(e.target.value)}
                     disabled={!selectedDistrict}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:bg-gray-100"
                   >
-                    <option value="">Chọn phường/xã</option>
+                    <option value="">{t('editProperty.selectWard')}</option>
                     {wards?.map((ward: any) => (
                       <option key={ward.id} value={ward.id}>
                         {ward.name}
@@ -475,28 +485,30 @@ const EditPropertyPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="property-address" className="block text-sm font-medium text-gray-700 mb-2">
                   <MapPin className="h-4 w-4 inline mr-1" />
-                  Địa chỉ cụ thể *
+                  {t('editProperty.specificAddress')}
                 </label>
                 <input
                   type="text"
+                  id="property-address"
                   name="address"
                   value={formData.address}
                   onChange={handleInputChange}
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  placeholder="Nhập địa chỉ cụ thể"
+                  placeholder={t('editProperty.addressPlaceholder')}
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="property-latitude" className="block text-sm font-medium text-gray-700 mb-2">
                     Vĩ độ
                   </label>
                   <input
                     type="number"
+                    id="property-latitude"
                     name="latitude"
                     value={formData.latitude}
                     onChange={handleInputChange}
@@ -507,11 +519,12 @@ const EditPropertyPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="property-longitude" className="block text-sm font-medium text-gray-700 mb-2">
                     Kinh độ
                   </label>
                   <input
                     type="number"
+                    id="property-longitude"
                     name="longitude"
                     value={formData.longitude}
                     onChange={handleInputChange}
@@ -525,14 +538,14 @@ const EditPropertyPage: React.FC = () => {
 
             {/* Images */}
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-gray-900">Hình ảnh</h2>
+              <h2 className="text-xl font-semibold text-gray-900">{t('editProperty.images')}</h2>
               <p className="text-sm text-gray-600">
-                Tải lên tối đa 10 hình ảnh. Hình ảnh đầu tiên sẽ là hình đại diện.
+                {t('editProperty.imageNote')}
               </p>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {imagePreviews.map((preview, index) => (
-                  <div key={index} className="relative group">
+                  <div key={`${preview.isNew ? "new" : "old"}-${preview.url}`} className="relative group">
                     <img
                       src={preview.isNew ? preview.url : getImageUrl(preview.url) || getImagePlaceholder(200, 150)}
                       alt={`Property ${index + 1}`}
@@ -544,7 +557,7 @@ const EditPropertyPage: React.FC = () => {
                     />
                     {index === 0 && (
                       <div className="absolute top-2 left-2 bg-red-600 text-white px-2 py-1 rounded text-xs font-medium">
-                        Ảnh đại diện
+                        {t('editProperty.coverImage')}
                       </div>
                     )}
                     <button
@@ -562,7 +575,7 @@ const EditPropertyPage: React.FC = () => {
                   <label className="w-full h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-red-500 hover:bg-red-50 transition-colors">
                     <div className="text-center">
                       <Camera className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                      <span className="text-sm text-gray-600">Thêm ảnh</span>
+                      <span className="text-sm text-gray-600">{t('editProperty.addPhoto')}</span>
                     </div>
                     <input
                       type="file"
@@ -579,9 +592,9 @@ const EditPropertyPage: React.FC = () => {
               {imagePreviews.length === 0 && (
                 <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
                   <Camera className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 mb-4">Chưa có hình ảnh nào</p>
+                  <p className="text-gray-600 mb-4">{t('editProperty.noImages')}</p>
                   <label className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 cursor-pointer inline-block">
-                    Chọn ảnh từ máy tính
+                    {t('editProperty.selectFromComputer')}
                     <input
                       type="file"
                       multiple
@@ -596,27 +609,27 @@ const EditPropertyPage: React.FC = () => {
             </div>
 
             {/* Submit Button */}
-            <div className="flex justify-end space-x-4">
+            <div className="flex justify-end gap-x-4">
               <button
                 type="button"
                 onClick={() => navigate(-1)}
                 className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
               >
-                Hủy
+                {t('editProperty.cancel')}
               </button>
               <button
                 type="submit"
                 disabled={updating || uploadingImages}
                 className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {uploadingImages ? 'Đang tải ảnh...' : updating ? 'Đang cập nhật...' : 'Cập nhật bất động sản'}
+                {uploadingImages ? t('editProperty.uploading') : updating ? t('editProperty.updating') : t('editProperty.updateButton')}
               </button>
             </div>
           </form>
         </div>
       </div>
-    </div>
   );
 };
 
 export default EditPropertyPage;
+

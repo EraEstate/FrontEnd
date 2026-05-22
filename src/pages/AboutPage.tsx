@@ -138,7 +138,7 @@ const AboutPage: React.FC = () => {
       <div className="bg-gradient-to-r from-orange-600 to-orange-700 text-white">
         <div className="container mx-auto px-4 py-20">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">
+            <h1 className="text-5xl md:text-6xl font-semibold mb-6">
               {t('about.title')}
             </h1>
             <p className="text-xl md:text-2xl opacity-90 mb-8">
@@ -146,7 +146,7 @@ const AboutPage: React.FC = () => {
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <div className="bg-white/20 backdrop-blur-sm rounded-lg px-6 py-3">
-                <div className="text-2xl font-bold">6+</div>
+                <div className="text-2xl font-semibold">6+</div>
                 <div className="text-sm opacity-90">{t('about.yearsActive')}</div>
               </div>
               <div className="bg-white/20 backdrop-blur-sm rounded-lg px-6 py-3">
@@ -165,10 +165,10 @@ const AboutPage: React.FC = () => {
       <div className="container mx-auto px-4 py-16">
         {/* Stats Section */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-20">
-          {stats.map((stat, index) => {
+          {stats.map((stat) => {
             const Icon = stat.icon;
             return (
-              <div key={index} className="text-center">
+              <div key={stat.label} className="text-center">
                 <div className="bg-white rounded-lg shadow-sm p-8 hover:shadow-md transition-shadow">
                   <Icon className={`w-12 h-12 mx-auto mb-4 ${stat.color}`} />
                   <div className="text-3xl font-bold text-gray-900 mb-2">{stat.value}</div>
@@ -186,7 +186,7 @@ const AboutPage: React.FC = () => {
               <div className="bg-orange-100 p-3 rounded-lg mr-4">
                 <Target className="w-8 h-8 text-orange-600" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900">{t('about.mission')}</h2>
+              <h2 className="text-2xl font-semibold text-gray-900">{t('about.mission')}</h2>
             </div>
             <p className="text-gray-700 leading-relaxed">
               {t('about.missionDesc')}
@@ -198,7 +198,7 @@ const AboutPage: React.FC = () => {
               <div className="bg-blue-100 p-3 rounded-lg mr-4">
                 <TrendingUp className="w-8 h-8 text-blue-600" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900">{t('about.vision')}</h2>
+              <h2 className="text-2xl font-semibold text-gray-900">{t('about.vision')}</h2>
             </div>
             <p className="text-gray-700 leading-relaxed">
               {t('about.visionDesc')}
@@ -208,14 +208,14 @@ const AboutPage: React.FC = () => {
 
         {/* Core Values */}
         <div className="mb-20">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+          <h2 className="text-3xl font-semibold text-center text-gray-900 mb-12">
             {t('about.values')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {values.map((value, index) => {
+            {values.map((value) => {
               const Icon = value.icon;
               return (
-                <div key={index} className="bg-white rounded-lg shadow-sm p-6 text-center hover:shadow-md transition-shadow">
+                <div key={value.title} className="bg-white rounded-lg shadow-sm p-6 text-center hover:shadow-md transition-shadow">
                   <div className={`inline-flex p-4 rounded-full ${value.color} mb-4`}>
                     <Icon className="w-8 h-8" />
                   </div>
@@ -229,13 +229,13 @@ const AboutPage: React.FC = () => {
 
         {/* Timeline */}
         <div className="mb-20">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+          <h2 className="text-3xl font-semibold text-center text-gray-900 mb-12">
             {t('about.timeline')}
           </h2>
           <div className="relative">
             <div className="absolute left-1/2 transform -translate-x-px h-full w-0.5 bg-orange-200"></div>
             {milestones.map((milestone, index) => (
-              <div key={index} className={`relative flex items-center ${
+              <div key={`${milestone.year}-${milestone.title}`} className={`relative flex items-center ${
                 index % 2 === 0 ? 'justify-start' : 'justify-end'
               } mb-8`}>
                 <div className={`bg-white rounded-lg shadow-sm p-6 max-w-md ${
@@ -257,12 +257,12 @@ const AboutPage: React.FC = () => {
 
         {/* Team */}
         <div className="mb-20">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+          <h2 className="text-3xl font-semibold text-center text-gray-900 mb-12">
             {t('about.team')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {team.map((member, index) => (
-              <div key={index} className="bg-white rounded-lg shadow-sm p-6 text-center hover:shadow-md transition-shadow">
+            {team.map((member) => (
+              <div key={member.name} className="bg-white rounded-lg shadow-sm p-6 text-center hover:shadow-md transition-shadow">
                 <img
                   src={member.image}
                   alt={member.name}
@@ -278,16 +278,16 @@ const AboutPage: React.FC = () => {
 
         {/* Testimonials */}
         <div className="mb-20">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+          <h2 className="text-3xl font-semibold text-center text-gray-900 mb-12">
             {t('about.testimonials')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-white rounded-lg shadow-sm p-6 relative">
+            {testimonials.map((testimonial) => (
+              <div key={testimonial.name} className="bg-white rounded-lg shadow-sm p-6 relative">
                 <Quote className="w-8 h-8 text-orange-200 absolute top-4 right-4" />
                 <div className="flex items-center mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
+                  {Array.from({ length: testimonial.rating }, (_, starIndex) => starIndex + 1).map((star) => (
+                    <Star key={`${testimonial.name}-star-${star}`} className="w-4 h-4 text-yellow-400 fill-current" />
                   ))}
                 </div>
                 <p className="text-gray-700 mb-4 italic">"{testimonial.content}"</p>
@@ -307,7 +307,7 @@ const AboutPage: React.FC = () => {
 
         {/* Awards & Recognition */}
         <div className="bg-white rounded-lg shadow-sm p-8 mb-20">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+          <h2 className="text-3xl font-semibold text-center text-gray-900 mb-12">
             {t('about.awards')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -337,7 +337,7 @@ const AboutPage: React.FC = () => {
 
         {/* CTA Section */}
         <div className="bg-gradient-to-r from-orange-600 to-orange-700 rounded-lg text-white p-12 text-center">
-          <h2 className="text-3xl font-bold mb-4">
+          <h2 className="text-3xl font-semibold mb-4">
             {t('about.joinUs')}
           </h2>
           <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">

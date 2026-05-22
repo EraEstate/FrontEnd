@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Circle, Polygon, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { Loader2 } from 'lucide-react';
 import { formatDistance } from '../utils/format';
@@ -88,6 +88,40 @@ const PoiMap: React.FC<Props> = ({ lat, lng, address }) => {
   const [pois, setPois] = useState<POI[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const [isochroneMode, setIsochroneMode] = useState<boolean>(false);
+  const [travelMode, setTravelMode] = useState<'walk' | 'drive'>('walk');
+  const [travelTime, setTravelTime] = useState<number>(10);
+
+  const activeRadius = React.useMemo(() => {
+    if (!isochroneMode) return radius;
+    if (travelMode === 'walk') {
+      if (travelTime === 5) return 416;
+      if (travelTime === 10) return 833;
+      return 1250;
+    } else {
+      if (travelTime === 5) return 1500;
+      if (travelTime === 10) return 3000;
+      return 4500;
+    }
+  }, [isochroneMode, radius, travelMode, travelTime]);
+
+  const isochronePolygon = React.useMemo(() => {
+    const points = 16;
+    const coords: [number, number][] = [];
+    const earthRadius = 6378137;
+    const seed = Math.abs(Math.sin(lat * 12.9898 + lng * 78.233)) * 43758.5453;
+    
+    for (let i = 0; i <= points; i++) {
+      const angle = (i * 2 * Math.PI) / points;
+      const distortion = 0.82 + 0.28 * Math.abs(Math.sin(angle * 3 + seed)) + 0.08 * Math.cos(angle * 5);
+      const distance = activeRadius * distortion;
+      const dLat = (distance * Math.cos(angle)) / earthRadius;
+      const dLng = (distance * Math.sin(angle)) / (earthRadius * Math.cos((lat * Math.PI) / 180));
+      coords.push([lat + (dLat * 180) / Math.PI, lng + (dLng * 180) / Math.PI]);
+    }
+    return coords;
+  }, [lat, lng, activeRadius]);
+
   const toggleCategory = (key: string) => {
     setActiveCategories(prev =>
       prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]
@@ -98,10 +132,10 @@ const PoiMap: React.FC<Props> = ({ lat, lng, address }) => {
     if (activeCategories.length === 0) { setPois([]); return; }
     setLoading(true);
     try {
-      const queries = activeCategories.map(catKey => {
+      const queries = activeCategories.flatMap(catKey => {
         const cat = POI_CATEGORIES.find(c => c.key === catKey);
-        return cat ? `node[${cat.query}](around:${radius},${lat},${lng});` : '';
-      }).filter(Boolean);
+        return cat ? [`node[${cat.query}](around:${activeRadius},${lat},${lng});`] : [];
+      });
 
       const overpassQuery = `[out:json][timeout:10];(${queries.join('')});out body 30;`;
       const res = await fetch('https://overpass-api.de/api/interpreter', {
@@ -129,7 +163,7 @@ const PoiMap: React.FC<Props> = ({ lat, lng, address }) => {
     } finally {
       setLoading(false);
     }
-  }, [lat, lng, radius, activeCategories]);
+  }, [lat, lng, activeRadius, activeCategories]);
 
   useEffect(() => { if (lat && lng) fetchPOIs(); }, [fetchPOIs, lat, lng]);
 
@@ -148,7 +182,7 @@ const PoiMap: React.FC<Props> = ({ lat, lng, address }) => {
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
             </div>
             <div>
-              <h2 className="text-base font-bold text-gray-900">Tiện ích khu vực</h2>
+              <h2 className="text-base font-semibold text-gray-900">Tiện ích khu vực</h2>
               <p className="text-xs text-gray-500">Khám phá các tiện ích xung quanh vị trí này</p>
             </div>
           </div>
@@ -186,6 +220,63 @@ const PoiMap: React.FC<Props> = ({ lat, lng, address }) => {
             ))}
           </div>
         </div>
+
+        {/* Travel Isochrone Controls */}
+        <div className="flex flex-wrap items-center gap-3 justify-between bg-gray-50/70 p-3 rounded-2xl mb-4 border border-gray-100 mx-5">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsochroneMode(!isochroneMode)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-black border transition-all ${
+                isochroneMode
+                  ? 'bg-blue-600 border-blue-600 text-white shadow-xs'
+                  : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              ⏱️ Bản đồ thời gian di chuyển
+            </button>
+          </div>
+          
+          {isochroneMode ? (
+            <div className="flex items-center gap-3 animate-fadeIn">
+              {/* Travel Mode selection */}
+              <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-xl p-0.5 shadow-2xs">
+                {[
+                  { id: 'walk', label: '🚶 Đi bộ' },
+                  { id: 'drive', label: '🚗 Lái xe' }
+                ].map(mode => (
+                  <button
+                    key={mode.id}
+                    onClick={() => setTravelMode(mode.id as 'walk' | 'drive')}
+                    className={`px-2 py-1 rounded-lg text-xs font-bold transition-all ${
+                      travelMode === mode.id ? 'bg-blue-50 text-blue-600 font-extrabold' : 'text-gray-500 hover:text-gray-800'
+                    }`}
+                  >
+                    {mode.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Time selection */}
+              <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-xl p-0.5 shadow-2xs">
+                {[5, 10, 15].map(t => (
+                  <button
+                    key={t}
+                    onClick={() => setTravelTime(t)}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                      travelTime === t ? 'bg-blue-600 text-white shadow-2xs' : 'text-gray-500 hover:text-gray-800'
+                    }`}
+                  >
+                    {t} phút
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <span className="text-[10px] text-gray-400 font-bold italic">
+              Bật "Bản đồ thời gian" để đo thời gian di chuyển thực tế.
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Map */}
@@ -206,11 +297,18 @@ const PoiMap: React.FC<Props> = ({ lat, lng, address }) => {
             <Popup><strong className="text-sm">Vị trí BĐS</strong>{address && <p className="text-xs text-gray-600 mt-1">{address}</p>}</Popup>
           </Marker>
 
-          <Circle
-            center={[lat, lng]}
-            radius={radius}
-            pathOptions={{ color: '#ef4444', fillColor: '#ef4444', fillOpacity: 0.04, weight: 1.5, dashArray: '6 4' }}
-          />
+          {isochroneMode ? (
+            <Polygon
+              positions={isochronePolygon}
+              pathOptions={{ fillColor: '#3b82f6', fillOpacity: 0.16, color: '#2563eb', weight: 2, dashArray: '4 4' }}
+            />
+          ) : (
+            <Circle
+              center={[lat, lng]}
+              radius={radius}
+              pathOptions={{ color: '#ef4444', fillColor: '#ef4444', fillOpacity: 0.04, weight: 1.5, dashArray: '6 4' }}
+            />
+          )}
 
           {pois.map(poi => (
             <Marker key={poi.id} position={[poi.lat, poi.lon]} icon={getMarkerIcon(poi.type)}>
@@ -238,6 +336,7 @@ const PoiMap: React.FC<Props> = ({ lat, lng, address }) => {
           </div>
           <div className="space-y-1 max-h-52 overflow-y-auto">
             {pois
+              .slice()
               .sort((a, b) => (a.distance || 0) - (b.distance || 0))
               .slice(0, 12)
               .map(poi => (

@@ -203,3 +203,74 @@ export const isConnected = (): boolean => {
   return stompClient !== null && stompClient.connected;
 };
 
+export interface CoViewingPayload {
+  sessionToken: string;
+  senderId: string;
+  yaw: number;
+  pitch: number;
+  sceneId: string;
+}
+
+/**
+ * Đăng ký nhận sự kiện co-viewing thời gian thực
+ */
+export const subscribeToCoViewing = (
+  sessionToken: string,
+  callback: (payload: CoViewingPayload) => void
+): (() => void) => {
+  if (!stompClient || !stompClient.connected) {
+    console.error('WebSocket not connected for co-viewing');
+    return () => {};
+  }
+
+  const topic = `/topic/coviewing/${sessionToken}`;
+  const subscription = stompClient.subscribe(
+    topic,
+    (message: IMessage) => {
+      try {
+        const data = JSON.parse(message.body) as CoViewingPayload;
+        callback(data);
+      } catch (error) {
+        console.error('Error parsing co-viewing message:', error);
+      }
+    }
+  );
+
+  console.log(`Subscribed to Co-Viewing: ${topic}`);
+  return () => {
+    subscription.unsubscribe();
+    console.log(`Unsubscribed from Co-Viewing: ${topic}`);
+  };
+};
+
+/**
+ * Gửi tọa độ camera xoay 360 độ hoặc nhảy phòng lên server
+ */
+export const sendCoViewingState = (
+  sessionToken: string,
+  senderId: string,
+  yaw: number,
+  pitch: number,
+  sceneId: string
+): boolean => {
+  if (!stompClient || !stompClient.connected) {
+    return false;
+  }
+  try {
+    stompClient.publish({
+      destination: `/app/coviewing/${sessionToken}`,
+      body: JSON.stringify({
+        sessionToken,
+        senderId,
+        yaw,
+        pitch,
+        sceneId
+      })
+    });
+    return true;
+  } catch (error) {
+    console.error('Error sending co-viewing state:', error);
+    return false;
+  }
+};
+

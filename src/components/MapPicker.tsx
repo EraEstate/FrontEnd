@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { X, MapPin, Search, Building2, Home, Store } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface MapPickerProps {
   isOpen: boolean;
@@ -21,6 +22,7 @@ const MapPicker: React.FC<MapPickerProps> = ({ isOpen, onClose, onSelectLocation
   const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number; address: string } | null>(null);
   const [selectedProvince, setSelectedProvince] = useState<string>('');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('');
+  const { t } = useTranslation();
 
   // 63 tỉnh thành Việt Nam + Quận/Huyện + Xã/Phường + Cửa hàng
   const vietnamLocations: Location[] = [
@@ -209,17 +211,17 @@ const MapPicker: React.FC<MapPickerProps> = ({ isOpen, onClose, onSelectLocation
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm pt-20">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-950/60 backdrop-blur-sm pt-20">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl h-[85vh] flex flex-col mx-4 mt-4">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center gap-x-3">
             <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
               <MapPin className="h-5 w-5 text-red-600" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-gray-900">🇻🇳 Địa Điểm Việt Nam</h2>
-              <p className="text-sm text-gray-500">63 tỉnh thành + Chi nhánh bất động sản</p>
+              <h2 className="text-xl font-semibold text-gray-900">🇻🇳 {t('mapPicker.title')}</h2>
+              <p className="text-sm text-gray-500">{t('mapPicker.subtitle')}</p>
             </div>
           </div>
           <button
@@ -240,7 +242,7 @@ const MapPicker: React.FC<MapPickerProps> = ({ isOpen, onClose, onSelectLocation
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Tìm tỉnh thành, quận/huyện, xã/phường, cửa hàng..."
+                  placeholder={t('mapPicker.searchPlaceholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 text-base"
@@ -252,7 +254,7 @@ const MapPicker: React.FC<MapPickerProps> = ({ isOpen, onClose, onSelectLocation
             <div className="flex-1 overflow-y-auto p-6">
               {!searchQuery && !selectedProvince && (
                 <>
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">🏙️ 63 Tỉnh Thành Việt Nam</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">🏙️ {t('mapPicker.provincesList')}</h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {provinces.map((province) => (
                   <button
@@ -264,7 +266,7 @@ const MapPicker: React.FC<MapPickerProps> = ({ isOpen, onClose, onSelectLocation
                             : 'border-gray-200 hover:border-red-300 hover:bg-gray-50'
                         }`}
                       >
-                        <div className="flex items-center space-x-3">
+                        <div className="flex items-center gap-x-3">
                           <div className={`p-2 rounded-lg ${
                             selectedLocation?.address.includes(province.name)
                               ? 'bg-red-500 text-white'
@@ -283,12 +285,12 @@ const MapPicker: React.FC<MapPickerProps> = ({ isOpen, onClose, onSelectLocation
               {!searchQuery && selectedProvince && !selectedDistrict && (
                 <>
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-bold text-gray-900">📍 {selectedProvince}</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">📍 {selectedProvince}</h3>
                     <button
                       onClick={() => setSelectedProvince('')}
                       className="text-sm text-red-600 hover:text-red-700 font-medium"
                     >
-                      ← Quay lại
+                      ← {t('common.back')}
                     </button>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
@@ -302,7 +304,7 @@ const MapPicker: React.FC<MapPickerProps> = ({ isOpen, onClose, onSelectLocation
                             : 'border-gray-200 hover:border-red-300 hover:bg-gray-50'
                         }`}
                       >
-                        <div className="flex items-center space-x-3">
+                        <div className="flex items-center gap-x-3">
                           <div className={`p-2 rounded-lg ${
                             selectedLocation?.address.includes(district.name)
                               ? 'bg-red-500 text-white'
@@ -322,18 +324,18 @@ const MapPicker: React.FC<MapPickerProps> = ({ isOpen, onClose, onSelectLocation
               {!searchQuery && selectedDistrict && (
                 <>
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-bold text-gray-900">🏘️ {selectedDistrict}</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">🏘️ {selectedDistrict}</h3>
               <button
                       onClick={() => setSelectedDistrict('')}
                       className="text-sm text-red-600 hover:text-red-700 font-medium"
               >
-                      ← Quay lại
+                      ← {t('common.back')}
               </button>
             </div>
 
                   {/* Wards */}
                   <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-gray-700 mb-3">📍 Xã/Phường</h4>
+                    <h4 className="text-sm font-semibold text-gray-700 mb-3">📍 {t('mapPicker.wards')}</h4>
                     <div className="grid grid-cols-2 gap-2">
                       {getWardsByDistrict(selectedDistrict).map((ward) => (
                   <button
@@ -345,7 +347,7 @@ const MapPicker: React.FC<MapPickerProps> = ({ isOpen, onClose, onSelectLocation
                               : 'border-gray-200 hover:border-red-300 hover:bg-gray-50'
                           }`}
                         >
-                          <div className="flex items-center space-x-2">
+                          <div className="flex items-center gap-x-2">
                             <MapPin className={`h-3.5 w-3.5 ${
                               selectedLocation?.address.includes(ward.name) ? 'text-red-500' : 'text-blue-600'
                             }`} />
@@ -362,7 +364,7 @@ const MapPicker: React.FC<MapPickerProps> = ({ isOpen, onClose, onSelectLocation
                     if (stores.length === 0) return null;
                     return (
                       <div key={ward.name} className="mb-4">
-                        <h4 className="text-sm font-semibold text-gray-700 mb-2">🏪 Cửa hàng - {ward.name}</h4>
+                        <h4 className="text-sm font-semibold text-gray-700 mb-2">🏪 {t('mapPicker.store')} - {ward.name}</h4>
                         <div className="space-y-2">
                           {stores.map((store) => (
                 <button
@@ -374,7 +376,7 @@ const MapPicker: React.FC<MapPickerProps> = ({ isOpen, onClose, onSelectLocation
                                   : 'border-gray-200 hover:border-red-300 hover:bg-gray-50'
                               }`}
                             >
-                              <div className="flex items-center space-x-3">
+                              <div className="flex items-center gap-x-3">
                                 <div className={`p-2 rounded-lg ${
                                   selectedLocation?.address === store.address
                                     ? 'bg-red-500 text-white'
@@ -398,11 +400,11 @@ const MapPicker: React.FC<MapPickerProps> = ({ isOpen, onClose, onSelectLocation
 
               {searchQuery && (
                 <>
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">🔍 Kết quả tìm kiếm</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">🔍 {t('mapPicker.searchResults')}</h3>
                   {filteredLocations.length === 0 ? (
                     <div className="text-center py-12 text-gray-500">
                       <Search className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                      <p>Không tìm thấy kết quả</p>
+                      <p>{t('mapPicker.noResults')}</p>
           </div>
                   ) : (
                     <div className="space-y-2">
@@ -416,7 +418,7 @@ const MapPicker: React.FC<MapPickerProps> = ({ isOpen, onClose, onSelectLocation
                               : 'border-gray-200 hover:border-red-300 hover:bg-gray-50'
                           }`}
                         >
-                          <div className="flex items-center space-x-3">
+                          <div className="flex items-center gap-x-3">
                             <div className={`p-2 rounded-lg ${
                               selectedLocation?.address === (location.address || location.name)
                                 ? 'bg-red-500 text-white'
@@ -447,14 +449,14 @@ const MapPicker: React.FC<MapPickerProps> = ({ isOpen, onClose, onSelectLocation
         {selectedLocation && (
           <div className="p-6 border-t border-gray-200 bg-white flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500 mb-1">📍 Địa điểm đã chọn</p>
+              <p className="text-xs text-gray-500 mb-1">📍 {t('mapPicker.selectedLocation')}</p>
               <p className="font-bold text-gray-900 text-lg">{selectedLocation.address}</p>
             </div>
             <button
               onClick={handleConfirm}
               className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-3 rounded-xl font-bold transition-all duration-200 shadow-lg hover:shadow-xl"
             >
-              Xác Nhận
+              {t('common.confirm')}
             </button>
           </div>
         )}

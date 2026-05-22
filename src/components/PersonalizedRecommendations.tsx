@@ -33,8 +33,9 @@ const PersonalizedRecommendations: React.FC = () => {
     const el = scrollRef.current;
     if (!el) return;
     checkScroll();
-    el.addEventListener('scroll', checkScroll);
-    return () => el.removeEventListener('scroll', checkScroll);
+    const options: AddEventListenerOptions = { passive: true };
+    el.addEventListener('scroll', checkScroll, options);
+    return () => el.removeEventListener('scroll', checkScroll, options);
   }, [properties]);
 
   const scroll = (dir: number) => {
@@ -55,7 +56,7 @@ const PersonalizedRecommendations: React.FC = () => {
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
             </div>
             <div>
-              <h2 className="text-base font-bold text-gray-900">Dành riêng cho bạn</h2>
+              <h2 className="text-base font-semibold text-gray-900">Dành riêng cho bạn</h2>
               <p className="text-xs text-gray-400">Gợi ý dựa trên sở thích và lịch sử tìm kiếm</p>
             </div>
           </div>
@@ -82,8 +83,8 @@ const PersonalizedRecommendations: React.FC = () => {
         {/* Loading Skeleton */}
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-white rounded-xl overflow-hidden border border-gray-100">
+            {[1, 2, 3, 4].map((slot) => (
+              <div key={`rec-skeleton-${slot}`} className="bg-white rounded-xl overflow-hidden border border-gray-100">
                 <div className="h-40 bg-gray-100 animate-pulse" />
                 <div className="p-3.5 space-y-2.5">
                   <div className="h-4 bg-gray-100 rounded animate-pulse w-20" />

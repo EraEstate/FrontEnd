@@ -300,11 +300,12 @@ const AIChatBox: React.FC<AIChatBoxProps> = ({
             <>
               {/* Messages */}
               <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/50">
-                {messages.map((message, index) => {
+                {messages.map((message) => {
                   const isUser = message.role === 'user';
+                  const msgKey = message.id || `msg-${message.role}-${message.timestamp || message.content.substring(0, 20)}`;
                   return (
                     <div
-                      key={index}
+                      key={msgKey}
                       className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}
                     >
                       <div

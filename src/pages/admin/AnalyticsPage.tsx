@@ -379,12 +379,14 @@ const AnalyticsPage: React.FC = () => {
             >
               <div className="flex flex-col gap-3 min-w-[300px]">
                 <div>
-                  <label className={`block text-sm font-medium mb-1 ${
+                  <label htmlFor="analytics-start-date" className={`block text-sm font-medium mb-1 ${
                     theme === 'dark' ? 'text-slate-300' : 'text-gray-700'
                   }`}>
                     Từ ngày
                   </label>
                   <input
+                    id="analytics-start-date"
+
                     type="date"
                     value={customStartDate}
                     onChange={(e) => setCustomStartDate(e.target.value)}
@@ -396,12 +398,14 @@ const AnalyticsPage: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className={`block text-sm font-medium mb-1 ${
+                  <label htmlFor="analytics-end-date" className={`block text-sm font-medium mb-1 ${
                     theme === 'dark' ? 'text-slate-300' : 'text-gray-700'
                   }`}>
                     Đến ngày
                   </label>
                   <input
+                    id="analytics-end-date"
+
                     type="date"
                     value={customEndDate}
                     onChange={(e) => setCustomEndDate(e.target.value)}

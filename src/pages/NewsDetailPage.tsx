@@ -44,8 +44,8 @@ const NewsDetailPage = () => {
           <div className="h-4 bg-gray-300 rounded w-1/4 mb-6"></div>
           <div className="h-64 bg-gray-300 rounded mb-6"></div>
           <div className="space-y-4">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="h-4 bg-gray-300 rounded"></div>
+            {[1, 2, 3, 4, 5].map((slot) => (
+              <div key={`news-skeleton-row-${slot}`} className="h-4 bg-gray-300 rounded"></div>
             ))}
           </div>
         </div>
@@ -61,7 +61,7 @@ const NewsDetailPage = () => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
           </svg>
         </div>
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">{t('news.notFound')}</h1>
+        <h1 className="text-2xl font-semibold text-gray-800 mb-4">{t('news.notFound')}</h1>
         <p className="text-gray-600 mb-6">{t('news.notFound')}</p>
         <Link
           to="/news"
@@ -84,7 +84,7 @@ const NewsDetailPage = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Breadcrumb */}
-      <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-8">
+      <nav className="flex items-center gap-x-2 text-sm text-gray-600 mb-8">
         <Link to="/" className="hover:text-red-600">{t('common.home')}</Link>
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -103,11 +103,11 @@ const NewsDetailPage = () => {
             <div className="p-8">
               {/* Article Header */}
               <div className="mb-6">
-                <div className="flex items-center space-x-4 text-sm text-gray-600 mb-4">
+                <div className="flex items-center gap-x-4 text-sm text-gray-600 mb-4">
                   <span className="bg-red-600 text-white px-3 py-1 rounded-full font-medium">
                     {article.category}
                   </span>
-                  <span>{new Date(article.createdAt).toLocaleDateString('vi-VN')}</span>
+                  <span suppressHydrationWarning>{new Date(article.createdAt).toLocaleDateString('vi-VN')}</span>
                   {article.viewCount && (
                     <>
                       <span>•</span>
@@ -116,7 +116,7 @@ const NewsDetailPage = () => {
                   )}
                 </div>
                 
-                <h1 className="text-3xl font-bold text-gray-800 mb-4 leading-tight">
+                <h1 className="text-3xl font-semibold text-gray-800 mb-4 leading-tight">
                   {article.title}
                 </h1>
                 
@@ -147,9 +147,9 @@ const NewsDetailPage = () => {
               {/* Article Footer */}
               <div className="mt-8 pt-6 border-t border-gray-200">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
+                  <div className="flex items-center gap-x-4">
                     {authorName && (
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center gap-x-2">
                         <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
                           <span className="text-sm font-medium text-gray-600">
                             {authorName.charAt(0).toUpperCase()}
@@ -171,7 +171,7 @@ const NewsDetailPage = () => {
                     )}
                   </div>
                   
-                  <div className="flex items-center space-x-4">
+                  <div className="flex items-center gap-x-4">
                     <button
                       type="button"
                       disabled={likeBusy || !id}
@@ -220,7 +220,7 @@ const NewsDetailPage = () => {
                         void navigator.clipboard?.writeText(window.location.href);
                         toast.info('Đã sao chép liên kết bài viết.');
                       }}
-                      className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors"
+                      className="flex items-center gap-x-2 text-gray-600 hover:text-blue-600 transition-colors"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
@@ -302,7 +302,7 @@ const NewsDetailPage = () => {
                   to={`/news/${news.id}`}
                   className="block group"
                 >
-                  <div className="flex space-x-4">
+                  <div className="flex gap-x-4">
                     <img
                       src={getImageUrl(news.imageUrl) || getImagePlaceholder(80, 60)}
                       alt={news.title}
@@ -313,7 +313,7 @@ const NewsDetailPage = () => {
                         {news.title}
                       </h4>
                       <p className="text-xs text-gray-600">
-                        {new Date(news.createdAt).toLocaleDateString('vi-VN')}
+                        <span suppressHydrationWarning>{new Date(news.createdAt).toLocaleDateString('vi-VN')}</span>
                       </p>
                     </div>
                   </div>
@@ -321,7 +321,7 @@ const NewsDetailPage = () => {
               ))}
             </div>
 
-            <div className="mt-8 pt-6 border-t border-gray-200">
+            <div className="mt-8 pt-6 border-t border-gray-200" suppressHydrationWarning>
               <Link
                 to="/news"
                 className="block w-full text-center py-3 px-4 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors"

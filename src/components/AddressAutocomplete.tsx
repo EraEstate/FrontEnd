@@ -194,14 +194,15 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       {showSuggestions && suggestions.length > 0 && (
         <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
           {suggestions.map((suggestion, index) => (
-            <div
-              key={index}
+            <button
+              type="button"
+              key={`${suggestion.display_name}-${suggestion.lat}-${suggestion.lon}`}
               onClick={() => handleSelectSuggestion(suggestion)}
               className={`px-4 py-3 cursor-pointer hover:bg-orange-50 transition-colors ${
                 index === selectedIndex ? 'bg-orange-50' : ''
               } ${index === 0 ? 'rounded-t-lg' : ''} ${
                 index === suggestions.length - 1 ? 'rounded-b-lg' : ''
-              }`}
+              } w-full text-left`}
             >
               <div className="flex items-start">
                 <MapPin className="h-4 w-4 text-gray-400 mr-2 mt-0.5 flex-shrink-0" />
@@ -220,7 +221,7 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
                   )}
                 </div>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       )}

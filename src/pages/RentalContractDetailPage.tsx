@@ -108,7 +108,7 @@ const RentalContractDetailPage: React.FC = () => {
         <div className="rounded-2xl bg-white p-6 shadow-sm">
           <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">{contract.propertyTitle || 'Rental Contract'}</h1>
+              <h1 className="text-2xl font-semibold text-gray-900">{contract.propertyTitle || 'Rental Contract'}</h1>
               <p className="mt-1 text-sm text-gray-600">Mã hợp đồng: {contract.id}</p>
             </div>
             <span className="rounded-lg bg-red-50 px-3 py-1 text-sm font-medium text-red-700">
@@ -120,8 +120,8 @@ const RentalContractDetailPage: React.FC = () => {
             <div className="rounded-xl border border-gray-200 p-4 text-sm">
               <p><strong>Landlord:</strong> {contract.landlordName || contract.landlordId}</p>
               <p><strong>Tenant:</strong> {contract.tenantName || contract.tenantId}</p>
-              <p><strong>Bắt đầu:</strong> {new Date(contract.startDate).toLocaleDateString('vi-VN')}</p>
-              <p><strong>Kết thúc:</strong> {new Date(contract.endDate).toLocaleDateString('vi-VN')}</p>
+              <p suppressHydrationWarning><strong>Bắt đầu:</strong> {new Date(contract.startDate).toLocaleDateString('vi-VN')}</p>
+              <p suppressHydrationWarning><strong>Kết thúc:</strong> {new Date(contract.endDate).toLocaleDateString('vi-VN')}</p>
             </div>
             <div className="rounded-xl border border-gray-200 p-4 text-sm">
               <p><strong>Tiền thuê:</strong> {contract.monthlyRent.toLocaleString('vi-VN')} VND/tháng</p>

@@ -50,7 +50,7 @@ const MaintenanceRequestsPage: React.FC = () => {
             <div className="flex items-center gap-3">
               <Wrench className="h-7 w-7 text-amber-600" />
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Yêu cầu bảo trì</h1>
+                <h1 className="text-2xl font-semibold text-gray-900">Yêu cầu bảo trì</h1>
                 <p className="text-sm text-gray-600">Theo dõi và xử lý các yêu cầu sửa chữa của tenant/landlord.</p>
               </div>
             </div>
@@ -95,13 +95,13 @@ const MaintenanceRequestsPage: React.FC = () => {
                         {request.status}
                       </span>
                       <p className="mt-2 text-xs text-gray-500">
-                        {new Date(request.createdAt).toLocaleString('vi-VN')}
+                        <span suppressHydrationWarning>{new Date(request.createdAt).toLocaleString('vi-VN')}</span>
                       </p>
                     </div>
                   </div>
 
                   {canManage ? (
-                    <div className="mt-4 flex flex-wrap items-center gap-2">
+                    <div className="mt-4 flex flex-wrap items-center gap-2" suppressHydrationWarning>
                       {STATUS_OPTIONS.map((status) => (
                         <button
                           key={status}

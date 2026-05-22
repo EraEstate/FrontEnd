@@ -107,11 +107,11 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ user, isOpen, onClose, on
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-gray-950 bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className="text-2xl font-semibold text-gray-900">
               {user ? 'Chỉnh sửa User' : 'Tạo User Mới'}
             </h2>
             <button
@@ -130,26 +130,26 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ user, isOpen, onClose, on
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="admin-user-fullname" className="block text-sm font-medium text-gray-700 mb-1">
                 Họ và tên
               </label>
               <input
-                type="text"
+                id="admin-user-fullname" type="text"
                 value={formData.fullName}
-                onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                onChange={(e) => setFormData((prev) => ({ ...prev, fullName: e.target.value }))}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="admin-user-email" className="block text-sm font-medium text-gray-700 mb-1">
                 Email
               </label>
               <input
-                type="email"
+                id="admin-user-email" type="email"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 required
                 disabled={!!user}
@@ -160,24 +160,24 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ user, isOpen, onClose, on
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="admin-user-phone" className="block text-sm font-medium text-gray-700 mb-1">
                 Số điện thoại
               </label>
               <input
-                type="tel"
+                id="admin-user-phone" type="tel"
                 value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                onChange={(e) => setFormData((prev) => ({ ...prev, phone: e.target.value }))}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="admin-user-role" className="block text-sm font-medium text-gray-700 mb-1">
                 Vai trò (Role)
               </label>
-              <select
+              <select id="admin-user-role"
                 value={formData.role}
-                onChange={(e) => setFormData({ ...formData, role: e.target.value as User['role'] })}
+                onChange={(e) => setFormData((prev) => ({ ...prev, role: e.target.value as User['role'] }))}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="USER">User</option>
@@ -191,7 +191,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ user, isOpen, onClose, on
                 type="checkbox"
                 id="enabled"
                 checked={formData.enabled || false}
-                onChange={(e) => setFormData({ ...formData, enabled: e.target.checked })}
+                onChange={(e) => setFormData((prev) => ({ ...prev, enabled: e.target.checked }))}
                 className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
               />
               <label htmlFor="enabled" className="text-sm font-medium text-gray-700">
@@ -233,6 +233,61 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ user, isOpen, onClose, on
 };
 
 type RoleTab = 'USER' | 'STAFF' | 'ADMIN';
+
+// Component để hiển thị avatar với fallback
+const UserAvatar: React.FC<{ user: User }> = ({ user }) => {
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Nếu đã có avatar trong user object, dùng luôn
+    if (user.avatar || user.avatarUrl || user.profile?.avatarUrl) {
+      setAvatarUrl(user.avatar || user.avatarUrl || user.profile?.avatarUrl || null);
+      setLoading(false);
+      return;
+    }
+
+    // Nếu không có, thử fetch từ public endpoint
+    const fetchAvatar = async () => {
+      try {
+        const response = await api.get(`/users/${user.id}/public`);
+        if (response.data?.avatarUrl) {
+          setAvatarUrl(response.data.avatarUrl);
+        }
+      } catch (error) {
+        // Nếu không có avatar, giữ null
+        console.debug(`No avatar for user ${user.id}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAvatar();
+  }, [user.id, user.avatar, user.avatarUrl, user.profile?.avatarUrl]);
+
+  const imageUrl = avatarUrl ? getImageUrl(avatarUrl) : null;
+
+  return (
+    <div className="relative w-10 h-10 flex-shrink-0">
+      {/* Fallback div - luôn hiển thị */}
+      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+        {user.fullName?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || 'U'}
+      </div>
+      {/* Avatar image - overlay lên trên nếu có */}
+      {!loading && imageUrl && (
+        <img 
+          src={imageUrl} 
+          alt={user.fullName || 'User'} 
+          className="absolute inset-0 w-10 h-10 rounded-full object-cover"
+          onError={(e) => {
+            // Ẩn img nếu lỗi, fallback div sẽ hiển thị
+            e.currentTarget.style.display = 'none';
+          }}
+        />
+      )}
+    </div>
+  );
+};
 
 const UserManagement: React.FC = () => {
   const { t } = useTranslation();
@@ -458,67 +513,12 @@ const UserManagement: React.FC = () => {
     return labels[role] || role;
   };
 
-  // Component để hiển thị avatar với fallback
-  const UserAvatar: React.FC<{ user: User }> = ({ user }) => {
-    const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-      // Nếu đã có avatar trong user object, dùng luôn
-      if (user.avatar || user.avatarUrl || user.profile?.avatarUrl) {
-        setAvatarUrl(user.avatar || user.avatarUrl || user.profile?.avatarUrl || null);
-        setLoading(false);
-        return;
-      }
-
-      // Nếu không có, thử fetch từ public endpoint
-      const fetchAvatar = async () => {
-        try {
-          const response = await api.get(`/users/${user.id}/public`);
-          if (response.data?.avatarUrl) {
-            setAvatarUrl(response.data.avatarUrl);
-          }
-        } catch (error) {
-          // Nếu không có avatar, giữ null
-          console.debug(`No avatar for user ${user.id}`);
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchAvatar();
-    }, [user.id, user.avatar, user.avatarUrl, user.profile?.avatarUrl]);
-
-    const imageUrl = avatarUrl ? getImageUrl(avatarUrl) : null;
-
-    return (
-      <div className="relative w-10 h-10 flex-shrink-0">
-        {/* Fallback div - luôn hiển thị */}
-        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-          {user.fullName?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || 'U'}
-        </div>
-        {/* Avatar image - overlay lên trên nếu có */}
-        {!loading && imageUrl && (
-          <img 
-            src={imageUrl} 
-            alt={user.fullName || 'User'} 
-            className="absolute inset-0 w-10 h-10 rounded-full object-cover"
-            onError={(e) => {
-              // Ẩn img nếu lỗi, fallback div sẽ hiển thị
-              e.currentTarget.style.display = 'none';
-            }}
-          />
-        )}
-      </div>
-    );
-  };
-
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('admin.menu.users')}</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">{t('admin.menu.users')}</h1>
           <p className="text-sm text-gray-500 mt-1">{t('admin.userManagement.subtitle')}</p>
         </div>
         <button 
@@ -753,7 +753,9 @@ const UserManagement: React.FC = () => {
                           </button>
                           {openDropdownId === user.id && (
                             <>
-                              <div 
+                              <button
+                                type="button"
+                                aria-label="Close user actions menu"
                                 className="fixed inset-0 z-10" 
                                 onClick={() => setOpenDropdownId(null)}
                               />

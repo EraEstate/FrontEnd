@@ -27,6 +27,44 @@ interface UtilityTool {
   path?: string;
 }
 
+const UtilityCard: React.FC<{ utility: UtilityTool }> = ({ utility }) => {
+  const Icon = utility.icon;
+  return (
+    <div className="bg-white border border-gray-200 rounded-lg p-5 hover:border-red-300 hover:shadow-md transition-all duration-200">
+      <div className="flex items-start gap-4">
+        <div className="p-3 bg-gray-50 rounded-lg flex-shrink-0">
+          <Icon className="h-6 w-6 text-gray-700" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2 mb-2">
+            <h3 className="text-base font-semibold text-gray-900 leading-tight">
+              {utility.name}
+            </h3>
+            {utility.isPopular && (
+              <span className="px-2 py-0.5 bg-red-50 text-red-600 text-xs font-medium rounded whitespace-nowrap flex-shrink-0">
+                Phổ biến
+              </span>
+            )}
+          </div>
+          <p className="text-sm text-gray-600 mb-4 leading-relaxed">{utility.description}</p>
+          {utility.path ? (
+            <Link
+              to={utility.path}
+              className="inline-block bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+            >
+              Sử dụng ngay
+            </Link>
+          ) : (
+            <button className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium">
+              Sử dụng ngay
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const UtilitiesPage: React.FC = () => {
   const { t } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -134,51 +172,19 @@ const UtilitiesPage: React.FC = () => {
   const filteredUtilities = utilities.filter(utility => 
     selectedCategory === 'all' || utility.category === selectedCategory
   );
-
-  const UtilityCard: React.FC<{ utility: UtilityTool }> = ({ utility }) => {
-    const Icon = utility.icon;
-    return (
-      <div className="bg-white border border-gray-200 rounded-lg p-5 hover:border-red-300 hover:shadow-md transition-all duration-200">
-        <div className="flex items-start gap-4">
-          <div className="p-3 bg-gray-50 rounded-lg flex-shrink-0">
-            <Icon className="h-6 w-6 text-gray-700" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-2 mb-2">
-              <h3 className="text-base font-semibold text-gray-900 leading-tight">
-                {utility.name}
-              </h3>
-              {utility.isPopular && (
-                <span className="px-2 py-0.5 bg-red-50 text-red-600 text-xs font-medium rounded whitespace-nowrap flex-shrink-0">
-                  Phổ biến
-                </span>
-              )}
-            </div>
-            <p className="text-sm text-gray-600 mb-4 leading-relaxed">{utility.description}</p>
-            {utility.path ? (
-              <Link
-                to={utility.path}
-                className="inline-block bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
-              >
-                Sử dụng ngay
-              </Link>
-            ) : (
-              <button className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium">
-                Sử dụng ngay
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  };
+  const popularUtilities = utilities.reduce<UtilityTool[]>((acc, utility) => {
+    if (utility.isPopular) {
+      acc.push(utility);
+    }
+    return acc;
+  }, []);
 
   return (
     <div className="min-h-screen bg-white pt-20">
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Các công cụ hữu ích hỗ trợ quyết định bất động sản</h1>
+          <h1 className="text-3xl font-semibold text-gray-900 mb-2">Các công cụ hữu ích hỗ trợ quyết định bất động sản</h1>
           <p className="text-gray-600">Tất cả công cụ đều miễn phí và dễ sử dụng</p>
         </div>
       </div>
@@ -213,7 +219,7 @@ const UtilitiesPage: React.FC = () => {
               <div className="mt-6 pt-6 border-t border-gray-200">
                 <h4 className="font-medium text-gray-900 mb-3 text-sm">Công cụ phổ biến</h4>
                 <div className="space-y-2">
-                  {utilities.filter(u => u.isPopular).map(utility => {
+                  {popularUtilities.map(utility => {
                     const Icon = utility.icon;
                     return (
                       <div key={utility.id} className="flex items-center gap-2 text-sm text-gray-700 hover:text-red-600 cursor-pointer transition-colors">
@@ -246,12 +252,12 @@ const UtilitiesPage: React.FC = () => {
             {/* Featured tools banner */}
             {selectedCategory === 'all' && (
               <div className="bg-red-600 rounded-lg p-6 mb-6 text-white">
-                <h3 className="text-xl font-bold mb-2">Công cụ nổi bật</h3>
+                <h3 className="text-xl font-semibold mb-2">Công cụ nổi bật</h3>
                 <p className="mb-4 text-red-50 text-sm">
                   Những công cụ được sử dụng nhiều nhất để hỗ trợ quyết định bất động sản
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  {utilities.filter(u => u.isPopular).map(utility => {
+                  {popularUtilities.map(utility => {
                     const Icon = utility.icon;
                     return (
                       <div key={utility.id} className="bg-white bg-opacity-10 rounded-lg p-3 hover:bg-opacity-20 transition-colors">

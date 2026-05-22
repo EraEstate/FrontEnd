@@ -95,7 +95,7 @@ const NewsPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">{t('news.pageTitle')}</h1>
+          <h1 className="text-4xl font-semibold text-gray-900 mb-4">{t('news.pageTitle')}</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             {t('news.pageSubtitle')}
           </p>
@@ -154,9 +154,9 @@ const NewsPage: React.FC = () => {
                     t('news.trendingTopicsList.interestRate'),
                     t('news.trendingTopicsList.hanoiRE'),
                     t('news.trendingTopicsList.apartmentInvestment')
-                  ].map((topic, index) => (
+                  ].map((topic) => (
                     <button
-                      key={index}
+                      key={topic}
                       className="block w-full text-left text-sm text-gray-600 hover:text-orange-600 transition-colors py-1"
                     >
                       #{topic}
@@ -172,7 +172,7 @@ const NewsPage: React.FC = () => {
             {/* Featured Articles */}
             <div className="mb-10">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">{t('news.featuredNews')}</h2>
+                <h2 className="text-2xl font-semibold text-gray-900">{t('news.featuredNews')}</h2>
                 <div className="flex items-center text-orange-600 hover:text-orange-700 cursor-pointer">
                   <span className="text-sm font-medium">{t('news.viewAll')}</span>
                   <ArrowRight className="h-4 w-4 ml-1" />
@@ -181,8 +181,8 @@ const NewsPage: React.FC = () => {
 
               {loading ? (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                  {[...Array(4)].map((_, i) => (
-                    <div key={i} className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
+                  {[1, 2, 3, 4].map((slot) => (
+                    <div key={`news-grid-skeleton-${slot}`} className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
                       <div className="h-48 bg-gray-300"></div>
                       <div className="p-6 space-y-3">
                         <div className="h-4 bg-gray-300 rounded w-3/4"></div>
@@ -216,7 +216,7 @@ const NewsPage: React.FC = () => {
                           </div>
                         </div>
                         <div className="p-6">
-                          <h3 className="font-bold text-xl text-gray-900 mb-3 group-hover:text-orange-600 transition-colors line-clamp-2">
+                          <h3 className="font-semibold text-xl text-gray-900 mb-3 group-hover:text-orange-600 transition-colors line-clamp-2">
                             {featuredArticles[0]?.title}
                           </h3>
                           <p className="text-gray-600 mb-4 line-clamp-3">
@@ -227,7 +227,7 @@ const NewsPage: React.FC = () => {
                               <User className="h-4 w-4 mr-1" />
                               <span>{featuredArticles[0]?.author?.fullName || t('news.admin')}</span>
                             </div>
-                            <div className="flex items-center space-x-4">
+                            <div className="flex items-center gap-x-4">
                               <div className="flex items-center">
                                 <Eye className="h-4 w-4 mr-1" />
                                 <span>{formatViewCount(featuredArticles[0]?.viewCount || 0)}</span>
@@ -264,7 +264,7 @@ const NewsPage: React.FC = () => {
                               </h4>
                               <div className="flex items-center justify-between text-xs text-gray-500">
                                 <span>{formatDate(article.createdAt)}</span>
-                                <div className="flex items-center space-x-2">
+                                <div className="flex items-center gap-x-2">
                                   <div className="flex items-center">
                                     <Eye className="h-3 w-3 mr-1" />
                                     <span>{formatViewCount(article.viewCount || 0)}</span>
@@ -288,7 +288,7 @@ const NewsPage: React.FC = () => {
             {/* Regular Articles */}
             <div>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">{t('news.latestNews')}</h2>
+                <h2 className="text-2xl font-semibold text-gray-900">{t('news.latestNews')}</h2>
                 <div className="flex items-center text-sm text-gray-600">
                   <span>{t('news.foundArticles', { count: articles.length })}</span>
                 </div>
@@ -296,8 +296,8 @@ const NewsPage: React.FC = () => {
 
               {loading ? (
                 <div className="space-y-6">
-                  {[...Array(6)].map((_, i) => (
-                    <div key={i} className="bg-white rounded-lg shadow-md p-6 animate-pulse">
+                  {[1, 2, 3, 4, 5, 6].map((slot) => (
+                    <div key={`news-list-skeleton-${slot}`} className="bg-white rounded-lg shadow-md p-6 animate-pulse">
                       <div className="flex">
                         <div className="w-48 h-32 bg-gray-300 rounded-lg mr-6"></div>
                         <div className="flex-1 space-y-3">
@@ -345,14 +345,14 @@ const NewsPage: React.FC = () => {
                                 {categories.find(cat => cat.id === article.category)?.name}
                               </span>
                             </div>
-                            <h3 className="font-bold text-xl text-gray-900 mb-3 group-hover:text-orange-600 transition-colors line-clamp-2">
+                            <h3 className="font-semibold text-xl text-gray-900 mb-3 group-hover:text-orange-600 transition-colors line-clamp-2">
                               {article.title}
                             </h3>
                             <p className="text-gray-600 mb-4 line-clamp-2">
                               {article.summary}
                             </p>
                             <div className="flex items-center justify-between text-sm text-gray-500">
-                              <div className="flex items-center space-x-4">
+                              <div className="flex items-center gap-x-4">
                                 <div className="flex items-center">
                                   <User className="h-4 w-4 mr-1" />
                                   <span>{article.author?.fullName || t('news.admin')}</span>
@@ -362,7 +362,7 @@ const NewsPage: React.FC = () => {
                                   <span>{formatDate(article.createdAt)}</span>
                                 </div>
                               </div>
-                              <div className="flex items-center space-x-4">
+                              <div className="flex items-center gap-x-4">
                                 <button className="flex items-center hover:text-red-500 transition-colors">
                                   <Heart className="h-4 w-4 mr-1" />
                                   <span>{t('news.save')}</span>
@@ -391,7 +391,7 @@ const NewsPage: React.FC = () => {
 
               {/* Pagination */}
               <div className="flex justify-center mt-12">
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center gap-x-2">
                   {[1, 2, 3, 4, 5].map((page) => (
                     <button
                       key={page}

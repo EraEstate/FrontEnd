@@ -44,7 +44,7 @@ const BadgesPage: React.FC = () => {
     <div className="min-h-screen bg-gray-50 pt-24">
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="mb-6 rounded-2xl bg-white p-6 shadow-sm">
-          <h1 className="flex items-center gap-2 text-2xl font-bold text-gray-900">
+          <h1 className="flex items-center gap-2 text-2xl font-semibold text-gray-900">
             <Award className="h-6 w-6 text-amber-500" />
             Hệ thống huy hiệu
           </h1>
@@ -72,10 +72,10 @@ const BadgesPage: React.FC = () => {
                   <span className="text-xs font-medium text-gray-500">{badge.category}</span>
                   {earned ? (
                     <span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-700">
-                      Đã đạt • {new Date(earned.earnedAt).toLocaleDateString('vi-VN')}
+                      Đã đạt • <span suppressHydrationWarning>{new Date(earned.earnedAt).toLocaleDateString('vi-VN')}</span>
                     </span>
                   ) : (
-                    <span className="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-600">
+                    <span className="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-600" suppressHydrationWarning>
                       Chưa đạt
                     </span>
                   )}

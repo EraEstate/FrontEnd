@@ -24,8 +24,10 @@ const CreateForumPostPage: React.FC = () => {
       new Set(
         tagsInput
           .split(',')
-          .map((item) => item.trim())
-          .filter(Boolean)
+          .flatMap((item) => {
+            const trimmed = item.trim();
+            return trimmed ? [trimmed] : [];
+          })
       )
     ).slice(0, 10);
 
@@ -56,7 +58,7 @@ const CreateForumPostPage: React.FC = () => {
         </div>
 
         <div className="rounded-2xl bg-white p-6 shadow-sm">
-          <h1 className="text-2xl font-bold text-gray-900">Tao bai viet forum</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">Tao bai viet forum</h1>
           <p className="mt-1 text-sm text-gray-600">
             Chia se thong tin huu ich cho cong dong. Ban co the dung xuong dong de dinh dang noi dung.
           </p>

@@ -151,10 +151,10 @@ const AgentManagement: React.FC = () => {
   };
 
   const getRatingStars = (rating: number) => {
-    return Array.from({ length: 5 }, (_, i) => (
+    return [1, 2, 3, 4, 5].map((star) => (
       <Star 
-        key={i} 
-        className={`w-4 h-4 ${i < rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} 
+        key={`star-${star}`} 
+        className={`w-4 h-4 ${star <= rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} 
       />
     ));
   };
@@ -164,7 +164,7 @@ const AgentManagement: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('admin.menu.agents')}</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">{t('admin.menu.agents')}</h1>
           <p className="text-sm text-gray-500 mt-1">Manage all agents in the system</p>
         </div>
         <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
@@ -244,7 +244,7 @@ const AgentManagement: React.FC = () => {
 
               {/* Agent Info */}
               <div className="p-4">
-                <h3 className="font-bold text-lg text-gray-900 mb-1">{agent.fullName}</h3>
+                <h3 className="font-semibold text-lg text-gray-900 mb-1">{agent.fullName}</h3>
                 
                 {/* Rating */}
                 <div className="flex items-center gap-2 mb-2">

@@ -108,10 +108,10 @@ const ReportManagement: React.FC = () => {
                       </div>
                       {r.description && <p className="text-sm text-gray-700 mt-1">{r.description}</p>}
                       <p className="text-xs text-gray-400 mt-1.5">
-                        {r.reporter?.fullName || 'N/A'} · {new Date(r.createdAt).toLocaleString('vi-VN')}
+                        {r.reporter?.fullName || 'N/A'} · <span suppressHydrationWarning>{new Date(r.createdAt).toLocaleString('vi-VN')}</span>
                       </p>
                       {r.adminNote && (
-                        <p className="text-xs text-blue-600 mt-1 flex items-center gap-1">
+                        <p className="text-xs text-blue-600 mt-1 flex items-center gap-1" suppressHydrationWarning>
                           <MessageSquare className="w-3 h-3" /> {r.adminNote}
                         </p>
                       )}

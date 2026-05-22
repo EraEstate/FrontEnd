@@ -11,6 +11,15 @@ interface MilestoneManagerModalProps {
   onSuccess: () => void;
 }
 
+const formatDate = (dateStr: string) => {
+  if (!dateStr) return '';
+  try {
+    return new Date(dateStr).toLocaleDateString('vi-VN');
+  } catch (e) {
+    return dateStr;
+  }
+};
+
 const MilestoneManagerModal: React.FC<MilestoneManagerModalProps> = ({
   isOpen,
   onClose,
@@ -134,11 +143,11 @@ const MilestoneManagerModal: React.FC<MilestoneManagerModalProps> = ({
   const totalAllocated = milestones.reduce((sum, m) => sum + m.percentage, 0);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-gray-950 bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
         <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-gray-50/50 sticky top-0 z-10">
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Quản lý Tiến độ Thanh toán</h2>
+            <h2 className="text-xl font-semibold text-gray-900">Quản lý Tiến độ Thanh toán</h2>
             <p className="text-sm text-gray-500 mt-1">Tổng tiền: <span className="font-semibold text-red-600">{formatPrice(totalAmount)} VND</span></p>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full transition-colors text-gray-500">
@@ -174,8 +183,10 @@ const MilestoneManagerModal: React.FC<MilestoneManagerModalProps> = ({
             <h3 className="font-semibold text-gray-900 mb-4">{editingId ? 'Sửa đợt thanh toán' : 'Thêm đợt mới'}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tên đợt thanh toán</label>
+                <label htmlFor="milestone-title" className="block text-sm font-medium text-gray-700 mb-1">Tên đợt thanh toán</label>
                 <input 
+                  id="milestone-title"
+
                   type="text" 
                   value={title} 
                   onChange={e => setTitle(e.target.value)} 
@@ -184,9 +195,11 @@ const MilestoneManagerModal: React.FC<MilestoneManagerModalProps> = ({
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tỷ lệ (%)</label>
+                <label htmlFor="milestone-percentage" className="block text-sm font-medium text-gray-700 mb-1">Tỷ lệ (%)</label>
                 <div className="relative">
                   <input 
+                    id="milestone-percentage"
+
                     type="number" 
                     min="0" max="100" step="0.1"
                     value={percentage || ''} 
@@ -200,8 +213,10 @@ const MilestoneManagerModal: React.FC<MilestoneManagerModalProps> = ({
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Hạn thanh toán</label>
+                <label htmlFor="milestone-due-date" className="block text-sm font-medium text-gray-700 mb-1">Hạn thanh toán</label>
                 <input 
+                  id="milestone-due-date"
+
                   type="date" 
                   value={dueDate} 
                   onChange={e => setDueDate(e.target.value)} 
@@ -233,7 +248,7 @@ const MilestoneManagerModal: React.FC<MilestoneManagerModalProps> = ({
           <div>
             <h3 className="font-semibold text-gray-900 mb-3">Danh sách đợt thanh toán</h3>
             {loading ? (
-              <div className="py-8 text-center text-gray-500">Đang tải...</div>
+              <div className="py-8 text-center text-gray-500">Đang tải…</div>
             ) : milestones.length === 0 ? (
               <div className="py-8 text-center bg-gray-50 rounded-lg border border-dashed border-gray-300 text-gray-500">
                 Chưa có đợt thanh toán nào được thiết lập.
@@ -250,7 +265,7 @@ const MilestoneManagerModal: React.FC<MilestoneManagerModalProps> = ({
                       <div className="text-sm text-gray-500 flex items-center gap-3">
                         <span>{m.percentage}% ({formatPrice(m.amount)} đ)</span>
                         <span className="w-1 h-1 rounded-full bg-gray-300"></span>
-                        <span>Hạn: {new Date(m.dueDate).toLocaleDateString('vi-VN')}</span>
+                        <span suppressHydrationWarning>Hạn: {formatDate(m.dueDate)}</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -258,14 +273,14 @@ const MilestoneManagerModal: React.FC<MilestoneManagerModalProps> = ({
                         <>
                           <button 
                             onClick={() => handleEdit(m)}
-                            className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            className="p-2 text-[#6b7280] hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                             title="Sửa"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
                           <button 
                             onClick={() => handleDelete(m.id)}
-                            className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            className="p-2 text-[#6b7280] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                             title="Xóa"
                           >
                             <Trash2 className="w-4 h-4" />

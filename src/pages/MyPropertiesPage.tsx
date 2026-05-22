@@ -96,7 +96,7 @@ const MyPropertiesPage = () => {
       setAnalysisData(data);
       setShowAnalysis(true);
     } catch {
-      toast.error('Không thể phân tích tin đăng. Vui lòng thử lại.');
+      toast.error(t('myProperties.analysisError'));
     } finally {
       setAnalysisLoading(null);
     }
@@ -122,21 +122,21 @@ const MyPropertiesPage = () => {
             <div className="flex items-center gap-3">
               <ClipboardList className="h-8 w-8 text-red-600" />
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('myProperties.title')}</h1>
+                <h1 className="text-3xl font-semibold text-gray-900 mb-2">{t('myProperties.title')}</h1>
                 <p className="text-gray-600">{t('myProperties.subtitle')}</p>
               </div>
             </div>
             <div className="mt-4 md:mt-0 flex items-center gap-3">
               <Link
                 to="/rental-management"
-                className="inline-flex items-center space-x-2 bg-white text-emerald-600 border border-emerald-200 hover:bg-emerald-50 px-5 py-3 rounded-xl font-semibold transition-all duration-200 shadow-sm hover:shadow-md"
+                className="inline-flex items-center gap-x-2 bg-white text-emerald-600 border border-emerald-200 hover:bg-emerald-50 px-5 py-3 rounded-xl font-semibold transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 <DollarSign className="h-5 w-5" />
-                <span>Quản lý dòng tiền</span>
+                <span>{t('myProperties.cashflowManagement')}</span>
               </Link>
               <Link
                 to="/post-property"
-                className="inline-flex items-center space-x-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="inline-flex items-center gap-x-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 <Plus className="h-5 w-5" />
                 <span>{t('myProperties.newListing')}</span>
@@ -148,8 +148,8 @@ const MyPropertiesPage = () => {
           {!loading && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {stats.map((stat, index) => (
-                <div key={index} className="bg-gradient-to-br from-white to-gray-50 rounded-xl p-4 border border-gray-200 hover:shadow-md transition-shadow">
-                  <div className="flex items-center space-x-3">
+                <div key={stat.label} className="bg-gradient-to-br from-white to-gray-50 rounded-xl p-4 border border-gray-200 hover:shadow-md transition-shadow">
+                  <div className="flex items-center gap-x-3">
                     <div className={`p-3 rounded-lg ${stat.color}`}>
                       <stat.icon className="h-5 w-5" />
                     </div>
@@ -220,8 +220,8 @@ const MyPropertiesPage = () => {
         {/* Loading State */}
         {loading ? (
           <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}>
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-sm animate-pulse">
+            {Array.from({ length: 6 }, (_, slot) => slot + 1).map((slot) => (
+              <div key={`property-skeleton-${slot}`} className="bg-white rounded-2xl overflow-hidden shadow-sm animate-pulse">
                 <div className="h-48 bg-gray-300"></div>
                 <div className="p-6 space-y-3">
                   <div className="h-4 bg-gray-300 rounded w-3/4"></div>
@@ -236,7 +236,7 @@ const MyPropertiesPage = () => {
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <Home className="h-12 w-12 text-gray-400" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">
+            <h3 className="text-2xl font-semibold text-gray-900 mb-3">
               {activeTab === 'all' ? t('myProperties.noListings') : t('myProperties.noListingsByStatus', { status: getStatusBadge(activeTab.toUpperCase()).text.toLowerCase() })}
             </h3>
             <p className="text-gray-600 mb-8 max-w-md mx-auto">
@@ -248,7 +248,7 @@ const MyPropertiesPage = () => {
             {activeTab === 'all' && (
               <Link 
                 to="/post-property" 
-                className="inline-flex items-center space-x-2 px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 text-white font-bold rounded-xl hover:shadow-xl transition-all duration-200"
+                className="inline-flex items-center gap-x-2 px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 text-white font-bold rounded-xl hover:shadow-xl transition-all duration-200"
               >
                 <Plus className="h-5 w-5" />
                 <span>{t('myProperties.postNow')}</span>
@@ -298,14 +298,14 @@ const MyPropertiesPage = () => {
                     </div>
                     {/* Property Type */}
                     <div className="absolute bottom-4 left-4">
-                      <span className="px-3 py-1.5 bg-black/70 backdrop-blur-sm text-white rounded-lg text-xs font-semibold">
+                      <span className="px-3 py-1.5 bg-gray-950/70 backdrop-blur-sm text-white rounded-lg text-xs font-semibold">
                         {property.propertyType}
                       </span>
                     </div>
                   </div>
                   
                   <div className="p-5">
-                    <h3 className="font-bold text-lg text-gray-900 mb-3 line-clamp-2 group-hover:text-red-600 transition-colors">
+                    <h3 className="font-semibold text-lg text-gray-900 mb-3 line-clamp-2 group-hover:text-red-600 transition-colors">
                       {property.title}
                     </h3>
                     
@@ -332,17 +332,17 @@ const MyPropertiesPage = () => {
                     
                     {/* Details */}
                     <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
-                      <div className="flex items-center space-x-1">
+                      <div className="flex items-center gap-x-1">
                         <Home className="h-4 w-4" />
                         <span className="font-medium">{property.propertyDetails?.[0]?.bedrooms || 0} PN</span>
                       </div>
-                      <div className="flex items-center space-x-1">
+                      <div className="flex items-center gap-x-1">
                         <span className="font-medium">{property.propertyDetails?.[0]?.bathrooms || 0} WC</span>
                       </div>
-                      <div className="flex items-center space-x-1">
+                      <div className="flex items-center gap-x-1">
                         <span className="font-medium">T.{property.propertyDetails?.[0]?.floors || 1}</span>
                       </div>
-                      <div className="flex items-center space-x-1">
+                      <div className="flex items-center gap-x-1">
                         <Eye className="h-4 w-4" />
                         <span>0</span>
                       </div>
@@ -360,7 +360,7 @@ const MyPropertiesPage = () => {
                         onClick={() => handleAnalyze(String(property.id))}
                         disabled={analysisLoading === String(property.id)}
                         className="px-4 py-2.5 border-2 border-purple-200 text-purple-700 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all text-sm font-semibold disabled:opacity-50"
-                        title="AI Phan tich"
+                        title={t('myProperties.aiAnalysis')}
                       >
                         {analysisLoading === String(property.id) ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
                       </button>
@@ -392,7 +392,7 @@ const MyPropertiesPage = () => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">
-                          <h3 className="font-bold text-xl text-gray-900 mb-2 line-clamp-2">
+                          <h3 className="font-semibold text-xl text-gray-900 mb-2 line-clamp-2">
                             {property.title}
                           </h3>
                           <div className="flex items-center text-gray-600 mb-3">
@@ -426,7 +426,7 @@ const MyPropertiesPage = () => {
                           <p className="text-xs text-gray-500">{t('myProperties.area')}</p>
                           <p className="text-lg font-semibold text-gray-900">{property.area} m²</p>
                         </div>
-                        <div className="flex items-center space-x-4 text-sm text-gray-600">
+                        <div className="flex items-center gap-x-4 text-sm text-gray-600">
                           <span>{property.propertyDetails?.[0]?.bedrooms || 0} PN</span>
                           <span>{property.propertyDetails?.[0]?.bathrooms || 0} WC</span>
                           <span>T.{property.propertyDetails?.[0]?.floors || 1}</span>
@@ -436,12 +436,12 @@ const MyPropertiesPage = () => {
                       <div className="flex gap-3">
                         <Link
                           to={`/property/${property.id}`}
-                          className="inline-flex items-center space-x-2 bg-red-600 text-white px-6 py-2.5 rounded-xl hover:bg-red-700 transition-colors text-sm font-semibold"
+                          className="inline-flex items-center gap-x-2 bg-red-600 text-white px-6 py-2.5 rounded-xl hover:bg-red-700 transition-colors text-sm font-semibold"
                         >
                           <Eye className="h-4 w-4" />
                           <span>{t('myProperties.viewDetails')}</span>
                         </Link>
-                        <button className="inline-flex items-center space-x-2 px-5 py-2.5 border-2 border-gray-200 text-gray-700 rounded-xl hover:border-red-600 hover:text-red-600 transition-all text-sm font-semibold">
+                        <button className="inline-flex items-center gap-x-2 px-5 py-2.5 border-2 border-gray-200 text-gray-700 rounded-xl hover:border-red-600 hover:text-red-600 transition-all text-sm font-semibold">
                           <BarChart3 className="h-4 w-4" />
                           <span>{t('myProperties.statistics')}</span>
                         </button>
@@ -457,7 +457,7 @@ const MyPropertiesPage = () => {
 
       {/* AI Analysis Modal */}
       {showAnalysis && analysisData && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-gray-950/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto">
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
@@ -466,8 +466,8 @@ const MyPropertiesPage = () => {
                   <Sparkles className="h-5 w-5 text-purple-600" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg text-gray-900">AI Phân tích</h3>
-                  <p className="text-xs text-gray-500">Kết quả phân tích tự động</p>
+                  <h3 className="font-semibold text-lg text-gray-900">{t('myProperties.aiAnalysis')}</h3>
+                  <p className="text-xs text-gray-500">{t('myProperties.aiAnalysisDesc')}</p>
                 </div>
               </div>
               <button onClick={() => setShowAnalysis(false)} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
@@ -479,9 +479,9 @@ const MyPropertiesPage = () => {
               {/* Quality Score */}
               <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-5 border border-gray-200">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="font-semibold text-gray-800">Chất lượng tin đăng</span>
+                  <span className="font-semibold text-gray-800">{t('myProperties.listingQuality')}</span>
                   <span className={`px-3 py-1 rounded-full text-sm font-bold border ${getGradeColor(analysisData.quality.grade)}`}>
-                    {analysisData.quality.grade} — {analysisData.quality.score}/100
+                    {analysisData.quality.grade}, {analysisData.quality.score}/100
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2.5 mb-3">
@@ -495,17 +495,17 @@ const MyPropertiesPage = () => {
                 </div>
                 {analysisData.quality.issues.length > 0 && (
                   <div className="space-y-1.5 mb-2">
-                    <p className="text-xs font-semibold text-red-600 flex items-center gap-1"><AlertTriangle className="h-3.5 w-3.5" /> Vấn đề:</p>
-                    {analysisData.quality.issues.map((issue, i) => (
-                      <p key={i} className="text-xs text-red-600 pl-5">• {issue}</p>
+                    <p className="text-xs font-semibold text-red-600 flex items-center gap-1"><AlertTriangle className="h-3.5 w-3.5" /> {t('myProperties.issue')}</p>
+                    {analysisData.quality.issues.map((issue) => (
+                      <p key={issue} className="text-xs text-red-600 pl-5">• {issue}</p>
                     ))}
                   </div>
                 )}
                 {analysisData.quality.suggestions.length > 0 && (
                   <div className="space-y-1.5">
-                    <p className="text-xs font-semibold text-blue-600 flex items-center gap-1"><Sparkles className="h-3.5 w-3.5" /> Gợi ý:</p>
-                    {analysisData.quality.suggestions.map((s, i) => (
-                      <p key={i} className="text-xs text-blue-600 pl-5">• {s}</p>
+                    <p className="text-xs font-semibold text-blue-600 flex items-center gap-1"><Sparkles className="h-3.5 w-3.5" /> {t('myProperties.suggestion')}</p>
+                    {analysisData.quality.suggestions.map((s) => (
+                      <p key={s} className="text-xs text-blue-600 pl-5">• {s}</p>
                     ))}
                   </div>
                 )}
@@ -514,7 +514,7 @@ const MyPropertiesPage = () => {
               {/* Moderation */}
               <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-5 border border-gray-200">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="font-semibold text-gray-800">Kiểm duyệt nội dung</span>
+                  <span className="font-semibold text-gray-800">{t('myProperties.contentModeration')}</span>
                   <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold ${
                     analysisData.moderation.decision === 'APPROVED' ? 'bg-emerald-100 text-emerald-700' :
                     analysisData.moderation.decision === 'FLAGGED' ? 'bg-amber-100 text-amber-700' :
@@ -523,14 +523,14 @@ const MyPropertiesPage = () => {
                     {analysisData.moderation.decision === 'APPROVED' && <ShieldCheck className="h-3.5 w-3.5" />}
                     {analysisData.moderation.decision === 'FLAGGED' && <AlertTriangle className="h-3.5 w-3.5" />}
                     {analysisData.moderation.decision === 'REJECTED' && <ShieldAlert className="h-3.5 w-3.5" />}
-                    {analysisData.moderation.decision === 'APPROVED' ? 'Đạt' :
-                     analysisData.moderation.decision === 'FLAGGED' ? 'Cần xem lại' : 'Vi phạm'}
+                    {analysisData.moderation.decision === 'APPROVED' ? t('myProperties.statusApproved') :
+                     analysisData.moderation.decision === 'FLAGGED' ? t('myProperties.statusFlagged') : t('myProperties.statusRejected')}
                   </span>
                 </div>
                 {analysisData.moderation.flags.length > 0 && (
                   <div className="space-y-1 mt-2">
-                    {analysisData.moderation.flags.map((f, i) => (
-                      <p key={i} className="text-xs text-amber-700">⚠ {f}</p>
+                    {analysisData.moderation.flags.map((f) => (
+                      <p key={f} className="text-xs text-amber-700">⚠ {f}</p>
                     ))}
                   </div>
                 )}
@@ -540,7 +540,7 @@ const MyPropertiesPage = () => {
               {analysisData.priceEstimation.status === 'OK' && (
                 <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-5 border border-gray-200">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="font-semibold text-gray-800">Ước tính giá thị trường</span>
+                    <span className="font-semibold text-gray-800">{t('myProperties.priceEstimation')}</span>
                     <span className={`px-3 py-1 rounded-full text-sm font-bold ${
                       analysisData.priceEstimation.priceAssessment === 'HỢP LÝ' ? 'bg-emerald-100 text-emerald-700' :
                       analysisData.priceEstimation.priceAssessment === 'CAO' ? 'bg-red-100 text-red-700' :
@@ -551,15 +551,15 @@ const MyPropertiesPage = () => {
                   </div>
                   {analysisData.priceEstimation.estimatedPrice && (
                     <p className="text-sm text-gray-600">
-                      Giá ước tính: <span className="font-bold text-gray-900">
-                        {(analysisData.priceEstimation.estimatedPrice / 1000000000).toFixed(1)} tỷ
+                      {t('myProperties.estimatedPrice')} <span className="font-bold text-gray-900">
+                        {(analysisData.priceEstimation.estimatedPrice / 1000000000).toFixed(1)} {t('common.billion')}
                       </span>
                     </p>
                   )}
                   {analysisData.priceEstimation.note && (
                     <p className="text-xs text-gray-500 mt-1">{analysisData.priceEstimation.note}</p>
                   )}
-                  <p className="text-xs text-gray-400 mt-2">Dựa trên {analysisData.priceEstimation.sampleSize} BĐS tương tự</p>
+                  <p className="text-xs text-gray-400 mt-2">{t('myProperties.basedOn')} {analysisData.priceEstimation.sampleSize} {t('myProperties.similarProperties')}</p>
                 </div>
               )}
             </div>

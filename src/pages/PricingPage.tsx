@@ -26,6 +26,12 @@ interface Package {
   status?: string;
 }
 
+const priceFormatter = new Intl.NumberFormat('vi-VN', {
+  style: 'currency',
+  currency: 'VND',
+  minimumFractionDigits: 0
+});
+
 const PricingPage: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -51,7 +57,7 @@ const PricingPage: React.FC = () => {
       setPackages({ content: transformed });
     } catch (err: any) {
       setError('Không thể tải danh sách gói dịch vụ');
-      toast.error('Kh�ng th? t?i g�i d?ch v?');
+      toast.error('Kh�ng th? t?i g�i d?ch v?');
     } finally {
       setLoading(false);
     }
@@ -86,11 +92,7 @@ const PricingPage: React.FC = () => {
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND',
-      minimumFractionDigits: 0,
-    }).format(price);
+    return priceFormatter.format(price);
   };
 
   if (loading) {
@@ -108,7 +110,7 @@ const PricingPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 mt-10 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Lỗi tải dữ liệu</h2>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Lỗi tải dữ liệu</h2>
           <p className="text-gray-600 mb-4">{error}</p>
           <button
             onClick={() => window.location.reload()}
@@ -126,7 +128,7 @@ const PricingPage: React.FC = () => {
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold text-gray-900 mb-3">
+          <h1 className="text-3xl font-semibold text-gray-900 mb-3">
             Đăng tin bất động sản của bạn với các gói dịch vụ chất lượng cao
           </h1>
           <p className="text-gray-600 mb-8">
@@ -184,12 +186,12 @@ const PricingPage: React.FC = () => {
                     {getPackageIcon(pkg.name)}
                   </div>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{pkg.name}</h3>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">{pkg.name}</h3>
                 <p className="text-gray-600 text-sm mb-5">{pkg.description}</p>
 
                 <div className="mb-6">
                   <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-3xl font-bold text-gray-900">
+                    <span className="text-3xl font-semibold text-gray-900">
                       {formatPrice(billingPeriod === 'yearly' ? pkg.price * 0.8 : pkg.price)}
                     </span>
                     <span className="text-gray-500 text-sm">
@@ -266,7 +268,7 @@ const PricingPage: React.FC = () => {
 
         {/* FAQ Section */}
         <div className="bg-white border border-gray-200 rounded-lg p-8 mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
+          <h2 className="text-2xl font-semibold text-gray-900 mb-8 text-center">
             Câu hỏi thường gặp
           </h2>
 
@@ -315,7 +317,7 @@ const PricingPage: React.FC = () => {
 
         {/* Contact Section */}
         <div className="text-center">
-          <h2 className="text-xl font-bold text-gray-900 mb-3">
+          <h2 className="text-xl font-semibold text-gray-900 mb-3">
             Cần hỗ trợ thêm?
           </h2>
           <p className="text-sm text-gray-600 mb-6 max-w-2xl mx-auto">

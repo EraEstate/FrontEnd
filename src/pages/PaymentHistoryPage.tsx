@@ -3,6 +3,11 @@ import { CreditCard, Calendar, DollarSign, CheckCircle, XCircle, Clock } from 'l
 import { useNewUserPayments } from '../api/hooks';
 import { useTranslation } from 'react-i18next';
 
+const priceFormatter = new Intl.NumberFormat('vi-VN', {
+  style: 'currency',
+  currency: 'VND',
+});
+
 const PaymentHistoryPage: React.FC = () => {
   const { t } = useTranslation();
   const { data: payments, loading, error, refetch } = useNewUserPayments(0, 20);
@@ -38,10 +43,7 @@ const PaymentHistoryPage: React.FC = () => {
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
-    }).format(price);
+    return priceFormatter.format(price);
   };
 
   const getPaymentMethodText = (method: string) => {
@@ -69,7 +71,7 @@ const PaymentHistoryPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 mt-10 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Lỗi tải dữ liệu</h2>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Lỗi tải dữ liệu</h2>
           <p className="text-gray-600 mb-4">{error}</p>
           <button
             onClick={refetch}
@@ -87,9 +89,9 @@ const PaymentHistoryPage: React.FC = () => {
       <div className="w-full max-w-6xl mx-auto px-6 lg:px-12 py-8">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-          <div className="flex items-center space-x-3 mb-4">
+          <div className="flex items-center gap-x-3 mb-4">
             <CreditCard className="h-8 w-8 text-red-600" />
-            <h1 className="text-3xl font-bold text-gray-900">Lịch sử thanh toán</h1>
+            <h1 className="text-3xl font-semibold text-gray-900">Lịch sử thanh toán</h1>
           </div>
           <p className="text-gray-600">
             Theo dõi tất cả các giao dịch thanh toán của bạn trên nền tảng.
@@ -97,12 +99,12 @@ const PaymentHistoryPage: React.FC = () => {
         </div>
 
         {/* Payment History */}
-        <div className="space-y-4">
+        <div className="gap-y-4">
           {payments?.content?.length ? (
             payments.content.map((payment: any) => (
               <div key={payment.id} className="bg-white rounded-lg shadow-sm p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center gap-x-3">
                     {getStatusIcon(payment.paymentStatus)}
                     <div>
                       <h3 className="font-semibold text-gray-900">
@@ -124,7 +126,7 @@ const PaymentHistoryPage: React.FC = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center gap-x-2">
                     <Calendar className="h-4 w-4 text-gray-400" />
                     <span className="text-gray-600">
                       {new Date(payment.createdAt).toLocaleDateString('vi-VN', {
@@ -137,14 +139,14 @@ const PaymentHistoryPage: React.FC = () => {
                     </span>
                   </div>
 
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center gap-x-2" suppressHydrationWarning>
                     <DollarSign className="h-4 w-4 text-gray-400" />
                     <span className="text-gray-600">
                       Trạng thái: {getStatusText(payment.paymentStatus)}
                     </span>
                   </div>
 
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center gap-x-2">
                     <CreditCard className="h-4 w-4 text-gray-400" />
                     <span className="text-gray-600">
                       Phương thức: {getPaymentMethodText(payment.paymentMethod)}
@@ -162,7 +164,7 @@ const PaymentHistoryPage: React.FC = () => {
               </div>
             ))
           ) : (
-            <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+            <div className="bg-white rounded-lg shadow-sm p-12 text-center" suppressHydrationWarning>
               <CreditCard className="h-16 w-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 Chưa có giao dịch nào
@@ -177,17 +179,17 @@ const PaymentHistoryPage: React.FC = () => {
         {/* Pagination */}
         {payments && payments.totalPages > 1 && (
           <div className="flex justify-center mt-8">
-            <div className="flex space-x-2">
-              {Array.from({ length: payments.totalPages }, (_, i) => (
+            <div className="flex gap-x-2">
+              {Array.from({ length: payments.totalPages }, (_, pageNumber) => pageNumber).map((pageNumber) => (
                 <button
-                  key={i}
+                  key={`page-btn-${pageNumber}`}
                   className={`px-3 py-2 rounded-lg ${
-                    i === payments.number
+                    pageNumber === payments.number
                       ? 'bg-red-600 text-white'
                       : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
                   }`}
                 >
-                  {i + 1}
+                  {pageNumber + 1}
                 </button>
               ))}
             </div>

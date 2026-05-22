@@ -94,7 +94,7 @@ const TransactionOverviewPage: React.FC = () => {
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
           <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">{t('transaction.overview.processTitle')}</p>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('transaction.overview.step1')}</h1>
+          <h1 className="text-2xl font-semibold text-gray-900 mb-2">{t('transaction.overview.step1')}</h1>
           <p className="text-sm text-gray-500">
             {t('transaction.overview.createdDate')}: <span className="font-medium">{contractDate}</span> • {t('transaction.transactionId')}:{' '}
             <span className="font-mono">{transaction.id}</span>
@@ -211,19 +211,19 @@ const TransactionOverviewPage: React.FC = () => {
                   </div>
                   <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white p-4 rounded border border-slate-200 shadow-sm">
                     <div className="flex items-center justify-between mb-1">
-                      <h3 className="font-bold text-slate-900">{m.title}</h3>
+                      <h3 className="font-semibold text-slate-900">{m.title}</h3>
                       <span className="font-bold text-red-600">{formatPrice(m.amount)} đ</span>
                     </div>
-                    <div className="text-sm text-slate-500 mb-3">Hạn: {new Date(m.dueDate).toLocaleDateString('vi-VN')}</div>
+                    <div suppressHydrationWarning className="text-sm text-slate-500 mb-3">Hạn: {new Date(m.dueDate).toLocaleDateString('vi-VN')}</div>
                     
-                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
+                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100" suppressHydrationWarning>
                       <div>
                         {m.status === 'PAID' ? (
                           <span className="inline-flex items-center gap-1.5 py-1 px-2 rounded-md text-xs font-medium bg-green-50 text-green-700">
-                            Đã thanh toán {m.paidAt ? `(${new Date(m.paidAt).toLocaleDateString('vi-VN')})` : ''}
+                            Đã thanh toán <span suppressHydrationWarning>{m.paidAt ? `(${new Date(m.paidAt).toLocaleDateString('vi-VN')})` : ''}</span>
                           </span>
                         ) : m.status === 'OVERDUE' ? (
-                          <span className="inline-flex items-center gap-1.5 py-1 px-2 rounded-md text-xs font-medium bg-red-50 text-red-700">
+                          <span className="inline-flex items-center gap-1.5 py-1 px-2 rounded-md text-xs font-medium bg-red-50 text-red-700" suppressHydrationWarning>
                             Quá hạn thanh toán
                           </span>
                         ) : (

@@ -734,3 +734,119 @@ export type PropertySearchForm = PropertySearchParams & {
   transactionType?: string;
   keyword?: string;
 };
+
+// Property History Types
+export interface PropertyHistory {
+  id: string;
+  propertyId: string;
+  eventType: 'CREATED' | 'PRICE_CHANGE' | 'STATUS_CHANGE' | 'LISTING_RENEWED' | string;
+  oldValue?: string;
+  newValue?: string;
+  description?: string;
+  createdAt: string;
+}
+
+export interface PropertyHistoryStats {
+  daysOnMarket: number;
+  priceChangeCount: number;
+  isDiscounted: boolean;
+  discountPercentage: number;
+  initialPrice: number;
+}
+
+export interface SavedSearch {
+  id: string;
+  userId: string;
+  searchName: string;
+  queryParams: string; // JSON string representing the search filters
+  alertFrequency: 'INSTANT' | 'DAILY' | 'WEEKLY' | 'OFF';
+  lastNotifiedAt?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PropertyNote {
+  id: string;
+  userId: string;
+  propertyId: number;
+  noteContent: string;
+  createdAt: string;
+  updatedAt: string;
+  property?: any;
+}
+
+export interface ValuationReport {
+  estimatedMinPrice: number;
+  estimatedMaxPrice: number;
+  marketSentiment: 'BULLISH' | 'NEUTRAL' | 'BEARISH';
+  investmentGrade: 'A' | 'B' | 'C' | 'D';
+  pros: string[];
+  cons: string[];
+  valuationAdvisory: string;
+  recommendations: string[];
+}
+
+export interface PropertyCollectionItem {
+  id: string;
+  collectionId: string;
+  propertyId: number;
+  createdAt: string;
+  property?: any;
+}
+
+export interface PropertyCollection {
+  id: string;
+  userId: string;
+  name: string;
+  description?: string;
+  isPublic: boolean;
+  shareToken: string;
+  createdAt: string;
+  updatedAt: string;
+  items: PropertyCollectionItem[];
+}
+
+export interface InvestmentCalculationRequest {
+  purchasePrice: number;
+  initialCosts: number;
+  monthlyRentIncome: number;
+  monthlyExpenses: number;
+  annualAppreciationRate: number;
+  annualInflationRate: number;
+  holdingYears: number;
+  discountRate: number;
+}
+
+export interface YearlyCashFlow {
+  year: number;
+  netCashFlow: number;
+  cumulativeCashFlow: number;
+}
+
+export interface InvestmentCalculationResponse {
+  totalInvestment: number;
+  totalNetCashFlow: number;
+  estimatedSaleValue: number;
+  netProfit: number;
+  roiPercent: number;
+  irrPercent: number;
+  npv: number;
+  paybackYears: number;
+  marketBenchmarkPercent: number;
+  yearlyCashFlows: YearlyCashFlow[];
+}
+
+export interface EnvironmentalQualityResponse {
+  aqi: number;
+  pm25: number;
+  aqiLabel: string;
+  aqiColor: string;
+  noiseLevel: number;
+  noiseLabel: string;
+  noiseColor: string;
+  greeneryScore: number;
+  environmentalAdvice: string;
+}
+
+

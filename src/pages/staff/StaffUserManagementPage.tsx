@@ -79,8 +79,14 @@ const EditUserModal: React.FC<{
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden" onClick={e => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <button
+        type="button"
+        aria-label="Close edit user modal"
+        className="absolute inset-0 bg-gray-950/40 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
         <div className="flex items-center justify-between p-5 border-b border-gray-100">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">Chỉnh sửa thông tin</h3>
@@ -90,13 +96,13 @@ const EditUserModal: React.FC<{
         </div>
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1.5 block">Họ và tên</label>
-            <input type="text" value={formData.fullName} onChange={e => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
+            <label htmlFor="staff-user-full-name" className="text-sm font-medium text-gray-700 mb-1.5 block">Họ và tên</label>
+            <input id="staff-user-full-name" type="text" value={formData.fullName} onChange={e => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
               className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent" required />
           </div>
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1.5 block">Số điện thoại</label>
-            <input type="tel" value={formData.phone} onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+            <label htmlFor="staff-user-phone" className="text-sm font-medium text-gray-700 mb-1.5 block">Số điện thoại</label>
+            <input id="staff-user-phone" type="tel" value={formData.phone} onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))}
               className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent" />
           </div>
           <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
@@ -210,9 +216,9 @@ const StaffUserManagementPage: React.FC = () => {
     return (
       <div className="space-y-4">
         <div className="h-8 w-56 bg-gray-200 rounded animate-pulse" />
-        <div className="flex gap-2">{[1, 2, 3, 4].map(i => <div key={i} className="h-10 w-24 bg-gray-200 rounded-xl animate-pulse" />)}</div>
-        {[1, 2, 3, 4].map(i => (
-          <div key={i} className="bg-white rounded-2xl p-5 animate-pulse">
+        <div className="flex gap-2">{[1, 2, 3, 4].map(slot => <div key={`staff-user-tab-skeleton-${slot}`} className="h-10 w-24 bg-gray-200 rounded-xl animate-pulse" />)}</div>
+        {[1, 2, 3, 4].map(slot => (
+          <div key={`staff-user-card-skeleton-${slot}`} className="bg-white rounded-2xl p-5 animate-pulse">
             <div className="flex gap-4"><div className="w-10 h-10 bg-gray-200 rounded-full" /><div className="flex-1 space-y-2"><div className="h-4 bg-gray-200 rounded w-1/3" /><div className="h-3 bg-gray-200 rounded w-1/2" /></div></div>
           </div>
         ))}
@@ -225,7 +231,7 @@ const StaffUserManagementPage: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Quản lý người dùng</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">Quản lý người dùng</h1>
           <p className="text-sm text-gray-500 mt-1">Xem thông tin, chỉnh sửa và khóa/mở khóa tài khoản</p>
         </div>
         <button onClick={() => { fetchUsers(); fetchTabCounts(); }} className="p-2 text-gray-400 hover:bg-gray-100 rounded-lg transition-colors" title="Làm mới">
@@ -344,7 +350,7 @@ const StaffUserManagementPage: React.FC = () => {
                       </div>
                       <div className="bg-white rounded-xl p-3 border border-gray-200">
                         <p className="text-xs text-gray-500 mb-1">Ngày tạo</p>
-                        <p className="text-sm text-gray-700">{user.createdAt ? new Date(user.createdAt).toLocaleDateString('vi-VN') : 'N/A'}</p>
+                        <p suppressHydrationWarning className="text-sm text-gray-700">{user.createdAt ? new Date(user.createdAt).toLocaleDateString('vi-VN') : 'N/A'}</p>
                       </div>
                     </div>
                   </div>

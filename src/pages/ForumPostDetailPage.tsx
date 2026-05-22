@@ -166,7 +166,7 @@ const ForumPostDetailPage: React.FC = () => {
         >
           <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-gray-500">
             <span className="font-medium text-gray-700">{comment.userName || 'Nguoi dung'}</span>
-            <span>{new Date(comment.createdAt).toLocaleString('vi-VN')}</span>
+            <span suppressHydrationWarning>{new Date(comment.createdAt).toLocaleString('vi-VN')}</span>
           </div>
           <p className="text-sm text-gray-800">{comment.content}</p>
           <div className="flex items-center gap-3 text-xs">
@@ -233,10 +233,10 @@ const ForumPostDetailPage: React.FC = () => {
                 {post.status !== 'ACTIVE' ? (
                   <span className="rounded-full bg-gray-100 px-2 py-0.5 text-gray-700">Status: {post.status}</span>
                 ) : null}
-                <span>{new Date(post.createdAt).toLocaleString('vi-VN')}</span>
+                <span suppressHydrationWarning>{new Date(post.createdAt).toLocaleString('vi-VN')}</span>
               </div>
 
-              <h1 className="text-2xl font-bold text-gray-900">{post.title}</h1>
+              <h1 className="text-2xl font-semibold text-gray-900" suppressHydrationWarning>{post.title}</h1>
               <p className="mt-2 text-sm text-gray-500">
                 Dang boi {post.userName || 'Nguoi dung'} • {post.commentCount} binh luan
               </p>
@@ -257,7 +257,7 @@ const ForumPostDetailPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => void votePost()}
-                  className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-black"
+                  className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-950"
                 >
                   <ThumbsUp className="h-4 w-4" />
                   {post.hasUpvoted ? 'Bo vote' : 'Vote'} ({post.upvotes})

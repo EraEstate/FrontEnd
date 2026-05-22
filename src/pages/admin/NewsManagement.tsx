@@ -68,7 +68,7 @@ const NewsManagement: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('admin.menu.news')}</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">{t('admin.menu.news')}</h1>
           <p className="text-sm text-gray-500 mt-1">Manage news articles and updates</p>
         </div>
         <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
@@ -142,7 +142,7 @@ const NewsManagement: React.FC = () => {
 
               {/* Content */}
               <div className="p-4">
-                <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                <h3 className="font-semibold text-lg text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
                   {article.title}
                 </h3>
                 
@@ -169,8 +169,8 @@ const NewsManagement: React.FC = () => {
                 {/* Tags */}
                 {article.tags && article.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {article.tags.slice(0, 3).map((tag: string, idx: number) => (
-                      <span key={idx} className="flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+                    {article.tags.slice(0, 3).map((tag: string) => (
+                      <span key={`${article.id}-${tag}`} className="flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
                         <Tag className="w-3 h-3" />
                         {tag}
                       </span>

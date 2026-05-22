@@ -70,7 +70,7 @@ const AdminAuditTrail: React.FC = () => {
         </div>
 
         {loading ? (
-          <div className="p-6 space-y-3">{[1,2,3,4,5].map(i=><div key={i} className="flex gap-4 animate-pulse"><div className={`w-8 h-8 rounded-lg ${isDark?'bg-slate-700':'bg-gray-200'}`}/><div className="flex-1 space-y-2"><div className={`h-4 rounded w-3/4 ${isDark?'bg-slate-700':'bg-gray-200'}`}/><div className={`h-3 rounded w-1/2 ${isDark?'bg-slate-700':'bg-gray-200'}`}/></div></div>)}</div>
+          <div className="p-6 space-y-3">{[1,2,3,4,5].map(slot=><div key={`audit-pulse-${slot}`} className="flex gap-4 animate-pulse"><div className={`w-8 h-8 rounded-lg ${isDark?'bg-slate-700':'bg-gray-200'}`}/><div className="flex-1 space-y-2"><div className={`h-4 rounded w-3/4 ${isDark?'bg-slate-700':'bg-gray-200'}`}/><div className={`h-3 rounded w-1/2 ${isDark?'bg-slate-700':'bg-gray-200'}`}/></div></div>)}</div>
         ) : filtered.length === 0 ? (
           <div className="p-12 text-center">
             <ScrollText className={`w-12 h-12 mx-auto mb-3 ${isDark?'text-slate-600':'text-gray-300'}`}/>
@@ -89,8 +89,8 @@ const AdminAuditTrail: React.FC = () => {
                       <p className={`text-xs mt-0.5 ${isDark?'text-slate-400':'text-gray-500'}`}>{evt.description}</p>
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <p className={`text-xs ${isDark?'text-slate-500':'text-gray-400'}`}>{new Date(evt.timestamp).toLocaleString('vi-VN')}</p>
-                      <p className={`text-xs mt-0.5 font-medium ${isDark?'text-slate-400':'text-gray-500'}`}>{evt.type}</p>
+                      <p suppressHydrationWarning className={`text-xs ${isDark?'text-slate-500':'text-gray-400'}`}>{new Date(evt.timestamp).toLocaleString('vi-VN')}</p>
+                      <p className={`text-xs mt-0.5 font-medium ${isDark?'text-slate-400':'text-gray-500'}`} suppressHydrationWarning>{evt.type}</p>
                     </div>
                   </div>
                 </div>

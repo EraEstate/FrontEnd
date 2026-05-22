@@ -60,7 +60,7 @@ const FavoritesPage = () => {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center py-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+          <h2 className="text-2xl font-semibold text-gray-900 mb-4">
             {t('favorites.loginRequired')}
           </h2>
           <p className="text-gray-600 mb-6">
@@ -106,7 +106,7 @@ const FavoritesPage = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('favorites.title')}</h1>
+        <h1 className="text-3xl font-semibold text-gray-800 mb-2">{t('favorites.title')}</h1>
         <p className="text-gray-600">{t('favorites.emptyDescription')}</p>
       </div>
 
@@ -235,9 +235,9 @@ const FavoritesPage = () => {
                     
                     <div className="pt-3 border-t">
                       <div className="flex items-center justify-between text-xs text-gray-500">
-                        <span>Lưu ngày {new Date(favorite.createdAt).toLocaleDateString('vi-VN')}</span>
+                        <span suppressHydrationWarning>Lưu ngày {new Date(favorite.createdAt).toLocaleDateString('vi-VN')}</span>
                         {property.views !== undefined && (
-                          <span className="flex items-center">
+                          <span className="flex items-center" suppressHydrationWarning>
                             <Eye className="w-3 h-3 mr-1" />
                             {property.views} lượt xem
                           </span>

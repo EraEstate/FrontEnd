@@ -33,6 +33,12 @@ export { documentAPI } from './document';
 export { badgeAPI } from './badge';
 export { calendarAPI } from './calendar';
 export { forumAPI } from './forum';
+export { propertyHistoryAPI } from './propertyHistory';
+export { savedSearchAPI } from './savedSearch';
+export { propertyNoteAPI } from './propertyNote';
+export { aiValuationAPI } from './aiValuation';
+export { propertyCollectionAPI } from './propertyCollection';
+export { environmentalAPI } from './environmental';
 
 // Export combined misc API
 export { miscAPI } from './misc';

@@ -149,7 +149,7 @@ const ProjectManagement: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('admin.menu.projects')}</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">{t('admin.menu.projects')}</h1>
           <p className="text-sm text-gray-500 mt-1">Manage real estate projects</p>
         </div>
         <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
@@ -232,7 +232,7 @@ const ProjectManagement: React.FC = () => {
 
               {/* Project Info */}
               <div className="p-5">
-                <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-1 group-hover:text-blue-600 transition-colors">
+                <h3 className="font-semibold text-lg text-gray-900 mb-2 line-clamp-1 group-hover:text-blue-600 transition-colors">
                   {project.name}
                 </h3>
 

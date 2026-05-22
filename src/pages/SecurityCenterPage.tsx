@@ -7,7 +7,7 @@ const SecurityCenterPage: React.FC = () => {
     <div className="min-h-screen bg-gray-50 pt-20">
       <div className="max-w-5xl mx-auto px-4 py-8">
         <div className="mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2">
+          <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 flex items-center gap-2">
             <Shield className="w-8 h-8 text-red-500" />
             Trung tâm bảo mật
           </h1>

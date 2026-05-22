@@ -198,7 +198,7 @@ const SignatureCanvas: React.FC<SignatureCanvasProps> = ({
             type="button"
             onClick={clearCanvas}
             disabled={disabled || !hasSignature}
-            className="p-1.5 rounded-md border border-gray-200 text-gray-500 hover:bg-red-50 hover:text-red-500 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="p-1.5 rounded-md border border-gray-200 text-[#6b7280] hover:bg-red-50 hover:text-red-500 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             title="Xóa chữ ký"
           >
             <Eraser className="w-3.5 h-3.5" />

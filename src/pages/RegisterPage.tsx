@@ -91,7 +91,7 @@ const RegisterPage: React.FC = () => {
     if (!canResendOtp) return;
     setSendingOtp(true);
     setOtpError(null);
-    setFormData({ ...formData, otpCode: '' });
+    setFormData((prev) => ({ ...prev, otpCode: '' }));
     try {
       await sendOtp(formData.email);
       setOtpCountdown(OTP_DURATION_SECONDS);
@@ -138,11 +138,11 @@ const RegisterPage: React.FC = () => {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    });
+    }));
     if (e.target.name === 'otpCode') {
       setOtpError(null);
     }
@@ -160,7 +160,7 @@ const RegisterPage: React.FC = () => {
           
           </div>
         </div>
-        <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
+        <h2 className="mt-6 text-center text-3xl font-semibold text-gray-900">
           {t('auth.register.createAccount')}
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
@@ -199,7 +199,7 @@ const RegisterPage: React.FC = () => {
                   type="text"
                   required
                   value={formData.fullName}
-                  onChange={handleChange}
+                  onChange={handleInputChange}
                   className="appearance-none block w-full px-3 py-2.5 pl-10 border border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 sm:text-sm transition-all duration-200"
                   placeholder={t('auth.register.enterFullName')}
                 />
@@ -218,7 +218,7 @@ const RegisterPage: React.FC = () => {
                   type="email"
                   required
                   value={formData.email}
-                  onChange={handleChange}
+                  onChange={handleInputChange}
                   disabled={showOtpForm}
                   className="appearance-none block w-full px-3 py-2.5 pl-10 border border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 sm:text-sm disabled:bg-gray-50 transition-all duration-200"
                   placeholder={t('auth.login.email')}
@@ -238,7 +238,7 @@ const RegisterPage: React.FC = () => {
                   type="tel"
                   required
                   value={formData.phone}
-                  onChange={handleChange}
+                  onChange={handleInputChange}
                   className="appearance-none block w-full px-3 py-2.5 pl-10 border border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 sm:text-sm transition-all duration-200"
                   placeholder={t('auth.register.enterPhone')}
                 />
@@ -257,7 +257,7 @@ const RegisterPage: React.FC = () => {
                   type={showPassword ? 'text' : 'password'}
                   required
                   value={formData.password}
-                  onChange={handleChange}
+                  onChange={handleInputChange}
                   className="appearance-none block w-full px-3 py-2.5 pl-10 pr-10 border border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 sm:text-sm transition-all duration-200"
                   placeholder={t('auth.register.enterPassword')}
                 />
@@ -295,7 +295,7 @@ const RegisterPage: React.FC = () => {
                   type={showConfirmPassword ? 'text' : 'password'}
                   required
                   value={formData.confirmPassword}
-                  onChange={handleChange}
+                  onChange={handleInputChange}
                   className="appearance-none block w-full px-3 py-2.5 pl-10 pr-10 border border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 sm:text-sm transition-all duration-200"
                   placeholder={t('auth.register.reEnterPassword')}
                 />
@@ -358,8 +358,8 @@ const RegisterPage: React.FC = () => {
                     required
                     maxLength={6}
                     value={formData.otpCode}
-                    onChange={handleChange}
-                    className="appearance-none block w-full px-3 py-3 pl-10 border border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 text-center text-lg tracking-[0.3em] font-mono transition-all duration-200"
+                    onChange={handleInputChange}
+                    className="appearance-none block w-full p-3 pl-10 border border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 text-center text-lg tracking-[0.3em] font-mono transition-all duration-200"
                     placeholder="000000"
                     autoComplete="one-time-code"
                   />
@@ -386,7 +386,7 @@ const RegisterPage: React.FC = () => {
                         : 'text-gray-300 cursor-not-allowed'
                     }`}
                   >
-                    {sendingOtp ? 'Đang gửi...' : canResendOtp ? 'Gửi lại mã' : `Gửi lại sau ${formatTime(otpCountdown)}`}
+                    {sendingOtp ? 'Đang gửi…' : canResendOtp ? 'Gửi lại mã' : `Gửi lại sau ${formatTime(otpCountdown)}`}
                   </button>
                 </div>
               </div>
@@ -403,13 +403,13 @@ const RegisterPage: React.FC = () => {
               />
               <label htmlFor="agree-terms" className="ml-2 block text-sm text-gray-900">
                 {t('auth.loginFooter.termsAgreement')}{' '}
-                <a href="#" className="text-orange-600 hover:text-orange-500">
+                <Link to="/legal" className="text-orange-600 hover:text-orange-500">
                   {t('auth.loginFooter.termsOfService')}
-                </a>{' '}
+                </Link>{' '}
                 {t('auth.loginFooter.and')}{' '}
-                <a href="#" className="text-orange-600 hover:text-orange-500">
+                <Link to="/legal" className="text-orange-600 hover:text-orange-500">
                   {t('auth.loginFooter.privacyPolicy')}
-                </a>
+                </Link>
               </label>
             </div>
 
@@ -422,7 +422,7 @@ const RegisterPage: React.FC = () => {
                 {sendingOtp ? (
                   <div className="flex items-center">
                     <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
-                    Đang gửi OTP...
+                    Đang gửi OTP…
                   </div>
                 ) : isLoading ? (
                   <div className="flex items-center">
@@ -491,23 +491,23 @@ const RegisterPage: React.FC = () => {
           <div className="border-t border-gray-200 pt-8">
             <h3 className="text-sm font-medium text-gray-600 mb-4">Quyền lợi thành viên</h3>
             <div className="space-y-3 text-xs text-gray-500">
-              <div className="flex items-center justify-center space-x-2">
+              <div className="flex items-center justify-center gap-x-2">
                 <div className="w-2 h-2 bg-red-600 rounded-full"></div>
                 <span>Đăng tin bán/cho thuê bất động sản miễn phí</span>
               </div>
-              <div className="flex items-center justify-center space-x-2">
+              <div className="flex items-center justify-center gap-x-2">
                 <div className="w-2 h-2 bg-red-600 rounded-full"></div>
                 <span>Lưu tin yêu thích và tìm kiếm nhanh</span>
               </div>
-              <div className="flex items-center justify-center space-x-2">
+              <div className="flex items-center justify-center gap-x-2">
                 <div className="w-2 h-2 bg-red-600 rounded-full"></div>
                 <span>Nhận thông báo tin đăng mới phù hợp</span>
               </div>
-              <div className="flex items-center justify-center space-x-2">
+              <div className="flex items-center justify-center gap-x-2">
                 <div className="w-2 h-2 bg-red-600 rounded-full"></div>
                 <span>Quản lý tin đăng hiệu quả</span>
               </div>
-              <div className="flex items-center justify-center space-x-2">
+              <div className="flex items-center justify-center gap-x-2">
                 <div className="w-2 h-2 bg-red-600 rounded-full"></div>
                 <span>Kết nối trực tiếp với khách hàng</span>
               </div>

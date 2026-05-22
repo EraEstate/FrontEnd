@@ -31,7 +31,7 @@ const LoginPage: React.FC = () => {
         navigate(from, { replace: true });
       }
     }
-  }, [isAuthenticated, user, navigate, location.state]);
+  }, [isAuthenticated, user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,15 +42,15 @@ const LoginPage: React.FC = () => {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Clear error khi user thay đổi input
     if (error) {
       clearError();
     }
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    });
+    }));
   };
 
   return (
@@ -62,7 +62,7 @@ const LoginPage: React.FC = () => {
            
           </div>
         </div>
-        <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
+        <h2 className="mt-6 text-center text-3xl font-semibold text-gray-900">
           {t('auth.login.title')}
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
@@ -82,15 +82,15 @@ const LoginPage: React.FC = () => {
             <>
               {/* Hiển thị banner đặc biệt cho tài khoản chưa kích hoạt */}
               {(error.includes('vô hiệu hóa') || error.includes('chưa kích hoạt') || error.includes('chưa được kích hoạt')) ? (
-                <div className="mb-6 bg-yellow-50 border-l-4 border-yellow-400 rounded-md p-4">
+                <div className="mb-6 bg-yellow-50 border-l-2 border-yellow-400 rounded-md p-4">
                   <div className="flex">
                     <AlertTriangle className="h-5 w-5 text-yellow-400 flex-shrink-0" />
                     <div className="ml-3">
                       <h3 className="text-sm font-medium text-yellow-800 mb-1">
-                        Tài khoản chưa được kích hoạt
+                        {t('auth.login.inactiveAccountTitle')}
                       </h3>
                       <p className="text-sm text-yellow-700">
-                        Tài khoản của bạn chưa được kích hoạt. Vui lòng liên hệ quản trị viên để kích hoạt tài khoản.
+                        {t('auth.login.inactiveAccountDesc')}
                       </p>
                     </div>
                   </div>
@@ -120,7 +120,7 @@ const LoginPage: React.FC = () => {
                   type="email"
                   required
                   value={formData.email}
-                  onChange={handleChange}
+                  onChange={handleInputChange}
                   className="appearance-none block w-full px-3 py-2.5 pl-10 border border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 sm:text-sm transition-all duration-200"
                   placeholder={t('auth.login.email')}
                 />
@@ -139,7 +139,7 @@ const LoginPage: React.FC = () => {
                   type={showPassword ? 'text' : 'password'}
                   required
                   value={formData.password}
-                  onChange={handleChange}
+                  onChange={handleInputChange}
                   className="appearance-none block w-full px-3 py-2.5 pl-10 pr-10 border border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 sm:text-sm transition-all duration-200"
                   placeholder={t('auth.login.password')}
                 />
@@ -244,27 +244,27 @@ const LoginPage: React.FC = () => {
         <div className="max-w-md mx-auto px-4">
           <p className="text-sm mb-4">
             {t('auth.loginFooter.termsAgreement')}{' '}
-            <a href="#" className="text-red-600 hover:text-red-700">{t('auth.loginFooter.termsOfService')}</a>
+            <Link to="/legal?tab=terms" className="text-red-600 hover:text-red-700">{t('auth.loginFooter.termsOfService')}</Link>
             {' '}{t('auth.loginFooter.and')}{' '}
-            <a href="#" className="text-red-600 hover:text-red-700">{t('auth.loginFooter.privacyPolicy')}</a>
+            <Link to="/legal?tab=terms" className="text-red-600 hover:text-red-700">{t('auth.loginFooter.privacyPolicy')}</Link>
             {t('auth.loginFooter.ofUs')}
           </p>
           <div className="border-t border-gray-200 pt-8">
             <h3 className="text-sm font-medium text-gray-600 mb-4">{t('auth.loginFooter.whyChoose')}</h3>
             <div className="space-y-3 text-xs text-gray-500">
-              <div className="flex items-center justify-center space-x-2">
+              <div className="flex items-center justify-center gap-x-2">
                 <div className="w-2 h-2 bg-red-600 rounded-full"></div>
                 <span>{t('auth.loginFooter.features.trustedListings')}</span>
               </div>
-              <div className="flex items-center justify-center space-x-2">
+              <div className="flex items-center justify-center gap-x-2">
                 <div className="w-2 h-2 bg-red-600 rounded-full"></div>
                 <span>{t('auth.loginFooter.features.transparentInfo')}</span>
               </div>
-              <div className="flex items-center justify-center space-x-2">
+              <div className="flex items-center justify-center gap-x-2">
                 <div className="w-2 h-2 bg-red-600 rounded-full"></div>
                 <span>{t('auth.loginFooter.features.support247')}</span>
               </div>
-              <div className="flex items-center justify-center space-x-2">
+              <div className="flex items-center justify-center gap-x-2">
                 <div className="w-2 h-2 bg-red-600 rounded-full"></div>
                 <span>{t('auth.loginFooter.features.userFriendly')}</span>
               </div>
@@ -277,3 +277,4 @@ const LoginPage: React.FC = () => {
 };
 
 export default LoginPage;
+

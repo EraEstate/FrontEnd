@@ -118,8 +118,8 @@ const StaffReportDashboard: React.FC = () => {
       <div className={`rounded-2xl border overflow-hidden ${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'}`}>
         {loading ? (
           <div className="p-8 space-y-4">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="flex gap-4 animate-pulse">
+            {[1, 2, 3].map(slot => (
+              <div key={`report-dash-pulse-${slot}`} className="flex gap-4 animate-pulse">
                 <div className={`w-10 h-10 rounded-full ${isDark ? 'bg-slate-700' : 'bg-gray-200'}`} />
                 <div className="flex-1 space-y-2">
                   <div className={`h-4 rounded w-3/4 ${isDark ? 'bg-slate-700' : 'bg-gray-200'}`} />
@@ -154,10 +154,10 @@ const StaffReportDashboard: React.FC = () => {
                     <p className={`text-sm mt-1 ${isDark ? 'text-slate-300' : 'text-gray-600'}`}>{report.description || 'Không có mô tả'}</p>
                     <div className={`flex items-center gap-4 mt-2 text-xs ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>
                       <span>Từ: {report.reporter?.fullName || 'Ẩn danh'}</span>
-                      <span>{new Date(report.createdAt).toLocaleDateString('vi-VN')}</span>
+                      <span suppressHydrationWarning>{new Date(report.createdAt).toLocaleDateString('vi-VN')}</span>
                     </div>
                   </div>
-                  <div className="flex gap-2 flex-shrink-0">
+                  <div className="flex gap-2 flex-shrink-0" suppressHydrationWarning>
                     {report.status === 'PENDING' && (
                       <>
                         <button onClick={() => handleUpdateStatus(report.id, 'REVIEWING')}

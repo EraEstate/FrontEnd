@@ -109,11 +109,9 @@ const ActivityTab: React.FC = () => {
       <div className="bg-white rounded-lg shadow-sm p-6">
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-gray-200 rounded w-1/3"></div>
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-24 bg-gray-200 rounded"></div>
+            {['act-skel-1', 'act-skel-2', 'act-skel-3'].map((skeletonId) => (
+              <div key={skeletonId} className="h-24 bg-gray-200 rounded"></div>
             ))}
-          </div>
         </div>
       </div>
     );
@@ -124,7 +122,7 @@ const ActivityTab: React.FC = () => {
       {/* Header with Filter */}
       <div className="bg-white rounded-lg shadow-sm p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-bold text-gray-900">Hoạt động của tôi</h3>
+          <h3 className="text-xl font-semibold text-gray-900">Hoạt động của tôi</h3>
           <div className="flex items-center gap-2">
             <Filter className="w-4 h-4 text-gray-500" />
             <span className="text-sm text-gray-600">Lọc:</span>
@@ -234,7 +232,7 @@ const ActivityTab: React.FC = () => {
                         <Clock className="w-3 h-3" />
                         <span>{formatTimeAgo(activity.timestamp)}</span>
                         <span>•</span>
-                        <span>{new Date(activity.timestamp).toLocaleDateString('vi-VN')}</span>
+                        <span suppressHydrationWarning>{new Date(activity.timestamp).toLocaleDateString('vi-VN')}</span>
                       </div>
                     </div>
 

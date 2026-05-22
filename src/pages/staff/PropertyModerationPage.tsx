@@ -47,8 +47,14 @@ const RejectModal: React.FC<{
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden" onClick={e => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <button
+        type="button"
+        aria-label="Close reject modal"
+        className="absolute inset-0 bg-gray-950/40 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
         <div className="flex items-center justify-between p-5 border-b border-gray-100">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">Từ chối tin đăng</h3>
@@ -302,9 +308,9 @@ const PropertyModerationPage: React.FC = () => {
     return (
       <div className="space-y-4">
         <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
-        <div className="flex gap-2">{[1,2,3].map(i => <div key={i} className="h-10 w-28 bg-gray-200 rounded-xl animate-pulse" />)}</div>
-        {[1,2,3].map(i => (
-          <div key={i} className="bg-white rounded-2xl p-5 animate-pulse">
+        <div className="flex gap-2">{[1,2,3].map(slot => <div key={`prop-mod-tab-skeleton-${slot}`} className="h-10 w-28 bg-gray-200 rounded-xl animate-pulse" />)}</div>
+        {[1,2,3].map(slot => (
+          <div key={`prop-mod-card-skeleton-${slot}`} className="bg-white rounded-2xl p-5 animate-pulse">
             <div className="flex gap-4"><div className="w-20 h-20 bg-gray-200 rounded-xl" /><div className="flex-1 space-y-3"><div className="h-5 bg-gray-200 rounded w-3/4" /><div className="h-4 bg-gray-200 rounded w-1/2" /></div></div>
           </div>
         ))}
@@ -317,7 +323,7 @@ const PropertyModerationPage: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Duyệt tin đăng</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">Duyệt tin đăng</h1>
           <p className="text-sm text-gray-500 mt-1">Xem xét và quản lý tin đăng trên hệ thống</p>
         </div>
         <button onClick={() => { fetchProperties(); fetchTabCounts(); }} className="p-2 text-gray-400 hover:bg-gray-100 rounded-lg transition-colors" title="Làm mới">
@@ -400,22 +406,28 @@ const PropertyModerationPage: React.FC = () => {
                   )}
 
                   {/* Thumbnail */}
-                  <div className="w-20 h-20 rounded-xl bg-gray-100 flex-shrink-0 overflow-hidden cursor-pointer"
-                    onClick={() => setExpandedId(isExpanded ? null : property.id)}>
+                  <button
+                    type="button"
+                    className="w-20 h-20 rounded-xl bg-gray-100 flex-shrink-0 overflow-hidden cursor-pointer"
+                    onClick={() => setExpandedId(isExpanded ? null : property.id)}
+                  >
                     {property.mainImageUrl ? (
                       <img src={property.mainImageUrl} alt="" className="w-full h-full object-cover" loading="lazy" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center"><Home className="w-8 h-8 text-gray-300" /></div>
                     )}
-                  </div>
+                  </button>
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start gap-2 mb-1">
-                      <h3 className="text-base font-semibold text-gray-900 truncate cursor-pointer hover:text-red-600 transition-colors"
-                        onClick={() => setExpandedId(isExpanded ? null : property.id)}>
+                      <button
+                        type="button"
+                        className="text-base font-semibold text-gray-900 truncate cursor-pointer hover:text-red-600 transition-colors"
+                        onClick={() => setExpandedId(isExpanded ? null : property.id)}
+                      >
                         {property.title}
-                      </h3>
+                      </button>
                       {property.propertyType && (
                         <span className="flex-shrink-0 px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 rounded-lg">
                           {propertyTypeLabels[property.propertyType] || property.propertyType}
@@ -480,8 +492,8 @@ const PropertyModerationPage: React.FC = () => {
                         </h4>
                         {property.images && property.images.length > 0 ? (
                           <div className="grid grid-cols-3 gap-2">
-                            {property.images.slice(0, 6).map((img: any, i: number) => (
-                              <div key={i} className="aspect-square rounded-lg overflow-hidden bg-gray-200">
+                            {property.images.slice(0, 6).map((img: any) => (
+                              <div key={img.id ?? img.imageUrl} className="aspect-square rounded-lg overflow-hidden bg-gray-200">
                                 <img src={img.imageUrl} alt="" className="w-full h-full object-cover hover:scale-110 transition-transform duration-300" loading="lazy" />
                               </div>
                             ))}
@@ -532,8 +544,14 @@ const PropertyModerationPage: React.FC = () => {
 
       {/* Bulk Reject Modal */}
       {bulkRejectModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={() => setBulkRejectModal(false)}>
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <button
+            type="button"
+            aria-label="Close bulk reject modal"
+            className="absolute inset-0 bg-gray-950/40 backdrop-blur-sm"
+            onClick={() => setBulkRejectModal(false)}
+          />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
             <div className="flex items-center justify-between p-5 border-b border-gray-100">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">Từ chối hàng loạt</h3>

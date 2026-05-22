@@ -46,7 +46,7 @@ const ErrorBoundaryFallback: React.FC<{ error: Error | null }> = ({ error }) => 
         <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
           <AlertTriangle className="w-8 h-8 text-red-600" />
         </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+        <h2 className="text-2xl font-semibold text-gray-900 mb-2">
           {t('common.error.unexpected')}
         </h2>
         <p className="text-gray-600 mb-6">

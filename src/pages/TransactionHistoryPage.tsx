@@ -340,12 +340,12 @@ const TransactionHistoryPage: React.FC<TransactionHistoryPageProps> = ({ embedde
                       {PAYMENT_METHOD_LABEL[tx.paymentMethod] || tx.paymentMethod}
                       {tx.bankTransactionId && ` · ${tx.bankTransactionId}`}
                       {' · '}
-                      {new Date(tx.createdAt).toLocaleDateString('vi-VN')}
+                      <span suppressHydrationWarning>{new Date(tx.createdAt).toLocaleDateString('vi-VN')}</span>
                     </p>
 
                     {/* Blockchain: one line, optional sign button */}
                     {showBlockchainBtn && (
-                      <div className="mt-2 flex items-center gap-2">
+                      <div className="mt-2 flex items-center gap-2" suppressHydrationWarning>
                         <span className="text-xs text-gray-500">{t('transaction.historyList.notSignedBlockchain')}</span>
                         <button
                           type="button"

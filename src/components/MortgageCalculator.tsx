@@ -58,10 +58,9 @@ const MortgageCalculator: React.FC<Props> = ({ propertyPrice, isRent }) => {
   }, [propertyPrice, downPaymentPercent, loanTermYears, annualRate]);
 
   const pieData = [
-    { name: 'Tiền gốc', value: calc.loanAmount || 0 },
-    { name: 'Tiền lãi', value: calc.totalInterest },
+    { name: 'Tiền gốc', value: calc.loanAmount || 0, color: '#ef4444' },
+    { name: 'Tiền lãi', value: calc.totalInterest, color: '#fbbf24' },
   ];
-  const PIE_COLORS = ['#ef4444', '#fbbf24'];
 
 
 
@@ -76,7 +75,7 @@ const MortgageCalculator: React.FC<Props> = ({ propertyPrice, isRent }) => {
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>
           </div>
           <div>
-            <h2 className="text-base font-bold text-gray-900">Ước tính khoản vay</h2>
+            <h2 className="text-base font-semibold text-gray-900">Ước tính khoản vay</h2>
             <p className="text-xs text-gray-500">Tính toán chi phí tài chính khi mua bất động sản này</p>
           </div>
         </div>
@@ -138,7 +137,7 @@ const MortgageCalculator: React.FC<Props> = ({ propertyPrice, isRent }) => {
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie data={pieData} innerRadius={35} outerRadius={55} paddingAngle={3} dataKey="value" strokeWidth={0}>
-                  {pieData.map((_, i) => (<Cell key={i} fill={PIE_COLORS[i]} />))}
+                  {pieData.map((item) => (<Cell key={item.name} fill={item.color} />))}
                 </Pie>
                 <Tooltip formatter={(val: any) => formatVND(val)} contentStyle={{ borderRadius: '10px', border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,.1)', fontSize: '13px' }} />
               </PieChart>

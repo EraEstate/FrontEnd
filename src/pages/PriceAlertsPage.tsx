@@ -59,7 +59,7 @@ const PriceAlertsPage: React.FC = () => {
         <div className="mb-6 rounded-2xl bg-white p-6 shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Quản lý cảnh báo giá</h1>
+              <h1 className="text-2xl font-semibold text-gray-900">Quản lý cảnh báo giá</h1>
               <p className="mt-1 text-sm text-gray-600">
                 Tổng {alerts.length} cảnh báo, đang bật {activeCount} cảnh báo.
               </p>
@@ -99,9 +99,9 @@ const PriceAlertsPage: React.FC = () => {
                     </p>
                     <p className="text-xs text-gray-500">
                       Triggered: {alert.triggerCount || 0} lần
-                      {alert.triggeredAt ? ` • Gần nhất: ${new Date(alert.triggeredAt).toLocaleString('vi-VN')}` : ''}
+                      <span suppressHydrationWarning>{alert.triggeredAt ? ` • Gần nhất: ${new Date(alert.triggeredAt).toLocaleString('vi-VN')}` : ''}</span>
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-500" suppressHydrationWarning>
                       Bộ lọc: {alert.propertyType || 'Tất cả loại'} • {alert.listingType || 'Mua/Bán + Thuê'}
                       {alert.minArea || alert.maxArea ? ` • Diện tích ${alert.minArea || 0}-${alert.maxArea || '∞'}m²` : ''}
                       {alert.provinceId ? ` • Province ${alert.provinceId}` : ''}

@@ -99,7 +99,7 @@ const AdminReportCenter: React.FC = () => {
       {/* List */}
       <div className={`rounded-2xl border overflow-hidden ${cardCls}`}>
         {loading ? (
-          <div className="p-8 space-y-4">{[1,2,3].map(i=><div key={i} className="flex gap-4 animate-pulse"><div className={`w-10 h-10 rounded-full ${isDark?'bg-slate-700':'bg-gray-200'}`}/><div className="flex-1 space-y-2"><div className={`h-4 rounded w-3/4 ${isDark?'bg-slate-700':'bg-gray-200'}`}/><div className={`h-3 rounded w-1/2 ${isDark?'bg-slate-700':'bg-gray-200'}`}/></div></div>)}</div>
+          <div className="p-8 space-y-4">{[1,2,3].map(slot=><div key={`report-pulse-${slot}`} className="flex gap-4 animate-pulse"><div className={`w-10 h-10 rounded-full ${isDark?'bg-slate-700':'bg-gray-200'}`}/><div className="flex-1 space-y-2"><div className={`h-4 rounded w-3/4 ${isDark?'bg-slate-700':'bg-gray-200'}`}/><div className={`h-3 rounded w-1/2 ${isDark?'bg-slate-700':'bg-gray-200'}`}/></div></div>)}</div>
         ) : filtered.length === 0 ? (
           <div className="p-12 text-center">
             <Flag className={`w-12 h-12 mx-auto mb-3 ${isDark?'text-slate-600':'text-gray-300'}`}/>
@@ -120,7 +120,7 @@ const AdminReportCenter: React.FC = () => {
                     <p className={`text-sm mt-1 ${isDark?'text-slate-300':'text-gray-600'}`}>{r.description || 'Không có mô tả'}</p>
                     <div className={`flex gap-4 mt-2 text-xs ${isDark?'text-slate-400':'text-gray-500'}`}>
                       <span><Users className="w-3 h-3 inline mr-1"/>{r.reporter?.fullName || 'Ẩn danh'}</span>
-                      <span>{new Date(r.createdAt).toLocaleDateString('vi-VN')}</span>
+                      <span suppressHydrationWarning>{new Date(r.createdAt).toLocaleDateString('vi-VN')}</span>
                     </div>
                     {/* Admin note input */}
                     {(r.status === 'PENDING' || r.status === 'REVIEWING') && (
@@ -128,7 +128,7 @@ const AdminReportCenter: React.FC = () => {
                         className={`mt-2 w-full px-3 py-1.5 rounded-lg text-xs border ${isDark?'bg-slate-700 border-slate-600 text-white':'bg-gray-50 border-gray-200'}`}/>
                     )}
                   </div>
-                  <div className="flex gap-2 flex-shrink-0">
+                  <div className="flex gap-2 flex-shrink-0" suppressHydrationWarning>
                     {r.status === 'PENDING' && (<>
                       <button onClick={()=>handleUpdateStatus(r.id,'REVIEWING')} className="px-3 py-1.5 text-xs font-medium rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200">Xem xét</button>
                       <button onClick={()=>handleUpdateStatus(r.id,'DISMISSED')} className="px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200">Bỏ qua</button>

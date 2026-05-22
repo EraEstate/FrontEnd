@@ -69,7 +69,7 @@ const QrCodeModal: React.FC<QrCodeModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/55 p-4">
+    <div className="fixed inset-0 z-[120] flex items-center justify-center bg-gray-950/55 p-4">
       <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
           <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900">
@@ -85,7 +85,7 @@ const QrCodeModal: React.FC<QrCodeModalProps> = ({
           </button>
         </div>
 
-        <div className="space-y-4 px-5 py-5">
+        <div className="space-y-4 p-5">
           <p className="text-sm text-gray-600">
             Quét mã để mở trực tiếp trang chi tiết tin đăng.
           </p>

@@ -138,34 +138,34 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ embedded = false }) => {
   };
 
   const formatPrice = (price: number) => {
-    if (price >= 1_000_000_000) return `${(price / 1_000_000_000).toFixed(1)} tỷ`;
-    if (price >= 1_000_000) return `${(price / 1_000_000).toFixed(0)} triệu`;
-    return price.toLocaleString('vi-VN');
+    if (price >= 1_000_000_000) return `${(price / 1_000_000_000).toFixed(1)} ${t('common.billion')}`;
+    if (price >= 1_000_000) return `${(price / 1_000_000).toFixed(0)} ${t('common.million')}`;
+    return price.toLocaleString();
   };
 
   const relativeTime = (ts: string) => {
     if (!ts) return '';
     const diff = Date.now() - new Date(ts).getTime();
     const mins = Math.floor(diff / 60000);
-    if (mins < 1) return 'Vừa xong';
-    if (mins < 60) return `${mins} phút trước`;
+    if (mins < 1) return t('time.justNow', { defaultValue: 'Vừa xong' });
+    if (mins < 60) return t('time.minutesAgo', { count: mins, defaultValue: `${mins} phút trước` });
     const hours = Math.floor(mins / 60);
-    if (hours < 24) return `${hours} giờ trước`;
+    if (hours < 24) return t('time.hoursAgo', { count: hours, defaultValue: `${hours} giờ trước` });
     const days = Math.floor(hours / 24);
-    if (days < 7) return `${days} ngày trước`;
-    return new Date(ts).toLocaleDateString('vi-VN');
+    if (days < 7) return t('time.daysAgo', { count: days, defaultValue: `${days} ngày trước` });
+    return new Date(ts).toLocaleDateString();
   };
 
   const content = (
     <>
       {/* Header */}
       <div className="bg-gradient-to-br from-red-600 to-red-800 rounded-2xl p-6 mb-8 text-white shadow-lg">
-        <div className="flex items-center space-x-3 mb-2">
+        <div className="flex items-center gap-x-3 mb-2">
           <BarChart3 className="h-8 w-8 opacity-90" />
-          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <h1 className="text-2xl font-semibold">{t('dashboard.title')}</h1>
         </div>
         <p className="opacity-80 text-sm">
-          Tổng quan về hoạt động bất động sản của bạn
+          {t('dashboard.subtitle')}
         </p>
       </div>
 
@@ -174,11 +174,11 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ embedded = false }) => {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Tổng tin đăng</p>
+              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{t('dashboard.stats.totalProperties')}</p>
               <p className="text-2xl font-bold text-gray-900 mt-1">
                 {statsLoading ? <span className="inline-block w-8 h-6 bg-gray-200 rounded animate-pulse" /> : totalProperties}
               </p>
-              <p className="text-xs text-emerald-600 mt-1 font-medium">{activeProperties} đang hiển thị</p>
+              <p className="text-xs text-emerald-600 mt-1 font-medium">{activeProperties} {t('dashboard.stats.active')}</p>
             </div>
             <div className="p-3 rounded-xl bg-blue-50">
               <MapPin className="h-6 w-6 text-blue-600" />
@@ -189,11 +189,11 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ embedded = false }) => {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Lượt xem</p>
+              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{t('dashboard.stats.views')}</p>
               <p className="text-2xl font-bold text-gray-900 mt-1">
                 {statsLoading ? <span className="inline-block w-8 h-6 bg-gray-200 rounded animate-pulse" /> : totalViews.toLocaleString()}
               </p>
-              <p className="text-xs text-emerald-600 mt-1 font-medium">Tất cả tin đăng</p>
+              <p className="text-xs text-emerald-600 mt-1 font-medium">{t('dashboard.stats.allProperties')}</p>
             </div>
             <div className="p-3 rounded-xl bg-green-50">
               <Eye className="h-6 w-6 text-green-600" />
@@ -204,11 +204,11 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ embedded = false }) => {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Yêu thích</p>
+              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{t('dashboard.stats.favorites')}</p>
               <p className="text-2xl font-bold text-gray-900 mt-1">
                 {statsLoading ? <span className="inline-block w-8 h-6 bg-gray-200 rounded animate-pulse" /> : totalFavorites}
               </p>
-              <p className="text-xs text-gray-500 mt-1 font-medium">BĐS đã lưu</p>
+              <p className="text-xs text-gray-500 mt-1 font-medium">{t('dashboard.stats.savedProperties')}</p>
             </div>
             <div className="p-3 rounded-xl bg-red-50">
               <Heart className="h-6 w-6 text-red-600" />
@@ -219,12 +219,12 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ embedded = false }) => {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Yêu cầu liên hệ</p>
+              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{t('dashboard.stats.inquiries')}</p>
               <p className="text-2xl font-bold text-gray-900 mt-1">
                 {statsLoading ? <span className="inline-block w-8 h-6 bg-gray-200 rounded animate-pulse" /> : totalInquiries}
               </p>
               <Link to="/inquiries" className="text-xs text-red-600 hover:text-red-700 font-medium mt-1 inline-block">
-                Xem chi tiết →
+                {t('dashboard.stats.viewDetails')}
               </Link>
             </div>
             <div className="p-3 rounded-xl bg-purple-50">
@@ -236,12 +236,12 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ embedded = false }) => {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Doanh thu thuê</p>
+              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{t('dashboard.stats.revenue')}</p>
               <p className="text-2xl font-bold text-gray-900 mt-1">
                 {revenueLoading ? <span className="inline-block w-12 h-6 bg-gray-200 rounded animate-pulse" /> : `${formatPrice(revenueTotal)}`}
               </p>
               <Link to="/revenue" className="text-xs text-red-600 hover:text-red-700 font-medium mt-1 inline-block">
-                Dashboard doanh thu →
+                {t('dashboard.stats.revenueDashboard')}
               </Link>
             </div>
             <div className="p-3 rounded-xl bg-emerald-50">
@@ -256,16 +256,16 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ embedded = false }) => {
         <div className="lg:col-span-2">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
             <div className="p-5 border-b border-gray-100 flex items-center justify-between">
-              <h2 className="text-base font-semibold text-gray-900">Hoạt động gần đây</h2>
+              <h2 className="text-base font-semibold text-gray-900">{t('dashboard.recentActivities.title')}</h2>
               <Link to="/activity-log" className="text-xs text-red-600 hover:text-red-700 font-medium flex items-center gap-1">
-                Xem tất cả <ChevronRight className="w-3 h-3" />
+                {t('dashboard.recentActivities.viewAll')} <ChevronRight className="w-3 h-3" />
               </Link>
             </div>
 
             {activitiesLoading ? (
               <div className="p-5 space-y-4">
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="flex items-start space-x-4 animate-pulse">
+                {[1, 2, 3].map(slot => (
+                  <div key={`activity-skeleton-${slot}`} className="flex items-start gap-x-4 animate-pulse">
                     <div className="w-10 h-10 rounded-full bg-gray-200" />
                     <div className="flex-1 space-y-2">
                       <div className="h-4 bg-gray-200 rounded w-3/4" />
@@ -277,7 +277,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ embedded = false }) => {
             ) : recentActivities.length === 0 ? (
               <div className="p-8 text-center">
                 <Activity className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-sm text-gray-500">Chưa có hoạt động nào</p>
+                <p className="text-sm text-gray-500">{t('dashboard.recentActivities.empty')}</p>
               </div>
             ) : (
               <div className="divide-y divide-gray-50">
@@ -285,7 +285,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ embedded = false }) => {
                   const { icon: IconComp, color, bg } = getActivityIcon(activity.type);
                   return (
                     <div key={activity.id || index} className="p-4 hover:bg-gray-50/50 transition-colors">
-                      <div className="flex items-start space-x-3">
+                      <div className="flex items-start gap-x-3">
                         <div className={`p-2 rounded-xl ${bg} flex-shrink-0`}>
                           <IconComp className={`h-4 w-4 ${color}`} />
                         </div>
@@ -297,7 +297,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ embedded = false }) => {
                         {activity.propertyId && (
                           <Link to={`/properties/${activity.propertyId}`}
                             className="text-xs text-red-600 hover:text-red-700 font-medium whitespace-nowrap">
-                            Xem →
+                            {t('dashboard.recentActivities.view')}
                           </Link>
                         )}
                       </div>
@@ -313,13 +313,13 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ embedded = false }) => {
         <div className="lg:col-span-1">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
             <div className="p-5 border-b border-gray-100">
-              <h2 className="text-base font-semibold text-gray-900">Top BĐS của bạn</h2>
+              <h2 className="text-base font-semibold text-gray-900">{t('dashboard.topProperties.title')}</h2>
             </div>
 
             {topLoading ? (
               <div className="p-5 space-y-4">
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="flex gap-3 animate-pulse">
+                {[1, 2, 3].map(slot => (
+                  <div key={`top-property-skeleton-${slot}`} className="flex gap-3 animate-pulse">
                     <div className="w-14 h-14 rounded-lg bg-gray-200 flex-shrink-0" />
                     <div className="flex-1 space-y-2">
                       <div className="h-4 bg-gray-200 rounded w-3/4" />
@@ -331,16 +331,16 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ embedded = false }) => {
             ) : topProperties.length === 0 ? (
               <div className="p-8 text-center">
                 <Home className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-sm text-gray-500">Chưa có tin đăng nào</p>
+                <p className="text-sm text-gray-500">{t('dashboard.topProperties.empty')}</p>
                 <Link to="/post-property" className="text-sm text-red-600 hover:text-red-700 font-medium mt-2 inline-block">
-                  Đăng tin ngay →
+                  {t('dashboard.topProperties.postNow')}
                 </Link>
               </div>
             ) : (
               <div className="p-4 space-y-3">
                 {topProperties.map((property) => (
                   <Link key={property.id} to={`/properties/${property.id}`}
-                    className="flex items-start space-x-3 p-2 rounded-xl hover:bg-gray-50 transition-colors">
+                    className="flex items-start gap-x-3 p-2 rounded-xl hover:bg-gray-50 transition-colors">
                     <div className="w-14 h-14 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden">
                       {property.mainImageUrl ? (
                         <img src={property.mainImageUrl} alt="" className="w-full h-full object-cover" loading="lazy" />
@@ -354,7 +354,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ embedded = false }) => {
                       <h4 className="text-sm font-medium text-gray-900 truncate">
                         {property.title}
                       </h4>
-                      <div className="flex items-center space-x-3 mt-1 text-xs text-gray-500">
+                      <div className="flex items-center gap-x-3 mt-1 text-xs text-gray-500">
                         <span className="flex items-center text-red-600 font-semibold">
                           {formatPrice(property.price)} VND
                         </span>
@@ -374,15 +374,15 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ embedded = false }) => {
 
       {/* Quick Actions */}
       <div className="mt-8 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <h2 className="text-base font-semibold text-gray-900 mb-4">Thao tác nhanh</h2>
+        <h2 className="text-base font-semibold text-gray-900 mb-4">{t('dashboard.quickActions.title')}</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           {[
-            { href: '/post-property', icon: MapPin, label: 'Đăng tin mới', color: 'from-red-500 to-red-600' },
-            { href: '/my-properties', icon: Home, label: 'Quản lý tin', color: 'from-blue-500 to-blue-600' },
-            { href: '/inquiries', icon: MessageSquare, label: 'Yêu cầu liên hệ', color: 'from-purple-500 to-purple-600' },
-            { href: '/payments', icon: CreditCard, label: 'Thanh toán', color: 'from-green-500 to-green-600' },
-            { href: '/calendar', icon: CalendarDays, label: 'Lịch hẹn', color: 'from-indigo-500 to-indigo-600' },
-            { href: '/revenue', icon: TrendingUp, label: 'Doanh thu', color: 'from-emerald-500 to-emerald-600' },
+            { href: '/post-property', icon: MapPin, label: t('dashboard.quickActions.postProperty'), color: 'from-red-500 to-red-600' },
+            { href: '/my-properties', icon: Home, label: t('dashboard.quickActions.manageProperties'), color: 'from-blue-500 to-blue-600' },
+            { href: '/inquiries', icon: MessageSquare, label: t('dashboard.quickActions.inquiries'), color: 'from-purple-500 to-purple-600' },
+            { href: '/payments', icon: CreditCard, label: t('dashboard.quickActions.payments'), color: 'from-green-500 to-green-600' },
+            { href: '/calendar', icon: CalendarDays, label: t('dashboard.quickActions.calendar'), color: 'from-indigo-500 to-indigo-600' },
+            { href: '/revenue', icon: TrendingUp, label: t('dashboard.quickActions.revenue'), color: 'from-emerald-500 to-emerald-600' },
           ].map(item => (
             <Link key={item.href} to={item.href}
               className={`bg-gradient-to-br ${item.color} text-white rounded-2xl p-4 hover:shadow-lg hover:scale-[1.02] transition-all duration-200 text-center`}>

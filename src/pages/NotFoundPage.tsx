@@ -2,6 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Home, ArrowLeft, Search, Building2, Compass } from 'lucide-react';
 
+const PARTICLES = Array.from({ length: 6 }, (_, i) => ({
+  id: `particle-${i}`,
+  index: i,
+  bgColor: ['#3b82f6', '#f97316', '#8b5cf6', '#10b981', '#ec4899', '#06b6d4'][i],
+}));
+
 const NotFoundPage: React.FC = () => {
   const navigate = useNavigate();
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -27,14 +33,14 @@ const NotFoundPage: React.FC = () => {
           style={{ transform: `translate(${-mousePos.x * 0.3}px, ${-mousePos.y * 0.3}px)` }} />
         <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-purple-100/20 rounded-full blur-3xl" />
         {/* Floating particles */}
-        {[...Array(6)].map((_, i) => (
-          <div key={i}
+        {PARTICLES.map((p) => (
+          <div key={p.id}
             className="absolute rounded-full opacity-20 animate-pulse"
             style={{
-              width: `${8 + i * 4}px`, height: `${8 + i * 4}px`,
-              backgroundColor: ['#3b82f6', '#f97316', '#8b5cf6', '#10b981', '#ec4899', '#06b6d4'][i],
-              top: `${15 + i * 14}%`, left: `${10 + i * 15}%`,
-              animationDelay: `${i * 0.7}s`, animationDuration: `${2 + i * 0.5}s`,
+              width: `${8 + p.index * 4}px`, height: `${8 + p.index * 4}px`,
+              backgroundColor: p.bgColor,
+              top: `${15 + p.index * 14}%`, left: `${10 + p.index * 15}%`,
+              animationDelay: `${p.index * 0.7}s`, animationDuration: `${2 + p.index * 0.5}s`,
             }}
           />
         ))}
@@ -43,7 +49,7 @@ const NotFoundPage: React.FC = () => {
       <div className="relative z-10 max-w-lg w-full text-center">
         {/* 404 Number — parallax */}
         <div className="mb-6" style={{ transform: `translate(${mousePos.x * 0.15}px, ${mousePos.y * 0.15}px)` }}>
-          <h1 className="text-[140px] md:text-[180px] font-black leading-none select-none"
+          <h1 className="text-[140px] md:text-[180px] font-semibold leading-none select-none"
             style={{
               background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 40%, #f97316 100%)',
               WebkitBackgroundClip: 'text',
@@ -71,7 +77,7 @@ const NotFoundPage: React.FC = () => {
         </div>
 
         {/* Message */}
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
+        <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-3">
           Trang không tồn tại
         </h2>
         <p className="text-gray-500 mb-8 text-base leading-relaxed max-w-sm mx-auto">
@@ -106,7 +112,7 @@ const NotFoundPage: React.FC = () => {
 
         {/* Subtle branding */}
         <p className="text-xs text-gray-300 mt-12 font-medium tracking-wider uppercase">
-          EraEstate — Nền tảng Bất Động Sản
+          EraEstate - Nền tảng Bất Động Sản
         </p>
       </div>
     </div>

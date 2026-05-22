@@ -69,8 +69,8 @@ const StaffActivityLog: React.FC = () => {
       </div>
 
       {loading ? (
-        <div className="space-y-3">{[1,2,3].map(i => (
-          <div key={i} className={`p-4 rounded-2xl border animate-pulse ${cardCls}`}>
+        <div className="space-y-3">{[1,2,3].map(slot => (
+          <div key={`activity-log-pulse-${slot}`} className={`p-4 rounded-2xl border animate-pulse ${cardCls}`}>
             <div className="flex gap-4"><div className={`w-10 h-10 rounded-full ${isDark?'bg-slate-700':'bg-gray-200'}`}/><div className="flex-1 space-y-2"><div className={`h-4 rounded w-3/4 ${isDark?'bg-slate-700':'bg-gray-200'}`}/><div className={`h-3 rounded w-1/2 ${isDark?'bg-slate-700':'bg-gray-200'}`}/></div></div>
           </div>
         ))}</div>

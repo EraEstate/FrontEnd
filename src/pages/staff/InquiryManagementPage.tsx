@@ -31,8 +31,14 @@ const ResponseModal: React.FC<{
   if (!open || !inquiry) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden" onClick={e => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <button
+        type="button"
+        aria-label="Close response modal"
+        className="absolute inset-0 bg-gray-950/40 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
         <div className="flex items-center justify-between p-5 border-b border-gray-100">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">Phản hồi yêu cầu</h3>
@@ -46,9 +52,9 @@ const ResponseModal: React.FC<{
             <p className="text-sm text-gray-700">{inquiry.message}</p>
           </div>
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1.5 block">Nội dung phản hồi:</label>
-            <textarea value={responseText} onChange={e => setResponseText(e.target.value)} placeholder="Nhập phản hồi cho khách hàng..."
-              rows={5} className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" autoFocus />
+            <label htmlFor="staff-inquiry-response" className="text-sm font-medium text-gray-700 mb-1.5 block">Nội dung phản hồi:</label>
+            <textarea id="staff-inquiry-response" value={responseText} onChange={e => setResponseText(e.target.value)} placeholder="Nhập phản hồi cho khách hàng..."
+              rows={5} className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" />
           </div>
         </div>
         <div className="flex gap-3 p-5 border-t border-gray-100 bg-gray-50">
@@ -167,9 +173,9 @@ const InquiryManagementPage: React.FC = () => {
     return (
       <div className="space-y-4">
         <div className="h-8 w-64 bg-gray-200 rounded animate-pulse" />
-        <div className="flex gap-2">{[1,2,3,4].map(i => <div key={i} className="h-10 w-24 bg-gray-200 rounded-xl animate-pulse" />)}</div>
-        {[1,2,3].map(i => (
-          <div key={i} className="bg-white rounded-2xl p-6 animate-pulse"><div className="space-y-3"><div className="h-5 bg-gray-200 rounded w-2/3" /><div className="h-4 bg-gray-200 rounded w-full" /></div></div>
+        <div className="flex gap-2">{[1,2,3,4].map(slot => <div key={`inquiry-tab-skeleton-${slot}`} className="h-10 w-24 bg-gray-200 rounded-xl animate-pulse" />)}</div>
+        {[1,2,3].map(slot => (
+          <div key={`inquiry-card-skeleton-${slot}`} className="bg-white rounded-2xl p-6 animate-pulse"><div className="space-y-3"><div className="h-5 bg-gray-200 rounded w-2/3" /><div className="h-4 bg-gray-200 rounded w-full" /></div></div>
         ))}
       </div>
     );
@@ -179,7 +185,7 @@ const InquiryManagementPage: React.FC = () => {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Quản lý yêu cầu tư vấn</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">Quản lý yêu cầu tư vấn</h1>
           <p className="text-sm text-gray-500 mt-1">Xem và phản hồi yêu cầu tư vấn từ khách hàng</p>
         </div>
         <button onClick={() => { fetchInquiries(); fetchStatusCounts(); }} className="p-2 text-gray-400 hover:bg-gray-100 rounded-lg" title="Làm mới">
@@ -250,7 +256,7 @@ const InquiryManagementPage: React.FC = () => {
                     </div>
 
                     {inquiry.agentResponse && (
-                      <div className="bg-blue-50 border-l-4 border-blue-400 rounded-r-xl p-3">
+                      <div className="bg-blue-50 border-l-2 border-blue-400 rounded-r-xl p-3">
                         <p className="text-xs font-medium text-blue-800 mb-1 flex items-center gap-1"><Send className="w-3 h-3" /> Phản hồi:</p>
                         <p className="text-sm text-blue-700">{inquiry.agentResponse}</p>
                         {inquiry.respondedAt && <p className="text-xs text-blue-500 mt-1">{relativeTime(inquiry.respondedAt)}</p>}
@@ -303,3 +309,4 @@ const InquiryManagementPage: React.FC = () => {
 };
 
 export default InquiryManagementPage;
+

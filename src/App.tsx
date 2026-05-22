@@ -9,6 +9,7 @@ import DashboardLayout from './layouts/DashboardLayout';
 import AuthLayout from './layouts/AuthLayout';
 import { useAuthStore } from './store/authStore';
 import NotFoundPage from './pages/NotFoundPage';
+import QuickContactWidget from './components/QuickContactWidget';
 
 const HomePage = lazy(() => import('./components/HomePage'));
 const PropertiesPage = lazy(() => import('./pages/PropertiesPage'));
@@ -28,7 +29,7 @@ const FavoritesPage = lazy(() => import('./pages/FavoritesPage'));
 const MyPropertiesPage = lazy(() => import('./pages/MyPropertiesPage'));
 const NewsDetailPage = lazy(() => import('./pages/NewsDetailPage'));
 const AgentDetailPage = lazy(() => import('./pages/AgentDetailPage'));
-const RentPage = lazy(() => import('./pages/RentPage'));
+const RentPage = lazy(() => import('./pages/RentLandingPage'));
 const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
 const ProjectDetailPage = lazy(() => import('./pages/ProjectDetailPage'));
 const CompaniesPage = lazy(() => import('./pages/CompaniesPage'));
@@ -62,7 +63,7 @@ const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
 const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'));
 const VerifyEmailPage = lazy(() => import('./pages/VerifyEmailPage'));
 const NotificationSettingsPage = lazy(() => import('./pages/NotificationSettingsPage'));
-const PropertyComparisonPage = lazy(() => import('./pages/PropertyComparisonPage'));
+const PropertyComparisonPage = lazy(() => import('./pages/EnhancedComparisonPage'));
 const MapSearchPage = lazy(() => import('./pages/MapSearchPage'));
 const EscrowDashboard = lazy(() => import('./pages/EscrowDashboard'));
 const KycVerificationPage = lazy(() => import('./pages/KycVerificationPage'));
@@ -70,6 +71,11 @@ const LandlordAnalyticsPage = lazy(() => import('./pages/LandlordAnalyticsPage')
 const ValuationPage = lazy(() => import('./pages/ValuationPage'));
 const InvestmentCalculatorPage = lazy(() => import('./pages/InvestmentCalculatorPage'));
 const PriceAlertsPage = lazy(() => import('./pages/PriceAlertsPage'));
+const SavedSearchesPage = lazy(() => import('./pages/SavedSearchesPage'));
+const MyNotesPage = lazy(() => import('./pages/MyNotesPage'));
+const CollectionManagePage = lazy(() => import('./pages/CollectionManagePage').then(m => ({ default: m.CollectionManagePage })));
+const SharedCollectionPage = lazy(() => import('./pages/SharedCollectionPage').then(m => ({ default: m.SharedCollectionPage })));
+const CoViewingPage = lazy(() => import('./pages/CoViewingPage').then(m => ({ default: m.CoViewingPage })));
 const RevenueDashboardPage = lazy(() => import('./pages/RevenueDashboardPage'));
 const MaintenanceRequestsPage = lazy(() => import('./pages/MaintenanceRequestsPage'));
 const CreateMaintenanceRequestPage = lazy(() => import('./pages/CreateMaintenanceRequestPage'));
@@ -85,6 +91,11 @@ const ActivityLogPage = lazy(() => import('./pages/ActivityLogPage'));
 const TestimonialsPage = lazy(() => import('./pages/TestimonialsPage'));
 const RentalManagementPage = lazy(() => import('./pages/RentalManagementPage'));
 const UserDashboardLayout = lazy(() => import('./pages/user/UserDashboardLayout'));
+const MarketPriceIndexPage = lazy(() => import('./pages/MarketPriceIndexPage'));
+const NeighborhoodReviewsPage = lazy(() => import('./pages/NeighborhoodReviewsPage'));
+const FengShuiGuidePage = lazy(() => import('./pages/FengShuiGuidePage'));
+const CostBreakdownPage = lazy(() => import('./pages/CostBreakdownPage'));
+const BuyingChecklistPage = lazy(() => import('./pages/BuyingChecklistPage'));
 
 function AppContent() {
   return (
@@ -134,10 +145,21 @@ function AppContent() {
             <Route element={<MainLayout />}>
               <Route path="/" element={<HomePage />} />
               <Route path="/properties" element={<PropertiesPage />} />
-              <Route path="/properties/:id" element={<PropertyDetailPage />} />
+              <Route
+                path="/properties/:id"
+                element={
+                  <ProtectedRoute>
+                    <PropertyDetailPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/compare" element={<PropertyComparisonPage />} />
               <Route path="/map-search" element={<MapSearchPage />} />
               <Route path="/rent" element={<RentPage />} />
+              <Route path="/market-price-index" element={<MarketPriceIndexPage />} />
+              <Route path="/neighborhood-reviews" element={<NeighborhoodReviewsPage />} />
+              <Route path="/feng-shui" element={<FengShuiGuidePage />} />
+              <Route path="/cost-breakdown" element={<CostBreakdownPage />} />
               <Route path="/projects" element={<ProjectsPage />} />
               <Route path="/projects/:id" element={<ProjectDetailPage />} />
               <Route path="/companies" element={<CompaniesPage />} />
@@ -186,6 +208,42 @@ function AppContent() {
                 element={
                   <ProtectedRoute>
                     <FavoritesPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/saved-searches"
+                element={
+                  <ProtectedRoute>
+                    <SavedSearchesPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/my-notes"
+                element={
+                  <ProtectedRoute>
+                    <MyNotesPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/collections"
+                element={
+                  <ProtectedRoute>
+                    <CollectionManagePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/shared-collection/:shareToken"
+                element={<SharedCollectionPage />}
+              />
+              <Route
+                path="/coviewing/:sessionToken"
+                element={
+                  <ProtectedRoute>
+                    <CoViewingPage />
                   </ProtectedRoute>
                 }
               />
@@ -424,6 +482,14 @@ function AppContent() {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/buying-checklist"
+                element={
+                  <ProtectedRoute>
+                    <BuyingChecklistPage />
+                  </ProtectedRoute>
+                }
+              />
 
               <Route path="*" element={<NotFoundPage />} />
             </Route>
@@ -431,6 +497,7 @@ function AppContent() {
         </Suspense>
       </ErrorBoundary>
 
+      <QuickContactWidget />
       <Toaster position="top-right" richColors />
     </div>
   );

@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 
+import { useTranslation } from 'react-i18next';
+
 import type { UserView } from './types';
 import UserSidebar, { buildUserMenuSections } from './UserSidebar';
 import UserContentRouter from './UserContentRouter';
 
 const UserDashboardLayout: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const logout = useAuthStore(state => state.logout);
   const [currentView, setCurrentView] = useState<UserView>('overview');
@@ -23,7 +26,7 @@ const UserDashboardLayout: React.FC = () => {
     setMobileMenuOpen(false);
   };
 
-  const menuSections = buildUserMenuSections();
+  const menuSections = buildUserMenuSections(t);
 
   return (
     <div className="h-screen flex overflow-hidden bg-gray-50">

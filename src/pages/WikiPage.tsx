@@ -98,6 +98,9 @@ const WikiPage: React.FC = () => {
   ];
 
   useEffect(() => {
+    let isMounted = true;
+    let timeoutId: NodeJS.Timeout | undefined;
+
     const loadArticles = async () => {
       try {
         setLoading(true);
@@ -131,11 +134,12 @@ const WikiPage: React.FC = () => {
           response = await wikiAPI.getAll({ page: 0, size: 50 });
         }
 
+        if (!isMounted) return;
+
         // Handle different response structures
         // Backend returns Page<WikiArticle> which has a 'content' property
         // But also handle case where response might be array directly
         let articlesData: any[] = [];
-        
         
         if (Array.isArray(response)) {
           articlesData = response;
@@ -146,7 +150,6 @@ const WikiPage: React.FC = () => {
         } else {
           articlesData = [];
         }
-
 
         // Transform API response to match our interface
         const transformedArticles = articlesData.map((article: any) => ({
@@ -167,25 +170,41 @@ const WikiPage: React.FC = () => {
           author: article.author
         }));
 
-        
         // Đảm bảo loading indicator hiển thị ít nhất minLoadingTime
         const elapsedTime = Date.now() - startTime;
         const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
         
-        await new Promise(resolve => setTimeout(resolve, remainingTime));
+        if (remainingTime > 0) {
+          await new Promise<void>(resolve => {
+            timeoutId = setTimeout(() => {
+              resolve();
+            }, remainingTime);
+          });
+        }
         
+        if (!isMounted) return;
         setArticles(transformedArticles as WikiArticle[]);
       } catch (error: any) {
-        toast.error('Kh�ng th? t?i danh s�ch Wiki');
+        if (!isMounted) return;
+        toast.error('Không thể tải danh sách Wiki');
         setError(error.response?.data?.message || error.message || t('wiki.errorLoading'));
         // Fallback to empty array if API fails
         setArticles([]);
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     loadArticles();
+
+    return () => {
+      isMounted = false;
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, [selectedCategory]);
 
   // Filter articles - only by search term, category filtering is done via API
@@ -203,10 +222,10 @@ const WikiPage: React.FC = () => {
       <div className="w-full max-w-7xl mx-auto px-6 lg:px-12 py-8">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-          <div className="flex items-center space-x-3 mb-4">
+          <div className="flex items-center gap-x-3 mb-4">
             <BookOpen className="h-8 w-8 text-red-600" />
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">{t('wiki.pageTitle')}</h1>
+              <h1 className="text-3xl font-semibold text-gray-900">{t('wiki.pageTitle')}</h1>
               <p className="text-gray-600 mt-1">
                 {t('wiki.pageSubtitle')}
               </p>
@@ -256,7 +275,7 @@ const WikiPage: React.FC = () => {
                         isActive ? 'bg-red-50 text-red-600' : 'hover:bg-gray-50'
                       } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center gap-x-2">
                         <IconComponent className={`h-4 w-4 ${cat.color}`} />
                         <span className="text-sm">{cat.name}</span>
                       </div>
@@ -275,7 +294,7 @@ const WikiPage: React.FC = () => {
             {/* Category Header */}
             {currentCategory && (
               <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-                <div className="flex items-center space-x-3 mb-2">
+                <div className="flex items-center gap-x-3 mb-2">
                   <currentCategory.icon className={`h-6 w-6 ${currentCategory.color}`} />
                   <h2 className="text-xl font-semibold text-gray-900">{currentCategory.name}</h2>
                 </div>
@@ -285,13 +304,13 @@ const WikiPage: React.FC = () => {
 
             {/* Articles List */}
             {loading ? (
-              <div className="space-y-4">
+              <div className="gap-y-4">
                 <div className="bg-white rounded-lg shadow-sm p-12 text-center">
                   <Loader2 className="h-12 w-12 text-red-600 animate-spin mx-auto mb-4" />
                   <p className="text-gray-600">{t('wiki.loading')}</p>
                 </div>
-                {[...Array(2)].map((_, i) => (
-                  <div key={i} className="bg-white rounded-lg shadow-sm p-6 animate-pulse">
+                {[1, 2].map((slot) => (
+                  <div key={`wiki-pulse-${slot}`} className="bg-white rounded-lg shadow-sm p-6 animate-pulse">
                     <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
                     <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
                     <div className="h-3 bg-gray-200 rounded w-full mb-2"></div>
@@ -346,16 +365,16 @@ const WikiPage: React.FC = () => {
                       </p>
 
                       <div className="flex items-center justify-between text-sm text-gray-500">
-                        <div className="flex items-center space-x-4">
-                          <div className="flex items-center space-x-1">
+                        <div className="flex items-center gap-x-4">
+                          <div className="flex items-center gap-x-1">
                             <User className="h-4 w-4" />
                             <span>{article.author?.fullName || t('common.unknown')}</span>
                           </div>
-                          <div className="flex items-center space-x-1">
+                          <div className="flex items-center gap-x-1">
                             <Calendar className="h-4 w-4" />
-                            <span>{article.publishedAt ? new Date(article.publishedAt).toLocaleDateString('vi-VN') : t('common.notAvailable', 'N/A')}</span>
+                            <span suppressHydrationWarning>{article.publishedAt ? new Date(article.publishedAt).toLocaleDateString('vi-VN') : t('common.notAvailable', 'N/A')}</span>
                           </div>
-                          <div className="flex items-center space-x-1">
+                          <div className="flex items-center gap-x-1" suppressHydrationWarning>
                             <Eye className="h-4 w-4" />
                             <span>{article.viewCount}</span>
                           </div>
@@ -363,7 +382,7 @@ const WikiPage: React.FC = () => {
 
                         <Link
                           to={`/wiki/article/${article.slug}`}
-                          className="text-red-600 hover:text-red-700 font-medium flex items-center space-x-1"
+                          className="text-red-600 hover:text-red-700 font-medium flex items-center gap-x-1"
                         >
                           <span>{t('wiki.readMore')}</span>
                           <ChevronRight className="h-4 w-4" />

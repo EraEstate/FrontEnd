@@ -16,6 +16,12 @@ import { useTranslation } from 'react-i18next';
 import { getImageUrl, getImagePlaceholder } from '../utils/imageUtils';
 import toast from '../utils/toast';
 
+const priceFormatter = new Intl.NumberFormat('vi-VN', {
+  style: 'currency',
+  currency: 'VND',
+  minimumFractionDigits: 0
+});
+
 const ProjectDetailPage: React.FC = () => {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
@@ -38,7 +44,7 @@ const ProjectDetailPage: React.FC = () => {
           await projectAPI.incrementViewCount(id);
         }
       } catch (error) {
-        toast.error('Kh�ng th? t?i th�ng tin d? �n');
+        toast.error('Kh�ng th? t?i th�ng tin d? �n');
         // Không có fallback data, chỉ log error
       } finally {
         setLoading(false);
@@ -49,12 +55,7 @@ const ProjectDetailPage: React.FC = () => {
   }, [id]);
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(price);
+    return priceFormatter.format(price);
   };
 
   const getStatusColor = (status: string) => {
@@ -96,7 +97,7 @@ const ProjectDetailPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 pt-20">
         <div className="max-w-7xl mx-auto px-4 py-8 text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Không tìm thấy dự án</h1>
+          <h1 className="text-2xl font-semibold text-gray-900 mb-4">Không tìm thấy dự án</h1>
           <Link to="/projects" className="text-blue-600 hover:text-blue-700">
             Quay lại danh sách dự án
           </Link>
@@ -111,7 +112,7 @@ const ProjectDetailPage: React.FC = () => {
     <div className="min-h-screen bg-gray-50 pt-20">
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
-        <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-6">
+        <nav className="flex items-center gap-x-2 text-sm text-gray-600 mb-6">
           <Link to="/" className="hover:text-blue-600">Trang chủ</Link>
           <ChevronLeft className="h-4 w-4" />
           <Link to="/projects" className="hover:text-blue-600">Dự án</Link>
@@ -125,9 +126,9 @@ const ProjectDetailPage: React.FC = () => {
             <div className="flex-1">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-900 mb-2">{project.name}</h1>
-                  <div className="flex items-center space-x-4 text-gray-600 mb-3">
-                    <div className="flex items-center space-x-1">
+                  <h1 className="text-3xl font-semibold text-gray-900 mb-2">{project.name}</h1>
+                  <div className="flex items-center gap-x-4 text-gray-600 mb-3">
+                    <div className="flex items-center gap-x-1">
                       <MapPin className="h-4 w-4" />
                       <span>{project.address}</span>
                     </div>
@@ -137,7 +138,7 @@ const ProjectDetailPage: React.FC = () => {
                   </div>
                   <p className="text-gray-600">{project.description}</p>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center gap-x-2">
                   <button
                     onClick={() => setIsFavorited(!isFavorited)}
                     className={`p-2 rounded-full ${isFavorited ? 'text-red-600 bg-red-50' : 'text-gray-400 hover:text-red-600'}`}
@@ -174,7 +175,7 @@ const ProjectDetailPage: React.FC = () => {
             <div className="lg:w-80 bg-gray-50 rounded-lg p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Thông tin liên hệ</h3>
               <div className="space-y-3">
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center gap-x-3">
                   <Building2 className="h-5 w-5 text-gray-400" />
                   <div>
                     <div className="font-medium text-gray-900">{project.developer}</div>
@@ -182,7 +183,7 @@ const ProjectDetailPage: React.FC = () => {
                   </div>
                 </div>
                 {project.contactPhone && (
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center gap-x-3">
                     <Phone className="h-5 w-5 text-gray-400" />
                     <a href={`tel:${project.contactPhone}`} className="text-blue-600 hover:text-blue-700">
                       {project.contactPhone}
@@ -190,7 +191,7 @@ const ProjectDetailPage: React.FC = () => {
                   </div>
                 )}
                 {project.contactEmail && (
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center gap-x-3">
                     <Mail className="h-5 w-5 text-gray-400" />
                     <a href={`mailto:${project.contactEmail}`} className="text-blue-600 hover:text-blue-700">
                       {project.contactEmail}
@@ -198,7 +199,7 @@ const ProjectDetailPage: React.FC = () => {
                   </div>
                 )}
                 {project.websiteUrl && (
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center gap-x-3">
                     <Globe className="h-5 w-5 text-gray-400" />
                     <a href={project.websiteUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700">
                       Website
@@ -225,11 +226,11 @@ const ProjectDetailPage: React.FC = () => {
 
               {allImages.length > 1 && (
                 <div className="p-4 border-t">
-                  <div className="flex space-x-2 overflow-x-auto">
-                    {allImages.map((image, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setActiveImageIndex(index)}
+                  <div className="flex gap-x-2 overflow-x-auto">
+                      {allImages.map((image, index) => (
+                        <button
+                          key={`${project.id}-${image}`}
+                          onClick={() => setActiveImageIndex(index)}
                         className={`flex-shrink-0 w-20 h-20 rounded border-2 overflow-hidden ${
                           activeImageIndex === index ? 'border-blue-500' : 'border-gray-200'
                         }`}
@@ -248,7 +249,7 @@ const ProjectDetailPage: React.FC = () => {
 
             {/* Project Details */}
             <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Thông tin chi tiết</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-6">Thông tin chi tiết</h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -282,13 +283,13 @@ const ProjectDetailPage: React.FC = () => {
 
             {/* Location Advantages */}
             <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Vị trí và lợi thế</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-6">Vị trí và lợi thế</h2>
               <p className="text-gray-600">{project.locationAdvantages}</p>
             </div>
 
             {/* Investment Attractions */}
             <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Tiềm năng đầu tư</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-6">Tiềm năng đầu tư</h2>
               <p className="text-gray-600">{project.investmentAttractions}</p>
             </div>
           </div>
@@ -332,7 +333,7 @@ const ProjectDetailPage: React.FC = () => {
             </div>
 
             {/* Related Projects */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="bg-white rounded-lg shadow-sm p-6" suppressHydrationWarning>
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Dự án liên quan</h3>
               <div className="space-y-3">
                 <Link to="/projects/2" className="block hover:bg-gray-50 p-3 rounded">

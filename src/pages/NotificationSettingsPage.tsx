@@ -37,6 +37,7 @@ const NotificationSettingsPage: React.FC = () => {
     let alive = true;
     (async () => {
       try {
+        if (!alive) return;
         const data = await notificationAPI.getSettings();
         if (!alive) return;
         setPrefs(normalizeSettings(data));
@@ -108,7 +109,7 @@ const NotificationSettingsPage: React.FC = () => {
               <Bell className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-gray-900">Cài đặt thông báo</h1>
+              <h1 className="text-lg font-semibold text-gray-900">Cài đặt thông báo</h1>
               <p className="text-sm text-gray-500">Chọn kênh bạn muốn nhận thông tin</p>
             </div>
           </div>

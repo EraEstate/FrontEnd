@@ -141,8 +141,8 @@ const AdminOverview: React.FC<AdminOverviewProps> = ({
 
         {activitiesLoading ? (
           <div className="p-8 space-y-4">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="flex gap-4 animate-pulse">
+            {[1, 2, 3].map(slot => (
+              <div key={`recent-act-skeleton-${slot}`} className="flex gap-4 animate-pulse">
                 <div className={`w-10 h-10 rounded-full flex-shrink-0 ${isDark ? 'bg-slate-700' : 'bg-gray-200'}`} />
                 <div className="flex-1 space-y-2">
                   <div className={`h-4 rounded w-3/4 ${isDark ? 'bg-slate-700' : 'bg-gray-200'}`} />

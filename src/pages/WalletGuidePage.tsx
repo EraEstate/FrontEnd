@@ -23,19 +23,19 @@ const WalletGuidePage: React.FC = () => {
         </Link>
 
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="px-6 py-6 border-b border-gray-100 bg-red-50/50">
+          <div className="p-6 border-b border-gray-100 bg-red-50/50">
             <div className="flex items-center gap-3">
               <div className="p-3 rounded-xl bg-white border border-red-100 shadow-sm">
                 <Wallet className="w-8 h-8 text-red-600" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">{t('walletGuide.title')}</h1>
+                <h1 className="text-2xl font-semibold text-gray-900">{t('walletGuide.title')}</h1>
                 <p className="text-sm text-gray-600 mt-1">{t('walletGuide.subtitle')}</p>
               </div>
             </div>
           </div>
 
-          <div className="px-6 py-6 space-y-8 text-gray-700">
+          <div className="p-6 space-y-8 text-gray-700">
             <section>
               <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-3">
                 <span className="flex h-7 w-7 items-center justify-center rounded-full bg-red-100 text-sm font-bold text-red-700">

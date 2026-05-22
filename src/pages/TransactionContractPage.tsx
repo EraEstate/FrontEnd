@@ -72,11 +72,11 @@ const TransactionContractPage: React.FC = () => {
           const prop = await propertyAPI.getById(tx.propertyId);
           setProperty(prop);
         } catch (e) {
-          toast.error('Kh�ng th? t?i th�ng tin B�S');
+          toast.error(t('txExtra.loadPropertyFailed'));
         }
       }
     } catch (error: any) {
-      toast.error('Kh�ng th? t?i giao d?ch');
+      toast.error(t('txExtra.loadTransactionFailed'));
       toast.error(t('transaction.errors.notFound'));
       navigate('/profile');
     } finally {
@@ -137,7 +137,7 @@ const TransactionContractPage: React.FC = () => {
     try {
       const blob = await generateContractPdf({
         transactionId: transaction.id,
-        propertyTitle: property?.title || transaction.property?.title || 'Bất động sản',
+        propertyTitle: property?.title || transaction.property?.title || t('txExtra.defaultTitle'),
         propertyAddress: property?.address,
         propertyArea: property?.area,
         totalAmount: transaction.totalAmount,
@@ -147,10 +147,10 @@ const TransactionContractPage: React.FC = () => {
         paymentMethod: transaction.paymentMethod,
         isRent: property?.transactionType === 'RENT',
         contractDate: new Date(transaction.createdAt).toLocaleDateString('vi-VN'),
-        sellerName: transaction.seller?.fullName || property?.owner?.fullName || 'Bên A',
+        sellerName: transaction.seller?.fullName || property?.owner?.fullName || t('txExtra.partyA'),
         sellerEmail: transaction.seller?.email || property?.owner?.email,
         sellerKyc: sellerKyc,
-        buyerName: transaction.buyer?.fullName || (user?.fullName || 'Bên B'),
+        buyerName: transaction.buyer?.fullName || (user?.fullName || t('txExtra.partyB')),
         buyerEmail: transaction.buyer?.email || user?.email,
         buyerKyc: buyerKyc,
         sellerSignature,
@@ -165,10 +165,10 @@ const TransactionContractPage: React.FC = () => {
       const url = URL.createObjectURL(blob);
       setPdfBlobUrl(url);
 
-      toast.success('Đã tạo PDF hợp đồng thành công!');
+      toast.success(t('txExtra.pdfGenerated'));
     } catch (err: any) {
-      toast.error('L?i t?o PDF h?p d?ng');
-      toast.error('Không thể tạo PDF: ' + (err?.message || 'Lỗi không xác định'));
+      toast.error(t('txExtra.pdfGenerateFailed'));
+      toast.error(t('txExtra.pdfGenerateFailed') + ': ' + (err?.message || t('common.unknown')));
     } finally {
       setGeneratingPdf(false);
     }
@@ -182,9 +182,9 @@ const TransactionContractPage: React.FC = () => {
       const role = isBuyerUser ? 'BUYER' : 'SELLER';
       const updated = await propertyTransactionAPI.saveContractHash(id, { contractHash, signedByRole: role });
       setTransaction(updated);
-      toast.success(`Chữ ký ${role === 'BUYER' ? 'Bên mua' : 'Bên bán'} đã được lưu trên hệ thống!`);
+      toast.success(t('txExtra.signatureSaved', { role: role === 'BUYER' ? t('transaction.buyer') : t('transaction.seller') }));
     } catch (err: any) {
-      toast.error(err?.response?.data?.error || 'Không thể lưu chữ ký');
+      toast.error(err?.response?.data?.error || t('txExtra.signatureSaveFailed'));
     } finally {
       setSavingHash(false);
     }
@@ -235,7 +235,7 @@ const TransactionContractPage: React.FC = () => {
       if (user?.id) {
         const isKycVerified = await kycAPI.isVerified(String(user.id)).catch(() => false);
         if (!isKycVerified) {
-          toast.error('Bạn cần xác minh CCCD trước khi thực hiện giao dịch blockchain. Vui lòng truy cập trang Xác minh CCCD.');
+          toast.error(t('txExtra.kycRequired'));
           setSigning(false);
           return;
         }
@@ -262,7 +262,7 @@ const TransactionContractPage: React.FC = () => {
         isRent: property?.transactionType === 'RENT',
       });
 
-      if (!result) throw new Error('Không nhận được kết quả từ MetaMask');
+      if (!result) throw new Error(t('txExtra.noMetamaskResult'));
 
       // Ghi log vào Backend Escrow Service
       await escrowAPI.logTransaction({
@@ -285,7 +285,7 @@ const TransactionContractPage: React.FC = () => {
       // Điều hướng người dùng tới Escrow Dashboard để xem trạng thái giao dịch
       navigate('/escrow');
     } catch (error: any) {
-      toast.error('L?i k� h?p d?ng blockchain');
+      toast.error(t('txExtra.blockchainSignFailed'));
       
       // Detect specific error types
       let errorMessage = t('transaction.errors.signFailed');
@@ -457,7 +457,7 @@ const TransactionContractPage: React.FC = () => {
             <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">
               {isRent ? t('transaction.rentContract') : t('transaction.saleContract')}
             </p>
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-semibold text-gray-900">
               {transaction.property?.title || t('transaction.title')}
             </h1>
             <p className="text-sm text-gray-500 mt-1">
@@ -502,7 +502,7 @@ const TransactionContractPage: React.FC = () => {
                 <CreditCard className="w-6 h-6 text-blue-600" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-gray-900">{t('transaction.vnpaySuccessTitle')}</h2>
+                <h2 className="text-xl font-semibold text-gray-900">{t('transaction.vnpaySuccessTitle')}</h2>
                 <p className="text-sm text-gray-600">{t('transaction.vnpaySuccessSubtitle')}</p>
               </div>
             </div>
@@ -684,23 +684,21 @@ const TransactionContractPage: React.FC = () => {
                 {isVnpayPaid ? (
                   <>
                     <p className="font-semibold text-gray-900 mb-1">
-                      Hợp đồng đã hiệu lực theo thanh toán VNPay
+                      {t('txExtra.vnpayActive')}
                     </p>
                     <p>
-                      Thanh toán VNPay thành công là căn cứ chính trong hệ thống. Ký Blockchain là
-                      <span className="font-semibold"> tuỳ chọn</span> nếu bạn muốn thêm lớp ghi nhận
-                      on-chain.
+                      {t('txExtra.vnpayActiveDesc')}{' '}
+                      <span className="font-semibold">{t('txExtra.optional')}</span> {t('txExtra.vnpayActiveDesc2')}
                     </p>
                   </>
                 ) : (
                   <>
                     <p className="font-semibold text-gray-900 mb-1">
-                      Ký hợp đồng Blockchain bằng MetaMask
+                      {t('txExtra.signBlockchain')}
                     </p>
                     <p>
-                      Giao dịch trên Blockchain giúp minh bạch hơn, nhưng{' '}
-                      <span className="font-semibold">vẫn cần</span> hợp đồng công chứng và thủ tục
-                      sang tên ngoài đời thực.
+                      {t('txExtra.signBlockchainDesc')}{' '}
+                      <span className="font-semibold">{t('txExtra.stillRequire')}</span> {t('txExtra.signBlockchainDesc2')}
                     </p>
                   </>
                 )}
@@ -885,7 +883,7 @@ const TransactionContractPage: React.FC = () => {
                 </div>
               ) : (
                 <div className="space-y-2 text-sm">
-                  <div className="flex items-start gap-2 text-xs text-gray-600 border border-blue-100 bg-blue-50 rounded-lg p-2">
+                  <div className="flex items-start gap-2 text-xs text-[#4b5563] border border-blue-100 bg-blue-50 rounded-lg p-2">
                     <Info className="w-4 h-4 text-blue-500 mt-0.5" />
                     <p>
                       <span className="font-semibold">Blockchain</span> là sổ cái phân tán ghi lại giao dịch.
@@ -893,7 +891,7 @@ const TransactionContractPage: React.FC = () => {
                       có thể tra cứu trên trình khám phá mạng (explorer).
                     </p>
                   </div>
-                  <p className="text-gray-600">
+                  <p className="text-[#4b5563]">
                     {t('transaction.network')}:{' '}
                     <span className="font-semibold text-gray-900">
                       {transaction.blockchainNetwork || BLOCKCHAIN_NETWORK_NAME || t('common.unknown')}
@@ -1469,7 +1467,7 @@ const TransactionContractPage: React.FC = () => {
                     className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-medium hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
                   >
                     {generatingPdf ? (
-                      <><Loader2 className="w-4 h-4 animate-spin" /> Đang tạo PDF...</>
+                      <><Loader2 className="w-4 h-4 animate-spin" /> Đang tạo PDF…</>
                     ) : (
                       <><FileText className="w-4 h-4" /> Xem trước & Tạo PDF</>
                     )}
@@ -1504,7 +1502,7 @@ const TransactionContractPage: React.FC = () => {
                     </div>
                     <p className="font-mono text-[10px] text-gray-600 break-all select-all">{contractHash}</p>
                     <p className="text-[10px] text-gray-400 mt-1">
-                      Mã hash này đảm bảo tính toàn vẹn — bất kỳ thay đổi nào trên PDF sẽ tạo ra hash khác.
+                      Mã hash này đảm bảo tính toàn vẹn, bất kỳ thay đổi nào trên PDF sẽ tạo ra hash khác.
                     </p>
                   </div>
                 )}
@@ -1535,10 +1533,10 @@ const TransactionContractPage: React.FC = () => {
                       <span className="font-semibold text-emerald-800">Hợp đồng đã được ký bởi cả hai bên</span>
                     </div>
                     <p className="text-xs text-emerald-700">
-                      Thời điểm ký: {new Date(transaction.contractSignedAt).toLocaleString('vi-VN')}
+                      Thời điểm ký: <span suppressHydrationWarning>{new Date(transaction.contractSignedAt).toLocaleString('vi-VN')}</span>
                     </p>
                     {transaction.contractHash && (
-                      <p className="text-xs text-emerald-600 mt-1 font-mono break-all">
+                      <p className="text-xs text-emerald-600 mt-1 font-mono break-all" suppressHydrationWarning>
                         Hash: {transaction.contractHash.slice(0, 16)}...{transaction.contractHash.slice(-16)}
                       </p>
                     )}
@@ -1551,7 +1549,7 @@ const TransactionContractPage: React.FC = () => {
       </div>
       {/* Modal xác nhận trước khi ký MetaMask */}
       {showSignConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 px-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-950 bg-opacity-40 px-4">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full overflow-hidden">
             <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
               <Shield className="w-5 h-5 text-red-500" />
@@ -1638,5 +1636,4 @@ const TransactionContractPage: React.FC = () => {
 };
 
 export default TransactionContractPage;
-
 

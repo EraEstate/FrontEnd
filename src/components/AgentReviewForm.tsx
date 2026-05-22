@@ -79,8 +79,9 @@ const AgentReviewForm: React.FC<AgentReviewFormProps> = ({ agentId, onSuccess })
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Nhận xét chi tiết (Tuỳ chọn)</label>
+        <label htmlFor="agent-review-comment" className="block text-sm font-medium text-gray-700 mb-1">Nhận xét chi tiết (Tuỳ chọn)</label>
         <textarea
+          id="agent-review-comment"
           value={comment}
           onChange={(e) => setComment(e.target.value)}
           rows={3}

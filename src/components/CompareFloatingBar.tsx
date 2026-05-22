@@ -16,6 +16,14 @@ const CompareFloatingBar: React.FC = () => {
       <div 
         className="h-12 bg-gray-900/95 backdrop-blur-sm text-white flex items-center justify-between px-6 cursor-pointer hover:bg-gray-900 transition-colors"
         onClick={() => setIsOpen(!isOpen)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setIsOpen(!isOpen);
+          }
+        }}
+        role="button"
+        tabIndex={0}
       >
         <div className="flex items-center gap-2">
           <Scale className="w-5 h-5" />
@@ -41,7 +49,7 @@ const CompareFloatingBar: React.FC = () => {
           <div key={property.id} className="relative flex-shrink-0 w-48 border border-gray-100 rounded-xl overflow-hidden bg-white/80 backdrop-blur-sm card-hover group">
             <button
               onClick={() => removeProperty(property.id)}
-              className="absolute top-2 right-2 glass text-gray-800 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 z-10 hover:bg-red-600 hover:text-white hover:scale-110 shadow-sm"
+              className="absolute top-2 right-2 glass text-[#1f2937] p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 z-10 hover:bg-red-600 hover:text-white hover:scale-110 shadow-sm"
             >
               <X className="w-3 h-3" />
             </button>
@@ -57,9 +65,8 @@ const CompareFloatingBar: React.FC = () => {
           </div>
         ))}
         
-        {/* Placeholder for missing slots */}
-        {[...Array(4 - compareList.length)].map((_, i) => (
-          <div key={`empty-${i}`} className="flex-shrink-0 w-48 h-[142px] border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center bg-gray-50/50 text-gray-400">
+        {['empty-0', 'empty-1', 'empty-2', 'empty-3'].slice(0, 4 - compareList.length).map((uniqueKey) => (
+          <div key={uniqueKey} className="flex-shrink-0 w-48 h-[142px] border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center bg-gray-50/50 text-gray-400">
             <span className="text-sm">Thêm BDS</span>
           </div>
         ))}

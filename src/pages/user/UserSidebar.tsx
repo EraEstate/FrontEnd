@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
+import { useTranslation } from 'react-i18next';
 import { getImageUrl, getAvatarPlaceholder } from '../../utils/imageUtils';
 import type { UserView, UserMenuSection } from './types';
 
@@ -64,44 +65,44 @@ const SectionHeader: React.FC<{ title: string; collapsed: boolean }> = ({ title,
 };
 
 // ─── Build menu sections ───
-export const buildUserMenuSections = (): UserMenuSection[] => [
+export const buildUserMenuSections = (t: any): UserMenuSection[] => [
   {
-    title: 'Tổng quan',
+    title: t('sidebar.overview'),
     items: [
-      { id: 'overview', icon: <BarChart3 className="w-5 h-5" />, label: 'Dashboard' },
-      { id: 'activity-log', icon: <Activity className="w-5 h-5" />, label: 'Hoạt động' },
+      { id: 'overview', icon: <BarChart3 className="w-5 h-5" />, label: t('sidebar.dashboard') },
+      { id: 'activity-log', icon: <Activity className="w-5 h-5" />, label: t('sidebar.activity') },
     ],
   },
   {
-    title: 'Bất động sản',
+    title: t('sidebar.properties'),
     items: [
-      { id: 'my-properties', icon: <Home className="w-5 h-5" />, label: 'BĐS của tôi' },
-      { id: 'favorites', icon: <Heart className="w-5 h-5" />, label: 'Yêu thích' },
-      { id: 'inquiries', icon: <MessageSquare className="w-5 h-5" />, label: 'Yêu cầu liên hệ' },
-      { id: 'viewings', icon: <CalendarDays className="w-5 h-5" />, label: 'Lịch hẹn xem' },
+      { id: 'my-properties', icon: <Home className="w-5 h-5" />, label: t('sidebar.myProperties') },
+      { id: 'favorites', icon: <Heart className="w-5 h-5" />, label: t('sidebar.favorites') },
+      { id: 'inquiries', icon: <MessageSquare className="w-5 h-5" />, label: t('sidebar.inquiries') },
+      { id: 'viewings', icon: <CalendarDays className="w-5 h-5" />, label: t('sidebar.viewings') },
     ],
   },
   {
-    title: 'Quản lý cho thuê',
+    title: t('sidebar.rentalManagement'),
     items: [
-      { id: 'rental-management', icon: <DollarSign className="w-5 h-5" />, label: 'Dòng tiền thuê' },
-      { id: 'contracts', icon: <FileText className="w-5 h-5" />, label: 'Hợp đồng' },
+      { id: 'rental-management', icon: <DollarSign className="w-5 h-5" />, label: t('sidebar.rentalCashflow') },
+      { id: 'contracts', icon: <FileText className="w-5 h-5" />, label: t('sidebar.contracts') },
     ],
   },
   {
-    title: 'Tài chính',
+    title: t('sidebar.finance'),
     items: [
-      { id: 'payments', icon: <CreditCard className="w-5 h-5" />, label: 'Thanh toán' },
-      { id: 'transaction-history', icon: <Clock className="w-5 h-5" />, label: 'Lịch sử GD' },
-      { id: 'bank-accounts', icon: <Wallet className="w-5 h-5" />, label: 'Tài khoản NH' },
-      { id: 'analytics', icon: <TrendingUp className="w-5 h-5" />, label: 'Phân tích' },
+      { id: 'payments', icon: <CreditCard className="w-5 h-5" />, label: t('sidebar.payments') },
+      { id: 'transaction-history', icon: <Clock className="w-5 h-5" />, label: t('sidebar.transactionHistory') },
+      { id: 'bank-accounts', icon: <Wallet className="w-5 h-5" />, label: t('sidebar.bankAccounts') },
+      { id: 'analytics', icon: <TrendingUp className="w-5 h-5" />, label: t('sidebar.analytics') },
     ],
   },
   {
-    title: 'Cá nhân',
+    title: t('sidebar.personal'),
     items: [
-      { id: 'calendar', icon: <CalendarDays className="w-5 h-5" />, label: 'Lịch' },
-      { id: 'settings', icon: <Settings className="w-5 h-5" />, label: 'Cài đặt' },
+      { id: 'calendar', icon: <CalendarDays className="w-5 h-5" />, label: t('sidebar.calendar') },
+      { id: 'settings', icon: <Settings className="w-5 h-5" />, label: t('sidebar.settings') },
     ],
   },
 ];
@@ -116,6 +117,7 @@ const SidebarContent: React.FC<{
 }> = ({ collapsed, menuSections, currentView, onMenuClick, onLogout }) => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
+  const { t } = useTranslation();
 
   return (
     <>
@@ -147,7 +149,7 @@ const SidebarContent: React.FC<{
               />
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold truncate text-gray-900">
-                  {user?.fullName || 'Người dùng'}
+                  {user?.fullName || t('sidebar.defaultUser')}
                 </p>
                 <p className="text-xs truncate text-gray-500">
                   {user?.email}
@@ -165,7 +167,7 @@ const SidebarContent: React.FC<{
                 collapsed ? 'justify-center p-3' : 'gap-3 px-4 py-2.5'
               } text-gray-600 hover:bg-gray-50`}>
               <ExternalLink className="w-4 h-4" />
-              {!collapsed && <span className="text-sm font-medium">Về trang chủ</span>}
+              {!collapsed && <span className="text-sm font-medium">{t('sidebar.backToHome')}</span>}
             </button>
           </div>
           <div className="relative group">
@@ -174,7 +176,7 @@ const SidebarContent: React.FC<{
                 collapsed ? 'justify-center p-3' : 'gap-3 px-4 py-2.5'
               } text-red-600 hover:bg-red-50`}>
               <LogOut className="w-4 h-4" />
-              {!collapsed && <span className="text-sm font-medium">Đăng xuất</span>}
+              {!collapsed && <span className="text-sm font-medium">{t('sidebar.logout')}</span>}
             </button>
           </div>
         </div>
@@ -200,6 +202,7 @@ const UserSidebar: React.FC<UserSidebarProps> = ({
   currentView, sidebarOpen, mobileMenuOpen, menuSections,
   onMenuClick, onToggleSidebar, onCloseMobile, onOpenMobile, onLogout,
 }) => {
+  const { t } = useTranslation();
   return (
     <>
       {/* Mobile hamburger */}
@@ -211,14 +214,19 @@ const UserSidebar: React.FC<UserSidebarProps> = ({
       {/* Mobile overlay */}
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onCloseMobile} />
+          <button
+            type="button"
+            aria-label="Close user mobile menu"
+            className="absolute inset-0 bg-gray-950/40 backdrop-blur-sm"
+            onClick={onCloseMobile}
+          />
           <aside className="relative w-72 h-full shadow-2xl flex flex-col bg-white">
             <div className="p-4 flex items-center justify-between border-b border-gray-100">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 bg-gradient-to-br from-red-600 to-red-700 rounded-lg flex items-center justify-center">
                   <BarChart3 className="w-4 h-4 text-white" />
                 </div>
-                <span className="text-base font-bold text-gray-900">My Dashboard</span>
+                <span className="text-base font-bold text-gray-900">{t('sidebar.myDashboard')}</span>
               </div>
               <button onClick={onCloseMobile} className="p-1.5 rounded-lg hover:bg-gray-100">
                 <X className="w-5 h-5 text-gray-500" />
@@ -241,7 +249,7 @@ const UserSidebar: React.FC<UserSidebarProps> = ({
             <div className="w-8 h-8 bg-gradient-to-br from-red-600 to-red-700 rounded-lg flex items-center justify-center flex-shrink-0">
               <BarChart3 className="w-4 h-4 text-white" />
             </div>
-            {sidebarOpen && <span className="text-base font-bold text-gray-900">Dashboard</span>}
+            {sidebarOpen && <span className="text-base font-bold text-gray-900">{t('sidebar.dashboard')}</span>}
           </div>
           {sidebarOpen && (
             <button onClick={() => onToggleSidebar(false)} className="p-1.5 rounded-lg hover:bg-gray-100">

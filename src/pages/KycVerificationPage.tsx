@@ -5,17 +5,18 @@ import { useAuthStore } from '../store/authStore';
 import {
   Upload, Camera, Loader2, ShieldCheck, AlertTriangle,
   CheckCircle2, XCircle, User, CreditCard, MapPin,
-  Calendar, Flag, ScanLine, RotateCcw, Eye, EyeOff,
-  ArrowLeft, Sparkles
+  Calendar, Flag, ScanLine, RotateCcw, Eye, EyeOff, ArrowLeft, Sparkles,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast from '../utils/toast';
+import { useTranslation } from 'react-i18next';
 
 type Step = 'upload' | 'scanning' | 'review' | 'done';
 
 const KycVerificationPage: React.FC = () => {
   const { user } = useAuthStore();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [step, setStep] = useState<Step>('upload');
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -46,12 +47,12 @@ const KycVerificationPage: React.FC = () => {
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      toast.error('Vui lòng chọn file ảnh (JPG, PNG)');
+      toast.error(t('kyc.errImageFormat', { defaultValue: 'Vui lòng chọn file ảnh (JPG, PNG)' }));
       return;
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      toast.error('Ảnh quá lớn (tối đa 10MB)');
+      toast.error(t('kyc.errImageSize', { defaultValue: 'Ảnh quá lớn (tối đa 10MB)' }));
       return;
     }
 
@@ -100,11 +101,11 @@ const KycVerificationPage: React.FC = () => {
       setStep('review');
 
       if (!parsed.cccdNumber && !parsed.fullName) {
-        toast.warning('Không nhận diện được thông tin CCCD. Vui lòng thử lại với ảnh rõ hơn.');
+        toast.warning(t('kyc.errOcrFail', { defaultValue: 'Không nhận diện được thông tin CCCD. Vui lòng thử lại với ảnh rõ hơn.' }));
       }
     } catch (error: any) {
-      toast.error('L?i x? l� ?nh CCCD');
-      toast.error('Lỗi quét ảnh: ' + (error.message || 'Không xác định'));
+      toast.error(t('kyc.errOcrProcess'));
+      toast.error(t('kyc.errScan') + (error.message || 'Không xác định'));
       setStep('upload');
     }
   };
@@ -129,9 +130,9 @@ const KycVerificationPage: React.FC = () => {
 
       setExistingKyc(result);
       setStep('done');
-      toast.success('Xác minh CCCD thành công!');
+      toast.success(t('kyc.success'));
     } catch (error: any) {
-      toast.error(error?.response?.data?.error || 'Lỗi khi gửi thông tin xác minh');
+      toast.error(error?.response?.data?.error || t('kyc.errSubmit'));
     } finally {
       setSubmitting(false);
     }
@@ -149,7 +150,7 @@ const KycVerificationPage: React.FC = () => {
 
   const updateField = (field: keyof CccdParsedData, value: string) => {
     if (parsedData) {
-      setParsedData({ ...parsedData, [field]: value });
+      setParsedData((prev) => (prev ? { ...prev, [field]: value } : prev));
     }
   };
 
@@ -162,18 +163,18 @@ const KycVerificationPage: React.FC = () => {
             <div className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/30 mb-6">
               <ShieldCheck className="w-10 h-10 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-900 mb-2">Đã xác minh danh tính</h1>
+            <h1 className="text-2xl font-semibold text-slate-900 mb-2">{t('kyc.verifiedTitle')}</h1>
             <p className="text-slate-500 text-sm mb-6">
-              Tài khoản của bạn đã được xác minh CCCD thành công. Badge "Đã xác minh" sẽ hiển thị trên trang cá nhân và hợp đồng.
+              {t('kyc.verifiedDesc')}
             </p>
 
             {existingKyc && (
               <div className="bg-emerald-50 rounded-2xl p-5 text-left text-sm space-y-2 mb-6">
-                <InfoRow icon={<CreditCard className="w-4 h-4" />} label="Số CCCD" value={existingKyc.cccdNumber ? `***${existingKyc.cccdNumber.slice(-4)}` : '—'} />
-                <InfoRow icon={<User className="w-4 h-4" />} label="Họ tên" value={existingKyc.fullName || '—'} />
-                <InfoRow icon={<Calendar className="w-4 h-4" />} label="Trạng thái" value={
+                <InfoRow icon={<CreditCard className="w-4 h-4" />} label={t('kyc.cccdNumber')} value={existingKyc.cccdNumber ? `***${existingKyc.cccdNumber.slice(-4)}` : '-'} />
+                <InfoRow icon={<User className="w-4 h-4" />} label={t('kyc.fullName')} value={existingKyc.fullName || '-'} />
+                <InfoRow icon={<Calendar className="w-4 h-4" />} label={t('common.status', { defaultValue: 'Trạng thái' })} value={
                   <span className="inline-flex items-center gap-1 text-emerald-700 font-semibold">
-                    <CheckCircle2 className="w-3.5 h-3.5" /> Đã xác minh
+                    <CheckCircle2 className="w-3.5 h-3.5" /> {t('kyc.statusVerified')}
                   </span>
                 } />
               </div>
@@ -181,10 +182,10 @@ const KycVerificationPage: React.FC = () => {
 
             <div className="flex gap-3">
               <button onClick={() => navigate('/profile')} className="flex-1 px-4 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200 transition-colors">
-                Về trang cá nhân
+                {t('kyc.backToProfile')}
               </button>
               <button onClick={resetFlow} className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors">
-                Quét lại
+                {t('kyc.scanAgain')}
               </button>
             </div>
           </div>
@@ -199,7 +200,7 @@ const KycVerificationPage: React.FC = () => {
 
         {/* Header */}
         <button onClick={() => navigate(-1)} className="inline-flex items-center text-sm text-slate-500 hover:text-slate-700 mb-4">
-          <ArrowLeft className="w-4 h-4 mr-1" /> Quay lại
+          <ArrowLeft className="w-4 h-4 mr-1" /> {t('common.back', { defaultValue: 'Quay lại' })}
         </button>
 
         <div className="flex items-center gap-3 mb-8">
@@ -207,14 +208,14 @@ const KycVerificationPage: React.FC = () => {
             <ScanLine className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-slate-900">Xác minh CCCD</h1>
-            <p className="text-slate-500 text-xs">Quét ảnh mặt trước CCCD để xác minh danh tính</p>
+            <h1 className="text-xl font-semibold text-slate-900">{t('kyc.title')}</h1>
+            <p className="text-slate-500 text-xs">{t('kyc.subtitle')}</p>
           </div>
         </div>
 
-        {/* Progress Steps */}
         <div className="flex items-center gap-2 mb-8">
-          {['Upload ảnh', 'Đang quét', 'Xác nhận'].map((label, i) => {
+          {[{label: t('kyc.stepUpload')}, {label: t('kyc.stepScanning')}, {label: t('kyc.stepReview')}].map((stepItem, i) => {
+            const label = stepItem.label;
             const stepIdx = ['upload', 'scanning', 'review'].indexOf(step);
             const isActive = i <= stepIdx;
             return (
@@ -239,17 +240,25 @@ const KycVerificationPage: React.FC = () => {
               onDrop={handleDrop}
               className="bg-white rounded-2xl border-2 border-dashed border-slate-200 hover:border-blue-400 p-8 text-center transition-colors cursor-pointer"
               onClick={() => fileInputRef.current?.click()}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  fileInputRef.current?.click();
+                }
+              }}
+              role="button"
+              tabIndex={0}
             >
               {imagePreview ? (
                 <div className="space-y-4">
                   <img src={imagePreview} alt="CCCD Preview" className="max-h-64 mx-auto rounded-xl shadow-md object-contain" />
-                  <p className="text-sm text-slate-600">Ảnh đã chọn. Nhấn "Bắt đầu quét" để tiếp tục.</p>
+                  <p className="text-sm text-slate-600">{t('kyc.imageSelected')}</p>
                 </div>
               ) : (
                 <>
                   <Upload className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                  <p className="text-slate-700 font-medium mb-1">Kéo thả hoặc nhấn để chọn ảnh CCCD</p>
-                  <p className="text-xs text-slate-400">Hỗ trợ JPG, PNG · Tối đa 10MB · Mặt trước CCCD</p>
+                  <p className="text-slate-700 font-medium mb-1">{t('kyc.dragDrop')}</p>
+                  <p className="text-xs text-slate-400">{t('kyc.supportFormat')}</p>
                 </>
               )}
               <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelect} />
@@ -258,13 +267,13 @@ const KycVerificationPage: React.FC = () => {
             {imagePreview && (
               <div className="flex gap-3">
                 <button onClick={resetFlow} className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors">
-                  <RotateCcw className="w-4 h-4 inline mr-1" /> Chọn lại
+                  <RotateCcw className="w-4 h-4 inline mr-1" /> {t('kyc.reselect')}
                 </button>
                 <button
                   onClick={startOcr}
                   className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-sm font-semibold shadow-lg shadow-blue-500/25 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 transition-all"
                 >
-                  <ScanLine className="w-4 h-4 inline mr-1" /> Bắt đầu quét
+                  <ScanLine className="w-4 h-4 inline mr-1" /> {t('kyc.startScan')}
                 </button>
               </div>
             )}
@@ -272,11 +281,11 @@ const KycVerificationPage: React.FC = () => {
             <div className="bg-amber-50 rounded-xl border border-amber-200 p-4 flex items-start gap-3">
               <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
               <div className="text-xs text-amber-800 leading-relaxed">
-                <p className="font-semibold mb-1">Lưu ý quan trọng</p>
+                <p className="font-semibold mb-1">{t('kyc.importantNote')}</p>
                 <ul className="space-y-0.5 list-disc pl-4">
-                  <li>Ảnh chụp rõ nét, đủ ánh sáng, không bị mờ/cắt góc</li>
-                  <li>OCR chạy trực tiếp trên trình duyệt — ảnh <strong>không được gửi lên server</strong></li>
-                  <li>Chỉ kết quả text trích xuất được gửi về backend để lưu</li>
+                  <li>{t('kyc.note1')}</li>
+                  <li>{t('kyc.note2')}</li>
+                  <li>{t('kyc.note3')}</li>
                 </ul>
               </div>
             </div>
@@ -292,8 +301,8 @@ const KycVerificationPage: React.FC = () => {
                 <ScanLine className="w-10 h-10 text-white animate-pulse" />
               </div>
             </div>
-            <h2 className="text-lg font-bold text-slate-900 mb-2">Đang quét CCCD...</h2>
-            <p className="text-sm text-slate-500 mb-6">Tesseract.js đang nhận diện chữ trên ảnh</p>
+            <h2 className="text-lg font-semibold text-slate-900 mb-2">{t('kyc.scanningTitle')}</h2>
+            <p className="text-sm text-slate-500 mb-6">{t('kyc.scanningDesc')}</p>
 
             <div className="w-full bg-slate-100 rounded-full h-3 mb-2 overflow-hidden">
               <div
@@ -301,7 +310,7 @@ const KycVerificationPage: React.FC = () => {
                 style={{ width: `${ocrProgress}%` }}
               />
             </div>
-            <p className="text-xs text-slate-400">{ocrProgress}% hoàn tất</p>
+            <p className="text-xs text-slate-400">{ocrProgress}% {t('kyc.complete')}</p>
           </div>
         )}
 
@@ -310,13 +319,13 @@ const KycVerificationPage: React.FC = () => {
           <div className="space-y-6">
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
               <div className="flex items-center justify-between mb-5">
-                <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-blue-500" />
-                  Kết quả quét OCR
+                  {t('kyc.ocrResult')}
                 </h2>
                 <button onClick={() => setShowRawText(!showRawText)} className="text-xs text-slate-500 hover:text-slate-700 flex items-center gap-1">
                   {showRawText ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                  {showRawText ? 'Ẩn raw text' : 'Xem raw text'}
+                  {showRawText ? t('kyc.hideRaw') : t('kyc.showRaw')}
                 </button>
               </div>
 
@@ -325,14 +334,14 @@ const KycVerificationPage: React.FC = () => {
               )}
 
               <div className="space-y-3">
-                <EditableField icon={<CreditCard className="w-4 h-4" />} label="Số CCCD" value={parsedData.cccdNumber} onChange={(v) => updateField('cccdNumber', v)} important />
-                <EditableField icon={<User className="w-4 h-4" />} label="Họ và tên" value={parsedData.fullName} onChange={(v) => updateField('fullName', v)} important />
-                <EditableField icon={<Calendar className="w-4 h-4" />} label="Ngày sinh" value={parsedData.dateOfBirth} onChange={(v) => updateField('dateOfBirth', v)} placeholder="yyyy-MM-dd" />
-                <EditableField icon={<User className="w-4 h-4" />} label="Giới tính" value={parsedData.gender} onChange={(v) => updateField('gender', v)} />
-                <EditableField icon={<Flag className="w-4 h-4" />} label="Quốc tịch" value={parsedData.nationality} onChange={(v) => updateField('nationality', v)} />
-                <EditableField icon={<MapPin className="w-4 h-4" />} label="Quê quán" value={parsedData.placeOfOrigin} onChange={(v) => updateField('placeOfOrigin', v)} />
-                <EditableField icon={<MapPin className="w-4 h-4" />} label="Nơi thường trú" value={parsedData.placeOfResidence} onChange={(v) => updateField('placeOfResidence', v)} />
-                <EditableField icon={<Calendar className="w-4 h-4" />} label="Có giá trị đến" value={parsedData.expiryDate} onChange={(v) => updateField('expiryDate', v)} placeholder="yyyy-MM-dd" />
+                <EditableField icon={<CreditCard className="w-4 h-4" />} label={t('kyc.cccdNumber')} value={parsedData.cccdNumber} onChange={(v) => updateField('cccdNumber', v)} important />
+                <EditableField icon={<User className="w-4 h-4" />} label={t('kyc.fullName')} value={parsedData.fullName} onChange={(v) => updateField('fullName', v)} important />
+                <EditableField icon={<Calendar className="w-4 h-4" />} label={t('kyc.dob')} value={parsedData.dateOfBirth} onChange={(v) => updateField('dateOfBirth', v)} placeholder="yyyy-MM-dd" />
+                <EditableField icon={<User className="w-4 h-4" />} label={t('kyc.gender')} value={parsedData.gender} onChange={(v) => updateField('gender', v)} />
+                <EditableField icon={<Flag className="w-4 h-4" />} label={t('kyc.nationality')} value={parsedData.nationality} onChange={(v) => updateField('nationality', v)} />
+                <EditableField icon={<MapPin className="w-4 h-4" />} label={t('kyc.origin')} value={parsedData.placeOfOrigin} onChange={(v) => updateField('placeOfOrigin', v)} />
+                <EditableField icon={<MapPin className="w-4 h-4" />} label={t('kyc.residence')} value={parsedData.placeOfResidence} onChange={(v) => updateField('placeOfResidence', v)} />
+                <EditableField icon={<Calendar className="w-4 h-4" />} label={t('kyc.expiry')} value={parsedData.expiryDate} onChange={(v) => updateField('expiryDate', v)} placeholder="yyyy-MM-dd" />
               </div>
 
               {/* CCCD Validation Info */}
@@ -341,16 +350,16 @@ const KycVerificationPage: React.FC = () => {
                 if (!v.valid) return (
                   <div className="mt-4 bg-red-50 rounded-xl border border-red-200 p-3 flex items-start gap-2">
                     <XCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
-                    <p className="text-xs text-red-700">Số CCCD không hợp lệ theo cấu trúc CCCD Việt Nam (mã tỉnh/giới tính). Vui lòng kiểm tra lại.</p>
+                    <p className="text-xs text-red-700">{t('kyc.invalidCccd')}</p>
                   </div>
                 );
                 return (
                   <div className="mt-4 bg-blue-50 rounded-xl border border-blue-200 p-3">
-                    <p className="text-xs font-semibold text-blue-800 mb-2 flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5" /> Xác thực CCCD hợp lệ</p>
+                    <p className="text-xs font-semibold text-blue-800 mb-2 flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5" /> {t('kyc.validCccd')}</p>
                     <div className="grid grid-cols-3 gap-2 text-xs text-blue-700">
-                      <div><span className="text-blue-400">Nơi cấp:</span> <strong>{v.province}</strong></div>
-                      <div><span className="text-blue-400">Giới tính:</span> <strong>{v.gender}</strong></div>
-                      <div><span className="text-blue-400">Năm sinh:</span> <strong>{v.birthYear}</strong></div>
+                      <div><span className="text-blue-400">{t('kyc.issuePlace')}</span> <strong>{v.province}</strong></div>
+                      <div><span className="text-blue-400">{t('kyc.gender')}</span> <strong>{v.gender}</strong></div>
+                      <div><span className="text-blue-400">{t('kyc.birthYear')}</span> <strong>{v.birthYear}</strong></div>
                     </div>
                   </div>
                 );
@@ -361,14 +370,14 @@ const KycVerificationPage: React.FC = () => {
               <div className="bg-amber-50 rounded-xl border border-amber-200 p-4 flex items-start gap-3">
                 <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
                 <p className="text-xs text-amber-800">
-                  <strong>Thiếu thông tin bắt buộc.</strong> Vui lòng điền số CCCD và họ tên thủ công, hoặc thử quét lại ảnh rõ hơn.
+                  {t('kyc.missingInfo')}
                 </p>
               </div>
             )}
 
             <div className="flex gap-3">
               <button onClick={resetFlow} className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors">
-                <RotateCcw className="w-4 h-4 inline mr-1" /> Quét lại
+                <RotateCcw className="w-4 h-4 inline mr-1" /> {t('kyc.scanAgain')}
               </button>
               <button
                 onClick={handleSubmit}
@@ -376,9 +385,9 @@ const KycVerificationPage: React.FC = () => {
                 className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-sm font-semibold shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitting ? (
-                  <><Loader2 className="w-4 h-4 inline animate-spin mr-1" /> Đang gửi...</>
+                  <><Loader2 className="w-4 h-4 inline animate-spin mr-1" /> {t('kyc.sending')}</>
                 ) : (
-                  <><ShieldCheck className="w-4 h-4 inline mr-1" /> Xác nhận & Lưu</>
+                  <><ShieldCheck className="w-4 h-4 inline mr-1" /> {t('kyc.confirmSave')}</>
                 )}
               </button>
             </div>

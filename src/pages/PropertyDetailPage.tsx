@@ -8,6 +8,7 @@ import {
   Eye,
   Phone,
   Mail,
+  Folder,
   MessageCircle,
   Star,
   Calendar,
@@ -32,6 +33,7 @@ import {
   Flag,
   X,
   CheckCircle,
+  Users,
 } from 'lucide-react';
 import { useProperty, useFavoriteStatus } from '../api/hooks';
 import { propertyFavoriteAPI } from '../api';
@@ -43,6 +45,13 @@ import { useAuthStore } from '../store/authStore';
 import { useUIStore } from '../store/uiStore';
 import PropertyChatList from '../components/PropertyChatList';
 import PriceHistoryChart from '../components/PriceHistoryChart';
+import { PropertyTimeline } from '../components/PropertyTimeline';
+import { PropertyNoteSection } from '../components/PropertyNoteSection';
+import { AIValuationReport } from '../components/AIValuationReport';
+import { InvestmentSimulator } from '../components/InvestmentSimulator';
+import { EnvironmentalQualityWidget } from '../components/EnvironmentalQualityWidget';
+import { AIMarketingHub } from '../components/AIMarketingHub';
+import { AddToCollectionModal } from '../components/AddToCollectionModal';
 import PropertyReviewSection from '../components/PropertyReviewSection';
 import PriceAlertButton from '../components/PriceAlertButton';
 import VRTour from '../components/vr-tour';
@@ -78,6 +87,7 @@ const PropertyDetailPage: React.FC = () => {
   const [reportReason, setReportReason] = useState('INACCURATE');
   const [reportDescription, setReportDescription] = useState('');
   const [reportSubmitting, setReportSubmitting] = useState(false);
+  const [isCollectionModalOpen, setIsCollectionModalOpen] = useState(false);
   const [similarProperties, setSimilarProperties] = useState<any[]>([]);
   const [similarLoading, setSimilarLoading] = useState(false);
   const { registerOwnerChat, unregisterOwnerChat } = useUIStore();
@@ -147,6 +157,15 @@ const PropertyDetailPage: React.FC = () => {
     t,
   ]);
 
+  const handleStartCoViewing = () => {
+    if (!isAuthenticated) {
+      toast.warning('Vui lòng đăng nhập để bắt đầu phòng xem chung (Co-Viewing)!');
+      return;
+    }
+    const token = Math.random().toString(36).substring(2, 10);
+    navigate(`/coviewing/${token}?propertyId=${property?.id}`);
+  };
+
   // Toggle favorite
   const handleToggleFavorite = async () => {
     if (!id || !isAuthenticated) {
@@ -206,7 +225,7 @@ const PropertyDetailPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('propertyDetail.loadingError')}</h2>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">{t('propertyDetail.loadingError')}</h2>
           <p className="text-gray-600 mb-4">{error}</p>
           <button 
             onClick={refetch}
@@ -223,7 +242,7 @@ const PropertyDetailPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('propertyDetail.notFound')}</h2>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">{t('propertyDetail.notFound')}</h2>
           <p className="text-gray-600">{t('propertyDetail.notFoundMessage')}</p>
         </div>
       </div>
@@ -387,19 +406,29 @@ const PropertyDetailPage: React.FC = () => {
                 </>
               )}
 
-              {/* VR 360 Tour Button — only show when there are images */}
+              {/* VR 360 Tour Button & Co-Viewing — only show when there are images */}
               {images.length > 0 && (
-                <button
-                   onClick={() => setShowVRModal(true)}
-                   className="absolute bottom-4 left-4 bg-red-600/90 hover:bg-red-700 text-white px-4 py-2 rounded-xl font-medium text-sm flex items-center shadow-lg transition-all hover:scale-105 backdrop-blur-sm gap-2"
-                >
-                   <Eye className="w-4 h-4" />
-                   Tham quan VR 360°
-                </button>
+                <div className="absolute bottom-4 left-4 flex gap-2">
+                  <button
+                     onClick={() => setShowVRModal(true)}
+                     className="bg-red-600/90 hover:bg-red-700 text-white px-4 py-2 rounded-xl font-semibold text-xs flex items-center shadow-lg transition-all hover:scale-105 backdrop-blur-sm gap-1.5"
+                  >
+                     <Eye className="w-3.5 h-3.5" />
+                     Tham quan VR 360°
+                  </button>
+                  <button
+                     onClick={handleStartCoViewing}
+                     className="bg-blue-600/90 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-semibold text-xs flex items-center shadow-lg transition-all hover:scale-105 backdrop-blur-sm gap-1.5 border border-white/10"
+                     title="Xem nhà ảo đồng bộ thời gian thực cùng môi giới / khách hàng"
+                  >
+                     <Users className="w-3.5 h-3.5 text-blue-200" />
+                     <span>Xem chung (Co-Viewing)</span>
+                  </button>
+                </div>
               )}
 
               {/* Action Buttons */}
-              <div className="absolute top-4 right-4 flex space-x-2">
+              <div className="absolute top-4 right-4 flex gap-x-2">
                 <button
                   onClick={handleToggleFavorite}
                   disabled={togglingFavorite || !isAuthenticated}
@@ -415,6 +444,20 @@ const PropertyDetailPage: React.FC = () => {
                   ) : (
                     <Heart className={`h-5 w-5 ${isFavorited ? 'fill-current' : ''}`} />
                   )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!isAuthenticated) {
+                      showWarning(t('savedSearch.loginRequired', 'Vui lòng đăng nhập để sử dụng tính năng này'));
+                      return;
+                    }
+                    setIsCollectionModalOpen(true);
+                  }}
+                  className="p-3 glass text-gray-700 rounded-full hover:bg-white hover:text-red-600 hover:scale-110 transition-all duration-200 shadow-sm cursor-pointer"
+                  title={t('propertyCollection.addToBtn', 'Thêm vào bộ sưu tập')}
+                >
+                  <Folder className="h-5 w-5" />
                 </button>
                 <button
                   type="button"
@@ -458,7 +501,7 @@ const PropertyDetailPage: React.FC = () => {
           {/* Thumbnail Gallery */}
           {images.length > 1 && (
             <div className="p-4 overflow-x-auto">
-              <div className="flex space-x-2">
+              <div className="flex gap-x-2">
                 {images.map((image: any, index: number) => (
                   <button
                     key={image.id}
@@ -507,7 +550,7 @@ const PropertyDetailPage: React.FC = () => {
                       <div className="text-sm">
                         <span className="font-semibold text-amber-800">Đang cho thuê</span>
                         <span className="text-amber-600 ml-1">
-                          — Hết hạn {new Date(property.rentalEndDate).toLocaleDateString('vi-VN')}
+                          , Hết hạn <span suppressHydrationWarning>{new Date(property.rentalEndDate).toLocaleDateString('vi-VN')}</span>
                           {(() => {
                             const days = Math.ceil((new Date(property.rentalEndDate).getTime() - Date.now()) / 86400000);
                             if (days > 0) return ` (còn ${days} ngày)`;
@@ -515,7 +558,7 @@ const PropertyDetailPage: React.FC = () => {
                           })()}
                         </span>
                         {isOwner && (
-                          <span className="block text-amber-500 text-xs mt-0.5">Tin sẽ tự động hiển thị lại sau khi hết hạn thuê</span>
+                          <span className="block text-amber-500 text-xs mt-0.5" suppressHydrationWarning>Tin sẽ tự động hiển thị lại sau khi hết hạn thuê</span>
                         )}
                       </div>
                     </div>
@@ -526,7 +569,7 @@ const PropertyDetailPage: React.FC = () => {
                       <span className="text-sm font-semibold text-red-800">Đã bán</span>
                     </div>
                   )}
-                  <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
+                  <h1 className="text-2xl lg:text-3xl font-semibold text-gray-900">
                     {property.title}
                   </h1>
                 </div>
@@ -554,7 +597,7 @@ const PropertyDetailPage: React.FC = () => {
                 <span>{fullAddress || property.address || t('propertyDetail.addressNotUpdated')}</span>
               </div>
 
-              <div className="flex items-center space-x-6 text-sm text-gray-600">
+              <div className="flex items-center gap-x-6 text-sm text-gray-600">
                 <div className="flex items-center">
                   <Ruler className="h-4 w-4 mr-1" />
                   <span>{property.area}m²</span>
@@ -575,12 +618,12 @@ const PropertyDetailPage: React.FC = () => {
             {/* Features */}
             {features.length > 0 && (
               <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">{t('propertyDetail.detailInfo')}</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('propertyDetail.detailInfo')}</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {features.map((feature, index) => {
                     const Icon = feature.icon;
                     return (
-                      <div key={index} className="text-center p-4 bg-gray-50/80 hover:bg-gray-50 rounded-xl transition-colors border border-gray-100/50">
+                      <div key={`${feature.label}-${feature.value}`} className="text-center p-4 bg-gray-50/80 hover:bg-gray-50 rounded-xl transition-colors border border-gray-100/50">
                         <Icon className="h-8 w-8 text-red-600 mx-auto mb-2" />
                         <div className="font-medium text-gray-900">{feature.value}</div>
                         <div className="text-sm text-gray-600">{feature.label}</div>
@@ -593,10 +636,10 @@ const PropertyDetailPage: React.FC = () => {
 
             {/* Description */}
             <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">{t('propertyDetail.description')}</h2>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('propertyDetail.description')}</h2>
               <div className="prose max-w-none text-gray-700">
                 {property.description.split('\n').map((paragraph: string, index: number) => (
-                  <p key={index} className="mb-3">{paragraph}</p>
+                  <p key={paragraph} className="mb-3">{paragraph}</p>
                 ))}
               </div>
             </div>
@@ -604,16 +647,28 @@ const PropertyDetailPage: React.FC = () => {
             {/* Additional Features */}
             {details?.additionalFeatures && (
               <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">{t('propertyDetail.additionalFeatures')}</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('propertyDetail.additionalFeatures')}</h2>
                 <p className="text-gray-700">{details.additionalFeatures}</p>
               </div>
             )}
+
+            {/* Property Timeline History */}
+            <PropertyTimeline propertyId={id || ''} />
+
+            {/* Property Visit Notes */}
+            <PropertyNoteSection propertyId={Number(id)} />
+
+            {/* AI Property Valuation Report */}
+            <AIValuationReport propertyId={id || ''} currentAskingPrice={Number(property.price)} />
 
             {/* Price History Chart */}
             <PriceHistoryChart propertyId={id || ''} currentPrice={property.price} />
 
             {/* Mortgage Calculator */}
             <MortgageCalculator propertyPrice={Number(property.price)} isRent={isRentListing} />
+
+            {/* Investment Simulator */}
+            <InvestmentSimulator propertyPrice={Number(property.price)} />
 
             {/* Reviews Section */}
             <PropertyReviewSection propertyId={property.id} />
@@ -643,7 +698,7 @@ const PropertyDetailPage: React.FC = () => {
               />
             ) : (
               <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">{t('propertyDetail.location')}</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('propertyDetail.location')}</h2>
                 <div className="aspect-[16/9] bg-gray-200 rounded-lg overflow-hidden">
                   <iframe
                     title="Bản đồ vị trí"
@@ -659,18 +714,21 @@ const PropertyDetailPage: React.FC = () => {
               </div>
             )}
 
+            {/* Environmental Quality Dashboard */}
+            <EnvironmentalQualityWidget propertyId={id || ''} />
+
             {/* Bất động sản tương tự */}
             {(similarLoading || similarProperties.length > 0) && (
               <div className="bg-white rounded-2xl shadow-sm p-6 mt-8 border border-gray-100">
                 <div className="flex items-center gap-2 mb-6">
                   <Star className="w-6 h-6 text-yellow-500 fill-current" />
-                  <h2 className="text-xl font-bold text-gray-900">Bất động sản tương tự</h2>
+                  <h2 className="text-xl font-semibold text-gray-900">Bất động sản tương tự</h2>
                 </div>
                 
                 {similarLoading ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {[...Array(4)].map((_, i) => (
-                      <div key={i} className="h-32 bg-gray-200 rounded-lg animate-pulse" />
+                    {[1, 2, 3, 4].map((slot) => (
+                      <div key={`similar-skeleton-${slot}`} className="h-32 bg-gray-200 rounded-lg animate-pulse" />
                     ))}
                   </div>
                 ) : (
@@ -711,11 +769,18 @@ const PropertyDetailPage: React.FC = () => {
           <div className="space-y-6 sticky top-24 max-h-[calc(100vh-6rem)] overflow-y-auto custom-scrollbar">
             {/* Owner View: Show list of people who messaged */}
             {isOwner ? (
-              <PropertyChatList
-                propertyId={property.id}
-                onSelectConversation={handleSelectConversation}
-                selectedConversationId={selectedConversation?.id}
-              />
+              <div className="space-y-6">
+                <PropertyChatList
+                  propertyId={property.id}
+                  onSelectConversation={handleSelectConversation}
+                  selectedConversationId={selectedConversation?.id}
+                />
+                <AIMarketingHub
+                  propertyId={property.id}
+                  originalTitle={property.title}
+                  originalDescription={property.description}
+                />
+              </div>
             ) : (
               /* Client View: Show contact card */
               <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
@@ -907,7 +972,7 @@ const PropertyDetailPage: React.FC = () => {
 
       {/* Blockchain contract preview modal */}
       {showReportModal && id && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-950/40">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 relative">
             <button
               type="button"
@@ -917,13 +982,15 @@ const PropertyDetailPage: React.FC = () => {
             >
               <X className="w-5 h-5" />
             </button>
-            <h2 className="text-lg font-bold text-gray-900 pr-8">Báo cáo tin đăng</h2>
+            <h2 className="text-lg font-semibold text-gray-900 pr-8">Báo cáo tin đăng</h2>
             <p className="text-sm text-gray-600 mt-1 mb-4">
               Thông tin của bạn giúp chúng tôi duy trì nội dung uy tín. Báo cáo được xử lý nội bộ.
             </p>
             <div className="space-y-3">
-              <label className="block text-sm font-medium text-gray-700">Lý do</label>
+              <label htmlFor="property-report-reason" className="block text-sm font-medium text-gray-700">Lý do</label>
               <select
+                id="property-report-reason"
+
                 value={reportReason}
                 onChange={(e) => setReportReason(e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500"
@@ -935,8 +1002,10 @@ const PropertyDetailPage: React.FC = () => {
                 <option value="OTHER">Khác</option>
               </select>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Mô tả thêm (tuỳ chọn)</label>
+                <label htmlFor="property-report-description" className="block text-sm font-medium text-gray-700 mb-1">Mô tả thêm (tuỳ chọn)</label>
                 <textarea
+                  id="property-report-description"
+
                   value={reportDescription}
                   onChange={(e) => setReportDescription(e.target.value)}
                   rows={3}
@@ -979,11 +1048,11 @@ const PropertyDetailPage: React.FC = () => {
       )}
 
       {showContractModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+        <div className="fixed inset-0 bg-gray-950 bg-opacity-50 flex items-center justify-center z-50 px-4">
           <div className="bg-white rounded-xl max-w-2xl w-full shadow-xl overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-bold text-gray-900">
+                <h2 className="text-xl font-semibold text-gray-900">
                   {isRentListing ? 'Hợp đồng thuê bất động sản' : 'Hợp đồng mua bán bất động sản'}
                 </h2>
                 <p className="text-sm text-gray-500 mt-1">
@@ -1088,6 +1157,13 @@ const PropertyDetailPage: React.FC = () => {
         onClose={() => setShowQrModal(false)}
         propertyId={property.id}
         propertyTitle={property.title}
+      />
+
+      {/* Add to Collection Modal */}
+      <AddToCollectionModal
+        propertyId={Number(id)}
+        isOpen={isCollectionModalOpen}
+        onClose={() => setIsCollectionModalOpen(false)}
       />
     </div>
   );

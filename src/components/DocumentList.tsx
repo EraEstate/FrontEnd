@@ -31,6 +31,10 @@ const formatDocumentType = (value: PropertyDocument['documentType']): string => 
   }
 };
 
+const formatDate = (dateString: string | number): string => {
+  return new Date(dateString).toLocaleString('vi-VN');
+};
+
 const DocumentList: React.FC<DocumentListProps> = ({ propertyId, canManage = false, refreshToken }) => {
   const [documents, setDocuments] = useState<PropertyDocument[]>([]);
   const [loading, setLoading] = useState(true);
@@ -105,7 +109,7 @@ const DocumentList: React.FC<DocumentListProps> = ({ propertyId, canManage = fal
       </div>
 
       {documents.length === 0 ? (
-        <div className="flex items-center gap-2 rounded-lg bg-gray-50 px-3 py-3 text-sm text-gray-600">
+        <div className="flex items-center gap-2 rounded-lg bg-gray-50 p-3 text-sm text-gray-600">
           <FileText className="h-4 w-4" />
           Chưa có tài liệu nào.
         </div>
@@ -123,7 +127,7 @@ const DocumentList: React.FC<DocumentListProps> = ({ propertyId, canManage = fal
                     <p className="mt-1 text-xs text-gray-600">{document.description}</p>
                   )}
                   <p className="mt-1 text-xs text-gray-500">
-                    {new Date(document.createdAt).toLocaleString('vi-VN')}
+                    <span suppressHydrationWarning>{formatDate(document.createdAt)}</span>
                     {document.uploadedByName ? ` • ${document.uploadedByName}` : ''}
                   </p>
                 </div>

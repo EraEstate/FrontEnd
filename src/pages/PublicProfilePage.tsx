@@ -77,7 +77,7 @@ const PublicProfilePage: React.FC = () => {
         const data = await propertyAPI.getByOwner(id, currentPage, pageSize);
         setPropertiesData(data);
       } catch (err: any) {
-        toast.error('Kh�ng th? t?i danh s�ch b?t d?ng s?n');
+        toast.error('Kh�ng th? t?i danh s�ch b?t d?ng s?n');
         setPropertiesData({ content: [], totalPages: 0 });
       } finally {
         setPropertiesLoading(false);
@@ -108,7 +108,7 @@ const PublicProfilePage: React.FC = () => {
       <div className="min-h-screen bg-gray-50 pt-20">
         <div className="container mx-auto px-4 py-8">
           <div className="animate-pulse">
-            <div className="flex items-center space-x-6 mb-8">
+            <div className="flex items-center gap-x-6 mb-8">
               <div className="w-32 h-32 bg-gray-300 rounded-full"></div>
               <div className="flex-1">
                 <div className="h-8 bg-gray-300 rounded w-1/3 mb-4"></div>
@@ -117,8 +117,8 @@ const PublicProfilePage: React.FC = () => {
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="bg-gray-300 h-64 rounded-lg"></div>
+              {[1, 2, 3, 4, 5, 6].map((slot) => (
+                <div key={`profile-load-skeleton-${slot}`} className="bg-gray-300 h-64 rounded-lg"></div>
               ))}
             </div>
           </div>
@@ -134,7 +134,7 @@ const PublicProfilePage: React.FC = () => {
           <div className="mb-8">
             <User className="mx-auto h-24 w-24 text-gray-400" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">Không tìm thấy người dùng</h1>
+          <h1 className="text-2xl font-semibold text-gray-800 mb-4">Không tìm thấy người dùng</h1>
           <p className="text-gray-600 mb-6">Người dùng bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.</p>
           <button
             onClick={() => navigate(-1)}
@@ -153,7 +153,7 @@ const PublicProfilePage: React.FC = () => {
     <div className="min-h-screen bg-gray-50 pt-20">
       <div className="container mx-auto px-4 py-8">
         {/* Breadcrumb */}
-        <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-8">
+        <nav className="flex items-center gap-x-2 text-sm text-gray-600 mb-8">
           <Link to="/" className="hover:text-red-600">Trang chủ</Link>
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -167,7 +167,7 @@ const PublicProfilePage: React.FC = () => {
 
         {/* Profile Header */}
         <div className="bg-white rounded-lg shadow-md p-8 mb-8">
-          <div className="flex flex-col md:flex-row items-start space-y-6 md:space-y-0 md:space-x-8">
+          <div className="flex flex-col md:flex-row items-start gap-y-6 md:gap-y-0 md:gap-x-8">
             {/* Avatar */}
             <div className="relative flex-shrink-0">
               <div className="relative w-32 h-32 md:w-40 md:h-40">
@@ -196,7 +196,7 @@ const PublicProfilePage: React.FC = () => {
             <div className="flex-1 w-full">
               <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-4">
                 <div className="flex-1">
-                  <h1 className="text-3xl font-bold text-gray-800 mb-2 flex items-center gap-2">
+                  <h1 className="text-3xl font-semibold text-gray-800 mb-2 flex items-center gap-2">
                     {profile.fullName}
                     {kycVerified && (
                       <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-semibold" title="Đã xác minh CCCD">
@@ -206,7 +206,7 @@ const PublicProfilePage: React.FC = () => {
                   </h1>
                   
                   {profile.isAgent && profile.agentLicense && (
-                    <div className="flex items-center space-x-4 text-gray-600 mb-2">
+                    <div className="flex items-center gap-x-4 text-gray-600 mb-2">
                       <span className="flex items-center text-green-600">
                         <Award className="w-5 h-5 mr-1" />
                         Giấy phép: {profile.agentLicense}
@@ -215,7 +215,7 @@ const PublicProfilePage: React.FC = () => {
                   )}
 
                   {/* Stats */}
-                  <div className="flex items-center space-x-6 mb-4">
+                  <div className="flex items-center gap-x-6 mb-4">
                     <div className="flex items-center text-gray-600">
                       <Building2 className="w-5 h-5 mr-2 text-red-600" />
                       <span className="font-semibold">{profile.totalProperties || 0}</span>
@@ -224,10 +224,10 @@ const PublicProfilePage: React.FC = () => {
                     {profile.averageRating && (
                       <div className="flex items-center">
                         <div className="flex text-yellow-400">
-                          {[...Array(5)].map((_, i) => (
+                          {[1, 2, 3, 4, 5].map((star) => (
                             <Star
-                              key={i}
-                              className={`w-5 h-5 ${i < Math.floor(profile.averageRating!) ? 'fill-current' : 'text-gray-300'}`}
+                              key={`star-rating-${star}`}
+                              className={`w-5 h-5 ${star <= Math.floor(profile.averageRating!) ? 'fill-current' : 'text-gray-300'}`}
                             />
                           ))}
                         </div>
@@ -270,7 +270,7 @@ const PublicProfilePage: React.FC = () => {
 
                 {/* Action Buttons */}
                 {!isOwnProfile && (
-                  <div className="flex flex-col space-y-2 mt-4 md:mt-0 md:ml-4">
+                  <div className="flex flex-col gap-y-2 mt-4 md:mt-0 md:ml-4">
                     <a
                       href={`tel:${profile.phone || ''}`}
                       className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors font-medium text-center flex items-center justify-center"
@@ -298,15 +298,15 @@ const PublicProfilePage: React.FC = () => {
         {/* Properties Section */}
         <div className="bg-white rounded-lg shadow-md p-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">
+            <h2 className="text-2xl font-semibold text-gray-800">
               Bất động sản đã đăng ({profile.totalProperties || 0})
             </h2>
           </div>
 
           {propertiesLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="bg-gray-200 h-64 rounded-lg animate-pulse"></div>
+              {[1, 2, 3, 4, 5, 6].map((slot) => (
+                <div key={`property-load-skeleton-${slot}`} className="bg-gray-200 h-64 rounded-lg animate-pulse"></div>
               ))}
             </div>
           ) : properties.length === 0 ? (
@@ -387,7 +387,7 @@ const PublicProfilePage: React.FC = () => {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex items-center justify-center space-x-2 mt-8">
+                <div className="flex items-center justify-center gap-x-2 mt-8">
                   <button
                     onClick={() => setCurrentPage((prev) => Math.max(0, prev - 1))}
                     disabled={currentPage === 0}

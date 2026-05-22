@@ -31,7 +31,7 @@ const LanguageSwitcher: React.FC = () => {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
+        className="flex items-center gap-x-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
         aria-haspopup="true"
         aria-expanded={isOpen}
       >
@@ -56,7 +56,7 @@ const LanguageSwitcher: React.FC = () => {
                   i18n.language === language.code ? 'bg-red-50 text-red-600' : 'text-gray-700'
                 }`}
               >
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center gap-x-3">
                   <span className="text-lg">{language.flag}</span>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium truncate">
@@ -78,10 +78,12 @@ const LanguageSwitcher: React.FC = () => {
 
       {/* Overlay to close dropdown when clicking outside */}
       {isOpen && (
-        <div
+        <button
+          type="button"
+          aria-label="Close language menu"
           className="fixed inset-0 z-40"
           onClick={() => setIsOpen(false)}
-        ></div>
+        />
       )}
     </div>
   );

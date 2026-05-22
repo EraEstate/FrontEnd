@@ -42,9 +42,9 @@ const EmptyState: React.FC<EmptyStateProps> = ({
           <Icon className="w-10 h-10 text-gray-400" />
         </div>
         {/* Floating dots decoration */}
-        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-100 animate-pulse" style={{ animationDuration: '3s' }} />
-        <div className="absolute -bottom-2 -left-2 w-3 h-3 rounded-full bg-orange-100 animate-pulse" style={{ animationDuration: '4s', animationDelay: '1s' }} />
-        <div className="absolute top-1/2 -right-4 w-2 h-2 rounded-full bg-red-200 animate-pulse" style={{ animationDuration: '3.5s', animationDelay: '0.5s' }} />
+        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-100 animate-pulse" style={{ animationDuration: '0.8s' }} />
+        <div className="absolute -bottom-2 -left-2 w-3 h-3 rounded-full bg-orange-100 animate-pulse" style={{ animationDuration: '0.9s', animationDelay: '0.15s' }} />
+        <div className="absolute top-1/2 -right-4 w-2 h-2 rounded-full bg-red-200 animate-pulse" style={{ animationDuration: '1s', animationDelay: '0.1s' }} />
       </div>
 
       <h3 className="text-lg font-semibold text-gray-900 mb-2 text-center">

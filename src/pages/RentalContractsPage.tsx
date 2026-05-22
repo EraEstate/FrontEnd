@@ -46,7 +46,7 @@ const RentalContractsPage: React.FC = () => {
         <div className="mb-6 rounded-2xl bg-white p-6 shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Hợp đồng thuê của tôi</h1>
+              <h1 className="text-2xl font-semibold text-gray-900">Hợp đồng thuê của tôi</h1>
               <p className="mt-1 text-sm text-gray-600">
                 {contracts.length} hợp đồng • {groupedInfo.active} đang hiệu lực • {groupedInfo.draft} bản nháp
               </p>
@@ -92,13 +92,13 @@ const RentalContractsPage: React.FC = () => {
                       {contract.propertyTitle || `Property ${contract.propertyId}`}
                     </p>
                     <p className="mt-1 text-xs text-gray-600">
-                      {new Date(contract.startDate).toLocaleDateString('vi-VN')} - {new Date(contract.endDate).toLocaleDateString('vi-VN')}
+                      <span suppressHydrationWarning>{new Date(contract.startDate).toLocaleDateString('vi-VN')}</span> - <span suppressHydrationWarning>{new Date(contract.endDate).toLocaleDateString('vi-VN')}</span>
                     </p>
-                    <p className="mt-1 text-xs text-gray-600">
+                    <p className="mt-1 text-xs text-gray-600" suppressHydrationWarning>
                       Thuê: {contract.monthlyRent.toLocaleString('vi-VN')} VND/tháng
                     </p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-right" suppressHydrationWarning>
                     <span className="inline-flex items-center gap-1 rounded-lg bg-red-50 px-2.5 py-1 text-xs font-medium text-red-700">
                       <FileText className="h-3.5 w-3.5" />
                       {contract.status}

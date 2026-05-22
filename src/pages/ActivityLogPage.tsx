@@ -105,7 +105,7 @@ const ActivityLogPage: React.FC = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Lịch sử hoạt động</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Lịch sử hoạt động</h1>
             <p className="text-sm text-gray-500 mt-1">Theo dõi các hoạt động của bạn trên hệ thống</p>
           </div>
           <button

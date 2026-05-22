@@ -86,8 +86,8 @@ const StaffRentalContractReview: React.FC = () => {
       {/* Contract List */}
       <div className={`rounded-2xl border overflow-hidden ${cardCls}`}>
         {loading ? (
-          <div className="p-8 space-y-4">{[1,2,3].map(i => (
-            <div key={i} className="flex gap-4 animate-pulse">
+          <div className="p-8 space-y-4">{[1,2,3].map(slot => (
+            <div key={`contract-pulse-${slot}`} className="flex gap-4 animate-pulse">
               <div className={`w-10 h-10 rounded-lg ${isDark?'bg-slate-700':'bg-gray-200'}`}/>
               <div className="flex-1 space-y-2">
                 <div className={`h-4 rounded w-3/4 ${isDark?'bg-slate-700':'bg-gray-200'}`}/>
@@ -117,10 +117,10 @@ const StaffRentalContractReview: React.FC = () => {
                       <span className="flex items-center gap-1"><User className="w-3 h-3"/>Chủ: {c.landlordName || 'N/A'}</span>
                       <span className="flex items-center gap-1"><User className="w-3 h-3"/>Thuê: {c.tenantName || 'N/A'}</span>
                       <span className="flex items-center gap-1"><DollarSign className="w-3 h-3"/>{formatPrice(c.monthlyRent)} VNĐ/tháng</span>
-                      <span className="flex items-center gap-1"><Calendar className="w-3 h-3"/>{new Date(c.startDate).toLocaleDateString('vi-VN')} - {new Date(c.endDate).toLocaleDateString('vi-VN')}</span>
+                      <span suppressHydrationWarning className="flex items-center gap-1"><Calendar className="w-3 h-3"/>{new Date(c.startDate).toLocaleDateString('vi-VN')} - {new Date(c.endDate).toLocaleDateString('vi-VN')}</span>
                     </div>
-                    <div className="flex gap-2 mt-2">
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${c.signedByLandlord ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>
+                    <div className="flex gap-2 mt-2" suppressHydrationWarning>
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${c.signedByLandlord ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'}`} suppressHydrationWarning>
                         {c.signedByLandlord ? '✓ Chủ đã ký' : '○ Chủ chưa ký'}
                       </span>
                       <span className={`text-xs px-2 py-0.5 rounded-full ${c.signedByTenant ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>

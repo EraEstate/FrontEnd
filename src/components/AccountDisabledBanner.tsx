@@ -11,7 +11,7 @@ const AccountDisabledBanner: React.FC = () => {
   }
 
   return (
-    <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+    <div className="bg-yellow-50 border-l-2 border-yellow-400 p-4 mb-4">
       <div className="flex items-start">
         <div className="flex-shrink-0">
           <AlertTriangle className="h-5 w-5 text-yellow-400" />
@@ -27,4 +27,5 @@ const AccountDisabledBanner: React.FC = () => {
 };
 
 export default AccountDisabledBanner;
+
 

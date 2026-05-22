@@ -7,6 +7,12 @@ import { useAuthStore } from '../store/authStore';
 import { MapPin } from 'lucide-react';
 import toast from '../utils/toast';
 
+const priceFormatter = new Intl.NumberFormat('vi-VN', {
+  style: 'currency',
+  currency: 'VND',
+  minimumFractionDigits: 0
+});
+
 const ProjectsPage: React.FC = () => {
   const { t } = useTranslation();
   const { isAuthenticated } = useAuthStore();
@@ -46,7 +52,7 @@ const ProjectsPage: React.FC = () => {
           setProjects(response.content);
         }
       } catch (error) {
-        toast.error('Kh�ng th? t?i danh s�ch d? �n');
+        toast.error(t('projects.fetchError'));
         // Fallback to mock data if API fails
         setProjects(getMockProjects());
       } finally {
@@ -161,12 +167,7 @@ const ProjectsPage: React.FC = () => {
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(price);
+    return priceFormatter.format(price);
   };
 
   const filteredProjects = projects.filter(project => {
@@ -191,7 +192,7 @@ const ProjectsPage: React.FC = () => {
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('projects.pageTitle')}</h1>
+          <h1 className="text-3xl font-semibold text-gray-900 mb-2">{t('projects.pageTitle')}</h1>
           <p className="text-gray-600">{t('projects.pageSubtitle')}</p>
         </div>
       </div>
@@ -231,13 +232,13 @@ const ProjectsPage: React.FC = () => {
               <select
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={filters.location}
-                onChange={(e) => setFilters({...filters, location: e.target.value})}
+                onChange={(e) => setFilters((prev) => ({ ...prev, location: e.target.value }))}
               >
                 <option value="">{t('projects.selectArea')}</option>
-                <option value="hcm">TP. Hồ Chí Minh</option>
-                <option value="hn">Hà Nội</option>
-                <option value="dn">Đà Nẵng</option>
-                <option value="bd">Bình Dương</option>
+                <option value="hcm">{t('projects.areas.hcm')}</option>
+                <option value="hn">{t('projects.areas.hn')}</option>
+                <option value="dn">{t('projects.areas.dn')}</option>
+                <option value="bd">{t('projects.areas.bd')}</option>
               </select>
             </div>
             <div>
@@ -245,7 +246,7 @@ const ProjectsPage: React.FC = () => {
               <select
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={filters.status}
-                onChange={(e) => setFilters({...filters, status: e.target.value})}
+                onChange={(e) => setFilters((prev) => ({ ...prev, status: e.target.value }))}
               >
                 <option value="">{t('projects.selectStatus')}</option>
                 <option value="opening">{t('projects.statusOpening')}</option>
@@ -258,7 +259,7 @@ const ProjectsPage: React.FC = () => {
               <select
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={filters.type}
-                onChange={(e) => setFilters({...filters, type: e.target.value})}
+                onChange={(e) => setFilters((prev) => ({ ...prev, type: e.target.value }))}
               >
                 <option value="">{t('projects.selectType')}</option>
                 <option value="apartment">{t('projects.apartment')}</option>
@@ -272,7 +273,7 @@ const ProjectsPage: React.FC = () => {
               <select
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={filters.priceRange}
-                onChange={(e) => setFilters({...filters, priceRange: e.target.value})}
+                onChange={(e) => setFilters((prev) => ({ ...prev, priceRange: e.target.value }))}
               >
                 <option value="">{t('projects.selectPriceRange')}</option>
                 <option value="under-2">{t('projects.priceUnder2')}</option>
@@ -296,7 +297,7 @@ const ProjectsPage: React.FC = () => {
               <div className="p-6 border-b">
                 <div className="flex justify-between items-center">
                   <h2 className="text-xl font-semibold">{t('projects.resultsCount', { count: filteredProjects.length })}</h2>
-                  <div className="flex items-center space-x-4">
+                  <div className="flex items-center gap-x-4">
                     <select className="px-3 py-2 border border-gray-300 rounded-md text-sm">
                       <option>{t('projects.sortBy')}</option>
                       <option>{t('projects.sortNameAZ')}</option>
@@ -328,7 +329,7 @@ const ProjectsPage: React.FC = () => {
                           </div>
                           <div className="w-2/3 p-4">
                             <div className="flex justify-between items-start mb-2">
-                              <h3 className="font-bold text-lg text-gray-900 group-hover:text-blue-600 transition-colors">
+                              <h3 className="font-semibold text-lg text-gray-900 group-hover:text-blue-600 transition-colors">
                                 {project.name}
                               </h3>
                               <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(project.projectStatus)}`}>
@@ -378,7 +379,7 @@ const ProjectsPage: React.FC = () => {
 
       {/* Login Required Modal */}
       {showLoginModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-950/40">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
             <div className="px-6 py-4 border-b border-red-100">
               <h3 className="text-lg font-semibold text-red-600">
