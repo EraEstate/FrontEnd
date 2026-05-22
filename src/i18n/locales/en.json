@@ -376,6 +376,128 @@
         "title": "Rental real estate escapes lean period",
         "source": "Phap Luat Online"
       }
+    },
+    "platformStats": {
+      "properties": "Properties",
+      "users": "Active Users",
+      "transactions": "Transactions",
+      "provinces": "Provinces"
+    },
+    "whyChooseUs": {
+      "title": "Why Choose Era Estate",
+      "subtitle": "The leading real estate platform in Vietnam",
+      "verified": {
+        "title": "Verified Listings",
+        "desc": "100% of listings are strictly moderated to ensure accurate and safe information."
+      },
+      "ai": {
+        "title": "Smart Recommendations (AI)",
+        "desc": "AI application analyzes needs and suggests the most suitable properties for you."
+      },
+      "secure": {
+        "title": "Secure Transactions",
+        "desc": "Protect user information and support transparent legal procedures."
+      },
+      "support": {
+        "title": "24/7 Support",
+        "desc": "A team of experts is always ready to answer all your questions."
+      },
+      "map": {
+        "title": "Utility Map",
+        "desc": "Easily view detailed locations, surrounding amenities, and area planning."
+      },
+      "analytics": {
+        "title": "Market Analysis",
+        "desc": "Provide price fluctuation reports and continuously updated market trends."
+      }
+    },
+    "buyingGuide": {
+      "title": "Buying & Selling Guide",
+      "subtitle": "4 simple steps to own your dream property",
+      "steps": [
+        {
+          "title": "Search",
+          "desc": "Use smart search tools to filter properties that match your criteria."
+        },
+        {
+          "title": "Negotiate",
+          "desc": "Contact the seller or consultant directly to negotiate the best price."
+        },
+        {
+          "title": "Legal Procedures",
+          "desc": "Receive detailed instructions on the necessary paperwork to ensure a safe transaction."
+        },
+        {
+          "title": "Handover",
+          "desc": "Complete the payment and receive the property handover along with legal ownership documents."
+        }
+      ]
+    },
+    "testimonials": {
+      "title": "What Our Clients Say",
+      "subtitle": "Thousands of clients have found their sweet home thanks to Era Estate",
+      "reviews": [
+        {
+          "content": "Thanks to Era Estate, my husband and I found a satisfactory apartment in just 1 week. The smart filtering system and consultants are very enthusiastic.",
+          "avatar": "T",
+          "name": "Tran Minh Tam",
+          "role": "Home Buyer"
+        },
+        {
+          "content": "The website interface is beautiful and easy to use. Especially the map feature and price fluctuation view helped me make quick investment decisions.",
+          "avatar": "H",
+          "name": "Le Thu Huong",
+          "role": "Investor"
+        },
+        {
+          "content": "Posting a house for sale has never been easier. Just 3 days after posting, I closed a deal with a customer at the desired price.",
+          "avatar": "N",
+          "name": "Nguyen Hoang Nam",
+          "role": "Seller"
+        },
+        {
+          "content": "I am very impressed with the quality of listings on Era Estate, no spam or fake listings. Very reliable!",
+          "avatar": "L",
+          "name": "Pham Mai Linh",
+          "role": "Home Buyer"
+        }
+      ]
+    },
+    "ctaBanner": {
+      "title": "Post Your Property Listing Today",
+      "subtitle": "Reach millions of potential customers every month with our platform.",
+      "postButton": "Post Listing Now",
+      "learnMore": "Learn More",
+      "stats1": "5M+",
+      "stats1Label": "Customers",
+      "stats2": "12K+",
+      "stats2Label": "Successful Transactions"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Useful information to help you use Era Estate more effectively",
+      "items": [
+        {
+          "question": "How to post a listing on Era Estate?",
+          "answer": "You need to create an account, then select 'Post Listing'. Fill in full information about the property, upload images, and wait for approval. The approval process usually takes place within 24 hours."
+        },
+        {
+          "question": "Is there a fee to use the service?",
+          "answer": "Searching and viewing listings is completely free. For posters, we have free and paid packages depending on display needs."
+        },
+        {
+          "question": "How to know if a listing is accurate?",
+          "answer": "Era Estate has a strict content moderation team. Listings with a green 'Verified' checkmark are those we have practically inspected."
+        },
+        {
+          "question": "I want to buy a VIP package to make my listing stand out?",
+          "answer": "You can go to the Listing Management page, select the listing to push, and buy a VIP package. There are many packages like VIP 1, VIP 2, VIP 3 for you to choose from."
+        },
+        {
+          "question": "What if I have a problem during a transaction?",
+          "answer": "You can contact our 24/7 support hotline or use the 'Report Listing' feature so we can handle it promptly."
+        }
+      ]
     }
   },
   "properties": {
@@ -498,8 +620,10 @@
       "registerLink": "Register now",
       "orLoginWith": "Or login with",
       "pleaseLogin": "Please login",
-      "needLoginToView": "You need to login to view this page",
-      "needLoginToPost": "You need to login to post property"
+      "needLoginToView": "You need to log in to view this page",
+      "needLoginToPost": "You need to log in to post a property",
+      "inactiveAccountTitle": "Account not activated",
+      "inactiveAccountDesc": "Your account has not been activated. Please contact an administrator to activate your account."
     },
     "register": {
       "title": "Register",
@@ -687,7 +811,23 @@
     "pleaseLogin": "Please Login",
     "loginRequired": "You need to login to view your profile",
     "loginNow": "Login Now",
-    "user": "User"
+    "user": "User",
+    "kycVerifiedTitle": "ID Verified",
+    "verified": "Verified",
+    "kycUnverifiedTitle": "Unverified — Click to verify",
+    "unverified": "Unverified",
+    "propertyStats": "Property Stats",
+    "kycIdentity": "Identity Verification (KYC)",
+    "kycVerifiedDesc": "ID verified account — Displays trust badge on profile and contracts",
+    "kycPending": "Verification pending",
+    "kycRejected": "Verification rejected — please try again",
+    "kycRetry": "Verify again",
+    "kycRequirement": "Verify ID to increase trust and unlock contract transactions.",
+    "verifyNow": "Verify Now",
+    "yourBadges": "Your Badges",
+    "viewAllBadges": "View all badges",
+    "fetchProfileError": "Failed to load profile",
+    "inactiveAccountBanner": "Display banner if account is inactive"
   },
   "about": {
     "title": "About Us",
@@ -914,7 +1054,22 @@
     "delete": "Delete",
     "gridView": "Grid view",
     "listView": "List view",
-    "processing": "Processing"
+    "processing": "Processing",
+    "cashflowManagement": "Cashflow Management",
+    "aiAnalysis": "AI Analysis",
+    "aiAnalysisDesc": "Automated analysis results",
+    "listingQuality": "Listing Quality",
+    "issue": "Issue:",
+    "suggestion": "Suggestion:",
+    "contentModeration": "Content Moderation",
+    "statusApproved": "Passed",
+    "statusFlagged": "Review Needed",
+    "statusRejected": "Violation",
+    "priceEstimation": "Market Price Estimation",
+    "estimatedPrice": "Estimated Price:",
+    "basedOn": "Based on",
+    "similarProperties": "similar properties",
+    "analysisError": "Failed to analyze listing. Please try again."
   },
   "editProperty": {
     "detailedDescription": "Detailed property description"
@@ -1088,7 +1243,15 @@
     "loginRequired": "Please Login",
     "loginRequiredMessage": "You need to login to view project details.",
     "loginRequiredDescription": "Select \"Go to Login\" to continue, or \"Cancel\" to return to the project list.",
-    "goToLogin": "Go to Login"
+    "goToLogin": "Go to Login",
+    "fetchError": "Cannot load project list",
+    "areas": {
+      "hcm": "Ho Chi Minh City",
+      "hn": "Hanoi",
+      "dn": "Da Nang",
+      "bd": "Binh Duong"
+    },
+    "views": "views"
   },
   "agency": {
     "realEstateSpecialist": "Real Estate Specialist"
@@ -1347,7 +1510,13 @@
     "step4Ready": "Can Print PDF",
     "step4Waiting": "Waiting for On-chain Confirmation",
     "step4Desc": "After the on-chain transaction is confirmed, you can print a simplified contract with blockchain information for storage or sending to parties.",
-    "blockchainStatus": "Blockchain Status",
+    "blockchainStatus": {
+      "notCreated": "Not Created",
+      "pending": "Pending On-chain",
+      "confirmed": "On-chain Confirmed",
+      "failed": "On-chain Failed",
+      "cancelled": "On-chain Cancelled"
+    },
     "network": "Network",
     "contractAddress": "Contract Address",
     "txHash": "Tx Hash",
@@ -1384,13 +1553,6 @@
       "failed": "Failed",
       "cancelled": "Cancelled",
       "refunded": "Refunded"
-    },
-    "blockchainStatus": {
-      "notCreated": "Not Created",
-      "pending": "Pending On-chain",
-      "confirmed": "On-chain Confirmed",
-      "failed": "On-chain Failed",
-      "cancelled": "On-chain Cancelled"
     },
     "errors": {
       "notFound": "Transaction contract information not found.",
@@ -1673,7 +1835,488 @@
     "startConversation": "Start a conversation",
     "sendToOwner": "Send a message to the owner about this property",
     "inputPlaceholder": "Type a message...",
-    "connecting": "Connecting...",
-    "sending": "Sending..."
+    "connecting": "Connecting..."
+  },
+  "mapPicker": {
+    "title": "Vietnam Locations",
+    "subtitle": "63 provinces + Real estate branches",
+    "searchPlaceholder": "Search for province, district, ward, store...",
+    "provincesList": "63 Provinces in Vietnam",
+    "wards": "Ward/Commune",
+    "store": "Store",
+    "searchResults": "Search results",
+    "noResults": "No results found",
+    "selectedLocation": "Selected location"
+  },
+  "txExtra": {
+    "loadPropertyFailed": "Failed to load property info",
+    "loadTransactionFailed": "Failed to load transaction",
+    "defaultTitle": "Real Estate Property",
+    "partyA": "Party A",
+    "partyB": "Party B",
+    "pdfGenerated": "Contract PDF generated successfully!",
+    "pdfGenerateFailed": "Failed to generate contract PDF",
+    "signatureSaved": "{{role}} signature saved on the system!",
+    "signatureSaveFailed": "Failed to save signature",
+    "kycRequired": "You need to verify your ID before proceeding with blockchain transaction. Please visit Identity Verification page.",
+    "noMetamaskResult": "No result received from MetaMask",
+    "blockchainSignFailed": "Failed to sign blockchain contract",
+    "vnpayActive": "Contract is active via VNPay payment",
+    "vnpayActiveDesc": "Successful VNPay payment is the main proof in the system. Blockchain signing is",
+    "optional": "optional",
+    "vnpayActiveDesc2": "if you want to add an on-chain record layer.",
+    "signBlockchain": "Sign Blockchain contract with MetaMask",
+    "signBlockchainDesc": "Blockchain transactions improve transparency, but you",
+    "stillRequire": "still need",
+    "signBlockchainDesc2": "notarized contracts and real-life name transfer procedures."
+  },
+  "propExtra": {
+    "messages": {
+      "favoriteAdded": "Added to favorites!",
+      "favoriteRemoved": "Removed from favorites",
+      "favoriteError": "An error occurred while updating favorites",
+      "loginToChat": "Please log in to send a message to the owner",
+      "ownerNotFound": "Owner information not found to send a message",
+      "cannotChatSelf": "You cannot send a message to yourself",
+      "phoneNotFound": "Owner's phone number not found",
+      "loginToFavorite": "Please log in to add to favorites"
+    },
+    "viewMap": "View on map",
+    "types": {
+      "apartment": "Apartment",
+      "house": "House",
+      "villa": "Villa",
+      "land": "Land",
+      "office": "Office"
+    },
+    "priceRanges": {
+      "under1B": "Under 1 billion",
+      "1To3B": "1 - 3 billion",
+      "3To5B": "3 - 5 billion",
+      "5To10B": "5 - 10 billion",
+      "over10B": "Over 10 billion"
+    },
+    "advancedSearch": {
+      "title": "Advanced Search",
+      "propertyType": "Property type",
+      "bedrooms": "Bedrooms",
+      "rooms": "rooms",
+      "bathrooms": "Bathrooms",
+      "priceRange": "Price range",
+      "fromVnd": "From (VND)",
+      "toVnd": "To (VND)",
+      "areaRange": "Area (m²)",
+      "fromSq": "From (m²)",
+      "toSq": "To (m²)",
+      "clearFilters": "Clear filters",
+      "applyFilters": "Apply filters"
+    },
+    "empty": {
+      "title": "No results found",
+      "desc": "Try changing your filters or search keywords to see more results.",
+      "action": "View all listings"
+    },
+    "loading": "Loading...",
+    "allLoaded": "Showing all {{count}} listings",
+    "sellPrompt": {
+      "title": "Want to sell your house?",
+      "desc": "Post a listing today to reach millions of potential customers.",
+      "button": "Post for free"
+    },
+    "neighborhoodProperties": "properties",
+    "details": {
+      "verified": "Verified",
+      "photos": "Photos",
+      "removeFavorite": "Remove from favorites",
+      "addFavorite": "Add to favorites",
+      "removeCompare": "Remove from comparison",
+      "addCompare": "Add to comparison",
+      "millionPerSqM": "million/m²",
+      "area": "Area",
+      "bedrooms": "Bedrooms",
+      "bathrooms": "Bathrooms",
+      "postedAt": "Posted at",
+      "call": "Call",
+      "chat": "Message"
+    }
+  },
+  "postPropertyExtra": {
+    "titlePlaceholder": "Ex: Luxury 2-bedroom apartment with river view in Vinhomes Central Park",
+    "ai": {
+      "generateError": "Could not generate content. Please try again.",
+      "generateUnexpectedError": "An error occurred while generating AI content.",
+      "assistantTitle": "AI Content Assistant",
+      "assistantDesc": "AI will turn your notes into professional, SEO-optimized listings",
+      "rawNotes": "Quick notes for AI",
+      "optional": "(optional)",
+      "notesPlaceholder": "Ex: 50m2 house, 2 floors, near Ba Chieu market, 6m car alley\nHas terrace, newly painted\nSuitable for living or small business...",
+      "notesHint": "💡 Write any bullet points, keywords, or advantages — AI will polish them into an attractive post",
+      "generating": "AI is generating content...",
+      "generateBtn": "🪄 Generate Title & Description with AI",
+      "requirePropertyType": "Please select a property type in Step 1 before using AI",
+      "appliedSuccess": "AI content has been applied. You can edit below or regenerate.",
+      "previewTitle": "AI Generated Content",
+      "previewDesc": "Preview, edit and apply to your listing",
+      "previewTitleLabel": "Title",
+      "previewDescLabel": "Detailed description",
+      "seoKeywords": "🔍 Suggested SEO Keywords",
+      "regenerateBtn": "Regenerate",
+      "cancelBtn": "Cancel",
+      "applyBtn": "Apply AI Content"
+    },
+    "validation": {
+      "missingLocation": "Please select Province/City, District and Ward completely",
+      "missingTransactionType": "Please select transaction type (Sell or Rent)"
+    },
+    "error": {
+      "uploadFailed": "Could not upload images. Please try again.",
+      "uploadError": "Error uploading images",
+      "uploadErrorDetail": "Error when uploading images: ",
+      "documentsFailed": "{{count}} legal documents failed to upload",
+      "postErrorTitle": "Error posting property"
+    },
+    "success": {
+      "posted": "Property posted successfully! 🎉"
+    },
+    "auth": {
+      "loginRequired": "Please log in",
+      "loginDesc": "You need to log in to post a property listing",
+      "loginBtn": "Log in now"
+    },
+    "quota": {
+      "exceededTitle": "Listing limit exceeded",
+      "exceededDesc1": "You have used all",
+      "exceededDesc2": "listings in your current",
+      "exceededDesc3": "package.",
+      "upgradeDesc": "Please upgrade your package to continue posting properties.",
+      "viewPackages": "View service packages",
+      "managePackage": "Manage current package"
+    },
+    "step1": {
+      "selectPropertyType": "Select property type",
+      "transactionType": "Transaction type"
+    },
+    "step2": {
+      "price": "Price",
+      "pricePlaceholder": "Ex: 5500000000",
+      "area": "Area",
+      "areaPlaceholder": "Ex: 85",
+      "province": "Province/City",
+      "selectProvince": "Select province/city",
+      "district": "District",
+      "selectDistrict": "Select district",
+      "ward": "Ward",
+      "selectWard": "Select ward",
+      "specificAddress": "Specific address",
+      "autoSearch": "(Auto search)",
+      "addressPlaceholder": "Ex: 123 Nguyen Hue Street, District 1, HCMC",
+      "addressHint": "💡 Enter address (min 3 characters) and select from suggestions to auto-fill Province/District",
+      "bedrooms": "Bedrooms",
+      "bathrooms": "Bathrooms",
+      "floors": "Floors",
+      "yearBuilt": "Year built"
+    },
+    "step3": {
+      "title": "Listing title",
+      "chars": "characters",
+      "titlePlaceholder": "Ex: Luxury 2-bedroom apartment with river view in Vinhomes Central Park",
+      "description": "Detailed description",
+      "descriptionPlaceholder": "Detailed description of the property: location, design, surrounding amenities...",
+      "furnishing": "Furnishing condition",
+      "features": "Amenities and features"
+    },
+    "step4": {
+      "imagesTitle": "Property images",
+      "imagesDesc": "Upload up to 10 images. The first image will be the thumbnail.",
+      "thumbnail": "Thumbnail",
+      "uploadImages": "Upload images",
+      "noImages": "No images uploaded yet",
+      "selectImages": "Select images from computer",
+      "documents": "Legal documents (optional)"
+    },
+    "step5": {
+      "previewTitle": "Preview listing",
+      "importantNotes": "Important notes",
+      "note1": "• Listings will be moderated within 24 hours",
+      "note2": "• Ensure accurate information and clear images",
+      "note3": "• Comply with BDSPortal's posting rules",
+      "note4": "• Free listings will be displayed for 30 days"
+    },
+    "header": {
+      "title1": "Post",
+      "title2": "Property",
+      "desc": "Post a listing for free, reach thousands of potential customers"
+    },
+    "nav": {
+      "back": "Back",
+      "next": "Continue"
+    }
+  },
+  "legal": {
+    "title": "Legal & Contract Center",
+    "description": "Clear explanation of how the system uses electronic contracts, blockchain, and real-life legal steps in real estate transactions.",
+    "tabs": {
+      "blockchain": "Blockchain Contract",
+      "terms": "Terms & Policies",
+      "faq": "Legal FAQ"
+    },
+    "blockchain": {
+      "q1Title": "What does a Blockchain Contract on ERA Estate record?",
+      "q1Desc_1": "A blockchain contract created via MetaMask is primarily used to ",
+      "q1Desc_2": "record the transaction intent",
+      "q1Desc_3": " between parties on a distributed ledger that is hard to alter.",
+      "q1Li1": "On-chain transaction hash.",
+      "q1Li2": "Wallet addresses of the signing parties (buyer / tenant).",
+      "q1Li3": "Transaction value at the time of signing on the chain.",
+      "q1Li4": "Timestamp of the transaction recorded on the blockchain.",
+      "guideLink": "Guide to install MetaMask, select network and prepare gas fees →",
+      "noteTitle": "Important note on legal value:",
+      "noteDesc_1": "A blockchain contract ",
+      "noteDesc_2": "does not replace",
+      "noteDesc_3": " a notarized contract, sale/transfer contract at a notary office or state agency. It is an additional recording layer to increase transparency and ease of cross-checking.",
+      "roleTitle": "Role of notarization and transferring pink/red book",
+      "roleLi1_1": "Contract notarization",
+      "roleLi1_2": ": confirms the intent and signatures of the parties, which is the basis for ownership transfer.",
+      "roleLi2_1": "Ownership transfer",
+      "roleLi2_2": ": updating ownership/use rights on the Certificate – this is the strongest legal basis.",
+      "roleLi3_1": "Taxes & fees",
+      "roleLi3_2": ": must be declared and paid in accordance with regulations (PIT, registration fee, notary fee...).",
+      "disclaimer_1": "ERA Estate supports the recording part on the system and blockchain; users still need to work with ",
+      "disclaimer_2": "notary offices",
+      "disclaimer_3": " and ",
+      "disclaimer_4": "land registration agencies",
+      "disclaimer_5": " to complete the legal process."
+    },
+    "terms": {
+      "title": "Terms of Use & Basic Policies",
+      "desc": "This section summarizes the main principles when you use ERA Estate to search, post listings, and trade real estate.",
+      "mainTermsTitle": "Main Terms of Use",
+      "mainTermsLi1": "Do not post false, misleading information or violate the law.",
+      "mainTermsLi2": "Take your own responsibility for listing content, legal documents, and agreements outside the system.",
+      "mainTermsLi3": "Do not use the platform for money laundering, fraud, or illegal fundraising.",
+      "mainTermsLi4": "ERA Estate reserves the right to hide/delete content that violates regulations or is reported with high-risk signs.",
+      "privacyTitle": "Privacy & Data Policy",
+      "privacyLi1": "Sensitive information (ID/Citizen ID, certificate number, account number...) is restricted from being displayed.",
+      "privacyLi2_1": "Transaction data is stored on the system and may be ",
+      "privacyLi2_2": "hashed/partially hidden",
+      "privacyLi2_3": " when put on the blockchain.",
+      "privacyLi3": "ERA Estate only shares data with third parties upon consent or request from competent state agencies.",
+      "disclaimer": "Full details of the Terms of Use and Privacy Policy may be expanded in future versions; this section is for orientation and transparent user experience."
+    },
+    "faq": {
+      "title": "Frequently Asked Questions (FAQ) about Transaction Legality",
+      "q1": "1. Is the contract on ERA Estate enough for ownership transfer?",
+      "a1": "No. The contract on the system (even recorded on blockchain) is only a layer to support transparency and clarify the transaction. To transfer ownership, you must make a notarized contract and complete procedures at the state agency.",
+      "q2": "2. How are buying/selling/renting taxes and fees calculated?",
+      "a2": "Personal income tax, registration fee, notary fee... depend on the contract value and regulations of each period. The system only supports displaying estimates; the exact figures are decided by the tax authority and notary office.",
+      "q3": "3. What if one party fails to fulfill their commitment on the system?",
+      "a3_1": "Transaction data, payment history, and blockchain information can serve as ",
+      "a3_2": "reference evidence",
+      "a3_3": ". However, handling violations, claiming damages, resolving disputes... are still negotiated by the two parties or resolved by Court/Arbitration.",
+      "q4": "4. I'm not familiar with Blockchain, is MetaMask mandatory?",
+      "a4": "Not mandatory. You can choose to pay via VNPay and only use the electronic contract on the system. Blockchain signing is optional for those who want an extra layer of transparency and cross-checking capability later.",
+      "disclaimer": "The information above is for reference only and does not replace advice from lawyers, tax authorities, or notary offices. For large or complex transactions, you should consult with legal experts."
+    },
+    "rent": {
+      "title": "Real Estate for Rent",
+      "subtitle": "Search for rental properties in Vietnam",
+      "location": "Location",
+      "selectLocation": "Select location",
+      "priceRange": "Price Range",
+      "selectPrice": "Select price",
+      "priceUnder10": "Under 10 million",
+      "price10to20": "10 - 20 million",
+      "price20to30": "20 - 30 million",
+      "price30to50": "30 - 50 million",
+      "priceOver50": "Over 50 million",
+      "type": "Type",
+      "selectType": "Select type",
+      "house": "House",
+      "room": "Room",
+      "office": "Office",
+      "bedrooms": "Bedrooms",
+      "selectBedrooms": "Select bedrooms",
+      "1bed": "1 room",
+      "2bed": "2 rooms",
+      "3bed": "3 rooms",
+      "4bedPlus": "4+ rooms",
+      "search": "Search",
+      "resultsCount": "There are {count} rental properties",
+      "sortBy": "Sort by",
+      "sortPriceAsc": "Price: Low to High",
+      "sortPriceDesc": "Price: High to Low",
+      "sortAreaAsc": "Area: Low to High",
+      "sortNewest": "Newest",
+      "bed": "{count} Beds",
+      "bath": "{count} Baths",
+      "priceUnit": "VND/month"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "subtitle": "Overview of your real estate activities",
+      "stats": {
+        "totalProperties": "Total Listings",
+        "active": "active",
+        "views": "Views",
+        "allProperties": "All listings",
+        "favorites": "Favorites",
+        "savedProperties": "Saved properties",
+        "inquiries": "Inquiries",
+        "viewDetails": "View details →",
+        "revenue": "Rental Revenue",
+        "revenueDashboard": "Revenue Dashboard →"
+      },
+      "recentActivities": {
+        "title": "Recent Activities",
+        "viewAll": "View all",
+        "empty": "No recent activities",
+        "view": "View →"
+      },
+      "topProperties": {
+        "title": "Your Top Properties",
+        "empty": "No listings yet",
+        "postNow": "Post now →"
+      },
+      "quickActions": {
+        "title": "Quick Actions",
+        "postProperty": "Post Property",
+        "manageProperties": "Manage Listings",
+        "inquiries": "Inquiries",
+        "payments": "Payments",
+        "calendar": "Calendar",
+        "revenue": "Revenue"
+      }
+    },
+    "sidebar": {
+      "overview": "Overview",
+      "dashboard": "Dashboard",
+      "activity": "Activity",
+      "properties": "Properties",
+      "myProperties": "My Properties",
+      "favorites": "Favorites",
+      "inquiries": "Inquiries",
+      "viewings": "Viewings",
+      "rentalManagement": "Rental Management",
+      "rentalCashflow": "Rental Cashflow",
+      "contracts": "Contracts",
+      "finance": "Finance",
+      "payments": "Payments",
+      "transactionHistory": "Transaction History",
+      "bankAccounts": "Bank Accounts",
+      "analytics": "Analytics",
+      "personal": "Personal",
+      "calendar": "Calendar",
+      "settings": "Settings",
+      "backToHome": "Back to Home",
+      "logout": "Logout",
+      "defaultUser": "User",
+      "myDashboard": "My Dashboard"
+    },
+    "editProperty": {
+      "title": "Edit Property",
+      "basicInfo": "Basic Information",
+      "propertyTitle": "Title *",
+      "titlePlaceholder": "Enter property title",
+      "propertyType": "Property Type *",
+      "transactionType": "Listing Type *",
+      "sale": "Sale",
+      "rent": "Rent",
+      "price": "Price (VND) *",
+      "pricePlaceholder": "Enter price",
+      "area": "Area (m²) *",
+      "areaPlaceholder": "Enter area",
+      "bedrooms": "Bedrooms",
+      "bathrooms": "Bathrooms",
+      "description": "Description",
+      "location": "Location",
+      "province": "Province/City *",
+      "selectProvince": "Select province/city",
+      "district": "District",
+      "selectDistrict": "Select district",
+      "ward": "Ward",
+      "selectWard": "Select ward",
+      "specificAddress": "Specific Address *",
+      "addressPlaceholder": "Enter specific address",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "images": "Images",
+      "imageNote": "Upload up to 10 images. The first image will be the cover photo.",
+      "coverImage": "Cover Photo",
+      "addPhoto": "Add Photo",
+      "noImages": "No images uploaded",
+      "selectFromComputer": "Select from computer",
+      "cancel": "Cancel",
+      "uploading": "Uploading...",
+      "updating": "Updating...",
+      "updateButton": "Update Property",
+      "notFound": "Property Not Found",
+      "notFoundDesc": "This property does not exist or has been deleted."
+    },
+    "kyc": {
+      "title": "ID Verification",
+      "subtitle": "Scan the front of your ID card to verify your identity",
+      "verifiedTitle": "Identity Verified",
+      "verifiedDesc": "Your account has been successfully verified. The \"Verified\" badge will appear on your profile and contracts.",
+      "backToProfile": "Back to Profile",
+      "scanAgain": "Scan Again",
+      "stepUpload": "Upload Image",
+      "stepScanning": "Scanning",
+      "stepReview": "Review",
+      "imageSelected": "Image selected. Click \"Start Scan\" to continue.",
+      "dragDrop": "Drag and drop or click to select ID image",
+      "supportFormat": "Supports JPG, PNG · Max 10MB · Front of ID",
+      "reselect": "Reselect",
+      "startScan": "Start Scan",
+      "importantNote": "Important Note",
+      "note1": "Clear photo, well-lit, no blur/cropped corners",
+      "note2": "OCR runs directly in the browser — images are NOT sent to the server",
+      "note3": "Only extracted text results are sent to the backend to be saved",
+      "scanningTitle": "Scanning ID…",
+      "scanningDesc": "Recognizing text on image",
+      "complete": "complete",
+      "ocrResult": "OCR Scan Result",
+      "hideRaw": "Hide raw text",
+      "showRaw": "Show raw text",
+      "cccdNumber": "ID Number",
+      "fullName": "Full Name",
+      "dob": "Date of Birth",
+      "gender": "Gender",
+      "nationality": "Nationality",
+      "origin": "Place of Origin",
+      "residence": "Place of Residence",
+      "expiry": "Valid Until",
+      "invalidCccd": "Invalid ID number structure. Please check again.",
+      "validCccd": "Valid ID authentication",
+      "issuePlace": "Place of Issue:",
+      "birthYear": "Birth Year:",
+      "missingInfo": "Missing required information. Please manually enter ID number and name, or try scanning a clearer image.",
+      "confirmSave": "Confirm & Save",
+      "sending": "Sending…",
+      "errImageFormat": "Please select an image file (JPG, PNG)",
+      "errImageSize": "Image too large (max 10MB)",
+      "errOcrFail": "Could not recognize ID information. Please try again with a clearer image.",
+      "errOcrProcess": "ID image processing error",
+      "errScan": "Scan error: ",
+      "success": "ID verification successful!",
+      "errSubmit": "Error sending verification info",
+      "statusVerified": "Verified"
+    },
+    "propertyHistory": {
+      "title": "Property Listing Timeline",
+      "subtitle": "Track all price updates, status changes, and history of the listing",
+      "daysOnMarket": "Days on Market",
+      "priceChanges": "Price Changes",
+      "isDiscounted": "Discounted",
+      "initialPrice": "Initial Price",
+      "currentPrice": "Current Price",
+      "discount": "Drop",
+      "eventCreated": "Listing Created",
+      "eventPriceChange": "Price Change",
+      "eventStatusChange": "Status Update",
+      "eventListingRenewed": "Listing Renewed",
+      "days": "days",
+      "noHistory": "No listing history events recorded.",
+      "fetchError": "Failed to load property listing history"
+    }
   }
 }

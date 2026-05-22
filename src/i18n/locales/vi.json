@@ -376,6 +376,128 @@
         "title": "Bất động sản cho thuê thoát thời ế ẩm",
         "source": "Pháp Luật Online"
       }
+    },
+    "platformStats": {
+      "properties": "Bất động sản",
+      "users": "Khách hàng",
+      "transactions": "Giao dịch",
+      "provinces": "Tỉnh thành"
+    },
+    "whyChooseUs": {
+      "title": "Tại sao chọn Era Estate",
+      "subtitle": "Nền tảng giao dịch bất động sản hàng đầu Việt Nam",
+      "verified": {
+        "title": "Tin đăng xác thực",
+        "desc": "100% tin đăng được kiểm duyệt chặt chẽ, đảm bảo thông tin chính xác và an toàn."
+      },
+      "ai": {
+        "title": "Gợi ý thông minh (AI)",
+        "desc": "Ứng dụng AI phân tích nhu cầu, đề xuất bất động sản phù hợp nhất với bạn."
+      },
+      "secure": {
+        "title": "Giao dịch an toàn",
+        "desc": "Bảo vệ thông tin người dùng và hỗ trợ thủ tục pháp lý minh bạch."
+      },
+      "support": {
+        "title": "Hỗ trợ 24/7",
+        "desc": "Đội ngũ chuyên gia luôn sẵn sàng giải đáp mọi thắc mắc của bạn."
+      },
+      "map": {
+        "title": "Bản đồ tiện ích",
+        "desc": "Xem chi tiết vị trí, tiện ích xung quanh và quy hoạch khu vực dễ dàng."
+      },
+      "analytics": {
+        "title": "Phân tích thị trường",
+        "desc": "Cung cấp báo cáo biến động giá, xu hướng thị trường cập nhật liên tục."
+      }
+    },
+    "buyingGuide": {
+      "title": "Hướng dẫn mua bán",
+      "subtitle": "4 bước đơn giản để sở hữu bất động sản mơ ước",
+      "steps": [
+        {
+          "title": "Tìm kiếm",
+          "desc": "Sử dụng công cụ tìm kiếm thông minh để lọc ra các bất động sản phù hợp với tiêu chí của bạn."
+        },
+        {
+          "title": "Thương lượng",
+          "desc": "Liên hệ trực tiếp với người bán hoặc chuyên viên tư vấn để thỏa thuận mức giá tốt nhất."
+        },
+        {
+          "title": "Thủ tục pháp lý",
+          "desc": "Được hướng dẫn chi tiết về các thủ tục giấy tờ cần thiết để đảm bảo giao dịch an toàn."
+        },
+        {
+          "title": "Bàn giao",
+          "desc": "Hoàn tất thanh toán và nhận bàn giao bất động sản cùng giấy tờ sở hữu hợp pháp."
+        }
+      ]
+    },
+    "testimonials": {
+      "title": "Khách hàng nói gì về chúng tôi",
+      "subtitle": "Hàng ngàn khách hàng đã tìm được tổ ấm nhờ Era Estate",
+      "reviews": [
+        {
+          "content": "Nhờ Era Estate, vợ chồng tôi đã tìm được căn hộ ưng ý chỉ sau 1 tuần. Hệ thống lọc thông minh và chuyên viên tư vấn rất nhiệt tình.",
+          "avatar": "T",
+          "name": "Trần Minh Tâm",
+          "role": "Người mua nhà"
+        },
+        {
+          "content": "Giao diện website đẹp, dễ sử dụng. Đặc biệt tính năng bản đồ và xem biến động giá giúp tôi ra quyết định đầu tư nhanh chóng.",
+          "avatar": "H",
+          "name": "Lê Thu Hương",
+          "role": "Nhà đầu tư"
+        },
+        {
+          "content": "Việc đăng tin bán nhà chưa bao giờ dễ dàng đến thế. Chỉ sau 3 ngày đăng bài, tôi đã chốt được khách với giá mong muốn.",
+          "avatar": "N",
+          "name": "Nguyễn Hoàng Nam",
+          "role": "Người bán"
+        },
+        {
+          "content": "Tôi rất ấn tượng với chất lượng tin đăng trên Era Estate, không có tin rác hay tin giả. Rất đáng tin cậy!",
+          "avatar": "L",
+          "name": "Phạm Mai Linh",
+          "role": "Người mua nhà"
+        }
+      ]
+    },
+    "ctaBanner": {
+      "title": "Đăng tin bất động sản của bạn ngay hôm nay",
+      "subtitle": "Tiếp cận hàng triệu khách hàng tiềm năng mỗi tháng với nền tảng của chúng tôi.",
+      "postButton": "Đăng tin ngay",
+      "learnMore": "Tìm hiểu thêm",
+      "stats1": "5M+",
+      "stats1Label": "Khách hàng",
+      "stats2": "12K+",
+      "stats2Label": "Giao dịch thành công"
+    },
+    "faq": {
+      "title": "Câu hỏi thường gặp",
+      "subtitle": "Những thông tin hữu ích giúp bạn sử dụng Era Estate hiệu quả hơn",
+      "items": [
+        {
+          "question": "Làm thế nào để đăng tin trên Era Estate?",
+          "answer": "Bạn cần tạo tài khoản, sau đó chọn mục 'Đăng tin'. Điền đầy đủ thông tin về bất động sản, tải hình ảnh lên và chờ duyệt. Quá trình duyệt thường diễn ra trong vòng 24h."
+        },
+        {
+          "question": "Tôi có mất phí khi sử dụng dịch vụ không?",
+          "answer": "Việc tìm kiếm và xem tin đăng hoàn toàn miễn phí. Đối với người đăng tin, chúng tôi có các gói miễn phí và trả phí tùy thuộc vào nhu cầu hiển thị."
+        },
+        {
+          "question": "Làm sao để biết tin đăng có chính xác không?",
+          "answer": "Era Estate có đội ngũ kiểm duyệt nội dung gắt gao. Những tin đăng có dấu tích xanh 'Đã xác thực' là những tin đã được chúng tôi kiểm tra thực tế."
+        },
+        {
+          "question": "Tôi muốn mua gói VIP để tin nổi bật hơn?",
+          "answer": "Bạn có thể vào trang Quản lý tin đăng, chọn tin cần đẩy và mua gói VIP. Có nhiều gói như VIP 1, VIP 2, VIP 3 để bạn lựa chọn."
+        },
+        {
+          "question": "Nếu tôi gặp vấn đề trong quá trình giao dịch thì sao?",
+          "answer": "Bạn có thể liên hệ với tổng đài hỗ trợ 24/7 của chúng tôi hoặc sử dụng tính năng 'Báo cáo tin đăng' để chúng tôi xử lý kịp thời."
+        }
+      ]
     }
   },
   "properties": {
@@ -509,7 +631,9 @@
       "orLoginWith": "Hoặc đăng nhập với",
       "pleaseLogin": "Vui lòng đăng nhập",
       "needLoginToView": "Bạn cần đăng nhập để xem trang này",
-      "needLoginToPost": "Bạn cần đăng nhập để đăng tin bất động sản"
+      "needLoginToPost": "Bạn cần đăng nhập để đăng tin bất động sản",
+      "inactiveAccountTitle": "Tài khoản chưa được kích hoạt",
+      "inactiveAccountDesc": "Tài khoản của bạn chưa được kích hoạt. Vui lòng liên hệ quản trị viên để kích hoạt tài khoản."
     },
     "register": {
       "title": "Đăng ký",
@@ -697,7 +821,23 @@
     "pleaseLogin": "Vui lòng đăng nhập",
     "loginRequired": "Bạn cần đăng nhập để xem trang cá nhân",
     "loginNow": "Đăng nhập ngay",
-    "user": "Người dùng"
+    "user": "Người dùng",
+    "kycVerifiedTitle": "Đã xác minh CCCD",
+    "verified": "Đã xác minh",
+    "kycUnverifiedTitle": "Chưa xác minh — Nhấn để xác minh",
+    "unverified": "Chưa xác minh",
+    "propertyStats": "Thống kê BĐS",
+    "kycIdentity": "Xác minh danh tính (KYC)",
+    "kycVerifiedDesc": "Tài khoản đã xác minh CCCD — Hiển thị badge uy tín trên trang cá nhân và hợp đồng",
+    "kycPending": "Đang chờ xác minh",
+    "kycRejected": "Xác minh bị từ chối — vui lòng thử lại",
+    "kycRetry": "Xác minh lại",
+    "kycRequirement": "Xác minh CCCD để tăng uy tín và mở khoá giao dịch hợp đồng.",
+    "verifyNow": "Xác minh ngay",
+    "yourBadges": "Huy hiệu của bạn",
+    "viewAllBadges": "Xem tất cả huy hiệu",
+    "fetchProfileError": "Không thể tải thông tin cá nhân",
+    "inactiveAccountBanner": "Hiển thị banner nếu tài khoản chưa kích hoạt"
   },
   "about": {
     "title": "Giới thiệu",
@@ -924,7 +1064,22 @@
     "delete": "Xóa",
     "gridView": "Xem dạng lưới",
     "listView": "Xem dạng danh sách",
-    "processing": "Đang xử lý"
+    "processing": "Đang xử lý",
+    "cashflowManagement": "Quản lý dòng tiền",
+    "aiAnalysis": "AI Phân tích",
+    "aiAnalysisDesc": "Kết quả phân tích tự động",
+    "listingQuality": "Chất lượng tin đăng",
+    "issue": "Vấn đề:",
+    "suggestion": "Gợi ý:",
+    "contentModeration": "Kiểm duyệt nội dung",
+    "statusApproved": "Đạt",
+    "statusFlagged": "Cần xem lại",
+    "statusRejected": "Vi phạm",
+    "priceEstimation": "Ước tính giá thị trường",
+    "estimatedPrice": "Giá ước tính:",
+    "basedOn": "Dựa trên",
+    "similarProperties": "BĐS tương tự",
+    "analysisError": "Không thể phân tích tin đăng. Vui lòng thử lại."
   },
   "editProperty": {
     "detailedDescription": "Mô tả chi tiết về bất động sản"
@@ -1098,7 +1253,15 @@
     "loginRequired": "Vui lòng đăng nhập",
     "loginRequiredMessage": "Bạn cần đăng nhập để xem chi tiết dự án.",
     "loginRequiredDescription": "Chọn \"Đi tới đăng nhập\" để tiếp tục, hoặc \"Hủy\" để quay lại danh sách dự án.",
-    "goToLogin": "Đi tới đăng nhập"
+    "goToLogin": "Đi tới đăng nhập",
+    "fetchError": "Không thể tải danh sách dự án",
+    "areas": {
+      "hcm": "TP. Hồ Chí Minh",
+      "hn": "Hà Nội",
+      "dn": "Đà Nẵng",
+      "bd": "Bình Dương"
+    },
+    "views": "lượt xem"
   },
   "agency": {
     "realEstateSpecialist": "Chuyên viên bất động sản"
@@ -1667,6 +1830,39 @@
     "linkSecurity": "Trung tâm bảo mật",
     "linkExplorer": "Mở blockchain explorer"
   },
+  "featurePages": {
+    "marketPriceIndex": {
+      "title": "Chi so gia bat dong san",
+      "trend": "Xu huong",
+      "highest": "Gia cao nhat",
+      "lowest": "Gia thap nhat",
+      "average": "Gia trung binh"
+    },
+    "neighborhoodReviews": {
+      "title": "Danh gia khu vuc",
+      "writeReview": "Viet danh gia",
+      "overall": "Tong quan khu vuc",
+      "empty": "Chua co danh gia cho khu vuc nay"
+    },
+    "fengShuiGuide": {
+      "title": "Phong thuy nha o",
+      "directionSection": "Chon huong nha",
+      "birthYearSection": "Tuoi phu hop",
+      "tipsSection": "Meo phong thuy"
+    },
+    "costBreakdown": {
+      "title": "Tinh toan chi phi mua nha",
+      "detailTable": "Bang chi tiet",
+      "totalExtra": "Tong chi phi phat sinh",
+      "totalPayment": "Tong thanh toan du kien"
+    },
+    "buyingChecklist": {
+      "title": "Checklist mua nha",
+      "create": "Tao checklist moi",
+      "progress": "Tien do tong the",
+      "empty": "Ban chua co checklist nao"
+    }
+  },
   "chatBox": {
     "sendMessage": "Nhắn tin",
     "customer": "Khách hàng",
@@ -1682,7 +1878,488 @@
     "startConversation": "Bắt đầu cuộc trò chuyện",
     "sendToOwner": "Gửi tin nhắn cho chủ nhà về bất động sản này",
     "inputPlaceholder": "Nhập tin nhắn...",
-    "connecting": "Đang kết nối...",
-    "sending": "Đang gửi..."
+    "connecting": "Đang kết nối..."
+  },
+  "mapPicker": {
+    "title": "Địa Điểm Việt Nam",
+    "subtitle": "63 tỉnh thành + Chi nhánh bất động sản",
+    "searchPlaceholder": "Tìm tỉnh thành, quận/huyện, xã/phường, cửa hàng...",
+    "provincesList": "63 Tỉnh Thành Việt Nam",
+    "wards": "Xã/Phường",
+    "store": "Cửa hàng",
+    "searchResults": "Kết quả tìm kiếm",
+    "noResults": "Không tìm thấy kết quả",
+    "selectedLocation": "Địa điểm đã chọn"
+  },
+  "txExtra": {
+    "loadPropertyFailed": "Không thể tải thông tin BĐS",
+    "loadTransactionFailed": "Không thể tải giao dịch",
+    "defaultTitle": "Bất động sản",
+    "partyA": "Bên A",
+    "partyB": "Bên B",
+    "pdfGenerated": "Đã tạo PDF hợp đồng thành công!",
+    "pdfGenerateFailed": "Lỗi tạo PDF hợp đồng",
+    "signatureSaved": "Chữ ký {{role}} đã được lưu trên hệ thống!",
+    "signatureSaveFailed": "Không thể lưu chữ ký",
+    "kycRequired": "Bạn cần xác minh CCCD trước khi thực hiện giao dịch blockchain. Vui lòng truy cập trang Xác minh CCCD.",
+    "noMetamaskResult": "Không nhận được kết quả từ MetaMask",
+    "blockchainSignFailed": "Lỗi ký hợp đồng blockchain",
+    "vnpayActive": "Hợp đồng đã hiệu lực theo thanh toán VNPay",
+    "vnpayActiveDesc": "Thanh toán VNPay thành công là căn cứ chính trong hệ thống. Ký Blockchain là",
+    "optional": "tuỳ chọn",
+    "vnpayActiveDesc2": "nếu bạn muốn thêm lớp ghi nhận on-chain.",
+    "signBlockchain": "Ký hợp đồng Blockchain bằng MetaMask",
+    "signBlockchainDesc": "Giao dịch trên Blockchain giúp minh bạch hơn, nhưng",
+    "stillRequire": "vẫn cần",
+    "signBlockchainDesc2": "hợp đồng công chứng và thủ tục sang tên ngoài đời thực."
+  },
+  "propExtra": {
+    "messages": {
+      "favoriteAdded": "Đã thêm vào danh sách yêu thích!",
+      "favoriteRemoved": "Đã xóa khỏi danh sách yêu thích",
+      "favoriteError": "Có lỗi xảy ra khi cập nhật danh sách yêu thích",
+      "loginToChat": "Vui lòng đăng nhập để gửi tin nhắn cho chủ nhà",
+      "ownerNotFound": "Không tìm thấy thông tin chủ nhà để nhắn tin",
+      "cannotChatSelf": "Bạn không thể tự nhắn tin cho chính mình",
+      "phoneNotFound": "Không tìm thấy số điện thoại của người đăng tin",
+      "loginToFavorite": "Vui lòng đăng nhập để thêm vào danh sách yêu thích"
+    },
+    "viewMap": "Tìm kiếm trên bản đồ",
+    "types": {
+      "apartment": "Căn hộ",
+      "house": "Nhà riêng",
+      "villa": "Biệt thự",
+      "land": "Đất nền",
+      "office": "Văn phòng"
+    },
+    "priceRanges": {
+      "under1B": "Dưới 1 tỷ",
+      "1To3B": "1 - 3 tỷ",
+      "3To5B": "3 - 5 tỷ",
+      "5To10B": "5 - 10 tỷ",
+      "over10B": "Trên 10 tỷ"
+    },
+    "advancedSearch": {
+      "title": "Tìm kiếm nâng cao",
+      "propertyType": "Loại nhà đất",
+      "bedrooms": "Số phòng ngủ",
+      "rooms": "phòng",
+      "bathrooms": "Số phòng tắm",
+      "priceRange": "Khoảng giá",
+      "fromVnd": "Từ (VNĐ)",
+      "toVnd": "Đến (VNĐ)",
+      "areaRange": "Diện tích (m²)",
+      "fromSq": "Từ (m²)",
+      "toSq": "Đến (m²)",
+      "clearFilters": "Xóa bộ lọc",
+      "applyFilters": "Áp dụng bộ lọc"
+    },
+    "empty": {
+      "title": "Không tìm thấy kết quả",
+      "desc": "Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm để xem thêm kết quả.",
+      "action": "Xem tất cả tin đăng"
+    },
+    "loading": "Đang tải...",
+    "allLoaded": "Đã hiển thị tất cả {{count}} tin",
+    "sellPrompt": {
+      "title": "Bạn muốn bán nhà?",
+      "desc": "Đăng tin ngay hôm nay để tiếp cận hàng triệu khách hàng tiềm năng.",
+      "button": "Đăng tin miễn phí"
+    },
+    "neighborhoodProperties": "bất động sản",
+    "details": {
+      "verified": "Xác thực",
+      "photos": "Ảnh",
+      "removeFavorite": "Xóa khỏi danh sách yêu thích",
+      "addFavorite": "Thêm vào danh sách yêu thích",
+      "removeCompare": "Huỷ so sánh",
+      "addCompare": "Thêm vào so sánh",
+      "millionPerSqM": "triệu/m²",
+      "area": "Diện tích",
+      "bedrooms": "Phòng ngủ",
+      "bathrooms": "Phòng tắm",
+      "postedAt": "Đăng",
+      "call": "Gọi điện",
+      "chat": "Nhắn tin"
+    }
+  },
+  "postPropertyExtra": {
+    "titlePlaceholder": "VD: Căn hộ cao cấp 2PN2WC view sông tại Vinhomes Central Park",
+    "ai": {
+      "generateError": "Không thể tạo nội dung. Vui lòng thử lại.",
+      "generateUnexpectedError": "Có lỗi xảy ra khi tạo nội dung AI.",
+      "assistantTitle": "Trợ lý AI viết nội dung",
+      "assistantDesc": "AI sẽ biến ghi chú của bạn thành bài đăng chuyên nghiệp, chuẩn SEO",
+      "rawNotes": "Ghi chú nhanh cho AI",
+      "optional": "(tuỳ chọn)",
+      "notesPlaceholder": "VD: Nhà 50m2, 2 lầu, gần chợ Bà Chiểu, hẻm xe hơi 6m\nCó sân thượng, mới sơn sửa\nPhù hợp ở hoặc kinh doanh nhỏ...",
+      "notesHint": "💡 Viết bất kỳ gạch đầu dòng, từ khóa, ưu điểm nào — AI sẽ tự chải chuốt thành bài viết hấp dẫn",
+      "generating": "AI đang sáng tạo nội dung...",
+      "generateBtn": "🪄 Tạo Tiêu đề & Mô tả bằng AI",
+      "requirePropertyType": "Vui lòng chọn loại hình BĐS ở Bước 1 trước khi dùng AI",
+      "appliedSuccess": "Nội dung AI đã được áp dụng. Bạn có thể chỉnh sửa bên dưới hoặc tạo lại.",
+      "previewTitle": "Nội dung AI đã tạo",
+      "previewDesc": "Xem trước, chỉnh sửa rồi áp dụng vào tin đăng",
+      "previewTitleLabel": "Tiêu đề",
+      "previewDescLabel": "Mô tả chi tiết",
+      "seoKeywords": "🔍 Từ khóa SEO gợi ý",
+      "regenerateBtn": "Tạo lại",
+      "cancelBtn": "Huỷ",
+      "applyBtn": "Áp dụng nội dung AI"
+    },
+    "validation": {
+      "missingLocation": "Vui lòng chọn đầy đủ Tỉnh/Thành phố, Quận/Huyện và Phường/Xã",
+      "missingTransactionType": "Vui lòng chọn hình thức giao dịch (Bán hoặc Cho thuê)"
+    },
+    "error": {
+      "uploadFailed": "Không thể upload ảnh. Vui lòng thử lại.",
+      "uploadError": "Lỗi tải ảnh lên",
+      "uploadErrorDetail": "Lỗi khi upload ảnh: ",
+      "documentsFailed": "{{count}} tài liệu pháp lý chưa tải lên được",
+      "postErrorTitle": "Lỗi đăng bất động sản"
+    },
+    "success": {
+      "posted": "Đăng tin thành công! 🎉"
+    },
+    "auth": {
+      "loginRequired": "Vui lòng đăng nhập",
+      "loginDesc": "Bạn cần đăng nhập để đăng tin bất động sản",
+      "loginBtn": "Đăng nhập ngay"
+    },
+    "quota": {
+      "exceededTitle": "Đã hết hạn mức đăng tin",
+      "exceededDesc1": "Bạn đã sử dụng hết",
+      "exceededDesc2": "lượt đăng tin trong gói",
+      "exceededDesc3": "hiện tại.",
+      "upgradeDesc": "Vui lòng nâng cấp gói để tiếp tục đăng tin bất động sản.",
+      "viewPackages": "Xem các gói dịch vụ",
+      "managePackage": "Quản lý gói hiện tại"
+    },
+    "step1": {
+      "selectPropertyType": "Chọn loại hình bất động sản",
+      "transactionType": "Hình thức giao dịch"
+    },
+    "step2": {
+      "price": "Giá",
+      "pricePlaceholder": "VD: 5500000000",
+      "area": "Diện tích",
+      "areaPlaceholder": "VD: 85",
+      "province": "Tỉnh/Thành phố",
+      "selectProvince": "Chọn tỉnh/thành phố",
+      "district": "Quận/Huyện",
+      "selectDistrict": "Chọn quận/huyện",
+      "ward": "Phường/Xã",
+      "selectWard": "Chọn phường/xã",
+      "specificAddress": "Địa chỉ cụ thể",
+      "autoSearch": "(Tìm kiếm tự động)",
+      "addressPlaceholder": "VD: Số 123, Đường Nguyễn Huệ, Quận 1, TP.HCM",
+      "addressHint": "💡 Nhập địa chỉ (tối thiểu 3 ký tự) và chọn từ gợi ý để tự động điền Tỉnh/Quận/Huyện",
+      "bedrooms": "Phòng ngủ",
+      "bathrooms": "Phòng tắm",
+      "floors": "Số tầng",
+      "yearBuilt": "Năm xây dựng"
+    },
+    "step3": {
+      "title": "Tiêu đề tin đăng",
+      "chars": "ký tự",
+      "titlePlaceholder": "VD: Căn hộ cao cấp 2PN2WC view sông tại Vinhomes Central Park",
+      "description": "Mô tả chi tiết",
+      "descriptionPlaceholder": "Mô tả chi tiết về bất động sản: vị trí, thiết kế, tiện ích xung quanh...",
+      "furnishing": "Tình trạng nội thất",
+      "features": "Tiện ích và đặc điểm"
+    },
+    "step4": {
+      "imagesTitle": "Hình ảnh bất động sản",
+      "imagesDesc": "Tải lên tối đa 10 hình ảnh. Hình ảnh đầu tiên sẽ là hình đại diện.",
+      "thumbnail": "Ảnh đại diện",
+      "uploadImages": "Tải ảnh lên",
+      "noImages": "Chưa có hình ảnh nào được tải lên",
+      "selectImages": "Chọn ảnh từ máy tính",
+      "documents": "Tài liệu pháp lý (tuỳ chọn)"
+    },
+    "step5": {
+      "previewTitle": "Xem trước tin đăng",
+      "importantNotes": "Lưu ý quan trọng",
+      "note1": "• Tin đăng sẽ được kiểm duyệt trong vòng 24 giờ",
+      "note2": "• Đảm bảo thông tin chính xác và hình ảnh rõ nét",
+      "note3": "• Tuân thủ quy định đăng tin của BDSPortal",
+      "note4": "• Tin đăng miễn phí sẽ hiển thị trong 30 ngày"
+    },
+    "header": {
+      "title1": "Đăng Tin",
+      "title2": "Bất Động Sản",
+      "desc": "Đăng tin miễn phí, tiếp cận hàng nghìn khách hàng tiềm năng"
+    },
+    "nav": {
+      "back": "Quay lại",
+      "next": "Tiếp tục"
+    }
+  },
+  "legal": {
+    "title": "Trung tâm pháp lý & hợp đồng",
+    "description": "Giải thích rõ cách hệ thống sử dụng hợp đồng điện tử, blockchain và các bước pháp lý ngoài đời thực khi giao dịch bất động sản.",
+    "tabs": {
+      "blockchain": "Hợp đồng Blockchain",
+      "terms": "Điều khoản & Chính sách",
+      "faq": "FAQ Pháp lý"
+    },
+    "blockchain": {
+      "q1Title": "Hợp đồng Blockchain trên ERA Estate ghi nhận những gì?",
+      "q1Desc_1": "Hợp đồng blockchain được tạo qua MetaMask chủ yếu dùng để ",
+      "q1Desc_2": "ghi nhận lại ý chí giao dịch",
+      "q1Desc_3": " giữa các bên trên một sổ cái phân tán, khó bị sửa đổi.",
+      "q1Li1": "Mã giao dịch on-chain (transaction hash).",
+      "q1Li2": "Địa chỉ ví của bên ký (người mua / người thuê).",
+      "q1Li3": "Giá trị giao dịch tại thời điểm ký trên chuỗi.",
+      "q1Li4": "Thời điểm giao dịch được ghi nhận trên blockchain.",
+      "guideLink": "Hướng dẫn cài MetaMask, chọn mạng và chuẩn bị phí gas →",
+      "noteTitle": "Lưu ý quan trọng về giá trị pháp lý:",
+      "noteDesc_1": "Hợp đồng blockchain ",
+      "noteDesc_2": "không thay thế",
+      "noteDesc_3": " cho hợp đồng công chứng, hợp đồng mua bán/sang tên tại văn phòng công chứng, cơ quan nhà nước. Đây là lớp ghi nhận bổ sung để tăng tính minh bạch và dễ đối chiếu.",
+      "roleTitle": "Vai trò của công chứng, sang tên sổ hồng/sổ đỏ",
+      "roleLi1_1": "Công chứng hợp đồng",
+      "roleLi1_2": ": xác nhận ý chí và chữ ký của các bên, là cơ sở để sang tên.",
+      "roleLi2_1": "Sang tên sổ",
+      "roleLi2_2": ": cập nhật quyền sở hữu/quyền sử dụng trên Giấy chứng nhận – đây mới là căn cứ pháp lý mạnh nhất.",
+      "roleLi3_1": "Thuế & phí",
+      "roleLi3_2": ": cần được kê khai và nộp đúng quy định (thuế TNCN, lệ phí trước bạ, phí công chứng…).",
+      "disclaimer_1": "ERA Estate hỗ trợ phần ghi nhận trên hệ thống và blockchain; người dùng vẫn cần làm việc với ",
+      "disclaimer_2": "văn phòng công chứng",
+      "disclaimer_3": " và ",
+      "disclaimer_4": "cơ quan đăng ký đất đai",
+      "disclaimer_5": " để hoàn tất pháp lý."
+    },
+    "terms": {
+      "title": "Điều khoản sử dụng & Chính sách cơ bản",
+      "desc": "Phần này tóm tắt các nguyên tắc chính khi bạn sử dụng ERA Estate để tìm kiếm, đăng tin và giao dịch bất động sản.",
+      "mainTermsTitle": "Điều khoản sử dụng chính",
+      "mainTermsLi1": "Không đăng tải thông tin sai sự thật, gây nhầm lẫn hoặc vi phạm pháp luật.",
+      "mainTermsLi2": "Tự chịu trách nhiệm về nội dung tin đăng, hồ sơ pháp lý và các thỏa thuận bên ngoài hệ thống.",
+      "mainTermsLi3": "Không sử dụng nền tảng cho các hành vi rửa tiền, lừa đảo, huy động vốn trái phép.",
+      "mainTermsLi4": "ERA Estate có quyền ẩn/xóa các nội dung vi phạm quy định hoặc bị tố cáo có dấu hiệu rủi ro cao.",
+      "privacyTitle": "Chính sách bảo mật & dữ liệu",
+      "privacyLi1": "Thông tin nhạy cảm (CMND/CCCD, số sổ, số tài khoản…) được hạn chế hiển thị.",
+      "privacyLi2_1": "Dữ liệu giao dịch được lưu trữ trên hệ thống và có thể được ",
+      "privacyLi2_2": "băm/ẩn bớt",
+      "privacyLi2_3": " khi đưa lên blockchain.",
+      "privacyLi3": "ERA Estate chỉ chia sẻ dữ liệu với bên thứ ba khi có sự đồng ý hoặc yêu cầu từ cơ quan nhà nước có thẩm quyền.",
+      "disclaimer": "Chi tiết đầy đủ của Điều khoản sử dụng và Chính sách bảo mật có thể được mở rộng trong các phiên bản sau; phần này mang tính chất định hướng và minh bạch trải nghiệm cho người dùng."
+    },
+    "faq": {
+      "title": "Câu hỏi thường gặp (FAQ) về pháp lý giao dịch",
+      "q1": "1. Hợp đồng trên ERA Estate có đủ để sang tên không?",
+      "a1": "Không. Hợp đồng trên hệ thống (kể cả đã ghi nhận blockchain) chỉ là lớp hỗ trợ minh bạch và làm rõ giao dịch. Để sang tên sổ, bạn bắt buộc phải làm hợp đồng công chứng và thủ tục tại cơ quan nhà nước.",
+      "q2": "2. Thuế, phí mua bán/cho thuê được tính như thế nào?",
+      "a2": "Thuế thu nhập cá nhân, lệ phí trước bạ, phí công chứng… phụ thuộc vào giá trị hợp đồng và quy định từng thời kỳ. Hệ thống chỉ hỗ trợ hiển thị ước tính; số liệu chính xác do cơ quan thuế và văn phòng công chứng quyết định.",
+      "q3": "3. Nếu một bên không thực hiện đúng cam kết trên hệ thống thì sao?",
+      "a3_1": "Dữ liệu giao dịch, lịch sử thanh toán và thông tin blockchain có thể làm ",
+      "a3_2": "chứng cứ tham khảo",
+      "a3_3": ". Tuy nhiên, việc xử lý vi phạm, bồi thường thiệt hại, tranh chấp… vẫn do hai bên thương lượng hoặc nhờ Tòa án/Trọng tài giải quyết.",
+      "q4": "4. Tôi không rành Blockchain, MetaMask thì có bắt buộc dùng không?",
+      "a4": "Không bắt buộc. Bạn có thể chọn thanh toán qua VNPay và chỉ dùng hợp đồng điện tử trên hệ thống. Ký blockchain là tuỳ chọn cho những ai muốn tăng thêm lớp minh bạch và khả năng đối chiếu sau này.",
+      "disclaimer": "Thông tin trên chỉ mang tính tham khảo, không thay thế cho tư vấn từ luật sư, cơ quan thuế hoặc văn phòng công chứng. Với các giao dịch lớn hoặc phức tạp, bạn nên làm việc thêm với chuyên gia pháp lý."
+    },
+    "rent": {
+      "title": "Nhà đất cho thuê",
+      "subtitle": "Tìm kiếm nhà đất cho thuê tại Việt Nam",
+      "location": "Khu vực",
+      "selectLocation": "Chọn khu vực",
+      "priceRange": "Mức giá",
+      "selectPrice": "Chọn mức giá",
+      "priceUnder10": "Dưới 10 triệu",
+      "price10to20": "10 - 20 triệu",
+      "price20to30": "20 - 30 triệu",
+      "price30to50": "30 - 50 triệu",
+      "priceOver50": "Trên 50 triệu",
+      "type": "Loại hình",
+      "selectType": "Chọn loại hình",
+      "house": "Nhà riêng",
+      "room": "Phòng trọ",
+      "office": "Văn phòng",
+      "bedrooms": "Phòng ngủ",
+      "selectBedrooms": "Chọn số phòng",
+      "1bed": "1 phòng",
+      "2bed": "2 phòng",
+      "3bed": "3 phòng",
+      "4bedPlus": "4+ phòng",
+      "search": "Tìm kiếm",
+      "resultsCount": "Có {count} bất động sản cho thuê",
+      "sortBy": "Sắp xếp theo",
+      "sortPriceAsc": "Giá tăng dần",
+      "sortPriceDesc": "Giá giảm dần",
+      "sortAreaAsc": "Diện tích tăng dần",
+      "sortNewest": "Mới nhất",
+      "bed": "{count} PN",
+      "bath": "{count} WC",
+      "priceUnit": "VNĐ/tháng"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "subtitle": "Tổng quan về hoạt động bất động sản của bạn",
+      "stats": {
+        "totalProperties": "Tổng tin đăng",
+        "active": "đang hiển thị",
+        "views": "Lượt xem",
+        "allProperties": "Tất cả tin đăng",
+        "favorites": "Yêu thích",
+        "savedProperties": "BĐS đã lưu",
+        "inquiries": "Yêu cầu liên hệ",
+        "viewDetails": "Xem chi tiết →",
+        "revenue": "Doanh thu thuê",
+        "revenueDashboard": "Dashboard doanh thu →"
+      },
+      "recentActivities": {
+        "title": "Hoạt động gần đây",
+        "viewAll": "Xem tất cả",
+        "empty": "Chưa có hoạt động nào",
+        "view": "Xem →"
+      },
+      "topProperties": {
+        "title": "Top BĐS của bạn",
+        "empty": "Chưa có tin đăng nào",
+        "postNow": "Đăng tin ngay →"
+      },
+      "quickActions": {
+        "title": "Thao tác nhanh",
+        "postProperty": "Đăng tin mới",
+        "manageProperties": "Quản lý tin",
+        "inquiries": "Yêu cầu liên hệ",
+        "payments": "Thanh toán",
+        "calendar": "Lịch hẹn",
+        "revenue": "Doanh thu"
+      }
+    },
+    "sidebar": {
+      "overview": "Tổng quan",
+      "dashboard": "Dashboard",
+      "activity": "Hoạt động",
+      "properties": "Bất động sản",
+      "myProperties": "BĐS của tôi",
+      "favorites": "Yêu thích",
+      "inquiries": "Yêu cầu liên hệ",
+      "viewings": "Lịch hẹn xem",
+      "rentalManagement": "Quản lý cho thuê",
+      "rentalCashflow": "Dòng tiền thuê",
+      "contracts": "Hợp đồng",
+      "finance": "Tài chính",
+      "payments": "Thanh toán",
+      "transactionHistory": "Lịch sử GD",
+      "bankAccounts": "Tài khoản NH",
+      "analytics": "Phân tích",
+      "personal": "Cá nhân",
+      "calendar": "Lịch",
+      "settings": "Cài đặt",
+      "backToHome": "Về trang chủ",
+      "logout": "Đăng xuất",
+      "defaultUser": "Người dùng",
+      "myDashboard": "My Dashboard"
+    },
+    "editProperty": {
+      "title": "Chỉnh sửa bất động sản",
+      "basicInfo": "Thông tin cơ bản",
+      "propertyTitle": "Tiêu đề *",
+      "titlePlaceholder": "Nhập tiêu đề bất động sản",
+      "propertyType": "Loại bất động sản *",
+      "transactionType": "Loại giao dịch *",
+      "sale": "Bán",
+      "rent": "Cho thuê",
+      "price": "Giá (VNĐ) *",
+      "pricePlaceholder": "Nhập giá",
+      "area": "Diện tích (m²) *",
+      "areaPlaceholder": "Nhập diện tích",
+      "bedrooms": "Phòng ngủ",
+      "bathrooms": "Phòng tắm",
+      "description": "Mô tả",
+      "location": "Địa chỉ",
+      "province": "Tỉnh/Thành phố *",
+      "selectProvince": "Chọn tỉnh/thành phố",
+      "district": "Quận/Huyện",
+      "selectDistrict": "Chọn quận/huyện",
+      "ward": "Phường/Xã",
+      "selectWard": "Chọn phường/xã",
+      "specificAddress": "Địa chỉ cụ thể *",
+      "addressPlaceholder": "Nhập địa chỉ cụ thể",
+      "latitude": "Vĩ độ",
+      "longitude": "Kinh độ",
+      "images": "Hình ảnh",
+      "imageNote": "Tải lên tối đa 10 hình ảnh. Hình ảnh đầu tiên sẽ là hình đại diện.",
+      "coverImage": "Ảnh đại diện",
+      "addPhoto": "Thêm ảnh",
+      "noImages": "Chưa có hình ảnh nào",
+      "selectFromComputer": "Chọn ảnh từ máy tính",
+      "cancel": "Hủy",
+      "uploading": "Đang tải ảnh...",
+      "updating": "Đang cập nhật...",
+      "updateButton": "Cập nhật bất động sản",
+      "notFound": "Không tìm thấy bất động sản",
+      "notFoundDesc": "Bất động sản này không tồn tại hoặc đã bị xóa."
+    },
+    "kyc": {
+      "title": "Xác minh CCCD",
+      "subtitle": "Quét ảnh mặt trước CCCD để xác minh danh tính",
+      "verifiedTitle": "Đã xác minh danh tính",
+      "verifiedDesc": "Tài khoản của bạn đã được xác minh CCCD thành công. Badge \"Đã xác minh\" sẽ hiển thị trên trang cá nhân và hợp đồng.",
+      "backToProfile": "Về trang cá nhân",
+      "scanAgain": "Quét lại",
+      "stepUpload": "Upload ảnh",
+      "stepScanning": "Đang quét",
+      "stepReview": "Xác nhận",
+      "imageSelected": "Ảnh đã chọn. Nhấn \"Bắt đầu quét\" để tiếp tục.",
+      "dragDrop": "Kéo thả hoặc nhấn để chọn ảnh CCCD",
+      "supportFormat": "Hỗ trợ JPG, PNG · Tối đa 10MB · Mặt trước CCCD",
+      "reselect": "Chọn lại",
+      "startScan": "Bắt đầu quét",
+      "importantNote": "Lưu ý quan trọng",
+      "note1": "Ảnh chụp rõ nét, đủ ánh sáng, không bị mờ/cắt góc",
+      "note2": "OCR chạy trực tiếp trên trình duyệt — ảnh không được gửi lên server",
+      "note3": "Chỉ kết quả text trích xuất được gửi về backend để lưu",
+      "scanningTitle": "Đang quét CCCD…",
+      "scanningDesc": "Đang nhận diện chữ trên ảnh",
+      "complete": "hoàn tất",
+      "ocrResult": "Kết quả quét OCR",
+      "hideRaw": "Ẩn raw text",
+      "showRaw": "Xem raw text",
+      "cccdNumber": "Số CCCD",
+      "fullName": "Họ và tên",
+      "dob": "Ngày sinh",
+      "gender": "Giới tính",
+      "nationality": "Quốc tịch",
+      "origin": "Quê quán",
+      "residence": "Nơi thường trú",
+      "expiry": "Có giá trị đến",
+      "invalidCccd": "Số CCCD không hợp lệ theo cấu trúc CCCD Việt Nam (mã tỉnh/giới tính). Vui lòng kiểm tra lại.",
+      "validCccd": "Xác thực CCCD hợp lệ",
+      "issuePlace": "Nơi cấp:",
+      "birthYear": "Năm sinh:",
+      "missingInfo": "Thiếu thông tin bắt buộc. Vui lòng điền số CCCD và họ tên thủ công, hoặc thử quét lại ảnh rõ hơn.",
+      "confirmSave": "Xác nhận & Lưu",
+      "sending": "Đang gửi…",
+      "errImageFormat": "Vui lòng chọn file ảnh (JPG, PNG)",
+      "errImageSize": "Ảnh quá lớn (tối đa 10MB)",
+      "errOcrFail": "Không nhận diện được thông tin CCCD. Vui lòng thử lại với ảnh rõ hơn.",
+      "errOcrProcess": "Lỗi xử lý ảnh CCCD",
+      "errScan": "Lỗi quét ảnh: ",
+      "success": "Xác minh CCCD thành công!",
+      "errSubmit": "Lỗi khi gửi thông tin xác minh",
+      "statusVerified": "Đã xác minh"
+    },
+    "propertyHistory": {
+      "title": "Dòng thời gian lịch sử BĐS",
+      "subtitle": "Theo dõi toàn bộ biến động và lịch sử phê duyệt của bất động sản",
+      "daysOnMarket": "Số ngày niêm yết",
+      "priceChanges": "Lần đổi giá",
+      "isDiscounted": "Đã giảm giá",
+      "initialPrice": "Giá ban đầu",
+      "currentPrice": "Giá hiện tại",
+      "discount": "Giảm",
+      "eventCreated": "Tin đăng mới",
+      "eventPriceChange": "Thay đổi giá",
+      "eventStatusChange": "Thay đổi trạng thái",
+      "eventListingRenewed": "Làm mới tin đăng",
+      "days": "ngày",
+      "noHistory": "Không có lịch sử hoạt động nào được ghi nhận.",
+      "fetchError": "Không thể tải lịch sử bất động sản"
+    }
   }
 }
