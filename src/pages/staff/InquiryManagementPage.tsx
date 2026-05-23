@@ -7,15 +7,13 @@ import { propertyInquiryAPI } from '../../api/propertyInquiry';
 import { relativeTime } from '../../utils/relativeTime';
 import { useDebounce } from '../../hooks/useDebounce';
 import toast from '../../utils/toast';
+import { useAdminTheme } from '../../contexts/AdminThemeContext';
 
 // ─── Label maps ───
 const statusLabels: Record<string, string> = {
   NEW: 'Mới', IN_PROGRESS: 'Đang xử lý', RESPONDED: 'Đã phản hồi', CLOSED: 'Đã đóng', SPAM: 'Spam',
 };
-const statusStyles: Record<string, string> = {
-  NEW: 'bg-blue-100 text-blue-700', IN_PROGRESS: 'bg-amber-100 text-amber-700',
-  RESPONDED: 'bg-emerald-100 text-emerald-700', CLOSED: 'bg-gray-100 text-gray-600', SPAM: 'bg-red-100 text-red-700',
-};
+
 const typeLabels: Record<string, string> = {
   GENERAL_INFO: 'Thông tin chung', SCHEDULE_VIEWING: 'Đặt lịch xem nhà',
   PRICE_NEGOTIATION: 'Thương lượng giá', FINANCING_INFO: 'Tài chính',
@@ -24,8 +22,8 @@ const typeLabels: Record<string, string> = {
 
 // ─── Response Modal ───
 const ResponseModal: React.FC<{
-  open: boolean; onClose: () => void; onSubmit: (response: string) => void; loading: boolean; inquiry: any;
-}> = ({ open, onClose, onSubmit, loading, inquiry }) => {
+  open: boolean; onClose: () => void; onSubmit: (response: string) => void; loading: boolean; inquiry: any; isDark: boolean;
+}> = ({ open, onClose, onSubmit, loading, inquiry, isDark }) => {
   const [responseText, setResponseText] = useState('');
   useEffect(() => { if (!open) setResponseText(''); }, [open]);
   if (!open || !inquiry) return null;
@@ -35,34 +33,69 @@ const ResponseModal: React.FC<{
       <button
         type="button"
         aria-label="Close response modal"
-        className="absolute inset-0 bg-gray-950/40 backdrop-blur-sm"
+        className="absolute inset-0 bg-slate-950/65 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
-        <div className="flex items-center justify-between p-5 border-b border-gray-100">
+      <div className={`relative rounded-3xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden border transition-all duration-300 ${
+        isDark ? 'bg-slate-800 border-slate-700/80' : 'bg-white border-gray-100'
+      }`}>
+        <div className={`flex items-center justify-between p-5 border-b ${
+          isDark ? 'border-slate-700/80' : 'border-gray-100'
+        }`}>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Phản hồi yêu cầu</h3>
-            <p className="text-sm text-gray-500 mt-0.5">{inquiry.inquirerName}</p>
+            <h3 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Phản hồi yêu cầu</h3>
+            <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>{inquiry.inquirerName}</p>
           </div>
-          <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5 text-gray-500" /></button>
+          <button onClick={onClose} className={`p-2 rounded-xl transition-colors ${
+            isDark ? 'hover:bg-slate-700 text-slate-400' : 'hover:bg-gray-100 text-gray-500'
+          }`}><X className="w-5 h-5" /></button>
         </div>
+        
         <div className="p-5 space-y-4">
-          <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-            <p className="text-xs font-medium text-gray-500 mb-1.5 flex items-center gap-1"><MessageSquare className="w-3 h-3" /> Nội dung yêu cầu:</p>
-            <p className="text-sm text-gray-700">{inquiry.message}</p>
+          <div className={`rounded-2xl p-4 border ${
+            isDark ? 'bg-slate-900/60 border-slate-700/80' : 'bg-gray-50 border-gray-100'
+          }`}>
+            <p className={`text-xs font-bold mb-1.5 flex items-center gap-1.5 ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>
+              <MessageSquare className="w-3.5 h-3.5 text-red-500" /> Nội dung yêu cầu:
+            </p>
+            <p className={`text-sm ${isDark ? 'text-slate-200' : 'text-gray-700'}`}>{inquiry.message}</p>
           </div>
-          <div>
-            <label htmlFor="staff-inquiry-response" className="text-sm font-medium text-gray-700 mb-1.5 block">Nội dung phản hồi:</label>
-            <textarea id="staff-inquiry-response" value={responseText} onChange={e => setResponseText(e.target.value)} placeholder="Nhập phản hồi cho khách hàng..."
-              rows={5} className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" />
+          
+          <div className="space-y-1.5">
+            <label htmlFor="staff-inquiry-response" className={`text-sm font-bold ${isDark ? 'text-slate-300' : 'text-gray-700'}`}>
+              Nội dung phản hồi:
+            </label>
+            <textarea 
+              id="staff-inquiry-response" 
+              value={responseText} 
+              onChange={e => setResponseText(e.target.value)} 
+              placeholder="Nhập phản hồi chi tiết gửi khách hàng..."
+              rows={5} 
+              className={`w-full px-4 py-3 rounded-2xl text-sm border focus:ring-1 focus:ring-red-500 resize-none transition-all duration-300 ${
+                isDark 
+                  ? 'bg-slate-900 border-slate-705 text-white placeholder-slate-500' 
+                  : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400'
+              }`} 
+            />
           </div>
         </div>
-        <div className="flex gap-3 p-5 border-t border-gray-100 bg-gray-50">
-          <button onClick={onClose} className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-100 text-sm font-medium">Hủy</button>
+        
+        <div className={`flex gap-3 p-5 border-t ${
+          isDark ? 'border-slate-700/80 bg-slate-800/40' : 'border-gray-100 bg-gray-50'
+        }`}>
+          <button onClick={onClose} className={`flex-1 px-4 py-3 rounded-2xl font-bold text-sm border transition-all duration-300 ${
+            isDark 
+              ? 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white' 
+              : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
+          }`}>
+            Hủy
+          </button>
+          
           <button onClick={() => { if (!responseText.trim()) { toast.error('Vui lòng nhập nội dung phản hồi'); return; } onSubmit(responseText); }}
             disabled={loading || !responseText.trim()}
-            className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 text-sm font-medium flex items-center justify-center gap-2">
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />} Gửi phản hồi
+            className="flex-1 px-4 py-3 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-755 hover:to-rose-750 text-white rounded-2xl disabled:opacity-50 text-sm font-bold flex items-center justify-center gap-2 transition-all duration-300 btn-press">
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />} 
+            Gửi phản hồi
           </button>
         </div>
       </div>
@@ -72,6 +105,9 @@ const ResponseModal: React.FC<{
 
 // ─── Main ───
 const InquiryManagementPage: React.FC = () => {
+  const { theme } = useAdminTheme();
+  const isDark = theme === 'dark';
+
   const [inquiries, setInquiries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
@@ -121,7 +157,6 @@ const InquiryManagementPage: React.FC = () => {
   const handleRespondSubmit = async (responseText: string) => {
     const id = responseModal.inquiry?.id;
     if (!id) return;
-    // Optimistic: update UI immediately
     const backup = [...inquiries];
     setInquiries(prev => prev.map(inq => inq.id === id ? { ...inq, agentResponse: responseText, status: 'RESPONDED', respondedAt: new Date().toISOString() } : inq));
 
@@ -140,7 +175,6 @@ const InquiryManagementPage: React.FC = () => {
   };
 
   const handleUpdateStatus = async (id: string, status: string) => {
-    // Optimistic
     const backup = [...inquiries];
     setInquiries(prev => prev.map(inq => inq.id === id ? { ...inq, status } : inq));
 
@@ -168,52 +202,100 @@ const InquiryManagementPage: React.FC = () => {
   const statusTabs = ['ALL', 'NEW', 'IN_PROGRESS', 'RESPONDED', 'CLOSED', 'SPAM'];
   const totalAll = Object.values(statusCounts).reduce((a, b) => a + b, 0);
 
-  // Skeleton
+  const statusStyles: Record<string, string> = {
+    NEW: isDark ? 'bg-blue-500/15 text-blue-300' : 'bg-blue-50 text-blue-700 border border-blue-100',
+    IN_PROGRESS: isDark ? 'bg-amber-500/15 text-amber-300' : 'bg-amber-50 text-amber-700 border border-amber-100',
+    RESPONDED: isDark ? 'bg-emerald-500/15 text-emerald-300' : 'bg-emerald-50 text-emerald-700 border border-emerald-100',
+    CLOSED: isDark ? 'bg-slate-700 text-slate-350' : 'bg-gray-100 text-gray-600 border border-gray-150',
+    SPAM: isDark ? 'bg-rose-500/15 text-rose-300' : 'bg-rose-50 text-rose-700 border border-rose-100',
+  };
+
+  // Skeleton Loading
   if (loading && inquiries.length === 0) {
     return (
-      <div className="space-y-4">
-        <div className="h-8 w-64 bg-gray-200 rounded animate-pulse" />
-        <div className="flex gap-2">{[1,2,3,4].map(slot => <div key={`inquiry-tab-skeleton-${slot}`} className="h-10 w-24 bg-gray-200 rounded-xl animate-pulse" />)}</div>
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <div className={`h-8 w-64 rounded-xl animate-pulse ${isDark ? 'bg-slate-800' : 'bg-gray-200'}`} />
+          <div className={`h-4 w-96 rounded-lg animate-pulse ${isDark ? 'bg-slate-800' : 'bg-gray-200'}`} />
+        </div>
+        <div className="flex gap-2">
+          {[1,2,3,4,5].map(slot => (
+            <div key={`inquiry-tab-skeleton-${slot}`} className={`h-11 w-28 rounded-2xl animate-pulse ${isDark ? 'bg-slate-800' : 'bg-gray-200'}`} />
+          ))}
+        </div>
         {[1,2,3].map(slot => (
-          <div key={`inquiry-card-skeleton-${slot}`} className="bg-white rounded-2xl p-6 animate-pulse"><div className="space-y-3"><div className="h-5 bg-gray-200 rounded w-2/3" /><div className="h-4 bg-gray-200 rounded w-full" /></div></div>
+          <div key={`inquiry-card-skeleton-${slot}`} className={`rounded-3xl p-6 border animate-pulse ${
+            isDark ? 'bg-slate-800/80 border-slate-700/80' : 'bg-white border-gray-100'
+          }`}>
+            <div className="space-y-4">
+              <div className="flex gap-3">
+                <div className={`h-6 w-32 rounded-lg ${isDark ? 'bg-slate-700' : 'bg-gray-200'}`} />
+                <div className={`h-6 w-20 rounded-lg ${isDark ? 'bg-slate-700' : 'bg-gray-200'}`} />
+              </div>
+              <div className={`h-16 w-full rounded-2xl ${isDark ? 'bg-slate-700' : 'bg-gray-200'}`} />
+            </div>
+          </div>
         ))}
       </div>
     );
   }
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Quản lý yêu cầu tư vấn</h1>
-          <p className="text-sm text-gray-500 mt-1">Xem và phản hồi yêu cầu tư vấn từ khách hàng</p>
+    <div className="space-y-6 pb-8">
+      {/* Header */}
+      <div className="flex items-center justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className={`text-3xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-gray-950'}`}>
+            Quản lý yêu cầu tư vấn
+          </h1>
+          <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>
+            Xem và phản hồi yêu cầu tư vấn từ khách hàng
+          </p>
         </div>
-        <button onClick={() => { fetchInquiries(); fetchStatusCounts(); }} className="p-2 text-gray-400 hover:bg-gray-100 rounded-lg" title="Làm mới">
-          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+        <button onClick={() => { fetchInquiries(); fetchStatusCounts(); }} 
+          className={`p-3 rounded-2xl border transition-all duration-300 ${
+            isDark ? 'bg-slate-800 border-slate-700 text-slate-300 hover:text-white' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50 shadow-sm'
+          }`} title="Làm mới">
+          <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
         </button>
       </div>
 
-      {/* Search */}
+      {/* Toolbar / Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-        <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <input 
+          type="text" 
+          value={searchQuery} 
+          onChange={e => setSearchQuery(e.target.value)}
           placeholder="Tìm theo tên, email, SĐT..."
-          className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+          className={`w-full pl-11 pr-4 py-3.5 rounded-2xl border transition-all duration-300 text-sm focus:ring-1 focus:ring-red-500 ${
+            isDark 
+              ? 'bg-slate-800 border-slate-700 text-white placeholder-slate-500' 
+              : 'bg-white border-gray-200 text-gray-950 placeholder-gray-400 shadow-sm'
+          }`} 
+        />
       </div>
 
       {/* Tabs with counts */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2.5">
         {statusTabs.map(s => {
           const count = s === 'ALL' ? totalAll : (statusCounts[s] || 0);
+          const isActive = filterStatus === s;
           return (
             <button key={s} onClick={() => { setFilterStatus(s); setCurrentPage(0); }}
-              className={`px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 ${
-                filterStatus === s ? 'bg-gray-900 text-white shadow-sm' : 'bg-white text-gray-600 border border-gray-200 hover:border-gray-300'
+              className={`px-5 py-2.5 rounded-2xl text-sm font-bold transition-all duration-300 flex items-center gap-2 border ${
+                isActive 
+                  ? 'bg-gradient-to-r from-red-600 to-rose-650 text-white border-transparent shadow-md' 
+                  : isDark 
+                  ? 'bg-slate-850 border-slate-705 text-slate-300 hover:bg-slate-800 hover:text-white' 
+                  : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50 shadow-sm'
               }`}>
               {s === 'ALL' ? 'Tất cả' : statusLabels[s] || s}
               {count > 0 && (
-                <span className={`px-1.5 py-0.5 text-xs font-bold rounded-full min-w-[18px] text-center ${
-                  filterStatus === s ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-600'
+                <span className={`px-2 py-0.5 text-xs font-bold rounded-full min-w-[20px] text-center transition-all ${
+                  isActive 
+                    ? 'bg-white/20 text-white' 
+                    : isDark ? 'bg-slate-800 text-slate-400' : 'bg-gray-100 text-gray-500'
                 }`}>{count}</span>
               )}
             </button>
@@ -223,66 +305,113 @@ const InquiryManagementPage: React.FC = () => {
 
       {/* List */}
       {filtered.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-gray-100 p-10 text-center">
-          <MessageSquare className="w-14 h-14 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-600 font-medium">Không có yêu cầu tư vấn nào</p>
+        <div className={`rounded-3xl border p-16 text-center flex flex-col items-center justify-center ${
+          isDark ? 'bg-slate-800/80 border-slate-700/80' : 'bg-white border-gray-100 shadow-sm'
+        }`}>
+          <div className={`p-4 rounded-3xl mb-4 ${isDark ? 'bg-slate-900 text-slate-500' : 'bg-gray-50 text-gray-400'}`}>
+            <MessageSquare className="w-10 h-10" />
+          </div>
+          <p className={`font-bold mb-1 ${isDark ? 'text-slate-200' : 'text-gray-900'}`}>Không có yêu cầu tư vấn nào</p>
+          <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>Bạn chưa nhận được yêu cầu nào trong danh mục này.</p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {filtered.map((inquiry) => {
             const isProcessing = processingId === inquiry.id;
             return (
-              <div key={inquiry.id} className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-md transition-shadow">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap mb-2">
-                      <h3 className="text-base font-semibold text-gray-900">{inquiry.inquirerName}</h3>
-                      <span className={`px-2 py-0.5 text-xs font-medium rounded-lg ${statusStyles[inquiry.status] || statusStyles.NEW}`}>
+              <div key={inquiry.id} className={`rounded-3xl border p-6 transition-all duration-300 hover:shadow-lg ${
+                isDark 
+                  ? 'bg-slate-850/80 border-slate-700/80 shadow-slate-950/20' 
+                  : 'bg-white border-gray-100 shadow-sm shadow-gray-100/30'
+              }`}>
+                <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
+                  <div className="flex-1 min-w-0 space-y-4">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className={`text-lg font-bold leading-tight ${isDark ? 'text-white' : 'text-gray-950'}`}>
+                        {inquiry.inquirerName}
+                      </h3>
+                      <span className={`px-2.5 py-0.5 text-xs font-bold rounded-lg border ${statusStyles[inquiry.status] || statusStyles.NEW}`}>
                         {statusLabels[inquiry.status] || inquiry.status}
                       </span>
-                      <span className="px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 rounded-lg flex items-center gap-1">
-                        <Tag className="w-3 h-3" />{typeLabels[inquiry.inquiryType] || inquiry.inquiryType}
+                      <span className={`px-2.5 py-0.5 text-xs font-bold rounded-lg flex items-center gap-1 border ${
+                        isDark ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-gray-50 border-gray-100 text-gray-600'
+                      }`}>
+                        <Tag className="w-3.5 h-3.5 text-gray-400" />{typeLabels[inquiry.inquiryType] || inquiry.inquiryType}
                       </span>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500 mb-3">
-                      <span className="flex items-center gap-1"><Mail className="w-3 h-3" />{inquiry.inquirerEmail}</span>
-                      {inquiry.inquirerPhone && <span className="flex items-center gap-1"><Phone className="w-3 h-3" />{inquiry.inquirerPhone}</span>}
-                      <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{relativeTime(inquiry.createdAt)}</span>
+                    <div className={`flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs ${
+                      isDark ? 'text-slate-400' : 'text-gray-500'
+                    }`}>
+                      <span className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5 text-gray-400" />{inquiry.inquirerEmail}</span>
+                      {inquiry.inquirerPhone && <span className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 text-gray-400" />{inquiry.inquirerPhone}</span>}
+                      <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-gray-400" />{relativeTime(inquiry.createdAt)}</span>
                     </div>
 
-                    <div className="bg-gray-50 rounded-xl p-3 mb-3 border border-gray-100">
-                      <p className="text-sm text-gray-700">{inquiry.message}</p>
+                    <div className={`rounded-2xl p-4 border leading-relaxed text-sm ${
+                      isDark ? 'bg-slate-900 border-slate-750 text-slate-200' : 'bg-gray-50 border-gray-100 text-gray-700'
+                    }`}>
+                      {inquiry.message}
                     </div>
 
                     {inquiry.agentResponse && (
-                      <div className="bg-blue-50 border-l-2 border-blue-400 rounded-r-xl p-3">
-                        <p className="text-xs font-medium text-blue-800 mb-1 flex items-center gap-1"><Send className="w-3 h-3" /> Phản hồi:</p>
-                        <p className="text-sm text-blue-700">{inquiry.agentResponse}</p>
-                        {inquiry.respondedAt && <p className="text-xs text-blue-500 mt-1">{relativeTime(inquiry.respondedAt)}</p>}
+                      <div className={`border-l-3 rounded-r-2xl p-4 ${
+                        isDark 
+                          ? 'bg-rose-500/5 border-rose-500 text-slate-200' 
+                          : 'bg-rose-50/50 border-red-500 text-gray-750'
+                      }`}>
+                        <p className={`text-xs font-bold mb-1.5 flex items-center gap-1.5 ${isDark ? 'text-rose-400' : 'text-red-700'}`}>
+                          <Send className="w-3.5 h-3.5" /> Nội dung đã phản hồi:
+                        </p>
+                        <p className="text-sm leading-relaxed">{inquiry.agentResponse}</p>
+                        {inquiry.respondedAt && (
+                          <p className={`text-xs mt-2 ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>
+                            {relativeTime(inquiry.respondedAt)}
+                          </p>
+                        )}
                       </div>
                     )}
                   </div>
 
-                  <div className="flex flex-col gap-2 flex-shrink-0">
+                  <div className="flex flex-row lg:flex-col gap-2 flex-shrink-0 lg:w-36">
                     <button onClick={() => window.open(`/properties/${inquiry.propertyId}`, '_blank')}
-                      className="p-2 text-gray-400 hover:bg-gray-100 rounded-lg" title="Xem BĐS"><Eye className="w-4 h-4" /></button>
+                      className={`flex-1 lg:flex-initial flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border text-xs font-bold transition-all duration-300 ${
+                        isDark 
+                          ? 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white' 
+                          : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
+                      }`} title="Xem BĐS">
+                      <Eye className="w-4 h-4" />
+                      Xem BĐS
+                    </button>
 
                     {!inquiry.agentResponse && (
                       <button onClick={() => setResponseModal({ open: true, inquiry })} disabled={isProcessing}
-                        className="inline-flex items-center gap-1.5 px-3 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 text-xs font-medium">
-                        {isProcessing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />} Phản hồi
+                        className="flex-1 lg:flex-initial flex items-center justify-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white rounded-xl disabled:opacity-50 text-xs font-bold shadow-sm transition-all duration-300 btn-press">
+                        {isProcessing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />} 
+                        Phản hồi
                       </button>
                     )}
 
                     {inquiry.status === 'NEW' && (
                       <button onClick={() => handleUpdateStatus(inquiry.id, 'IN_PROGRESS')} disabled={isProcessing}
-                        className="px-3 py-2 bg-amber-100 text-amber-700 rounded-xl hover:bg-amber-200 disabled:opacity-50 text-xs font-medium">Đang xử lý</button>
+                        className={`flex-1 lg:flex-initial px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-300 ${
+                          isDark 
+                            ? 'bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/20' 
+                            : 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200/50'
+                        }`}>
+                        Đang xử lý
+                      </button>
                     )}
 
                     {inquiry.status !== 'CLOSED' && inquiry.status !== 'SPAM' && (
                       <button onClick={() => handleUpdateStatus(inquiry.id, 'CLOSED')} disabled={isProcessing}
-                        className="px-3 py-2 bg-gray-100 text-gray-600 rounded-xl hover:bg-gray-200 disabled:opacity-50 text-xs font-medium">Đóng</button>
+                        className={`flex-1 lg:flex-initial px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-300 ${
+                          isDark 
+                            ? 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200 border border-slate-700/60' 
+                            : 'bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-gray-700 border border-gray-150'
+                        }`}>
+                        Đóng yêu cầu
+                      </button>
                     )}
                   </div>
                 </div>
@@ -292,18 +421,37 @@ const InquiryManagementPage: React.FC = () => {
         </div>
       )}
 
+      {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 pt-2">
+        <div className="flex items-center justify-center gap-2 pt-6">
           <button onClick={() => setCurrentPage(p => Math.max(0, p - 1))} disabled={currentPage === 0}
-            className="px-4 py-2 border border-gray-200 rounded-xl disabled:opacity-40 hover:bg-gray-50 text-sm">Trước</button>
-          <span className="px-4 py-2 text-sm text-gray-500">Trang {currentPage + 1} / {totalPages}</span>
+            className={`px-4 py-2 border rounded-xl disabled:opacity-40 hover:bg-gray-50 text-sm font-bold transition-all duration-300 ${
+              isDark 
+                ? 'bg-slate-800 border-slate-700 text-slate-350 hover:bg-slate-700 disabled:pointer-events-none' 
+                : 'bg-white border-gray-200 text-gray-600 shadow-sm hover:bg-gray-50'
+            }`}>
+            Trước
+          </button>
+          
+          <span className={`px-4 py-2 text-sm font-bold rounded-xl ${
+            isDark ? 'bg-slate-800/60 text-slate-300' : 'bg-gray-100 text-gray-700'
+          }`}>
+            Trang {currentPage + 1} / {totalPages}
+          </span>
+          
           <button onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))} disabled={currentPage >= totalPages - 1}
-            className="px-4 py-2 border border-gray-200 rounded-xl disabled:opacity-40 hover:bg-gray-50 text-sm">Sau</button>
+            className={`px-4 py-2 border rounded-xl disabled:opacity-40 hover:bg-gray-50 text-sm font-bold transition-all duration-300 ${
+              isDark 
+                ? 'bg-slate-800 border-slate-700 text-slate-350 hover:bg-slate-700 disabled:pointer-events-none' 
+                : 'bg-white border-gray-200 text-gray-600 shadow-sm hover:bg-gray-50'
+            }`}>
+            Sau
+          </button>
         </div>
       )}
 
       <ResponseModal open={responseModal.open} onClose={() => setResponseModal({ open: false, inquiry: null })}
-        onSubmit={handleRespondSubmit} loading={processingId === responseModal.inquiry?.id} inquiry={responseModal.inquiry} />
+        onSubmit={handleRespondSubmit} loading={processingId === responseModal.inquiry?.id} inquiry={responseModal.inquiry} isDark={isDark} />
     </div>
   );
 };

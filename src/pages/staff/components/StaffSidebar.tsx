@@ -15,50 +15,67 @@ import type { StaffView, MenuSection, StaffStats } from '../types';
 // ─── Menu Item ───
 const MenuItem: React.FC<{
   icon: React.ReactNode; label: string; active: boolean; onClick: () => void; collapsed: boolean; badge?: number; theme: string;
-}> = ({ icon, label, active, onClick, collapsed, badge, theme }) => (
-  <div className="relative group">
-    <button onClick={onClick} title={collapsed ? label : undefined}
-      className={`w-full flex items-center rounded-xl transition-all duration-200 ${
-        collapsed ? 'justify-center p-3' : 'gap-3 px-4 py-2.5'
-      } ${
-        active
-          ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-md shadow-red-200/50'
-          : theme === 'dark'
-          ? 'text-slate-300 hover:bg-slate-700/60'
-          : 'text-gray-600 hover:bg-gray-50'
-      }`}>
-      <span className={`relative flex items-center justify-center ${active ? 'text-white' : theme === 'dark' ? 'text-slate-400 group-hover:text-red-400' : 'text-gray-500 group-hover:text-red-600'}`}>
-        {icon}
-        {badge !== undefined && badge > 0 && collapsed && (
-          <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+}> = ({ icon, label, active, onClick, collapsed, badge, theme }) => {
+  const isDark = theme === 'dark';
+  return (
+    <div className="relative group">
+      {/* Left indicator bar */}
+      {active && (
+        <span className={`absolute left-0 top-[20%] bottom-[20%] w-[3.5px] rounded-r-full transition-all duration-300 ${
+          isDark ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]' : 'bg-red-600 shadow-[0_0_8px_rgba(220,38,38,0.4)]'
+        }`} />
+      )}
+
+      <button onClick={onClick} title={collapsed ? label : undefined}
+        className={`w-full flex items-center rounded-xl transition-all duration-300 ${
+          collapsed ? 'justify-center p-3' : 'gap-3 px-4 py-2.5'
+        } ${
+          active
+            ? isDark
+              ? 'bg-red-500/10 text-red-400 font-semibold'
+              : 'bg-red-50 text-red-600 font-semibold shadow-sm'
+            : isDark
+            ? 'text-slate-400 hover:bg-slate-700/40 hover:text-slate-200'
+            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+        }`}>
+        <span className={`relative flex items-center justify-center transition-transform duration-300 ${
+          active 
+            ? isDark ? 'text-red-400' : 'text-red-600' 
+            : isDark ? 'text-slate-500 group-hover:text-red-400 group-hover:scale-110' : 'text-gray-400 group-hover:text-red-600 group-hover:scale-110'
+        }`}>
+          {icon}
+          {badge !== undefined && badge > 0 && collapsed && (
+            <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse">
+              {badge > 99 ? '99+' : badge}
+            </span>
+          )}
+        </span>
+        {!collapsed && <span className="whitespace-nowrap flex-1 text-left text-sm">{label}</span>}
+        {!collapsed && badge !== undefined && badge > 0 && (
+          <span className={`px-2 py-0.5 text-xs font-bold rounded-full min-w-[20px] text-center transition-colors ${
+            active 
+              ? isDark ? 'bg-red-500/20 text-red-400' : 'bg-red-100 text-red-700' 
+              : 'bg-red-500 text-white'
+          }`}>
             {badge > 99 ? '99+' : badge}
           </span>
         )}
-      </span>
-      {!collapsed && <span className="whitespace-nowrap flex-1 text-left text-sm font-medium">{label}</span>}
-      {!collapsed && badge !== undefined && badge > 0 && (
-        <span className={`px-2 py-0.5 text-xs font-bold rounded-full min-w-[20px] text-center ${
-          active ? 'bg-white/20 text-white' : 'bg-red-500 text-white'
+      </button>
+      
+      {/* Tooltip for collapsed state */}
+      {collapsed && (
+        <div className={`absolute left-full top-1/2 -translate-y-1/2 ml-4 px-3 py-2 rounded-xl text-sm font-medium whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 shadow-xl border ${
+          isDark ? 'bg-slate-800 text-slate-200 border-slate-700' : 'bg-gray-900 text-white border-transparent'
         }`}>
-          {badge > 99 ? '99+' : badge}
-        </span>
+          <div className={`absolute left-0 top-1/2 -translate-x-1.5 -translate-y-1/2 w-3 h-3 rotate-45 border-l border-b ${
+            isDark ? 'bg-slate-800 border-slate-700' : 'bg-gray-900 border-transparent'
+          }`} />
+          {label}
+        </div>
       )}
-    </button>
-    
-    {/* Tooltip for collapsed state */}
-    {collapsed && (
-      <div className={`absolute left-full top-1/2 -translate-y-1/2 ml-4 px-3 py-2 rounded-xl text-sm font-medium whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 shadow-xl border ${
-        theme === 'dark' ? 'bg-slate-800 text-slate-200 border-slate-700' : 'bg-gray-900 text-white border-transparent'
-      }`}>
-        <div className={`absolute left-0 top-1/2 -translate-x-1.5 -translate-y-1/2 w-3 h-3 rotate-45 border-l border-b ${
-          theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-gray-900 border-transparent'
-        }`} />
-        {label}
-        {badge !== undefined && badge > 0 && <span className="ml-2 text-red-400">({badge})</span>}
-      </div>
-    )}
-  </div>
-);
+    </div>
+  );
+};
 
 // ─── Section Header ───
 const SectionHeader: React.FC<{ title: string; collapsed: boolean; theme: string }> = ({ title, collapsed, theme }) => {
