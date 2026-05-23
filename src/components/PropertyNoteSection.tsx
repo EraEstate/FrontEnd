@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
   FileText, 
@@ -8,8 +8,7 @@ import {
   Loader2, 
   Sparkles, 
   Edit3,
-  CheckCircle,
-  AlertCircle
+  CheckCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { propertyNoteAPI } from '../api';
@@ -23,6 +22,7 @@ interface PropertyNoteSectionProps {
 export const PropertyNoteSection: React.FC<PropertyNoteSectionProps> = ({ propertyId }) => {
   const { t } = useTranslation();
   const { isAuthenticated } = useAuthStore();
+  const hasValidPropertyId = Number.isFinite(propertyId) && propertyId > 0;
   
   const [noteContent, setNoteContent] = useState('');
   const [noteId, setNoteId] = useState<string | null>(null);
@@ -32,7 +32,7 @@ export const PropertyNoteSection: React.FC<PropertyNoteSectionProps> = ({ proper
   const [lastSaved, setLastSaved] = useState<string | null>(null);
 
   const fetchNote = async () => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated || !hasValidPropertyId) return;
     try {
       setLoading(true);
       const note = await propertyNoteAPI.getNoteByProperty(propertyId);
@@ -50,16 +50,20 @@ export const PropertyNoteSection: React.FC<PropertyNoteSectionProps> = ({ proper
 
   useEffect(() => {
     fetchNote();
-  }, [propertyId, isAuthenticated]);
+  }, [propertyId, isAuthenticated, hasValidPropertyId]);
 
   const handleSave = async () => {
     if (!isAuthenticated) {
-      showWarning(t('savedSearch.loginRequired', 'Vui lòng đăng nhập để ghi lại ghi chú của bạn'));
+      showWarning(t('savedSearch.loginRequired', 'Vui lòng đăng nhập để lưu ghi chú'));
       return;
     }
 
     if (!noteContent.trim()) {
-      showWarning(t('propertyNote.emptyWarning', 'Nội dung ghi chú không được bỏ trống'));
+      showWarning(t('propertyNote.emptyWarning', 'Nội dung ghi chú không được để trống'));
+      return;
+    }
+    if (!hasValidPropertyId) {
+      showWarning('Bất động sản không hợp lệ để lưu ghi chú');
       return;
     }
 
@@ -68,7 +72,7 @@ export const PropertyNoteSection: React.FC<PropertyNoteSectionProps> = ({ proper
       const savedNote = await propertyNoteAPI.saveNote(propertyId, noteContent.trim());
       setNoteId(savedNote.id);
       setLastSaved(new Date(savedNote.updatedAt || savedNote.createdAt).toLocaleTimeString());
-      showSuccess(t('propertyNote.saveSuccess', 'Đã lưu ghi chú xem nhà riêng tư thành công!'));
+      showSuccess(t('propertyNote.saveSuccess', 'Đã lưu ghi chú thành công'));
       setIsEditing(false);
     } catch (error) {
       showError(t('propertyNote.saveError', 'Lỗi khi lưu ghi chú'));
@@ -90,7 +94,7 @@ export const PropertyNoteSection: React.FC<PropertyNoteSectionProps> = ({ proper
       setNoteId(null);
       setLastSaved(null);
       setIsEditing(false);
-      showSuccess(t('propertyNote.deleteSuccess', 'Đã xóa ghi chú riêng tư'));
+      showSuccess(t('propertyNote.deleteSuccess', 'Đã xóa ghi chú'));
     } catch (error) {
       showError(t('propertyNote.deleteError', 'Lỗi khi xóa ghi chú'));
     } finally {
@@ -100,28 +104,28 @@ export const PropertyNoteSection: React.FC<PropertyNoteSectionProps> = ({ proper
 
   if (!isAuthenticated) {
     return (
-      <div className="bg-white/60 backdrop-blur-md border border-gray-100 rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center text-center">
+      <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center text-center">
         <Lock className="h-8 w-8 text-gray-400 mb-3" />
         <h4 className="font-bold text-gray-900 mb-1">{t('propertyNote.privateTitle', 'Ghi chú xem nhà riêng tư')}</h4>
         <p className="text-xs text-gray-500 max-w-xs mb-4">
-          Hãy lưu trữ các thông tin đánh giá cá nhân, ý kiến khảo sát thực tế hoàn toàn bảo mật và chỉ hiển thị với chính bạn.
+          Lưu nhận xét cá nhân khi xem nhà. Nội dung này chỉ mình bạn có thể thấy.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white/85 backdrop-blur-lg border border-gray-100 rounded-2xl p-6 shadow-sm transition-all duration-300 hover:shadow">
+    <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm transition-all duration-300 hover:shadow">
       {/* Header Info */}
-      <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-50">
+      <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-100">
         <div className="flex items-center gap-2">
-          <div className="p-2 bg-red-50 text-red-600 rounded-xl">
+          <div className="p-2 bg-red-50 text-red-600 rounded-xl border border-red-100">
             <FileText className="h-5 w-5" />
           </div>
           <div>
             <h4 className="font-extrabold text-gray-900 text-sm flex items-center gap-1.5">
               {t('propertyNote.title', 'Ghi Chú Xem Nhà')}
-              <span className="inline-flex items-center gap-0.5 px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded-full font-bold">
+              <span className="inline-flex items-center gap-0.5 px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded-full font-bold border border-gray-200">
                 <Lock className="h-3 w-3" />
                 Cá nhân
               </span>
@@ -133,7 +137,7 @@ export const PropertyNoteSection: React.FC<PropertyNoteSectionProps> = ({ proper
         {lastSaved && !isEditing && (
           <button
             onClick={() => setIsEditing(true)}
-            className="flex items-center gap-1 text-xs text-red-600 hover:text-red-700 bg-red-50 px-3 py-1.5 rounded-lg font-bold transition-all duration-200"
+            className="flex items-center gap-1 text-xs text-red-600 hover:text-red-700 bg-red-50 border border-red-100 px-3 py-1.5 rounded-lg font-bold transition-all duration-200"
           >
             <Edit3 className="h-3.5 w-3.5" />
             Sửa
@@ -152,8 +156,8 @@ export const PropertyNoteSection: React.FC<PropertyNoteSectionProps> = ({ proper
               <textarea
                 value={noteContent}
                 onChange={(e) => setNoteContent(e.target.value)}
-                placeholder={t('propertyNote.placeholder', 'Ví dụ: Hướng nhà mát mẻ, khu dân cư an ninh, cần đàm phán giảm giá thêm khoảng 100tr...')}
-                className="w-full h-32 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none text-gray-900 text-sm font-medium transition-all resize-none"
+                placeholder={t('propertyNote.placeholder', 'Ví dụ: Hướng nhà mát, khu dân cư an ninh, cần đàm phán giá...')}
+                className="w-full h-32 px-4 py-3 border border-gray-200 bg-white rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none text-gray-900 placeholder:text-gray-400 text-sm font-medium transition-all resize-none"
               />
               
               <div className="flex items-center justify-between gap-3">
@@ -220,3 +224,5 @@ export const PropertyNoteSection: React.FC<PropertyNoteSectionProps> = ({ proper
     </div>
   );
 };
+
+

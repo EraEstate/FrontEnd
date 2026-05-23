@@ -15,7 +15,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { aiListingAPI } from '../api/aiListing';
-import { extractErrorMessage } from '../utils/errorUtils';
+import { extractErrorMessage } from '../utils/errorParser';
 
 interface AIMarketingHubProps {
   propertyId: string;

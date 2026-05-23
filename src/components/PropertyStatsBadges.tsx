@@ -44,27 +44,27 @@ export const PropertyStatsBadges: React.FC<PropertyStatsBadgesProps> = ({ stats,
       variants={containerVariants}
       initial="hidden"
       animate="show"
-      className="flex flex-wrap gap-3 my-4"
+      className="flex flex-wrap gap-3 my-2"
     >
       {/* Days On Market Badge */}
       <motion.div 
         variants={itemVariants}
-        className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 text-blue-700 dark:text-blue-400 rounded-xl text-xs font-semibold border border-blue-100/50 dark:border-blue-900/30 shadow-sm transition-all hover:scale-105"
+        className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 text-slate-700 rounded-xl text-xs font-bold border border-slate-200/60 shadow-sm transition-all hover:scale-105"
       >
-        <Calendar size={14} className="animate-pulse" />
+        <Calendar size={14} className="text-slate-500" />
         <span>
-          {t('propertyHistory.daysOnMarket', 'Days Listed')}: {stats.daysOnMarket} {t('propertyHistory.days', 'days')}
+          {t('propertyHistory.daysOnMarket', 'Days Listed')}: {stats.daysOnMarket} {t('propertyHistory.days', 'ngày')}
         </span>
       </motion.div>
 
       {/* Price Change Count Badge */}
       <motion.div 
         variants={itemVariants}
-        className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-purple-50 to-fuchsia-50 dark:from-purple-950/30 dark:to-fuchsia-950/30 text-purple-700 dark:text-purple-400 rounded-xl text-xs font-semibold border border-purple-100/50 dark:border-purple-900/30 shadow-sm transition-all hover:scale-105"
+        className="flex items-center gap-2 px-3 py-1.5 bg-red-50 text-red-600 rounded-xl text-xs font-bold border border-red-100/60 shadow-sm transition-all hover:scale-105"
       >
-        <Clock size={14} />
+        <Clock size={14} className="text-red-500" />
         <span>
-          {t('propertyHistory.priceChanges', 'Price Changes')}: {stats.priceChangeCount}
+          {t('propertyHistory.priceChanges', 'Biến động giá')}: {stats.priceChangeCount}
         </span>
       </motion.div>
 
@@ -72,11 +72,11 @@ export const PropertyStatsBadges: React.FC<PropertyStatsBadgesProps> = ({ stats,
       {stats.isDiscounted && stats.discountPercentage > 0 && (
         <motion.div 
           variants={itemVariants}
-          className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 text-emerald-700 dark:text-emerald-400 rounded-xl text-xs font-semibold border border-emerald-100/50 dark:border-emerald-900/30 shadow-sm transition-all hover:scale-105"
+          className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-xl text-xs font-bold border border-emerald-100/60 shadow-sm transition-all hover:scale-105"
         >
-          <TrendingDown size={14} className="text-emerald-500" />
+          <TrendingDown size={14} className="text-emerald-600" />
           <span>
-            {t('propertyHistory.discount', 'Price Drop')}: -{stats.discountPercentage}%
+            {t('propertyHistory.discount', 'Giảm giá')}: -{stats.discountPercentage}%
           </span>
         </motion.div>
       )}

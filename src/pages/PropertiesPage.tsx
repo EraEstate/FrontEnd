@@ -625,6 +625,30 @@ const PropertyListItem: React.FC<{
     return price.toLocaleString();
   };
 
+  const contactName =
+    property.agent?.user?.fullName ||
+    property.user?.fullName ||
+    property.owner?.fullName ||
+    (property as any).agentName ||
+    (property as any).ownerName ||
+    t('properties.details.owner');
+
+  const rawContactPhone =
+    property.agent?.user?.phoneNumber ||
+    property.agent?.user?.phone ||
+    property.user?.phoneNumber ||
+    property.user?.phone ||
+    property.owner?.phoneNumber ||
+    property.owner?.phone ||
+    (property as any).phoneNumber ||
+    (property as any).phone ||
+    '';
+
+  const contactPhone = typeof rawContactPhone === 'string'
+    ? rawContactPhone.replace(/[^\d+]/g, '')
+    : '';
+  const canContact = contactPhone.length >= 8;
+
   // Get primary image or first image - handle multiple possible structures
   // PropertyResponse has: mainImageUrl, propertyImages (array), or images (array)
   // PropertyImageResponse has: imageUrl, isPrimary (or isMain)
@@ -800,19 +824,47 @@ const PropertyListItem: React.FC<{
               <User className="h-4 w-4 text-red-600" />
             </div>
             <div>
-              <span className="text-sm font-semibold text-gray-900 block">{property.agent?.user?.fullName || property.user?.fullName || t('properties.details.owner')}</span>
+              <span className="text-sm font-semibold text-gray-900 block">{contactName}</span>
               <span className="text-xs text-gray-500 font-medium">Đăng {property.createdAt ? new Date(property.createdAt).toLocaleDateString('vi-VN') : new Date().toLocaleDateString('vi-VN')}</span>
             </div>
           </div>
           
           <div className="flex gap-2">
-            <button className="flex items-center gap-1.5 px-4 py-2 bg-red-50 text-red-600 text-sm font-semibold rounded-lg hover:bg-red-100 transition-colors">
+            <a
+              href={canContact ? `tel:${contactPhone}` : undefined}
+              aria-disabled={!canContact}
+              onClick={(e) => {
+                if (!canContact) {
+                  e.preventDefault();
+                  showWarning('Tin đăng này chưa có số điện thoại liên hệ');
+                }
+              }}
+              className={`flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${
+                canContact
+                  ? 'bg-red-50 text-red-600 hover:bg-red-100'
+                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              }`}
+            >
               <Phone className="h-4 w-4" />
               <span className="hidden sm:inline">Gọi điện</span>
-            </button>
-            <button className="flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 text-gray-700 text-sm font-semibold rounded-lg hover:border-gray-300 hover:bg-gray-50 transition-colors">
+            </a>
+            <a
+              href={canContact ? `sms:${contactPhone}` : undefined}
+              aria-disabled={!canContact}
+              onClick={(e) => {
+                if (!canContact) {
+                  e.preventDefault();
+                  showWarning('Tin đăng này chưa có số điện thoại liên hệ');
+                }
+              }}
+              className={`flex items-center gap-1.5 px-4 py-2 border text-sm font-semibold rounded-lg transition-colors ${
+                canContact
+                  ? 'bg-white border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50'
+                  : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
+              }`}
+            >
               Nhắn tin
-            </button>
+            </a>
           </div>
         </div>
       </div>

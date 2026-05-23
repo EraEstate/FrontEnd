@@ -42,7 +42,7 @@ const MyNotesPage: React.FC = () => {
       const notesWithProperties = await Promise.all(
         data.map(async (note) => {
           try {
-            const property = await propertyAPI.getPropertyById(note.propertyId.toString());
+            const property = await propertyAPI.getById(note.propertyId.toString());
             return { ...note, property };
           } catch {
             return note;

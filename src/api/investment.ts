@@ -3,7 +3,7 @@ import type { InvestmentCalculationRequest, InvestmentCalculationResponse } from
 
 export const investmentAPI = {
   calculate: async (data: InvestmentCalculationRequest): Promise<InvestmentCalculationResponse> => {
-    const response = await api.post<InvestmentCalculationResponse>('/api/investment/calculate', data);
+    const response = await api.post<InvestmentCalculationResponse>('/investment/calculate', data);
     return response.data;
   }
 };

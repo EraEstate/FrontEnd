@@ -6,9 +6,9 @@ import {
   connectWebSocket, 
   disconnectWebSocket, 
   subscribeToCoViewing, 
-  sendCoViewingState,
-  CoViewingPayload
+  sendCoViewingState
 } from '../services/websocket';
+import type { CoViewingPayload } from '../services/websocket';
 import { ReactPhotoSphereViewer } from 'react-photo-sphere-viewer';
 import { 
   Users, 
@@ -72,7 +72,7 @@ export const CoViewingPage: React.FC = () => {
       return;
     }
     setLoading(true);
-    propertyAPI.get(propertyId)
+    propertyAPI.getById(propertyId)
       .then((res) => {
         setProperty(res);
       })

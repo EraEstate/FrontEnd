@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { environmentalAPI } from '../api';
 import type { EnvironmentalQualityResponse } from '../api/types';
-import { extractErrorMessage } from '../utils/errorUtils';
+import { extractErrorMessage } from '../utils/errorParser';
 
 interface EnvironmentalQualityWidgetProps {
   propertyId: string;

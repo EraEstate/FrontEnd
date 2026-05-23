@@ -43,8 +43,76 @@ export const useApi = <T>(apiCall: () => Promise<T>, dependencies: any[] = []) =
 };
 
 // Property hooks
+const PROPERTIES_CACHE_PREFIX = 'properties-cache:v1:';
+
+const stableStringify = (value: unknown): string => {
+  if (value === null || typeof value !== 'object') {
+    return JSON.stringify(value);
+  }
+
+  if (Array.isArray(value)) {
+    return `[${value.map(stableStringify).join(',')}]`;
+  }
+
+  const entries = Object.entries(value as Record<string, unknown>)
+    .filter(([, v]) => v !== undefined)
+    .sort(([a], [b]) => a.localeCompare(b));
+
+  return `{${entries
+    .map(([k, v]) => `${JSON.stringify(k)}:${stableStringify(v)}`)
+    .join(',')}}`;
+};
+
+const getPropertiesCacheKey = (params?: unknown): string =>
+  `${PROPERTIES_CACHE_PREFIX}${stableStringify(params ?? {})}`;
+
 export const useProperties = (params?: any) => {
-  return useApi(() => propertyAPI.search(params), [JSON.stringify(params)]);
+  const cacheKey = getPropertiesCacheKey(params);
+  const [data, setData] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = async (forceRefresh = false) => {
+    const shouldUseCache = !forceRefresh;
+
+    if (shouldUseCache) {
+      const cachedRaw = sessionStorage.getItem(cacheKey);
+      if (cachedRaw) {
+        try {
+          const cachedData = JSON.parse(cachedRaw);
+          setData(cachedData);
+          setLoading(false);
+          setError(null);
+          return;
+        } catch {
+          sessionStorage.removeItem(cacheKey);
+        }
+      }
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      const result = await propertyAPI.search(params);
+      setData(result);
+      sessionStorage.setItem(cacheKey, JSON.stringify(result));
+    } catch (err: any) {
+      setError(err.response?.data?.message || err.message || 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData(false);
+  }, [cacheKey]);
+
+  return {
+    data,
+    loading,
+    error,
+    refetch: () => fetchData(true),
+  };
 };
 
 export const useProperty = (id: string) => {

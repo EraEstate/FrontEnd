@@ -4,23 +4,23 @@ import { FileText, ShieldCheck, SearchCheck, Landmark } from 'lucide-react';
 const tips = [
   {
     icon: FileText,
-    title: 'Kiem tra hop dong',
-    description: 'Doc ky dieu khoan gia han, boi thuong, va dieu kien cham dut.',
+    title: 'Kiểm tra hợp đồng',
+    description: 'Đọc kỹ điều khoản gia hạn, bồi thường, và điều kiện chấm dứt.',
   },
   {
     icon: ShieldCheck,
-    title: 'Dat coc an toan',
-    description: 'Giao dich dat coc can bien nhan, thong tin chu nha va dieu kien hoan coc.',
+    title: 'Đặt cọc an toàn',
+    description: 'Giao dịch đặt cọc cần biên nhận, thông tin chủ nhà và điều kiện hoàn cọc.',
   },
   {
     icon: SearchCheck,
-    title: 'Kiem tra nha truoc khi thue',
-    description: 'Thu dien, nuoc, internet, PCCC va chup anh hien trang truoc ban giao.',
+    title: 'Kiểm tra nhà trước khi thuê',
+    description: 'Thử điện, nước, internet, PCCC và chụp ảnh hiện trạng trước bàn giao.',
   },
   {
     icon: Landmark,
-    title: 'Quyen loi nguoi thue',
-    description: 'Nam ro quyen sua chua, bao tri va tra nha dung han theo hop dong.',
+    title: 'Quyền lợi người thuê',
+    description: 'Nắm rõ quyền sửa chữa, bảo trì và trả nhà đúng hạn theo hợp đồng.',
   },
 ];
 
@@ -28,7 +28,7 @@ const RentTipsSection: React.FC = () => {
   return (
     <section className="bg-white py-12">
       <div className="mx-auto max-w-7xl px-4">
-        <h2 className="text-2xl font-semibold text-gray-900">Kinh nghiem thue nha</h2>
+        <h2 className="text-2xl font-semibold text-gray-900">Kinh nghiệm thuê nhà</h2>
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           {tips.map((tip) => (
             <div key={tip.title} className="rounded-2xl border border-red-100 bg-red-50/30 p-5">
