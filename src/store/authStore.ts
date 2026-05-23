@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+﻿import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { User, LoginForm, RegisterForm } from '../types';
 import { authAPI } from '../api/auth';
@@ -22,7 +22,6 @@ interface AuthState {
   initializeAuth: () => void;
 }
 
-// Helper function to check if user is authenticated
 const checkIsAuthenticated = (user: User | null, token: string | null): boolean => {
   return !!(user && token);
 };
@@ -51,18 +50,11 @@ export const useAuthStore = create<AuthState>()(
           });
           logger.info('Login success:', user?.email);
           showSuccess('Đăng nhập thành công!');
-          
-          // Manual localStorage save as backup
           localStorage.setItem('jwt', token);
         } catch (error: any) {
-          // Backend có thể trả về error hoặc message
           const errorMessage = extractErrorMessage(error, 'Đăng nhập thất bại');
           logger.debug('Login failed:', errorMessage);
-          
-          set({
-            error: errorMessage,
-            isLoading: false,
-          });
+          set({ error: errorMessage, isLoading: false });
           showError(errorMessage);
           throw error;
         }
@@ -83,10 +75,7 @@ export const useAuthStore = create<AuthState>()(
           showSuccess('Đăng ký tài khoản thành công!');
         } catch (error: any) {
           const errorMessage = extractErrorMessage(error, 'Đăng ký thất bại');
-          set({
-            error: errorMessage,
-            isLoading: false,
-          });
+          set({ error: errorMessage, isLoading: false });
           showError(errorMessage);
           throw error;
         }
@@ -107,26 +96,26 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: async () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('auth-storage');
+        localStorage.removeItem('auth-storage:v1');
+        localStorage.removeItem('jwt');
+
+        set({
+          user: null,
+          token: null,
+          refreshToken: null,
+          isAuthenticated: false,
+          error: null,
+        });
+
+        showSuccess('Đăng xuất thành công!');
+        window.location.href = '/';
+
         try {
-          // Gọi API logout
           await authAPI.logout();
         } catch (error) {
           logger.warn('Logout API call failed:', error);
-        } finally {
-          // Clear localStorage
-          localStorage.removeItem('token');
-          localStorage.removeItem('auth-storage');
-          
-          set({
-            user: null,
-            token: null,
-            refreshToken: null,
-            isAuthenticated: false,
-            error: null,
-          });
-          
-          // Redirect to login page
-          window.location.href = '/login';
         }
       },
 
@@ -134,26 +123,18 @@ export const useAuthStore = create<AuthState>()(
 
       updateUser: (user) => {
         const state = get();
-        set({ 
-          user,
-          isAuthenticated: checkIsAuthenticated(user, state.token)
-        });
+        set({ user, isAuthenticated: checkIsAuthenticated(user, state.token) });
       },
 
-      // Initialize auth state from persisted data
       initializeAuth: () => {
         const state = get();
         const isAuthenticated = checkIsAuthenticated(state.user, state.token);
-        
         logger.debug('Auth init:', { hasUser: !!state.user, hasToken: !!state.token, isAuthenticated });
-        
-        set({
-          isAuthenticated
-        });
+        set({ isAuthenticated });
       },
     }),
     {
-      name: 'auth-storage',
+      name: 'auth-storage:v1',
       partialize: (state) => ({
         user: state.user,
         token: state.token,

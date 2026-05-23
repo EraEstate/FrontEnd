@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { adminAPI } from '../api/admin';
 import { propertyAPI } from '../api/property';
@@ -12,7 +11,6 @@ import AdminContentRouter from './admin/AdminContentRouter';
 
 const AdminDashboardContent: React.FC = () => {
   const { theme, resetTheme } = useAdminTheme();
-  const navigate = useNavigate();
   const logout = useAuthStore(state => state.logout);
   const [currentView, setCurrentView] = useState<AdminView>('overview');
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -105,7 +103,6 @@ const AdminDashboardContent: React.FC = () => {
   const handleLogout = () => {
     resetTheme();
     logout();
-    navigate('/login');
   };
 
   const handleMenuClick = (view: AdminView) => {

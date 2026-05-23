@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { staffDashboardAPI } from '../api/staffDashboard';
 import toast from '../utils/toast';
@@ -12,7 +11,6 @@ import StaffContentRouter from './staff/StaffContentRouter';
 const StaffDashboardContent: React.FC = () => {
   const { theme, resetTheme } = useAdminTheme();
   const { logout } = useAuthStore();
-  const navigate = useNavigate();
   const [currentView, setCurrentView] = useState<StaffView>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -45,7 +43,6 @@ const StaffDashboardContent: React.FC = () => {
   const handleLogout = () => {
     resetTheme();
     logout();
-    navigate('/login');
   };
 
   const handleMenuClick = (view: StaffView) => {

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 
 import { useTranslation } from 'react-i18next';
@@ -10,7 +9,6 @@ import UserContentRouter from './UserContentRouter';
 
 const UserDashboardLayout: React.FC = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const logout = useAuthStore(state => state.logout);
   const [currentView, setCurrentView] = useState<UserView>('overview');
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -18,7 +16,6 @@ const UserDashboardLayout: React.FC = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
   };
 
   const handleMenuClick = (view: UserView) => {
