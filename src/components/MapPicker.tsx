@@ -255,7 +255,7 @@ const MapPicker: React.FC<MapPickerProps> = ({ isOpen, onClose, onSelectLocation
               {!searchQuery && !selectedProvince && (
                 <>
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">🏙️ {t('mapPicker.provincesList')}</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                     {provinces.map((province) => (
                   <button
                         key={province.name}
@@ -293,7 +293,7 @@ const MapPicker: React.FC<MapPickerProps> = ({ isOpen, onClose, onSelectLocation
                       ← {t('common.back')}
                     </button>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {getDistrictsByProvince(selectedProvince).map((district) => (
                       <button
                         key={district.name}
@@ -336,7 +336,7 @@ const MapPicker: React.FC<MapPickerProps> = ({ isOpen, onClose, onSelectLocation
                   {/* Wards */}
                   <div className="mb-6">
                     <h4 className="text-sm font-semibold text-gray-700 mb-3">📍 {t('mapPicker.wards')}</h4>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {getWardsByDistrict(selectedDistrict).map((ward) => (
                   <button
                           key={ward.name}
@@ -447,14 +447,14 @@ const MapPicker: React.FC<MapPickerProps> = ({ isOpen, onClose, onSelectLocation
 
         {/* Footer with Selected Location */}
         {selectedLocation && (
-          <div className="p-6 border-t border-gray-200 bg-white flex items-center justify-between">
-            <div>
+          <div className="p-6 border-t border-gray-200 bg-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="min-w-0 flex-1">
               <p className="text-xs text-gray-500 mb-1">📍 {t('mapPicker.selectedLocation')}</p>
-              <p className="font-bold text-gray-900 text-lg">{selectedLocation.address}</p>
+              <p className="font-bold text-gray-900 text-base sm:text-lg break-words leading-tight">{selectedLocation.address}</p>
             </div>
             <button
               onClick={handleConfirm}
-              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-3 rounded-xl font-bold transition-all duration-200 shadow-lg hover:shadow-xl"
+              className="w-full sm:w-auto bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-3 rounded-xl font-bold transition-all duration-200 shadow-lg hover:shadow-xl text-center whitespace-nowrap"
             >
               {t('common.confirm')}
             </button>

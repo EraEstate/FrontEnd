@@ -20,14 +20,14 @@ const QuickContactWidget: React.FC = () => {
   };
 
   return (
-    <div className="fixed bottom-24 right-6 z-50">
+    <div className="fixed bottom-20 sm:bottom-24 right-4 sm:right-6 z-50">
       <AnimatePresence>
         {open && (
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 16 }}
-            className="mb-3 w-80 rounded-2xl border border-white/30 bg-white/90 p-4 shadow-xl backdrop-blur"
+            className="mb-3 w-[calc(100vw-2rem)] sm:w-80 rounded-2xl border border-white/30 bg-white/90 p-4 shadow-xl backdrop-blur"
           >
             <div className="mb-3 flex items-center justify-between">
               <h3 className="text-sm font-semibold text-gray-900">Lien he nhanh</h3>

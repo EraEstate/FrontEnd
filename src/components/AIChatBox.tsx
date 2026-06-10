@@ -248,8 +248,10 @@ const AIChatBox: React.FC<AIChatBoxProps> = ({
       {/* Chat Box (Controlled by FloatingActionHub) */}
       {isOpen && (
         <div
-          className={`fixed bottom-6 right-6 bg-white/95 backdrop-blur-md rounded-2xl shadow-[0_8px_40px_rgb(0,0,0,0.12)] border border-gray-200 z-50 flex flex-col transition-all duration-300 overflow-hidden ${
-            isMinimized ? 'w-80 h-16' : 'w-96 h-[600px]'
+          className={`fixed bottom-4 sm:bottom-6 right-4 sm:right-6 bg-white/95 backdrop-blur-md rounded-2xl shadow-[0_8px_40px_rgb(0,0,0,0.12)] border border-gray-200 z-50 flex flex-col transition-all duration-300 overflow-hidden ${
+            isMinimized 
+              ? 'w-[calc(100vw-2rem)] sm:w-80 h-16' 
+              : 'w-[calc(100vw-2rem)] sm:w-96 h-[500px] sm:h-[600px] max-h-[calc(100vh-6rem)]'
           }`}
         >
           <div className={`bg-gradient-to-r from-red-600/95 to-red-700/95 backdrop-blur-md text-white p-4 flex items-center justify-between transition-all duration-300 ${isMinimized ? '' : 'shadow-lg border-b border-red-800/20'}`}>

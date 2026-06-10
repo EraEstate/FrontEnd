@@ -30,7 +30,7 @@ const FloatingActionHub: React.FC = () => {
   return (
     <>
       {/* Container for the Action Hub */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+      <div className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50 flex flex-col items-end gap-3">
         {/* Expanded Menu Options */}
         {isMenuOpen && (
           <div className="flex flex-col items-end gap-3 mb-2 animate-fade-in-up">

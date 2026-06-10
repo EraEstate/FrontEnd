@@ -547,7 +547,7 @@ const HomePage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section với Banner Background và Search Bar */}
-      <section className="relative h-96 md:h-[500px] lg:h-[600px] overflow-hidden">
+      <section className="relative min-h-[420px] h-auto py-12 md:py-0 md:h-[500px] lg:h-[600px] flex items-center overflow-hidden">
         {/* Background Banner Slider Optimized */}
         <div className="absolute inset-0 bg-gray-900">
           <AnimatePresence initial={false}>
@@ -600,23 +600,23 @@ const HomePage: React.FC = () => {
         </button>
 
         {/* Content overlay với Search */}
-        <div className="relative z-20 h-full flex flex-col justify-center">
-          <div className="max-w-7xl mx-auto px-6 lg:px-12 w-full">
+        <div className="relative z-20 w-full flex flex-col justify-center">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 w-full">
             {/* Hero Title */}
-            <div className="text-center text-white mb-8">
-              <h1 className="text-3xl md:text-5xl lg:text-6xl font-semibold mb-4 leading-tight">
+            <div className="text-center text-white mb-4 md:mb-8 mt-12 md:mt-0">
+              <h1 className="text-2xl md:text-5xl lg:text-6xl font-semibold mb-2 md:mb-4 leading-tight">
                 {t("home.hero.title")}
               </h1>
-              <p className="text-lg md:text-xl opacity-90 max-w-2xl mx-auto">
+              <p className="text-xs md:text-xl opacity-90 max-w-2xl mx-auto">
                 {t("home.hero.subtitle")}
               </p>
             </div>
 
             {/* Tab Navigation */}
-            <div className="flex justify-center gap-x-1 mb-6">
+            <div className="flex justify-center gap-x-1 mb-4 md:mb-6">
               <button
                 onClick={() => setActiveTab("sale")}
-                className={`px-6 py-3 rounded-t-lg font-bold transition-all duration-200 shadow-lg ${
+                className={`px-3 py-1.5 sm:px-6 sm:py-3 rounded-t-lg font-bold text-xs sm:text-base transition-all duration-200 shadow-lg ${
                   activeTab === "sale"
                     ? "bg-white text-red-600 shadow-xl"
                     : "bg-gray-950 bg-opacity-30 text-white hover:bg-opacity-40 hover:shadow-lg"
@@ -626,7 +626,7 @@ const HomePage: React.FC = () => {
               </button>
               <button
                 onClick={() => setActiveTab("rent")}
-                className={`px-6 py-3 rounded-t-lg font-bold transition-all duration-200 shadow-lg ${
+                className={`px-3 py-1.5 sm:px-6 sm:py-3 rounded-t-lg font-bold text-xs sm:text-base transition-all duration-200 shadow-lg ${
                   activeTab === "rent"
                     ? "bg-white text-red-600 shadow-xl"
                     : "bg-gray-950 bg-opacity-30 text-white hover:bg-opacity-40 hover:shadow-lg"
@@ -636,7 +636,7 @@ const HomePage: React.FC = () => {
               </button>
               <button
                 onClick={() => setActiveTab("project")}
-                className={`px-6 py-3 rounded-t-lg font-bold transition-all duration-200 shadow-lg ${
+                className={`px-3 py-1.5 sm:px-6 sm:py-3 rounded-t-lg font-bold text-xs sm:text-base transition-all duration-200 shadow-lg ${
                   activeTab === "project"
                     ? "bg-white text-red-600 shadow-xl"
                     : "bg-gray-950 bg-opacity-30 text-white hover:bg-opacity-40 hover:shadow-lg"
@@ -648,23 +648,23 @@ const HomePage: React.FC = () => {
 
             {/* Simple 2-Button Search */}
             <div className="max-w-3xl mx-auto">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                 {/* Map Button - Large and Beautiful */}
                 <button
                   type="button"
                   onClick={() => setIsMapPickerOpen(true)}
-                  className="group relative bg-white rounded-2xl p-8 card-hover border border-gray-100 hover:border-blue-200"
+                  className="group relative bg-white rounded-2xl p-4 sm:p-8 card-hover border border-gray-100 hover:border-blue-200"
                   style={{ boxShadow: "var(--shadow-lg)" }}
                 >
-                  <div className="flex flex-col items-center gap-y-4">
-                    <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-full p-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                      <Map className="h-10 w-10 text-white" />
+                  <div className="flex flex-col items-center gap-y-2 sm:gap-y-4">
+                    <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-full p-3 sm:p-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                      <Map className="h-6 w-6 sm:h-10 sm:w-10 text-white" />
                     </div>
                     <div className="text-center">
-                      <h3 className="text-2xl font-semibold text-gray-900 mb-2">
+                      <h3 className="text-base sm:text-2xl font-semibold text-gray-900 mb-1 sm:mb-2">
                         {t("home.search.viewMap")}
                       </h3>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-[11px] sm:text-sm text-gray-500">
                         {t("home.search.viewMapDesc")}
                       </p>
                     </div>
@@ -676,18 +676,18 @@ const HomePage: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleSearch}
-                  className="group relative bg-white rounded-2xl p-8 card-hover border border-gray-100 hover:border-red-200"
+                  className="group relative bg-white rounded-2xl p-4 sm:p-8 card-hover border border-gray-100 hover:border-red-200"
                   style={{ boxShadow: "var(--shadow-lg)" }}
                 >
-                  <div className="flex flex-col items-center gap-y-4">
-                    <div className="bg-gradient-to-br from-red-500 to-red-600 rounded-full p-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                      <Search className="h-10 w-10 text-white" />
+                  <div className="flex flex-col items-center gap-y-2 sm:gap-y-4">
+                    <div className="bg-gradient-to-br from-red-500 to-red-600 rounded-full p-3 sm:p-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                      <Search className="h-6 w-6 sm:h-10 sm:w-10 text-white" />
                     </div>
                     <div className="text-center">
-                      <h3 className="text-2xl font-semibold text-gray-900 mb-2">
+                      <h3 className="text-base sm:text-2xl font-semibold text-gray-900 mb-1 sm:mb-2">
                         {t("home.search.searchTitle")}
                       </h3>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-[11px] sm:text-sm text-gray-500">
                         {t("home.search.searchDesc")}
                       </p>
                     </div>

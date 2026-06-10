@@ -44,34 +44,36 @@ const CompareFloatingBar: React.FC = () => {
       </div>
 
       {/* Content */}
-      <div className="px-6 py-4 flex items-center gap-4 overflow-x-auto">
-        {compareList.map((property) => (
-          <div key={property.id} className="relative flex-shrink-0 w-48 border border-gray-100 rounded-xl overflow-hidden bg-white/80 backdrop-blur-sm card-hover group">
-            <button
-              onClick={() => removeProperty(property.id)}
-              className="absolute top-2 right-2 glass text-[#1f2937] p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 z-10 hover:bg-red-600 hover:text-white hover:scale-110 shadow-sm"
-            >
-              <X className="w-3 h-3" />
-            </button>
-            <div className="h-24 bg-cover bg-center group-hover:scale-105 transition-transform duration-500" style={{ backgroundImage: `url(${getImageUrl(property.imageUrl) || getImagePlaceholder(200, 150)})` }} />
-            <div className="p-3">
-              <p className="text-xs font-semibold text-gray-900 line-clamp-1">{property.title}</p>
-              <p className="text-sm font-bold text-red-600 mt-1">
-                {property.price >= 1000000000 ? `${(property.price / 1000000000).toFixed(1)} tỷ` : 
-                 property.price >= 1000000 ? `${(property.price / 1000000).toFixed(0)} triệu` : 
-                 property.price?.toLocaleString('vi-VN')}
-              </p>
+      <div className="px-4 py-4 flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="flex items-center gap-4 overflow-x-auto flex-1 min-w-0 pb-1">
+          {compareList.map((property) => (
+            <div key={property.id} className="relative flex-shrink-0 w-48 border border-gray-100 rounded-xl overflow-hidden bg-white/80 backdrop-blur-sm card-hover group">
+              <button
+                onClick={() => removeProperty(property.id)}
+                className="absolute top-2 right-2 glass text-[#1f2937] p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 z-10 hover:bg-red-600 hover:text-white hover:scale-110 shadow-sm"
+              >
+                <X className="w-3 h-3" />
+              </button>
+              <div className="h-24 bg-cover bg-center group-hover:scale-105 transition-transform duration-500" style={{ backgroundImage: `url(${getImageUrl(property.imageUrl) || getImagePlaceholder(200, 150)})` }} />
+              <div className="p-3">
+                <p className="text-xs font-semibold text-gray-900 line-clamp-1">{property.title}</p>
+                <p className="text-sm font-bold text-red-600 mt-1">
+                  {property.price >= 1000000000 ? `${(property.price / 1000000000).toFixed(1)} tỷ` : 
+                   property.price >= 1000000 ? `${(property.price / 1000000).toFixed(0)} triệu` : 
+                   property.price?.toLocaleString('vi-VN')}
+                </p>
+              </div>
             </div>
-          </div>
-        ))}
-        
-        {['empty-0', 'empty-1', 'empty-2', 'empty-3'].slice(0, 4 - compareList.length).map((uniqueKey) => (
-          <div key={uniqueKey} className="flex-shrink-0 w-48 h-[142px] border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center bg-gray-50/50 text-gray-400">
-            <span className="text-sm">Thêm BDS</span>
-          </div>
-        ))}
+          ))}
+          
+          {['empty-0', 'empty-1', 'empty-2', 'empty-3'].slice(0, 4 - compareList.length).map((uniqueKey) => (
+            <div key={uniqueKey} className="flex-shrink-0 w-48 h-[142px] border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center bg-gray-50/50 text-gray-400">
+              <span className="text-sm">Thêm BDS</span>
+            </div>
+          ))}
+        </div>
 
-        <div className="ml-auto pl-4 border-l border-gray-200">
+        <div className="border-t sm:border-t-0 sm:border-l border-gray-200 pt-3 sm:pt-0 sm:pl-4 flex justify-end flex-shrink-0">
           <button
             onClick={() => {
               if (compareList.length > 1) {
@@ -80,7 +82,7 @@ const CompareFloatingBar: React.FC = () => {
               }
             }}
             disabled={compareList.length < 2}
-            className={`px-6 py-3 rounded-xl font-bold whitespace-nowrap btn-press ${
+            className={`w-full sm:w-auto px-6 py-3 rounded-xl font-bold whitespace-nowrap btn-press text-center ${
               compareList.length > 1 
                 ? 'bg-red-600 text-white hover:bg-red-700 shadow-sm hover:shadow-md' 
                 : 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200'
