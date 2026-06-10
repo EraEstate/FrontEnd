@@ -376,8 +376,8 @@ const MyPropertiesPage = () => {
               ) : (
                 /* List View - Compact */
                 <div key={property.id} className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100">
-                  <div className="flex gap-6">
-                    <div className="relative w-64 h-40 flex-shrink-0 rounded-xl overflow-hidden bg-gray-100">
+                  <div className="flex flex-col md:flex-row gap-6">
+                    <div className="relative w-full md:w-64 h-48 md:h-40 flex-shrink-0 rounded-xl overflow-hidden bg-gray-100">
                       <img
                         src={imageUrl || getImagePlaceholder(300, 200)}
                         alt={property.title}
