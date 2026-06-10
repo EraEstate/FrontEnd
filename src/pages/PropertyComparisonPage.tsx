@@ -284,7 +284,7 @@ const PropertyComparisonPage: React.FC = () => {
               {properties.length > 1 ? (
                 <div className="h-80 w-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>
+                    <RadarChart cx="50%" cy="50%" outerRadius="55%" data={chartData}>
                       <PolarGrid stroke="#e5e7eb" />
                       <PolarAngleAxis dataKey="subject" tick={{ fill: '#4b5563', fontSize: 12, fontWeight: 600 }} />
                       <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />

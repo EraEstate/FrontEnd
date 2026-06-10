@@ -98,9 +98,9 @@ const PropertiesPage: React.FC = () => {
         <div className="w-full px-6 lg:px-12 py-4 max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row items-center gap-4">
             {/* Search Input */}
-            <div className="flex-1 w-full relative">
-              <div className="flex items-center bg-gray-50 border border-gray-200 rounded-full hover:shadow-md hover:border-red-200 transition-all duration-300">
-                <div className="pl-6 pr-2 text-red-600">
+            <div className="flex-1 w-full flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <div className="flex-1 flex items-center bg-gray-50 border border-gray-200 rounded-full hover:shadow-md hover:border-red-200 transition-all duration-300">
+                <div className="pl-4 sm:pl-6 pr-2 text-red-600">
                   <Search className="h-5 w-5" />
                 </div>
                 <input
@@ -108,15 +108,15 @@ const PropertiesPage: React.FC = () => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder={t('properties.search.placeholder')}
-                  className="flex-1 px-4 py-3.5 bg-transparent border-none focus:outline-none text-gray-900 font-medium placeholder-gray-400"
+                  className="flex-1 px-2 sm:px-4 py-2.5 sm:py-3.5 bg-transparent border-none focus:outline-none text-gray-900 font-medium placeholder-gray-400 text-sm sm:text-base"
                 />
-                <button 
-                  onClick={handleSearch}
-                  className="mr-2 px-6 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors flex items-center font-semibold shadow-sm hover:shadow-md"
-                >
-                  {t('properties.search.button')}
-                </button>
               </div>
+              <button 
+                onClick={handleSearch}
+                className="px-6 py-2.5 sm:py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors flex items-center justify-center font-semibold shadow-sm hover:shadow-md text-sm sm:text-base whitespace-nowrap"
+              >
+                {t('properties.search.button')}
+              </button>
             </div>
 
             {/* Map Icon */}
@@ -778,11 +778,11 @@ const PropertyListItem: React.FC<{
       {/* Content Section */}
       <div className="flex-1 p-5 md:p-6 flex flex-col justify-between">
         <div>
-          <div className="flex justify-between items-start mb-3 gap-4">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-3 gap-2 sm:gap-4">
             <Link to={`/properties/${property.id}`} className="font-bold text-lg md:text-xl text-gray-900 line-clamp-2 hover:text-red-600 transition-colors duration-200 flex-1">
               {property.title}
             </Link>
-            <div className="text-right flex-shrink-0">
+            <div className="text-left sm:text-right flex-shrink-0">
               <div className="text-xl md:text-2xl font-extrabold text-red-600">
                 {property.price ? formatPrice(property.price) : t('properties.status.negotiable')}
               </div>

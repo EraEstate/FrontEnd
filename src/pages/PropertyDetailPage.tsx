@@ -536,7 +536,7 @@ const PropertyDetailPage: React.FC = () => {
           <div className="lg:col-span-2 space-y-8">
             {/* Header */}
             <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
-              <div className="flex items-start justify-between mb-4">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
                 <div>
                   <span className={`inline-block px-3 py-1 text-sm font-medium rounded-full text-white mb-3 ${
                     (property.listingType || property.transactionType) === 'SALE' ? 'bg-green-600' : 'bg-blue-600'
@@ -573,7 +573,7 @@ const PropertyDetailPage: React.FC = () => {
                     {property.title}
                   </h1>
                 </div>
-                <div className="text-right">
+                <div className="text-left sm:text-right flex-shrink-0">
                   <div className="text-3xl font-bold text-red-600">
                     {formatPrice(Number(property.price))}
                     {(property.listingType || property.transactionType) === 'RENT' && (
