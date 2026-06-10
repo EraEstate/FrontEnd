@@ -143,14 +143,14 @@ const MyViewingsPage: React.FC = () => {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-2 mb-6 overflow-x-auto pb-1 scrollbar-none">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             return (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 flex-shrink-0 ${
                   activeTab === tab.key
                     ? 'bg-blue-600 text-white shadow-lg'
                     : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
@@ -195,9 +195,9 @@ const MyViewingsPage: React.FC = () => {
                   key={viewing.id}
                   className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow"
                 >
-                  <div className="flex items-start gap-4">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     {/* Property info */}
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 w-full">
                       <div className="flex items-center gap-2 mb-2">
                         <span
                           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${badge.color}`}
@@ -222,7 +222,7 @@ const MyViewingsPage: React.FC = () => {
                         </Link>
                       )}
 
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-600">
                         <span className="flex items-center gap-1.5">
                           <Calendar className="w-4 h-4 text-blue-500" />
                           {parseLocalDate(viewing.viewingDate).toLocaleDateString('vi-VN', {
@@ -257,12 +257,12 @@ const MyViewingsPage: React.FC = () => {
 
                     {/* Actions */}
                     {activeTab === 'upcoming' && (
-                      <div className="flex flex-col gap-2 flex-shrink-0">
+                      <div className="flex flex-row md:flex-col gap-2 w-full md:w-auto md:flex-shrink-0 justify-end pt-3 md:pt-0 border-t border-gray-50 md:border-none">
                         {viewing.status === 'PENDING' && isOwner && (
                           <button
                             onClick={() => handleConfirm(viewing.id)}
                             disabled={actionLoading === viewing.id}
-                            className="flex items-center gap-1.5 px-3 py-2 bg-emerald-600 text-white rounded-xl text-xs font-semibold hover:bg-emerald-700 disabled:opacity-50 transition-colors"
+                            className="flex items-center justify-center gap-1.5 px-3 py-2 bg-emerald-600 text-white rounded-xl text-xs font-semibold hover:bg-emerald-700 disabled:opacity-50 transition-colors flex-1 md:flex-none"
                           >
                             {actionLoading === viewing.id ? (
                               <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -275,7 +275,7 @@ const MyViewingsPage: React.FC = () => {
                         <button
                           onClick={() => handleCancel(viewing.id)}
                           disabled={actionLoading === viewing.id}
-                          className="flex items-center gap-1.5 px-3 py-2 border border-red-200 text-red-600 rounded-xl text-xs font-semibold hover:bg-red-50 disabled:opacity-50 transition-colors"
+                          className="flex items-center justify-center gap-1.5 px-3 py-2 border border-red-200 text-red-600 rounded-xl text-xs font-semibold hover:bg-red-50 disabled:opacity-50 transition-colors flex-1 md:flex-none"
                         >
                           <X className="w-3.5 h-3.5" />
                           Hủy lịch

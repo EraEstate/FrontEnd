@@ -243,7 +243,7 @@ const SavedSearchesPage: React.FC = () => {
                     </div>
 
                     {/* Action Controls */}
-                    <div className="flex flex-wrap items-center gap-4 border-t md:border-t-0 pt-4 md:pt-0 border-gray-100">
+                    <div className="flex flex-row flex-wrap items-center justify-between sm:justify-end gap-3 border-t md:border-t-0 pt-4 md:pt-0 border-gray-100 w-full md:w-auto">
                       {/* Frequency Selection */}
                       <div className="flex items-center gap-1.5 bg-gray-100 p-1 rounded-xl">
                         {[
@@ -266,29 +266,31 @@ const SavedSearchesPage: React.FC = () => {
                         ))}
                       </div>
 
-                      {/* Active Status Switch */}
-                      <button
-                        onClick={() => handleToggleActive(search.id, search.isActive)}
-                        disabled={updatingId === search.id}
-                        className="text-gray-500 hover:text-red-600 transition-colors p-1.5 hover:bg-gray-50 rounded-xl"
-                        title={search.isActive ? 'Tạm dừng cảnh báo' : 'Kích hoạt cảnh báo'}
-                      >
-                        {search.isActive ? (
-                          <ToggleRight className="h-8 w-8 text-red-600" />
-                        ) : (
-                          <ToggleLeft className="h-8 w-8 text-gray-400" />
-                        )}
-                      </button>
+                      <div className="flex items-center gap-2">
+                        {/* Active Status Switch */}
+                        <button
+                          onClick={() => handleToggleActive(search.id, search.isActive)}
+                          disabled={updatingId === search.id}
+                          className="text-gray-500 hover:text-red-600 transition-colors p-1.5 hover:bg-gray-50 rounded-xl"
+                          title={search.isActive ? 'Tạm dừng cảnh báo' : 'Kích hoạt cảnh báo'}
+                        >
+                          {search.isActive ? (
+                            <ToggleRight className="h-8 w-8 text-red-600" />
+                          ) : (
+                            <ToggleLeft className="h-8 w-8 text-gray-400" />
+                          )}
+                        </button>
 
-                      {/* Delete Button */}
-                      <button
-                        onClick={() => handleDelete(search.id)}
-                        disabled={updatingId === search.id}
-                        className="p-2.5 border border-gray-200 hover:border-red-200 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
-                        title="Xóa tìm kiếm này"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
+                        {/* Delete Button */}
+                        <button
+                          onClick={() => handleDelete(search.id)}
+                          disabled={updatingId === search.id}
+                          className="p-2.5 border border-gray-200 hover:border-red-200 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
+                          title="Xóa tìm kiếm này"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </motion.div>
