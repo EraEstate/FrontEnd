@@ -285,7 +285,7 @@ const ValuationPage: React.FC = () => {
                 </div>
 
                 {/* Confidence + Stats */}
-                <div className="grid grid-cols-4 divide-x divide-gray-100 border-y border-gray-100">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-4 sm:gap-y-0 sm:divide-x divide-gray-100 border-y border-gray-100 py-4 bg-gray-50/50">
                   <div className="p-4 text-center">
                     <div className="w-10 h-10 rounded-full mx-auto mb-1.5 flex items-center justify-center" style={{ border: `3px solid ${confidenceColor(result.confidence)}` }}>
                       <span className="text-xs font-bold" style={{ color: confidenceColor(result.confidence) }}>{result.confidence}%</span>
@@ -293,15 +293,15 @@ const ValuationPage: React.FC = () => {
                     <p className="text-[10px] text-gray-400 font-medium">Độ tin cậy</p>
                     <p className="text-[10px] font-semibold" style={{ color: confidenceColor(result.confidence) }}>{confidenceLabel(result.confidence)}</p>
                   </div>
-                  <div className="p-4 text-center">
+                  <div className="p-4 text-center flex flex-col justify-center">
                     <p className="text-lg font-bold text-gray-900">{result.comparableCount}</p>
                     <p className="text-[10px] text-gray-400 font-medium">BĐS so sánh</p>
                   </div>
-                  <div className="p-4 text-center">
+                  <div className="p-4 text-center flex flex-col justify-center">
                     <p className="text-lg font-bold text-gray-900">{formatVND(result.medianPricePerSqm)}</p>
                     <p className="text-[10px] text-gray-400 font-medium">Giá/m² (Median)</p>
                   </div>
-                  <div className="p-4 text-center">
+                  <div className="p-4 text-center flex flex-col justify-center">
                     <p className="text-lg font-bold text-gray-900">{result.ageFactor}%</p>
                     <p className="text-[10px] text-gray-400 font-medium">Hệ số tuổi</p>
                   </div>

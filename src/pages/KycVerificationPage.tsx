@@ -356,7 +356,7 @@ const KycVerificationPage: React.FC = () => {
                 return (
                   <div className="mt-4 bg-blue-50 rounded-xl border border-blue-200 p-3">
                     <p className="text-xs font-semibold text-blue-800 mb-2 flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5" /> {t('kyc.validCccd')}</p>
-                    <div className="grid grid-cols-3 gap-2 text-xs text-blue-700">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-blue-700">
                       <div><span className="text-blue-400">{t('kyc.issuePlace')}</span> <strong>{v.province}</strong></div>
                       <div><span className="text-blue-400">{t('kyc.gender')}</span> <strong>{v.gender}</strong></div>
                       <div><span className="text-blue-400">{t('kyc.birthYear')}</span> <strong>{v.birthYear}</strong></div>
