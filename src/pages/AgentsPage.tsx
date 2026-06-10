@@ -40,86 +40,90 @@ const AgentCard: React.FC<AgentCardProps> = ({ agent }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
-      <div className="flex items-start gap-x-4">
-        <div className="relative">
+    <div className="bg-white rounded-xl shadow-sm hover:shadow-md border border-gray-100 transition-all p-5 sm:p-6">
+      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+        {/* Avatar Container */}
+        <div className="relative flex-shrink-0">
           <img
             src={agent.avatar}
             alt={agent.fullName}
-            className="w-20 h-20 rounded-full object-cover"
+            className="w-20 h-20 rounded-full object-cover shadow-sm border border-gray-100"
           />
           {agent.isOnline && (
-            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
-              <div className="w-2 h-2 bg-white rounded-full"></div>
+            <div className="absolute bottom-0 right-0 w-5 h-5 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+              <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
             </div>
           )}
           {agent.isVerified && (
-            <div className="absolute -top-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+            <div className="absolute top-0 right-0 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
               <Award className="w-3 h-3 text-white" />
             </div>
           )}
         </div>
 
-        <div className="flex-1">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-xl font-semibold text-gray-900">{agent.fullName}</h3>
-            <div className="flex items-center">
+        {/* Content Section */}
+        <div className="flex-1 w-full text-center sm:text-left">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+            <h3 className="text-lg font-semibold text-gray-900">{agent.fullName}</h3>
+            <div className="flex items-center justify-center sm:justify-start gap-1">
               <Star className="w-4 h-4 text-yellow-400 fill-current" />
-              <span className="ml-1 text-sm font-medium text-gray-900">
+              <span className="text-sm font-medium text-gray-900">
                 {agent.rating}
               </span>
-              <span className="ml-1 text-sm text-gray-500">
+              <span className="text-xs text-gray-500">
                 ({agent.reviewCount} đánh giá)
               </span>
             </div>
           </div>
 
-          <div className="flex items-center text-sm text-gray-600 mb-2">
-            <Building className="w-4 h-4 mr-1" />
-            <span>{agent.agency?.name}</span>
-            <span className="mx-2">•</span>
-            <Calendar className="w-4 h-4 mr-1" />
-            <span>{agent.experience} năm kinh nghiệm</span>
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-2 gap-y-1 text-sm text-gray-600 mb-2">
+            <span className="flex items-center">
+              <Building className="w-4 h-4 mr-1 text-gray-400" />
+              {agent.agency?.name}
+            </span>
+            <span className="hidden sm:inline text-gray-300">•</span>
+            <span className="flex items-center">
+              <Calendar className="w-4 h-4 mr-1 text-gray-400" />
+              {agent.experience} năm kinh nghiệm
+            </span>
           </div>
 
-          <div className="flex items-center text-sm text-gray-600 mb-3">
-            <MapPin className="w-4 h-4 mr-1" />
-            <span>{agent.workingAreas.map(area => getLocationLabel(area)).join(', ')}</span>
+          <div className="flex items-center justify-center sm:justify-start text-sm text-gray-600 mb-3">
+            <MapPin className="w-4 h-4 mr-1 text-gray-400 flex-shrink-0" />
+            <span className="line-clamp-1">{agent.workingAreas.map(area => getLocationLabel(area)).join(', ')}</span>
           </div>
 
-          <p className="text-gray-700 text-sm mb-4 line-clamp-2">
+          <p className="text-gray-650 text-sm mb-4 line-clamp-2 leading-relaxed">
             {agent.description}
           </p>
 
-          <div className="flex flex-wrap gap-2 mb-4">
+          <div className="flex flex-wrap justify-center sm:justify-start gap-1.5 mb-4">
             {agent.specialties.map((specialty) => (
               <span
                 key={specialty}
-                className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium"
+                className="bg-orange-50 text-orange-700 px-2.5 py-0.5 rounded-full text-xs font-medium border border-orange-100"
               >
                 {getSpecialtyLabel(specialty)}
               </span>
             ))}
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-x-4 text-sm text-gray-600">
-              <div className="flex items-center">
-                <Users className="w-4 h-4 mr-1" />
-                <span>{agent.totalSales} giao dịch</span>
-              </div>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-gray-50">
+            <div className="flex items-center justify-center sm:justify-start gap-1 text-sm text-gray-600">
+              <Users className="w-4 h-4 text-gray-400" />
+              <span>{agent.totalSales} giao dịch</span>
             </div>
 
-            <div className="flex gap-x-2">
-              <button className="p-2 text-[#4b5563] hover:text-orange-600 hover:bg-orange-50 rounded-full transition-colors">
+            <div className="flex items-center justify-center gap-2">
+              <button className="p-2 text-[#4b5563] hover:text-orange-600 hover:bg-orange-50 rounded-full transition-colors border border-gray-100">
                 <Phone className="w-4 h-4" />
               </button>
-              <button className="p-2 text-[#4b5563] hover:text-orange-600 hover:bg-orange-50 rounded-full transition-colors">
+              <button className="p-2 text-[#4b5563] hover:text-orange-600 hover:bg-orange-50 rounded-full transition-colors border border-gray-100">
                 <Mail className="w-4 h-4" />
               </button>
               <Link
                 to={`/agents/${agent.id}`}
-                className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm font-medium"
+                className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm font-medium shadow-sm"
               >
                 Xem chi tiết
               </Link>
@@ -268,16 +272,23 @@ const AgentsPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Search */}
             <div>
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+              <div className="relative flex items-center">
+                <Search className="absolute left-3 h-5 w-5 text-gray-400" />
                 <input
                   type="text"
                   placeholder="Tìm kiếm môi giới..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyPress={(e) => e.key === t('common.enter') && handleSearch()}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="w-full pl-10 pr-20 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 />
+                <button
+                  type="button"
+                  onClick={handleSearch}
+                  className="absolute right-1 px-3 py-1 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition text-xs font-semibold"
+                >
+                  Tìm kiếm
+                </button>
               </div>
             </div>
 
