@@ -94,12 +94,12 @@ const PropertyManagement: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">{t('admin.menu.properties')}</h1>
           <p className="text-sm text-gray-500 mt-1">Manage all properties in the system</p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+        <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors w-max">
           <Plus className="w-4 h-4" />
           Add Property
         </button>
@@ -108,7 +108,7 @@ const PropertyManagement: React.FC = () => {
       {/* Toolbar */}
       <div className="bg-white rounded-xl shadow-md p-4">
         <div className="flex flex-wrap items-center gap-4">
-          <div className="flex-1 min-w-[300px]">
+          <div className="w-full md:min-w-[300px] md:flex-1">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input

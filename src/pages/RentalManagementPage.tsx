@@ -178,65 +178,122 @@ const RentalManagementPage: React.FC = () => {
               <p className="text-gray-500">Chưa có dữ liệu cho mục này.</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-gray-50 border-b border-gray-100">
-                    <th className="p-4 text-sm font-medium text-gray-500">Bất động sản</th>
-                    <th className="p-4 text-sm font-medium text-gray-500">Người thuê</th>
-                    <th className="p-4 text-sm font-medium text-gray-500">Số tiền</th>
-                    <th className="p-4 text-sm font-medium text-gray-500">Hạn chót</th>
-                    <th className="p-4 text-sm font-medium text-gray-500">Trạng thái</th>
-                    <th className="p-4 text-sm font-medium text-gray-500 text-right">Thao tác</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {filteredPayments.map(payment => (
-                    <tr key={payment.id} className="hover:bg-gray-50/50">
-                      <td className="p-4">
-                        <p className="font-semibold text-gray-900 line-clamp-1">{payment.propertyTitle}</p>
+            <>
+              {/* Card List for Mobile */}
+              <div className="block md:hidden divide-y divide-gray-100">
+                {filteredPayments.map(payment => (
+                  <div key={payment.id} className="p-4 space-y-3 bg-white hover:bg-gray-50/50">
+                    <div className="flex justify-between items-start gap-2">
+                      <div>
+                        <p className="font-semibold text-gray-900 line-clamp-2">{payment.propertyTitle}</p>
                         <p className="text-xs text-gray-500 mt-1">{payment.description}</p>
-                      </td>
-                      <td className="p-4">
-                        <span className="text-sm font-medium text-gray-700">{payment.tenantName || 'Khách vãng lai'}</span>
-                      </td>
-                      <td className="p-4">
-                        <span className="font-bold text-red-600">{payment.amount.toLocaleString()} VNĐ</span>
-                      </td>
-                      <td className="p-4">
-                        <span className="text-sm text-gray-600 flex items-center gap-1">
-                          <Calendar className="w-3.5 h-3.5" /> 
-                          <span suppressHydrationWarning>{new Date(payment.dueDate).toLocaleDateString('vi-VN')}</span>
-                        </span>
-                      </td>
-                      <td className="p-4" suppressHydrationWarning>
+                      </div>
+                      <div suppressHydrationWarning>
                         {getStatusBadge(payment.status)}
-                      </td>
-                      <td className="p-4 text-right">
-                        <div className="flex justify-end gap-2">
-                          {payment.status !== 'PAID' && (
-                            <button 
-                              onClick={() => handleMarkAsPaid(payment.id)}
-                              className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition"
-                              title="Xác nhận đã thu tiền"
-                            >
-                              <CheckCircle2 className="w-5 h-5" />
-                            </button>
-                          )}
-                          <button 
-                            onClick={() => handleDelete(payment.id)}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
-                            title="Xóa hóa đơn"
-                          >
-                            <Trash2 className="w-5 h-5" />
-                          </button>
-                        </div>
-                      </td>
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-500">Người thuê:</span>
+                      <span className="font-medium text-gray-700">{payment.tenantName || 'Khách vãng lai'}</span>
+                    </div>
+
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-500">Số tiền:</span>
+                      <span className="font-bold text-red-600">{payment.amount.toLocaleString()} VNĐ</span>
+                    </div>
+
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-500">Hạn chót:</span>
+                      <span className="text-gray-600 flex items-center gap-1">
+                        <Calendar className="w-3.5 h-3.5" /> 
+                        <span suppressHydrationWarning>{new Date(payment.dueDate).toLocaleDateString('vi-VN')}</span>
+                      </span>
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-2 border-t border-gray-50">
+                      {payment.status !== 'PAID' && (
+                        <button 
+                          onClick={() => handleMarkAsPaid(payment.id)}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-xs font-semibold hover:bg-green-100 transition"
+                          title="Xác nhận đã thu tiền"
+                        >
+                          <CheckCircle2 className="w-4 h-4"/> Xác nhận thu
+                        </button>
+                      )}
+                      <button 
+                        onClick={() => handleDelete(payment.id)}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-50 text-red-700 rounded-lg text-xs font-semibold hover:bg-red-100 transition"
+                        title="Xóa hóa đơn"
+                      >
+                        <Trash2 className="w-4 h-4" /> Xóa
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Table for Desktop */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-gray-50 border-b border-gray-100">
+                      <th className="p-4 text-sm font-medium text-gray-500">Bất động sản</th>
+                      <th className="p-4 text-sm font-medium text-gray-500">Người thuê</th>
+                      <th className="p-4 text-sm font-medium text-gray-500">Số tiền</th>
+                      <th className="p-4 text-sm font-medium text-gray-500">Hạn chót</th>
+                      <th className="p-4 text-sm font-medium text-gray-500">Trạng thái</th>
+                      <th className="p-4 text-sm font-medium text-gray-500 text-right">Thao tác</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {filteredPayments.map(payment => (
+                      <tr key={payment.id} className="hover:bg-gray-50/50">
+                        <td className="p-4">
+                          <p className="font-semibold text-gray-900 line-clamp-1">{payment.propertyTitle}</p>
+                          <p className="text-xs text-gray-500 mt-1">{payment.description}</p>
+                        </td>
+                        <td className="p-4">
+                          <span className="text-sm font-medium text-gray-700">{payment.tenantName || 'Khách vãng lai'}</span>
+                        </td>
+                        <td className="p-4">
+                          <span className="font-bold text-red-600">{payment.amount.toLocaleString()} VNĐ</span>
+                        </td>
+                        <td className="p-4">
+                          <span className="text-sm text-gray-600 flex items-center gap-1">
+                            <Calendar className="w-3.5 h-3.5" /> 
+                            <span suppressHydrationWarning>{new Date(payment.dueDate).toLocaleDateString('vi-VN')}</span>
+                          </span>
+                        </td>
+                        <td className="p-4" suppressHydrationWarning>
+                          {getStatusBadge(payment.status)}
+                        </td>
+                        <td className="p-4 text-right">
+                          <div className="flex justify-end gap-2">
+                            {payment.status !== 'PAID' && (
+                              <button 
+                                onClick={() => handleMarkAsPaid(payment.id)}
+                                className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition"
+                                title="Xác nhận đã thu tiền"
+                              >
+                                <CheckCircle2 className="w-5 h-5" />
+                              </button>
+                            )}
+                            <button 
+                              onClick={() => handleDelete(payment.id)}
+                              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+                              title="Xóa hóa đơn"
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </div>
       </div>
