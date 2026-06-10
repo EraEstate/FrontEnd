@@ -212,11 +212,23 @@ const NeighborhoodReviewsPage: React.FC = () => {
                   {review.likesCount || 0}
                 </button>
               </div>
-              <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                <p className="text-sm text-gray-700">Tong the: {review.overallRating}/5</p>
-                <p className="text-sm text-gray-700">An ninh: {review.safetyRating}/5</p>
-                <p className="text-sm text-gray-700">Tien ich: {review.amenitiesRating}/5</p>
-                <p className="text-sm text-gray-700">Giao thong: {review.transportRating}/5</p>
+              <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3 bg-gray-50/50 rounded-xl p-3 border border-gray-100">
+                <div className="flex flex-col sm:items-center">
+                  <span className="text-[10px] text-gray-400 uppercase tracking-wider">Tổng thể</span>
+                  <span className="text-sm font-bold text-gray-800 flex items-center gap-1 mt-0.5"><Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" /> {review.overallRating}/5</span>
+                </div>
+                <div className="flex flex-col sm:items-center">
+                  <span className="text-[10px] text-gray-400 uppercase tracking-wider">An ninh</span>
+                  <span className="text-sm font-bold text-gray-800 flex items-center gap-1 mt-0.5"><Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" /> {review.safetyRating}/5</span>
+                </div>
+                <div className="flex flex-col sm:items-center">
+                  <span className="text-[10px] text-gray-400 uppercase tracking-wider">Tiện ích</span>
+                  <span className="text-sm font-bold text-gray-800 flex items-center gap-1 mt-0.5"><Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" /> {review.amenitiesRating}/5</span>
+                </div>
+                <div className="flex flex-col sm:items-center">
+                  <span className="text-[10px] text-gray-400 uppercase tracking-wider">Giao thông</span>
+                  <span className="text-sm font-bold text-gray-800 flex items-center gap-1 mt-0.5"><Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" /> {review.transportRating}/5</span>
+                </div>
               </div>
               <p className="mt-3 rounded-xl bg-gray-50 p-3 text-sm text-gray-700">{review.comment || 'Khong co binh luan.'}</p>
             </article>

@@ -212,7 +212,7 @@ const PropertyReviewSection: React.FC<Props> = ({ propertyId }) => {
             </div>
 
             {/* Sub ratings row */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <p className="text-xs text-gray-500">Vị trí</p>
                 <StarRating value={formData.locationRating || 0} onChange={(v) => setFormData(p => ({ ...p, locationRating: v }))} size="sm" />

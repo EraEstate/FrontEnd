@@ -132,7 +132,7 @@ const MortgageCalculator: React.FC<Props> = ({ propertyPrice, isRent }) => {
         </div>
 
         {/* Pie + Legend */}
-        <div className="flex items-center gap-4 mb-4">
+        <div className="flex flex-col sm:flex-row items-center gap-4 mb-4">
           <div className="w-32 h-32 shrink-0">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -143,7 +143,7 @@ const MortgageCalculator: React.FC<Props> = ({ propertyPrice, isRent }) => {
               </PieChart>
             </ResponsiveContainer>
           </div>
-          <div className="flex-1 space-y-3">
+          <div className="w-full sm:flex-1 space-y-3">
             <div className="flex items-center gap-2.5">
               <span className="w-3 h-3 rounded-sm bg-red-500 shrink-0" />
               <div className="flex-1">
