@@ -514,23 +514,23 @@ const PostPropertyPage: React.FC = () => {
   }
 
   const renderStepIndicator = () => (
-    <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-      <div className="flex items-center justify-between">
+    <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-8 overflow-x-auto">
+      <div className="flex items-center justify-between w-full min-w-[320px]">
         {steps.map((step, index) => (
-          <div key={step.id} className="flex items-center">
-            <div className={`flex items-center justify-center w-10 h-10 rounded-full ${
+          <div key={step.id} className={`flex items-center ${index < steps.length - 1 ? 'flex-1' : ''}`}>
+            <div className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full shrink-0 text-sm sm:text-base font-semibold ${
               currentStep >= step.id 
                 ? 'bg-red-600 text-white' 
                 : 'bg-gray-200 text-gray-600'
             }`}>
               {currentStep > step.id ? (
-                <CheckCircle className="w-5 h-5" />
+                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
               ) : (
                 <span>{step.id}</span>
               )}
             </div>
             {index < steps.length - 1 && (
-              <div className={`h-1 w-16 mx-4 ${
+              <div className={`h-1 mx-2 sm:mx-4 flex-1 ${
                 currentStep > step.id ? 'bg-red-600' : 'bg-gray-200'
               }`} />
             )}
@@ -538,10 +538,10 @@ const PostPropertyPage: React.FC = () => {
         ))}
       </div>
       <div className="mt-4 text-center">
-        <h3 className="text-lg font-semibold text-gray-900">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900">
           {steps[currentStep - 1].title}
         </h3>
-        <p className="text-gray-600">
+        <p className="text-xs sm:text-sm text-gray-600">
           {steps[currentStep - 1].description}
         </p>
       </div>
